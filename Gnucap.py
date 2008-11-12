@@ -1,13 +1,7 @@
 from __future__ import with_statement
 from Signal import Signal
 import os.path
-
-class LoadFileError():
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return "File error :", value
+from ExceptErrors import *
 
 class Gnucap:
     # Get signals from line
