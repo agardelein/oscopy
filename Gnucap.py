@@ -1,11 +1,15 @@
 from __future__ import with_statement
 from Signal import Signal
-import os.path
-from ExceptErrors import *
+from BaseFileType import *
 
-class Gnucap:
+class Gnucap(BaseFileType):
     # Get signals from line
-    def getsiglist(self, names, f):
+    def getsiglist(self, f):
+        
+        with open(f) as fil:
+            names = fil.readline()
+        names = names.lstrip('#')
+
         slist = []
         nlist = names.split()
         domain = nlist.pop(0)
@@ -22,17 +26,4 @@ class Gnucap:
                 if i!='(' and i!= ')': s.name = s.name + i
             slist.append(s)
         return slist
-            
-    # Read the variable list from file
-    def loadfile(self, fi):
-        if fi == "":
-            raise LoadFileError("No file specified")
-        if not os.path.exists(fi):
-            raise LoadFileError("File do not exist")
-        if not os.path.isfile(fi):
-            raise LoadFileError("File is not a file")
 
-        with open(fi) as f:
-            s = f.readline()
-            s = s.lstrip('#')
-        return self.getsiglist(s, file)
