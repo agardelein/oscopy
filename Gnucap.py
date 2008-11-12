@@ -1,5 +1,13 @@
 from __future__ import with_statement
 from Signal import Signal
+import os.path
+
+class LoadFileError():
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return "File error :", value
 
 class Gnucap:
     # Get signals from line
@@ -23,9 +31,13 @@ class Gnucap:
             
     # Read the variable list from file
     def loadfile(self, fi):
-        if file == "":
-            print "load: no file specified"
-            return False
+        if fi == "":
+            raise LoadFileError("No file specified")
+        if not os.path.exists(fi):
+            raise LoadFileError("File do not exist")
+        if not os.path.isfile(fi):
+            raise LoadFileError("File is not a file")
+
         with open(fi) as f:
             s = f.readline()
             s = s.lstrip('#')

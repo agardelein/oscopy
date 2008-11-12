@@ -53,5 +53,8 @@ while True:
     except EOFError:
         break
 
+    except LoadFileError, e:
+        print "Error in loadfile :", e.value
+
 byebye()
 
