@@ -47,7 +47,7 @@ class HelloWorld:
     def main(self):
         gtk.main()
 
-def myplot():
+def myplot(args):
     t = arange(0.0, 2.0, 0.01)
     s = sin(2*pi*t)
     xscale('log')
@@ -59,7 +59,7 @@ def myplot():
     grid(True)
     show()
 
-def myline():
+def myline(args):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set_title('Click to build line segments')
@@ -67,7 +67,7 @@ def myline():
     linebuilder = LineBuilder(line)
     plt.show()
 
-def hi():
+def myhi(args):
     print __name__
     if __name__ == "Examples":
         hello = HelloWorld()

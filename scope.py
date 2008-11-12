@@ -5,17 +5,10 @@ import readline
 from Examples import *
 from Cmd import *
 
-def byebye():
-    readline.write_history_file(hist_file)
-    exit
-
 # Readline configuration
 hist_file = ".scope_history"
 readline.read_history_file(hist_file)
 
-str = "Hello World !"
-print str
-slist = [] ;
 # Prompt
 p = "scope> "
 
@@ -32,29 +25,27 @@ while True:
             cmd = inp
             args = ""
             
-        # Dispatch command
+        # End of program
         if cmd == "exit" or cmd == "quit":
             break
-        if cmd == "load":
-            load(args)
-            continue
-                
-        if cmd == "hi":
-            hi()
-                
-        if cmd == "plot":
-            myplot()
-            continue
 
-        if cmd == "line":
-            myline()
-            continue
-            
+        # Evaluate the command
+        eval(cmd + "(args)")
+        continue
+
     except EOFError:
         break
+
+    except NameError:
+        print "Unknown command"
+        continue
+
+    except SyntaxError:
+        print "Syntax Error"
+        continue
 
     except LoadFileError, e:
         print "Error in loadfile :", e.value
 
-byebye()
+readline.write_history_file(hist_file)
 
