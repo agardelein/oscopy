@@ -11,6 +11,7 @@ readline.read_history_file(hist_file)
 
 # Prompt
 p = "scope> "
+cmds = Cmds()
 
 # Main loop
 while True:
@@ -30,11 +31,15 @@ while True:
             break
 
         # Evaluate the command
-        eval(cmd + "(args)")
+        eval("cmds." + cmd + "(args)")
         continue
 
     except EOFError:
         break
+
+    except AttributeError:
+        print "Unknown command..."
+        continue
 
     except NameError:
         print "Unknown command"
