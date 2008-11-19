@@ -1,13 +1,13 @@
 from Gnucap import *
 from Signal import *
 from Figure import *
+import matplotlib.pyplot as plt
 
 
 class Cmds:
-    a = -1
     figs = []
     curfig = 0
-    sigs = []
+    sigs = {}
     files = []
     
     def __init__(self):
@@ -15,26 +15,44 @@ class Cmds:
 
     # Load a file
     def load(self, args):
-        for s in self.files:
-            if s == args:
-                print "Already here"
-                return
+        # File already loaded ?
+        if args in self.files:
+            print "File already loaded"
+            return
+            
         obj = Gnucap() # for now only Gnucap is supported
-        self.sigs.extend(obj.loadfile(args))
+        self.sigs = obj.loadfile(args)
         print args, ":"
-        for ns in self.sigs:
-            print ns.name, "/", ns.domain
+        for ns, si in self.sigs.iteritems():
+            print si
         self.files.append(args)
+#        self.filetype[args] = obj
 
     # Plot signals
     def plot(self, args):
+        print "plot"
+        toplot = []
+        # Are there signals to plot ?
         if self.sigs == []:
             print "No signal loaded"
             return
-        self.a = self.a + 1
-        print "plot " + str(self.a)
+
+        # Prepare the signal list
+        for s in args.split(","):
+            s = s.strip()
+            if s in self.sigs:
+                toplot.append(s)
+            else:
+                print s + ": Not here"
+
+        # No signals found
+        if len(toplot) < 1:
+            print "No signals found"
+            return
+
+        # Can now prepare the plot
         if self.figs == []:
-            self.new()
+            self.new(toplot)
 
     # List of figures
     def list(self, args):
@@ -43,11 +61,12 @@ class Cmds:
             f.list()
 
     # Create a new figure, set it as current
-    def new(self):
+    def new(self, toplot):
         print "newfig"
-        self.curfig = Figure()
+        self.curfig = Figure(toplot)
         self.figs.append(self.curfig)
 
+    # List signals
     def siglist(self, args):
-        for s in self.sigs:
+        for n, s in self.sigs.iteritems():
             print s

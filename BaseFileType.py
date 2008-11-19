@@ -11,3 +11,4 @@ class BaseFileType:
         if not os.path.isfile(fi):
             raise LoadFileError("File is not a file")
         return self.getsiglist(fi)
+

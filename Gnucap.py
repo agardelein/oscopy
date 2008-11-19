@@ -3,27 +3,35 @@ from Signal import Signal
 from BaseFileType import *
 
 class Gnucap(BaseFileType):
-    # Get signals from line
-    def getsiglist(self, f):
-        
-        with open(f) as fil:
-            names = fil.readline()
-        names = names.lstrip('#')
-
+    # Get signals from first line
+    # Abscisse is first read as a signal then assigned to signals
+    def getsiglist(self, fn):
+        firstline = 1
+        sdict = {}
         slist = []
-        nlist = names.split()
-        domain = nlist.pop(0)
-        for name in nlist:
-            s = Signal()
-            s.domain = domain
-            s.origfile = f
-            # Original signal name
-            s.origname = name
-            # Signal name
-            s.name = ""
-            # Remove parenthesis from name
-            for i in name.strip():
-                if i!='(' and i!= ')': s.name = s.name + i
-            slist.append(s)
-        return slist
+        fil = open(fn)
+        for names in fil:
+            if firstline == 1:
+                # Get signal names from first line, remove leading "#"
+                firstline = 0
+                nlist = names.lstrip('#').split()
+                for name in nlist:
+                    tmp = ""
+                    for i in name.strip():
+                        if i!='(' and i!= ')': tmp = tmp + i
+                    s = Signal(tmp, fn, name)
+                    s.pts = []
+                    slist.append(s)
+            else:
+                # Read values and assign to signals
+                vallist = names.split()
+                for i, v in enumerate(vallist):
+                    slist[i].pts.append(v)
 
+        # Assign abscisse to signals
+        ref = slist.pop(0)
+        for s in slist:
+            s.ref = ref
+            sdict[s.name] = s
+        fil.close()
+        return sdict

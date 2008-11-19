@@ -37,13 +37,13 @@ while True:
     except EOFError:
         break
 
-    except AttributeError:
-        print "Unknown command..."
-        continue
+#    except AttributeError:
+#        print "Unknown command..."
+#        continue
 
-    except NameError:
-        print "Unknown command"
-        continue
+#    except NameError:
+#        print "Unknown command"
+#        continue
 
     except SyntaxError:
         print "Syntax Error"
