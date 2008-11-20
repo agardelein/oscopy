@@ -2,7 +2,7 @@ from __future__ import with_statement
 from Signal import Signal
 from BaseFileType import *
 
-class Gnucap(BaseFileType):
+class GnucapReader(BaseFileType):
     # Get signals from first line
     # Abscisse is first read as a signal then assigned to signals
     def getsiglist(self, fn):

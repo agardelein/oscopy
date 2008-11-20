@@ -1,4 +1,4 @@
-from Gnucap import *
+from GnucapReader import *
 from Signal import *
 from Figure import *
 import matplotlib.pyplot as plt
@@ -20,7 +20,7 @@ class Cmds:
             print "File already loaded"
             return
             
-        obj = Gnucap() # for now only Gnucap is supported
+        obj = GnucapReader() # for now only Gnucap is supported
         self.sigs = obj.loadfile(args)
         print args, ":"
         for ns, si in self.sigs.iteritems():
