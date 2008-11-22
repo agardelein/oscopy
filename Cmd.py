@@ -8,8 +8,7 @@ class Cmds:
     figs = []
     curfig = 0
     sigs = {}
-    files = []
-    readers = []
+    readers = {}
     
     def __init__(self):
         self.a = 0
@@ -17,25 +16,23 @@ class Cmds:
     # Load a file, do not handle signals with same name
     def load(self, args):
         # File already loaded ?
-        if args in self.files:
+        if args in self.readers.keys():
             print "File already loaded"
             return
             
-        obj = GnucapReader() # for now only Gnucap is supported
-        sigs = obj.loadfile(args)
+        r = GnucapReader() # for now only Gnucap is supported
+        sigs = r.loadfile(args)
         # Insert signals into the list
         for v in sigs.keys():
             self.sigs[v] = sigs[v]
         print args, ":"
         for ns, si in self.sigs.iteritems():
             print si
-        self.files.append(args)
-        self.readers.append(obj)
+        self.readers[args] = r
 
     def update(self, args):
-        for v in self.readers:
-            print "Updating", v
-            sigs, u, d, n = v.update()
+        for v in self.readers.keys():
+            sigs, u, d, n = self.readers[v].update()
             for s in u:
                 self.sigs[s] = sigs[s]
             for s in n:

@@ -25,7 +25,7 @@ class ReaderBase:
         d = []
         n = []
         old = {}
-        # Old signal name list
+        # Old signal list
         for s in self.slist:
             old[s.name] = s
 
@@ -42,21 +42,10 @@ class ReaderBase:
             else:
                 # delete signal
                 d.append(s)
-
         # Go through the new list
         for s in sdict.keys():
             # Signal not in the old list
             if not old.has_key(s):
                 #   then add
                 n.append(s)
-                
-        print "Updated signals"
-        for v in u:
-            print v
-        print "New signals"
-        for v in n:
-            print v
-        print "Deleted signals"
-        for v in d:
-            print v
         return sdict, u, d, n
