@@ -9,11 +9,12 @@ class Cmds:
     curfig = 0
     sigs = {}
     files = []
+    readers = []
     
     def __init__(self):
         self.a = 0
 
-    # Load a file
+    # Load a file, do not handle signals with same name
     def load(self, args):
         # File already loaded ?
         if args in self.files:
@@ -21,11 +22,26 @@ class Cmds:
             return
             
         obj = GnucapReader() # for now only Gnucap is supported
-        self.sigs = obj.loadfile(args)
+        sigs = obj.loadfile(args)
+        # Insert signals into the list
+        for v in sigs.keys():
+            self.sigs[v] = sigs[v]
         print args, ":"
         for ns, si in self.sigs.iteritems():
             print si
         self.files.append(args)
+        self.readers.append(obj)
+
+    def update(self, args):
+        for v in self.readers:
+            print "Updating", v
+            sigs, u, d, n = v.update()
+            for s in u:
+                self.sigs[s] = sigs[s]
+            for s in n:
+                self.sigs[s] = sigs[s]
+            for s in d:
+                del self.sigs[s]
 
     # Plot signals
     def plot(self, args):

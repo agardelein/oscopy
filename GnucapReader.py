@@ -6,6 +6,7 @@ class GnucapReader(ReaderBase):
     # Get signals from first line
     # Abscisse is first read as a signal then assigned to signals
     def getsiglist(self):
+        self.slist = []
         sdict = {}
         fil = open(self.fn)
 
@@ -31,7 +32,3 @@ class GnucapReader(ReaderBase):
             s.ref = ref
             sdict[s.name] = s
         return sdict
-
-    def update(self):
-        old_slist = self.slist
-        return

@@ -17,3 +17,46 @@ class ReaderBase:
 
     def __str__(self):
         return self.fn
+
+    # Re-read the data file
+    # Return signal list and names of updated, deleted and new signals
+    def update(self):
+        u = []
+        d = []
+        n = []
+        old = {}
+        # Old signal name list
+        for s in self.slist:
+            old[s.name] = s
+
+        # New signal list
+        sdict = self.getsiglist()
+
+        # Find updated signals
+        # Go through the old list
+        for s in old.keys():
+            # Signal in the new list
+            if sdict.has_key(s):
+                # update signal
+                u.append(s)
+            else:
+                # delete signal
+                d.append(s)
+
+        # Go through the new list
+        for s in sdict.keys():
+            # Signal not in the old list
+            if not old.has_key(s):
+                #   then add
+                n.append(s)
+                
+        print "Updated signals"
+        for v in u:
+            print v
+        print "New signals"
+        for v in n:
+            print v
+        print "Deleted signals"
+        for v in d:
+            print v
+        return sdict, u, d, n
