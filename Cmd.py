@@ -1,8 +1,6 @@
 from GnucapReader import *
 from Signal import *
 from Figure import *
-import matplotlib.pyplot as plt
-
 
 class Cmds:
     figs = []
@@ -52,8 +50,8 @@ class Cmds:
         # Prepare the signal list
         for s in args.split(","):
             s = s.strip()
-            if s in self.sigs:
-                toplot.append(s)
+            if s in self.sigs.keys():
+                toplot.append(self.sigs[s])
             else:
                 print s + ": Not here"
 
@@ -65,6 +63,7 @@ class Cmds:
         # Can now prepare the plot
         if self.figs == []:
             self.new(toplot)
+        self.curfig.plot(toplot)
 
     # List of figures
     def list(self, args):

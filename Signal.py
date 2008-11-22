@@ -13,7 +13,7 @@ class Signal:
         self.pts = []
 
     def __str__(self):
-        a = self.name + " / (" + str(self.reader) + ") "
+        a = self.name + " / " + (self.ref.name) + " (" + str(self.reader) + ") "
         b = ""
         if len(self.pts) > 10:
             for i in range(0, 9):
