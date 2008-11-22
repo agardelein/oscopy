@@ -16,6 +16,6 @@ class Signal:
         a = self.name + " / (" + str(self.reader) + ") "
         b = ""
         if len(self.pts) > 10:
-            for i in range(1, 10):
+            for i in range(0, 9):
                 b = b + self.pts[i] + "|"
         return a + b

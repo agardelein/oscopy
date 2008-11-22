@@ -12,8 +12,10 @@ class GnucapReader(ReaderBase):
 
         # Get signal names from first line, remove leading "#"
         def f(c): return c != "(" and c != ")" # remove ()
-        names = fil.readline()
-        nlist = names.lstrip('#').split()
+        for names in fil:
+            nlist = names.lstrip('#').split()
+            break
+
         for name in nlist:
             name = filter(f, name.strip())
             s = Signal(name, self)
