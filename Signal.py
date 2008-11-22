@@ -3,18 +3,17 @@
 # Signals class
 class Signal:
     name = ""     # Identifier for cmdline
-    origfile = "" # Comes from
-    origname = "" # Name as it appear in the file
+    reader = None # Comes from
     pts = []
-    ref = 0       # Abscisse
+    ref = None       # Abscisse
 
-    def __init__(self, name = "", origfile = "", origname = ""):
+    def __init__(self, name = "", reader = None):
         self.name = name
-        self.origfile = origfile
-        self.origname = origname
+        self.reader = reader
+        self.pts = []
 
     def __str__(self):
-        a = self.name + " / " + " (" + self.origfile + ")"
+        a = self.name + " / (" + str(self.reader) + ") "
         b = ""
         for i in range(1, 10):
             b = b + self.pts[i] + "|"

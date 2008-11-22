@@ -1,7 +1,9 @@
 import os.path
 from ExceptErrors import *
 
-class BaseFileType:
+class ReaderBase:
+    fn = ""
+    slist = []
     # Certify the path is valid and is a file
     def loadfile(self, fi):
         if fi == "":
@@ -10,5 +12,8 @@ class BaseFileType:
             raise LoadFileError("File do not exist")
         if not os.path.isfile(fi):
             raise LoadFileError("File is not a file")
-        return self.getsiglist(fi)
+        self.fn = fi
+        return self.getsiglist()
 
+    def __str__(self):
+        return self.fn

@@ -26,7 +26,6 @@ class Cmds:
         for ns, si in self.sigs.iteritems():
             print si
         self.files.append(args)
-#        self.filetype[args] = obj
 
     # Plot signals
     def plot(self, args):
