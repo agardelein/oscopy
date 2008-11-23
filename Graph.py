@@ -44,7 +44,8 @@ class Graph:
 
     def __str__(self):
         a = self.mode + " "
-        for s in self.sigs:
-            a = a + s.name
+        print len(self.sigs)
+        for n, s in self.sigs.iteritems():
+            a = a + n
             a = a + " "
         return a
