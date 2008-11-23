@@ -3,14 +3,12 @@ from Signal import *
 from Figure import *
 
 class Cmds:
-    figs = []
-    curfig = 0
-    sigs = {}
-    readers = {}
-    
     def __init__(self):
-        self.a = 0
-
+        self.curfig = 0
+        self.readers = {}
+        self.figs = []
+        self.sigs = {}
+        
     # Load a file, do not handle signals with same name
     def load(self, args):
         # File already loaded ?
@@ -28,6 +26,7 @@ class Cmds:
             print si
         self.readers[args] = r
 
+    # Update the signals from files
     def update(self, args):
         for v in self.readers.keys():
             sigs, u, d, n = self.readers[v].update()
@@ -38,14 +37,40 @@ class Cmds:
             for s in d:
                 del self.sigs[s]
 
-    # Plot signals
+    # Set the plots
+    def setplot(self, args):
+        toplot = self.gettoplot(args)
+        if toplot == None:
+            return
+        # Can now prepare the plot
+        if self.figs == []:
+            self.new(toplot)
+        else:
+            self.figs[self.curfig].setf(toplot)
+
+    # Plot the signals
     def plot(self, args):
-        print "plot"
+        if self.figs == []:
+            return
+        self.figs[self.curfig].plot()
+
+    # Add a graph to the current figure
+    def addtofig(self, args):
+        if len(self.figs) < 1:
+            self.setplot(args)
+        else:
+            toplot = self.gettoplot(args)
+            if toplot == None:
+                return
+            print "Adding into figure"
+            self.figs[self.curfig].add(toplot)
+
+    def gettoplot(self, args):
         toplot = []
-        # Are there signals to plot ?
+        # Are there signals ?
         if self.sigs == []:
             print "No signal loaded"
-            return
+            return None
 
         # Prepare the signal list
         for s in args.split(","):
@@ -58,24 +83,21 @@ class Cmds:
         # No signals found
         if len(toplot) < 1:
             print "No signals found"
-            return
-
-        # Can now prepare the plot
-        if self.figs == []:
-            self.new(toplot)
-        self.curfig.plot(toplot)
+            return None
+        return toplot
 
     # List of figures
-    def list(self, args):
-        print "list"
+    def figlist(self, args):
+        print "figlist"
         for f in self.figs:
             f.list()
 
     # Create a new figure, set it as current
     def new(self, toplot):
         print "newfig"
-        self.curfig = Figure(toplot)
-        self.figs.append(self.curfig)
+        f = Figure(toplot)
+        self.figs.append(f)
+        self.curfig = 0
 
     # List signals
     def siglist(self, args):
