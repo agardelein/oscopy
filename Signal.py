@@ -2,15 +2,11 @@
 
 # Signals class
 class Signal:
-    name = ""     # Identifier for cmdline
-    reader = None # Comes from
-    pts = []
-    ref = None       # Abscisse
-
     def __init__(self, name = "", reader = None):
-        self.name = name
-        self.reader = reader
-        self.pts = []
+        self.name = name         # Identifier
+        self.reader = reader     # Reader object
+        self.pts = []            # Data points
+        self.ref = None          # Reference signal
 
     def __str__(self):
         a = self.name + " / " + (self.ref.name) + " (" + str(self.reader) + ") "
