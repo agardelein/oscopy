@@ -6,7 +6,7 @@ class Figure:
 
     def __init__(self, sigs = None):
         self.graphs = []
-        self.mode = 0
+        self.mode = "horiz"
         self.curgraph = 0
         if sigs == None:
             return
@@ -15,27 +15,11 @@ class Figure:
 
     # Add a graph into the figure, select the right mode
     def add(self, sigs = None):
-        if self.mode == 3:
-            if len(self.graphs) < 4:
-                gr = Graph(sigs)
-                self.graphs.append(gr)
-                self.setgraph(4)
-                return
-            else:
-                return
-        if self.mode == 0:
-            self.setmode(1)
-            print "Here"
-            gr = Graph(sigs)
-            print "There"
-            self.graphs.append(gr)
-            self.setgraph(1)
+        if len(self.graphs) > 3:
             return
-        if self.mode == 1 or self.mode == 2:
-            self.setmode(3)
-            gr = Graph(sigs)
-            self.graphs.append(gr)
-            self.setgraph(3)
+        gr = Graph(sigs)
+        self.graphs.append(gr)
+        self.setgraph(len(self.graphs))
 
     # Set the signals of the current graph
     def setf(self, sigs = None):
@@ -54,10 +38,31 @@ class Figure:
 
     # Plot the signals
     def plot(self):
+        # Set the number of lines and rows
         if len(self.graphs) < 1:
             return
-        nx = (self.mode >= 2) + 1
-        ny = (self.mode == 1 or self.mode == 3) + 1
+        if self.mode == "horiz":
+            nx = len(self.graphs)
+            ny = 1
+        elif self.mode == "vert":
+            nx = 1
+            ny = len(self.graphs)
+        elif self.mode == "quad":
+            if len(self.graphs) == 1:
+                nx = 1
+                ny = 1
+            elif len(self.graphs) == 2:
+                # For two graphs in quad config, go to horiz
+                nx = 2
+                ny = 1
+            else:
+                nx = 2
+                ny = 2
+        else:
+            nx = 2
+            ny = 2
+
+        # Plot the whole figure
         for i, g in enumerate(self.graphs):
             subplot(nx, ny, i+1)
             hold(True)
@@ -71,12 +76,11 @@ class Figure:
         return
 
     # Define graphical mode :
-    # 0 : one subplot
-    # 1 : two subplots, top/bottom
-    # 2 : two subplots, left/right
-    # 3 : four subplots
-    def setmode(self, mode = 0):
-        if mode >= 0 and mode <= 3:
+    # horiz : graphs are horizontaly aligned
+    # vert  : graphs are verticaly aligned
+    # quad  : graphs are 2 x 2 at maximum
+    def setmode(self, mode = "quad"):
+        if mode == "horiz" or mode == "vert" or mode == "quad":
             self.mode = mode
             return
         else:
@@ -84,23 +88,9 @@ class Figure:
 
     # Select the current graph, depending on current mode
     def setgraph(self, graph = 0):
-        if graph < 0:
+        if graph < 0 or graph > len(self.graphs):
             return
-        if self.mode == 0:
-            self.curgraph = 0
-            return
-        if self.mode == 1 or self.mode == 2:
-            if graph > 1:
-                return
-            else:
-                self.curgraph = graph
-                return
-        if self.mode == 3:
-            if graph > 3:
-                return
-            else:
-                self.curgraph = graph
-                return
+        self.curgraph = graph
 
     # Set the signals into the current graph
     def setsigs(self, sigs = None):
