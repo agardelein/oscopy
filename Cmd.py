@@ -69,6 +69,10 @@ class Cmds:
             print "Adding into figure"
             self.figs[self.curfig].add(toplot)
 
+    def delfromfig(self, args):
+        self.figs[self.curfig].delete(args)
+        return
+
     def gettoplot(self, args):
         toplot = []
         # Are there signals ?

@@ -24,9 +24,12 @@ class Figure:
     # Set the signals of the current graph
     def setf(self, sigs = None):
         self.graphs[self.curgraph].setg(sigs)
-                        
-    def delete(self):
-        a = 0
+
+    # Delete a graph from the figure, default is the first one
+    def delete(self, num = 0):
+        if len(self.graphs) < 1 or eval(num) > len(self.graphs) - 1:
+            return
+        del self.graphs[eval(num)]
 
     def update(self):
         a = 0
