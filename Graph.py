@@ -12,6 +12,7 @@ class Graph:
         # Here signals do exist and are valid
         self.mode = mode
         self.sigs = {}
+        self.xaxis = ""
         if sigs == None:
             return
         else:

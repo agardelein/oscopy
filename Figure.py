@@ -7,7 +7,7 @@ class Figure:
     def __init__(self, sigs = None):
         self.graphs = []
         self.mode = "horiz"
-        self.curgraph = 0
+        self.curgraph = -1
         if sigs == None:
             return
         gr = Graph(sigs)
@@ -30,6 +30,7 @@ class Figure:
         if len(self.graphs) < 1 or eval(num) > len(self.graphs) - 1:
             return
         del self.graphs[eval(num)]
+        ## TODO: Handle self.curgraph
 
     def update(self):
         a = 0
@@ -75,7 +76,6 @@ class Figure:
                 plot(x, y)
             hold(False)
             xlabel(g.xaxis)
-        show()
         return
 
     # Define graphical mode :

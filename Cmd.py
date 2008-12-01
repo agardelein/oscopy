@@ -1,10 +1,14 @@
 from GnucapReader import *
 from Signal import *
 from Figure import *
+#import matplotlib.pyplot as plt
+#from pylab import *
+from pylab import show
+from pylab import figure as pyfig
 
 class Cmds:
     def __init__(self):
-        self.curfig = 0
+        self.curfig = -1
         self.readers = {}
         self.figs = []
         self.sigs = {}
@@ -56,10 +60,13 @@ class Cmds:
     def plot(self, args):
         if self.figs == []:
             return
-        self.figs[self.curfig].plot()
+        for i, f in enumerate(self.figs):
+            pyfig(i + 1)
+            f.plot()
+        show()
 
     # Add a graph to the current figure
-    def addtofig(self, args):
+    def add(self, args):
         if len(self.figs) < 1:
             self.setplot(args)
         else:
@@ -69,10 +76,12 @@ class Cmds:
             print "Adding into figure"
             self.figs[self.curfig].add(toplot)
 
+    # Delete a graph from the current figure
     def delfromfig(self, args):
         self.figs[self.curfig].delete(args)
         return
 
+    # Analyse the signals to plot and prepare the list
     def gettoplot(self, args):
         toplot = []
         # Are there signals ?
@@ -105,9 +114,24 @@ class Cmds:
         print "newfig"
         f = Figure(toplot)
         self.figs.append(f)
-        self.curfig = 0
+        self.curfig = self.curfig + 1
 
     # List signals
     def siglist(self, args):
         for n, s in self.sigs.iteritems():
             print s
+
+    # Delete a figure
+    def delete(self, args):
+        num = eval(args)
+        if num > len(self.figs) or num < 1:
+            return
+        del self.figs[num]
+        ## TODO : what about self.curfig ???
+
+    # Select the current figure
+    def select(self, args):
+        num = eval(args)
+        if num > len(self.figs) or num < 1:
+            return
+        self.curfig = num
