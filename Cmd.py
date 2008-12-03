@@ -9,6 +9,9 @@ from types import *
 
 class Cmds:
     def __init__(self):
+        # self.curfig valid interval: [0..len(self.figs)-1]
+        # There is a shift compared to the number displayed
+        # by matplotlib, i.e. figure 1 is self.figs[0]
         self.curfig = -1
         self.readers = {}
         self.figs = []
@@ -124,7 +127,6 @@ class Cmds:
         f = Figure(toplot)
         self.figs.append(f)
         self.curfig = self.figs.index(f)
-#        self.curfig = self.curfig + 1
 
     # List signals
     def siglist(self, args):
@@ -136,12 +138,17 @@ class Cmds:
         num = eval(args)
         if num > len(self.figs) or num < 1:
             return
-        del self.figs[num]
-        ## TODO : what about self.curfig ???
+        del self.figs[num - 1]
+        # Handle self.curfig. By default, next figure becomes the current
+        if len(self.figs) == 0:
+            self.curfig = -1
+        elif self.curfig > len(self.figs):
+            self.curfig = len(self.figs) - 1
+        print "Curfig : ", self.curfig
 
     # Select the current figure
     def select(self, args):
         num = eval(args)
         if num > len(self.figs) or num < 1:
             return
-        self.curfig = num
+        self.curfig = num - 1
