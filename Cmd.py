@@ -5,6 +5,7 @@ from Figure import *
 #from pylab import *
 from pylab import show
 from pylab import figure as pyfig
+from types import *
 
 class Cmds:
     def __init__(self):
@@ -112,9 +113,18 @@ class Cmds:
     # Create a new figure, set it as current
     def new(self, toplot):
         print "newfig"
+        print len(toplot), "pp"
+        if type(toplot) == StringType:
+            if not toplot == "":
+                toplot = self.gettoplot(toplot)
+            else:
+                toplot = None
+        elif not type(toplot) == ListType:
+            return
         f = Figure(toplot)
         self.figs.append(f)
-        self.curfig = self.curfig + 1
+        self.curfig = self.figs.index(f)
+#        self.curfig = self.curfig + 1
 
     # List signals
     def siglist(self, args):

@@ -68,6 +68,7 @@ class Figure:
 
         # Plot the whole figure
         for i, g in enumerate(self.graphs):
+            print i
             subplot(nx, ny, i+1)
             hold(True)
             for n, s in g.sigs.iteritems():
