@@ -139,7 +139,8 @@ class Cmds:
         if num > len(self.figs) or num < 1:
             return
         del self.figs[num - 1]
-        # Handle self.curfig. By default, next figure becomes the current
+        # Handle self.curfig.
+        # By default, next figure becomes the current
         if len(self.figs) == 0:
             self.curfig = -1
         elif self.curfig > len(self.figs):
