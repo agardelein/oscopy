@@ -30,8 +30,14 @@ class Figure:
         if len(self.graphs) < 1 or eval(num) > len(self.graphs) - 1:
             return
         del self.graphs[eval(num)]
-        ## TODO: Handle self.curgraph
-
+        
+        # Handle self.curgraph
+        # By default, next figure becomes the current
+        if len(self.graphs) == 0:
+            self.curgraph = -1
+        elif self.curgraph > len(self.graphs):
+            self.curgraph = len(self.graphs) - 1
+        print "Curgraph", self.curgraph
     def update(self):
         a = 0
 
