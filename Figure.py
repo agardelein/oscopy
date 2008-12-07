@@ -94,6 +94,7 @@ class Figure:
             self.curgraph = len(self.graphs) - 1
 
     def update(self):
+        # TODO : update
         a = 0
 
     def list(self):
@@ -102,7 +103,6 @@ class Figure:
         for g in self.graphs:
             print g
 
-    # Plot the signals
     def plot(self):
         """ Plot the figure
         First compute the number of subplot and the layout
