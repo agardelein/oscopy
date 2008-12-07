@@ -33,7 +33,7 @@ Figure -- Handle a list of graphs
    setmode(mode)
       Set the layout, either horiz, vert or quad
 
-   setgraph(graphnum)
+   select(graphnum)
       Select the graph to be the default
 
    setsigs(sigs)
@@ -69,7 +69,7 @@ class Figure:
             return
         gr = Graph(sigs)
         self.graphs.append(gr)
-        self.setgraph(len(self.graphs))
+        self.select(len(self.graphs))
 
     def setf(self, sigs = None):
         """ Set the signals of the current graph
@@ -157,7 +157,7 @@ class Figure:
         else:
             return
 
-    def setgraph(self, graph = 0):
+    def select(self, graph = 0):
         """ Select the current graph
         """
         if graph < 0 or graph > len(self.graphs):
