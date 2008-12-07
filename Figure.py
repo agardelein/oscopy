@@ -30,7 +30,7 @@ Figure -- Handle a list of graphs
    plot()
       Plot the figure
 
-   setmode(mode)
+   setlayout(layout)
       Set the layout, either horiz, vert or quad
 
    select(graphnum)
@@ -49,10 +49,10 @@ class Figure:
     def __init__(self, sigs = None):
         """ Create a Figure.
         If a signal list is provided, add a graph with the signal list
-        By default, create an empty list of graph and set the mode to horiz
+        By default, create an empty list of graph and set the layout to horiz
         """
         self.graphs = []
-        self.mode = "horiz"
+        self.layout = "horiz"
         self.curgraph = -1
         if sigs == None:
             return
@@ -111,13 +111,13 @@ class Figure:
         # Set the number of lines and rows
         if len(self.graphs) < 1:
             return
-        if self.mode == "horiz":
+        if self.layout == "horiz":
             nx = len(self.graphs)
             ny = 1
-        elif self.mode == "vert":
+        elif self.layout == "vert":
             nx = 1
             ny = len(self.graphs)
-        elif self.mode == "quad":
+        elif self.layout == "quad":
             if len(self.graphs) == 1:
                 nx = 1
                 ny = 1
@@ -145,14 +145,14 @@ class Figure:
             xlabel(g.xaxis)
         return
 
-    def setmode(self, mode = "quad"):
+    def setlayout(self, layout = "quad"):
         """ Set the layout of the figure, default is quad
         horiz : graphs are horizontaly aligned
         vert  : graphs are verticaly aligned
         quad  : graphs are 2 x 2 at maximum
         """
-        if mode == "horiz" or mode == "vert" or mode == "quad":
-            self.mode = mode
+        if layout == "horiz" or layout == "vert" or layout == "quad":
+            self.layout = layout
             return
         else:
             return

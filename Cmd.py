@@ -57,8 +57,8 @@ class Cmds:
             self.figs[self.curfig].setf(toplot)
 
     # Set the current figure mode
-    def setmode(self, args):
-        self.figs[self.curfig].setmode(args)
+    def layout(self, args):
+        self.figs[self.curfig].setlayout(args)
 
     # Plot the signals
     def plot(self, args):
