@@ -92,7 +92,7 @@ class Figure:
             self.curgraph = -1
         elif self.curgraph > len(self.graphs):
             self.curgraph = len(self.graphs) - 1
-        print "Curgraph", self.curgraph
+
     def update(self):
         a = 0
 
@@ -106,7 +106,7 @@ class Figure:
     def plot(self):
         """ Plot the figure
         First compute the number of subplot and the layout
-        And then really call the plot function
+        And then really call the plot function of each graph
         """
         # Set the number of lines and rows
         if len(self.graphs) < 1:
@@ -134,15 +134,8 @@ class Figure:
 
         # Plot the whole figure
         for i, g in enumerate(self.graphs):
-            print i
             subplot(nx, ny, i+1)
-            hold(True)
-            for n, s in g.sigs.iteritems():
-                x = s.ref.pts
-                y = s.pts
-                plot(x, y)
-            hold(False)
-            xlabel(g.xaxis)
+            g.plot()
         return
 
     def setlayout(self, layout = "quad"):
