@@ -1,3 +1,45 @@
+""" Figure handler
+
+A figure consist of a list of up to 4 graphs, with a layout.
+Signal list are passed directly to each graph.
+Layout can be either all graphs stacked verticaly, horizontaly or in quad
+
+The variable curgraph represent the active graph on which operations setf and setsigs can be done.
+Valitidy interval : 0..3, -1 when the figure is empty.
+
+class:
+
+Figure -- Handle a list of graphs
+
+   methods:
+   __init__(sigs)
+      Create a figure and eventually initialize a graphics with a signal list
+
+   add(sigs)
+      Add a grapth into the figure
+
+   setf(sigs)
+      Set the signals of the current graph
+
+   delete(num)
+      Delete a graph
+
+   list()
+      List the graph of the current figure
+
+   plot()
+      Plot the figure
+
+   setmode(mode)
+      Set the layout, either horiz, vert or quad
+
+   setgraph(graphnum)
+      Select the graph to be the default
+
+   setsigs(sigs)
+      Add signals into the current graph
+"""
+
 from Graph import *
 import matplotlib.pyplot as plt
 from pylab import *
@@ -5,6 +47,10 @@ from pylab import *
 class Figure:
 
     def __init__(self, sigs = None):
+        """ Create a Figure.
+        If a signal list is provided, add a graph with the signal list
+        By default, create an empty list of graph and set the mode to horiz
+        """
         self.graphs = []
         self.mode = "horiz"
         self.curgraph = -1
@@ -13,20 +59,29 @@ class Figure:
         gr = Graph(sigs)
         self.graphs.append(gr)
 
-    # Add a graph into the figure, select the right mode
     def add(self, sigs = None):
+        """ Add a graph into the figure and set it as current graph.
+        Up to four graphs can be plotted on the same figure.
+        Additionnal attemps are ignored.
+        By default, do nothing.
+        """
         if len(self.graphs) > 3:
             return
         gr = Graph(sigs)
         self.graphs.append(gr)
         self.setgraph(len(self.graphs))
 
-    # Set the signals of the current graph
     def setf(self, sigs = None):
+        """ Set the signals of the current graph
+        By default, do nothing
+        """
         self.graphs[self.curgraph].setg(sigs)
 
-    # Delete a graph from the figure, default is the first one
     def delete(self, num = 0):
+        """ Delete a graph from the figure
+        By default, delete the first graph.
+        Act as a "pop" with curgraph variable.
+        """
         if len(self.graphs) < 1 or eval(num) > len(self.graphs) - 1:
             return
         del self.graphs[eval(num)]
@@ -41,13 +96,18 @@ class Figure:
     def update(self):
         a = 0
 
-    # List the graphs
     def list(self):
+        """ List the graphs from the figure
+        """
         for g in self.graphs:
             print g
 
     # Plot the signals
     def plot(self):
+        """ Plot the figure
+        First compute the number of subplot and the layout
+        And then really call the plot function
+        """
         # Set the number of lines and rows
         if len(self.graphs) < 1:
             return
@@ -85,23 +145,26 @@ class Figure:
             xlabel(g.xaxis)
         return
 
-    # Define graphical mode :
-    # horiz : graphs are horizontaly aligned
-    # vert  : graphs are verticaly aligned
-    # quad  : graphs are 2 x 2 at maximum
     def setmode(self, mode = "quad"):
+        """ Set the layout of the figure, default is quad
+        horiz : graphs are horizontaly aligned
+        vert  : graphs are verticaly aligned
+        quad  : graphs are 2 x 2 at maximum
+        """
         if mode == "horiz" or mode == "vert" or mode == "quad":
             self.mode = mode
             return
         else:
             return
 
-    # Select the current graph, depending on current mode
     def setgraph(self, graph = 0):
+        """ Select the current graph
+        """
         if graph < 0 or graph > len(self.graphs):
             return
         self.curgraph = graph
 
-    # Set the signals into the current graph
     def setsigs(self, sigs = None):
+        """ Add signals into the current graph
+        """
         self.graphs[curgraph].add(sigs)
