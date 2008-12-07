@@ -1,3 +1,25 @@
+""" Common file read functions
+
+Class ReaderBase -- Define the common functions for reader objects
+
+   methods:
+   loadfile(fi)
+      Check if the file can be opened before calling getsiglist(),
+
+   getsiglist()
+      To be defined into the derived objects
+      Read the signals from the file, fill slist
+      and return a dict of the signals, with the signame as key.
+
+   __str__()
+      Return the filename
+
+   update()
+      Reread the file and return a dict of the reread signals,
+      together with a list of the updated, deleted and added signals
+
+"""
+
 import os.path
 from ExceptErrors import *
 
@@ -6,6 +28,8 @@ class ReaderBase:
     slist = []
     # Certify the path is valid and is a file
     def loadfile(self, fi):
+        """ Check if the path is a valid file and call getsiglist
+        """
         if fi == "":
             raise LoadFileError("No file specified")
         if not os.path.exists(fi):
@@ -15,12 +39,23 @@ class ReaderBase:
         self.fn = fi
         return self.getsiglist()
 
+    def getsiglist(self):
+        """ Read the signal list from the file, fill self.slist
+        and return a dict of the signals, with the signal name as a key
+        """
+        return {}
+
     def __str__(self):
+        """ Return the signal name.
+        """
         return self.fn
 
     # Re-read the data file
     # Return signal list and names of updated, deleted and new signals
     def update(self):
+        """ Reread the file, update self.slist and return a dict of the
+        signals, as well as a list of thre updated, deleted and new signals
+        """
         u = []
         d = []
         n = []
@@ -37,10 +72,10 @@ class ReaderBase:
         for s in old.keys():
             # Signal in the new list
             if sdict.has_key(s):
-                # update signal
+                # updated signal
                 u.append(s)
             else:
-                # delete signal
+                # deleted signal
                 d.append(s)
         # Go through the new list
         for s in sdict.keys():

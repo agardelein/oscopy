@@ -1,4 +1,4 @@
-""" Signal list,
+""" Points list of a signal
 
 A signal is the common point between the reader and the graph objects,
 i.e. the file and the plot.
