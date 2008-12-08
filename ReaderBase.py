@@ -1,5 +1,13 @@
 """ Common file read functions
 
+Class LoadFileError -- Errors encountered when loading file
+   methods:
+   __init__(value)
+      Assign the error message
+
+   __str__()
+      Return a string with the error message
+
 Class ReaderBase -- Define the common functions for reader objects
 
    methods:
@@ -21,9 +29,18 @@ Class ReaderBase -- Define the common functions for reader objects
 """
 
 import os.path
-from ExceptErrors import *
+
+class LoadFileError:
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return "File error :", value
 
 class ReaderBase:
+    """ Reader Base -- Provide common function for signal file reading
+    The derived class must redefine getsiglist()
+    """
     fn = ""
     slist = []
     # Certify the path is valid and is a file

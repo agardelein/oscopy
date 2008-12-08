@@ -21,8 +21,6 @@ from Signal import Signal
 from ReaderBase import *
 
 class GnucapReader(ReaderBase):
-    # Get signals from first line
-    # Abscisse is first read as a signal then assigned to signals
     def getsiglist(self):
         """ Read the signals from the file
 
