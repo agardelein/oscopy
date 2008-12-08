@@ -100,8 +100,8 @@ class Figure:
     def list(self):
         """ List the graphs from the figure
         """
-        for g in self.graphs:
-            print g
+        for i, g in enumerate(self.graphs):
+            print "  Graph :", i, g
 
     def plot(self):
         """ Plot the figure
@@ -143,6 +143,7 @@ class Figure:
         horiz : graphs are horizontaly aligned
         vert  : graphs are verticaly aligned
         quad  : graphs are 2 x 2 at maximum
+        Other values are ignored
         """
         if layout == "horiz" or layout == "vert" or layout == "quad":
             self.layout = layout
