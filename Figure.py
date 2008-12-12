@@ -93,9 +93,25 @@ class Figure:
         elif self.curgraph > len(self.graphs):
             self.curgraph = len(self.graphs) - 1
 
-    def update(self):
+    def update(self, u, d):
         # TODO : update
-        a = 0
+        """ Update the graphs
+        """
+        for g in self.graphs:
+            # Get the signal list from the graph
+            sg = g.getsigs()
+            # Generate the list of updated signals
+            ug = {}
+            for k, s in u.iteritems():
+                if k in sg:
+                    ug[k] = u[k]
+            # Generate the list of deleted signals
+            dg = []
+            for k in d:
+                if k in sg:
+                    dg.append(k)
+            # Update the graph
+            g.update(ug, dg)
 
     def list(self):
         """ List the graphs from the figure
@@ -162,3 +178,9 @@ class Figure:
         """ Add signals into the current graph
         """
         self.graphs[curgraph].add(sigs)
+
+    def getsigs(self):
+        sigs = []
+        for i, g in enumerate(self.graphs):
+            sigs.extend(g.getsigs())
+        return sigs

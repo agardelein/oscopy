@@ -97,3 +97,15 @@ class Graph:
             a = a + n
             a = a + " "
         return a
+
+    def update(self, u, d):
+        """ Update the signals with reread values
+        """
+        for k, s in u.iteritems():
+            self.sigs[k] = s
+        for k in d:
+            del self.sigs[k]
+        return None
+
+    def getsigs(self):
+        return self.sigs.keys()

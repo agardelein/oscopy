@@ -105,6 +105,7 @@ class Cmds:
         For each file, reread it, and for updated, new and deleted signal,
         update the signal dict accordingly.
         """
+        # Reread the files
         for v in self.readers.keys():
             sigs, u, d, n = self.readers[v].update()
             for s in u:
@@ -113,6 +114,22 @@ class Cmds:
                 self.sigs[s] = sigs[s]
             for s in d:
                 del self.sigs[s]
+        # Update in figures
+        for f in self.figs:
+            # Get the signals list from the figure
+            fsigs = f.getsigs()
+            # Generate the dict of updated signals for the figure
+            fu = {}
+            for k in u:
+                if k in fsigs:
+                    fu[k] = sigs[k]
+            # Generate the list of the name of deleted signals for the figure
+            fd = []
+            for k in d:
+                if k in fsigs:
+                    fd.append(k)
+            # Update the figure
+            f.update(fu, fd)
 
     def setplot(self, args):
         """ Set the signals of the current graph of the current figure.

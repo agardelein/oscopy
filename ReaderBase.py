@@ -71,7 +71,8 @@ class ReaderBase:
     # Return signal list and names of updated, deleted and new signals
     def update(self):
         """ Reread the file, update self.slist and return a dict of the
-        signals, as well as a list of thre updated, deleted and new signals
+        signals, as well as a list of the name of updated, deleted
+        and new signals
         """
         u = []
         d = []
