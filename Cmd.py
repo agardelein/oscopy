@@ -144,10 +144,12 @@ class Cmds:
     def setplot(self, args):
         """ Set the signals of the current graph of the current figure.
         If no figure exist, create a new one.
+        FOR DEBUG ONLY
         """
         if args == "help":
             print "Usage : setplot SIG [, SIG [, SIG]...]"
             print "   Set the signals of the current graph of the current figure"
+            print "FOR DEBUG ONLY"
             return
 
         toplot = self.gettoplot(args)
@@ -326,3 +328,31 @@ class Cmds:
         if num > len(self.figs) or num < 1:
             return
         self.curfig = num - 1
+
+    def help(self, args):
+        """ Display general help message or individual command help
+        """
+        if args == "":
+            print "\
+Commands related to figures:\n\
+   new         create a new figure\n\
+   delete      delete a figure\n\
+   select      define the current figure\n\
+   layout      set the layout (either horiz, vert or quad)\n\
+   figlist     list the existing figures\n\
+   plot        draw and show the figures\n\
+Commands related to graphs:\n\
+   add         add a graph to the current figure\n\
+   delfromfig  delete a graph from the current figure\n\
+Commands related to signals:\n\
+   load        read signals from file\n\
+   update      reread signals from file(s)\n\
+   siglist     list the signals\n\
+Misc commands:\n\
+   quit, exit  exit the program\n\
+   help        display this help message\n\
+\n\
+Help for individual command can be obtained with 'help COMMAND'\n\
+"
+        else:
+            eval("self." + args + "(\"help\")")
