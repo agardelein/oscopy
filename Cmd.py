@@ -84,6 +84,11 @@ class Cmds:
         For new only gnucap files are supported.
         Do not load the same file twice.
         """
+        if args == "help":
+            print "Usage : load DATAFILE"
+            print "   Load signal file"
+            return
+
         # File already loaded ?
         if args in self.readers.keys():
             print "File already loaded"
@@ -105,6 +110,11 @@ class Cmds:
         For each file, reread it, and for updated, new and deleted signal,
         update the signal dict accordingly.
         """
+        if args == "help":
+            print "Usage : update"
+            print "   Reread data files"
+            return
+
         # Reread the files
         for v in self.readers.keys():
             sigs, u, d, n = self.readers[v].update()
@@ -135,6 +145,11 @@ class Cmds:
         """ Set the signals of the current graph of the current figure.
         If no figure exist, create a new one.
         """
+        if args == "help":
+            print "Usage : setplot SIG [, SIG [, SIG]...]"
+            print "   Set the signals of the current graph of the current figure"
+            return
+
         toplot = self.gettoplot(args)
         if toplot == None:
             return
@@ -147,11 +162,21 @@ class Cmds:
     def layout(self, args):
         """ Define the layout of the current figure
         """
+        if args == "help":
+            print "Usage : layout horiz|vert|quad"
+            print "   Define the layout of the current figure"
+            return
+
         self.figs[self.curfig].setlayout(args)
 
     def plot(self, args):
         """ Plot the figures, and enter in the matplotlib main loop
         """
+        if args == "help":
+            print "Usage : plot"
+            print "   Draw and show the figures"
+            return
+
         if self.figs == []:
             return
         for i, f in enumerate(self.figs):
@@ -164,6 +189,11 @@ class Cmds:
         The signal list is a coma separated list of signal names
         If no figure exist, create a new one.
         """
+        if args == "help":
+            print "Usage : add SIG [, SIG [, SIG]...]"
+            print "   Add a graph to the current figure"
+            return
+
         if len(self.figs) < 1:
             self.setplot(args)
         else:
@@ -176,6 +206,11 @@ class Cmds:
     def delfromfig(self, args):
         """ Delete a graph from the current figure
         """
+        if args == "help":
+            print "Usage : delete GRAPH#"
+            print "   Delete a graph from the current figure"
+            return
+
         self.figs[self.curfig].delete(args)
         return
 
@@ -207,6 +242,11 @@ class Cmds:
     def figlist(self, args):
         """ Print the list of figures
         """
+        if args == "help":
+            print "Usage : figlist"
+            print "   Print the list of figures"
+            return
+
         for i, f in enumerate(self.figs):
             print "Figure", i + 1, ":", f.layout
             f.list()
@@ -220,6 +260,11 @@ class Cmds:
         then return.
         After those tests, the figure is created with the signal list.
         """
+        if toplot == "help":
+            print "Usage : new [SIG [, SIG [, SIG]...]]"
+            print "   Create a new figure, set it as current, add the signals"
+            return
+
         if type(toplot) == StringType:
             # Called from commandline,
             # Get the signal list from args
@@ -238,6 +283,11 @@ class Cmds:
     def siglist(self, args):
         """ List loaded signals
         """
+        if args == "help":
+            print "Usage : siglist"
+            print "   List loaded signals"
+            return
+
         for n, s in self.sigs.iteritems():
             print s
 
@@ -247,6 +297,11 @@ class Cmds:
         If the number is out of range, then return
         Act as a "pop" with self.curfig
         """
+        if args == "help":
+            print "Usage : delete FIG#"
+            print "   Delete a figure"
+            return
+        
         num = eval(args)
         if num > len(self.figs) or num < 1:
             return
@@ -262,6 +317,11 @@ class Cmds:
     def select(self, args):
         """ Select the current figure
         """
+        if args == "help":
+            print "Usage: select FIG#"
+            print "   Select the current figure"
+            return
+
         num = eval(args)
         if num > len(self.figs) or num < 1:
             return
