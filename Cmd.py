@@ -25,7 +25,7 @@ Class Cmds: Commands callables from scope commandline
    add(args)
    Add a graph to the current figure
 
-   delfromfig(args)
+   remove(args)
    Delete a graph from the current figure
 
    gettoplot(args)
@@ -205,7 +205,7 @@ class Cmds:
             print "Adding into figure"
             self.figs[self.curfig].add(toplot)
 
-    def delfromfig(self, args):
+    def remove(self, args):
         """ Delete a graph from the current figure
         """
         if args == "help":
@@ -343,7 +343,7 @@ Commands related to figures:\n\
    plot        draw and show the figures\n\
 Commands related to graphs:\n\
    add         add a graph to the current figure\n\
-   delfromfig  delete a graph from the current figure\n\
+   remove      delete a graph from the current figure\n\
 Commands related to signals:\n\
    load        read signals from file\n\
    update      reread signals from file(s)\n\
