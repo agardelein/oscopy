@@ -1,0 +1,22 @@
+scope -- A program to view electrical simulation results
+
+This is scope, a program to view 2D electrical simulation results.
+It is designed to easily new input data file formats, new
+types of plots.
+This program use matplotlib to plot the data.
+
+scope is an example of use of the available functions,
+implemented as a simple command line program.
+
+To run the program, just do ./scope.
+
+To get any info on available commands, type help.
+
+EXTENDING THE PROGRAM:
+---------------------
+New data file format can be added by deriving ReaderBase and
+redefining the function getsiglist(), which fills the list
+of signals self.siglist and return a dict of signals.
+During execution, ReaderBase.loadfile() check the validity
+of the provided path, and then call getsiglist().
+
