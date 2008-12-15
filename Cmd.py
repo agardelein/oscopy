@@ -356,3 +356,13 @@ Help for individual command can be obtained with 'help COMMAND'\n\
 "
         else:
             eval("self." + args + "(\"help\")")
+
+    def type(self, args):
+        """ Set the type of the current graph of the current figure
+        """
+        if args == "help":
+            print "Usage: type TYPE"
+            print "   Set the type of the current graph of the current figure"
+            return
+
+        self.figs[self.curfig].settype(args)

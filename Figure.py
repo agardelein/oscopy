@@ -38,11 +38,16 @@ Figure -- Handle a list of graphs
 
    setsigs(sigs)
       Add signals into the current graph
+
+   settype(type)
+      Set the type of the current graph
 """
 
-from Graph import *
+from LinGraph import *
+from LogxGraph import *
 import matplotlib.pyplot as plt
 from pylab import *
+from types import *
 
 class Figure:
 
@@ -56,7 +61,7 @@ class Figure:
         self.curgraph = -1
         if sigs == None:
             return
-        gr = Graph(sigs)
+        gr = LinGraph(sigs)
         self.graphs.append(gr)
 
     def add(self, sigs = None):
@@ -67,9 +72,9 @@ class Figure:
         """
         if len(self.graphs) > 3:
             return
-        gr = Graph(sigs)
+        gr = LinGraph(sigs)
         self.graphs.append(gr)
-        self.select(len(self.graphs))
+        self.select(len(self.graphs) - 1)
 
     def setf(self, sigs = None):
         """ Set the signals of the current graph
@@ -180,7 +185,21 @@ class Figure:
         self.graphs[curgraph].add(sigs)
 
     def getsigs(self):
+        """ Return the list of signals in all graphs
+        """
         sigs = []
         for i, g in enumerate(self.graphs):
             sigs.extend(g.getsigs())
         return sigs
+
+    def settype(self, gtype):
+        """ Set the type of the current graph
+        """
+        if type(gtype) == StringType:
+            if gtype == "lin":
+                g = LinGraph(self.graphs[self.curgraph])
+                self.graphs[self.curgraph] = g
+            elif gtype == "logx":
+                g = LogxGraph(self.graphs[self.curgraph])
+                self.graphs[self.curgraph] = g
+                
