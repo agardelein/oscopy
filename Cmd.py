@@ -25,7 +25,7 @@ Class Cmds: Commands callables from scope commandline
    add(args)
    Add a graph to the current figure
 
-   remove(args)
+   delete(args)
    Delete a graph from the current figure
 
    gettoplot(args)
@@ -35,17 +35,23 @@ Class Cmds: Commands callables from scope commandline
    figlist(args)
    Print a list of figures
 
-   new(args)
+   create(args)
    Create a new figure, and assign signals if provided
 
    siglist(args)
    List all the signals
 
-   delete(args)
+   destroy(args)
    Delete a figure
 
    select(args)
    Select the figure to become the current one
+
+   insert(args)
+   Add signals to the current graph of the current figure
+
+   remove(args)
+   Remove signals from the current graph of the current figure
 """
 
 from GnucapReader import *
@@ -157,7 +163,7 @@ class Cmds:
             return
         # Can now prepare the plot
         if self.figs == []:
-            self.new(toplot)
+            self.create(toplot)
         else:
             self.figs[self.curfig].setf(toplot)
 
@@ -205,7 +211,7 @@ class Cmds:
             print "Adding into figure"
             self.figs[self.curfig].add(toplot)
 
-    def remove(self, args):
+    def delete(self, args):
         """ Delete a graph from the current figure
         """
         if args == "help":
@@ -253,7 +259,7 @@ class Cmds:
             print "Figure", i + 1, ":", f.layout
             f.list()
 
-    def new(self, toplot):
+    def create(self, toplot):
         """ Create a new figure and set it as current
         Can be either called from commandline or a function.
         When called from commandline, call gettoplot to retrieve
@@ -293,7 +299,7 @@ class Cmds:
         for n, s in self.sigs.iteritems():
             print s
 
-    def delete(self, args):
+    def destroy(self, args):
         """ Delete a figure
         User must provide the figure number.
         If the number is out of range, then return
@@ -335,19 +341,21 @@ class Cmds:
         if args == "":
             print "\
 Commands related to figures:\n\
-   new         create a new figure\n\
-   delete      delete a figure\n\
+   create      create a new figure\n\
+   destroy     delete a figure\n\
    select      define the current figure\n\
    layout      set the layout (either horiz, vert or quad)\n\
    figlist     list the existing figures\n\
    plot        draw and show the figures\n\
 Commands related to graphs:\n\
    add         add a graph to the current figure\n\
-   remove      delete a graph from the current figure\n\
+   delete      delete a graph from the current figure\n\
 Commands related to signals:\n\
    load        read signals from file\n\
    update      reread signals from file(s)\n\
    siglist     list the signals\n\
+   insert      add a signal to the current graph of the current figure\n\
+   remove      delete a signal from the current graph of the current figure\n\
 Misc commands:\n\
    quit, exit  exit the program\n\
    help        display this help message\n\
@@ -366,3 +374,34 @@ Help for individual command can be obtained with 'help COMMAND'\n\
             return
 
         self.figs[self.curfig].settype(args)
+
+    def insert(self, args):
+        """ Insert a list of signals into the current graph 
+        of the current figure
+        """
+        if args == "help":
+            print "Usage: insert SIG [, SIG [, SIG]...]"
+            print "   Insert a list of signals into the current graph"
+            return
+
+        if self.figs == []:
+            return
+
+        sigs = self.gettoplot(args)
+        self.figs[self.curfig].insert(sigs)
+        return
+
+    def remove(self, args):
+        """ Remove a list of signals from the current graph
+        of the current figure
+        """
+        if args == "help":
+            print "Usage: remove SIG [, SIG [, SIG]...]"
+            print "   Delete a list of signals into from current graph"
+            return
+        if self.figs == []:
+            return
+
+        sigs = self.gettoplot(args)
+        self.figs[self.curfig].remove(sigs)
+        return

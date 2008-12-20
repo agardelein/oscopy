@@ -24,3 +24,6 @@ New graph type can be added by deriving BaseGraph and redefining
 the function setaxes() which if called by plot(), or eventually 
 redefining plot().
 NOTE : Figure.settype() has to be updated !
+
+Vocabular:
+A figure is CREATEd or DESTROYed, a graph is ADDed to a figure or DELETEd and a signal is INSERTed or REMOVEd from a graph.

@@ -182,7 +182,7 @@ class Figure:
     def setsigs(self, sigs = None):
         """ Add signals into the current graph
         """
-        self.graphs[curgraph].add(sigs)
+        self.graphs[curgraph].insert(sigs)
 
     def getsigs(self):
         """ Return the list of signals in all graphs
@@ -203,3 +203,16 @@ class Figure:
                 g = LogxGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
                 
+    def insert(self, sigs):
+        """ Add a signal into the current graph
+        """
+        if self.curgraph < 0 or self.curgraph > len(self.graphs):
+            return
+        self.graphs[self.curgraph].insert(sigs)
+
+    def remove(self, sigs):
+        """ Delete a signal from the current graph
+        """
+        if self.curgraph < 0 or self.curgraph > len(self.graphs):
+            return
+        self.graphs[self.curgraph].remove(sigs)

@@ -14,7 +14,7 @@ Class BaseGraph -- Handle the representation of a list of signals
    __init__(sigs)
       Create a graph and fill it with the sigs
 
-   add(sigs)
+   insert(sigs)
       Add signal list to the graph, set the abscisse name
 
    setg(sigs)
@@ -28,6 +28,12 @@ Class BaseGraph -- Handle the representation of a list of signals
 
    setaxes()
       Define the type of the axes. To be overloaded by deriving classes.
+
+   gettype()
+      Return a string with the type of graph, to be overloaded.
+
+   remove(sigs)
+      Delete signals from the graph
 """
 
 from Axe import Axe
@@ -51,10 +57,10 @@ class BaseGraph:
             if sigs == None:
                 return
             else:
-                self.add(sigs)
+                self.insert(sigs)
                 return
 
-    def add(self, sigs = None):
+    def insert(self, sigs = None):
         """ Add a list of signals into the graph
         The first signal to be added defines the abscisse.
         The remaining signals to be added must have the same abscisse name,
@@ -81,7 +87,7 @@ class BaseGraph:
         """
         self.sigs = {}
         self.xaxis = ""
-        self.add(sigs)
+        self.insert(sigs)
 
     def plot(self):
         """ Plot the graph
@@ -130,3 +136,13 @@ class BaseGraph:
         """ Return a string with the type of the graph
         To be overloaded by derived classes.
         """
+        return
+    
+    def remove(self, sigs = None):
+        """ Delete signals from the graph
+        """
+        for s in sigs:
+            print s
+            if s.name in self.sigs.keys():
+                del self.sigs[s.name]
+        return
