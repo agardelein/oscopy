@@ -39,8 +39,8 @@ Figure -- Handle a list of graphs
    setsigs(sigs)
       Add signals into the current graph
 
-   settype(type)
-      Set the type of the current graph
+   setmode(type)
+      Set the mode of the current graph
 """
 
 from LinGraph import *
@@ -192,14 +192,14 @@ class Figure:
             sigs.extend(g.getsigs())
         return sigs
 
-    def settype(self, gtype):
-        """ Set the type of the current graph
+    def setmode(self, gmode):
+        """ Set the mode of the current graph
         """
-        if type(gtype) == StringType:
-            if gtype == "lin":
+        if type(gmode) == StringType:
+            if gmode == "lin":
                 g = LinGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
-            elif gtype == "logx":
+            elif gmode == "logx":
                 g = LogxGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
                 

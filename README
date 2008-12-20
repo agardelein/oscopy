@@ -20,10 +20,10 @@ of signals self.siglist and return a dict of signals.
 During execution, ReaderBase.loadfile() check the validity
 of the provided path, and then call getsiglist().
 
-New graph type can be added by deriving BaseGraph and redefining
+New graph mode can be added by deriving BaseGraph and redefining
 the function setaxes() which if called by plot(), or eventually 
 redefining plot().
-NOTE : Figure.settype() has to be updated !
+NOTE : Figure.setmode() has to be updated when new mode are added !
 
 Vocabular:
 A figure is CREATEd or DESTROYed, a graph is ADDed to a figure or DELETEd and a signal is INSERTed or REMOVEd from a graph.

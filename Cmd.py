@@ -52,6 +52,9 @@ Class Cmds: Commands callables from scope commandline
 
    remove(args)
    Remove signals from the current graph of the current figure
+
+   mode(args)
+   Set the mode of the current graph
 """
 
 from GnucapReader import *
@@ -350,6 +353,7 @@ Commands related to figures:\n\
 Commands related to graphs:\n\
    add         add a graph to the current figure\n\
    delete      delete a graph from the current figure\n\
+   mode        set the mode of the current graph of the current figure\n\
 Commands related to signals:\n\
    load        read signals from file\n\
    update      reread signals from file(s)\n\
@@ -365,15 +369,15 @@ Help for individual command can be obtained with 'help COMMAND'\n\
         else:
             eval("self." + args + "(\"help\")")
 
-    def type(self, args):
-        """ Set the type of the current graph of the current figure
+    def mode(self, args):
+        """ Set the mode of the current graph of the current figure
         """
         if args == "help":
-            print "Usage: type TYPE"
+            print "Usage: mode MODE"
             print "   Set the type of the current graph of the current figure"
             return
 
-        self.figs[self.curfig].settype(args)
+        self.figs[self.curfig].setmode(args)
 
     def insert(self, args):
         """ Insert a list of signals into the current graph 

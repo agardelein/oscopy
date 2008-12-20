@@ -142,7 +142,6 @@ class BaseGraph:
         """ Delete signals from the graph
         """
         for s in sigs:
-            print s
             if s.name in self.sigs.keys():
                 del self.sigs[s.name]
         return
