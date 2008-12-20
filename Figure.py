@@ -18,29 +18,36 @@ Figure -- Handle a list of graphs
    add(sigs)
       Add a grapth into the figure
 
-   setf(sigs)
-      Set the signals of the current graph
-
    delete(num)
       Delete a graph
 
-   list()
-      List the graph of the current figure
-
-   plot()
-      Plot the figure
-
-   setlayout(layout)
-      Set the layout, either horiz, vert or quad
+   update(toupdate, todelete)
+      Update the signals of the figure
 
    select(graphnum)
       Select the graph to be the default
 
-   setsigs(sigs)
-      Add signals into the current graph
+   list()
+      List the graph of the current figure
 
-   setmode(type)
+   setmode(mode)
       Set the mode of the current graph
+
+   setlayout(layout)
+      Set the layout, either horiz, vert or quad
+
+   plot()
+      Plot the figure
+
+#   setsigs(sigs)
+#      Add signals into the current graph
+   
+   getsigs()
+      Return a list of the signals in all graphs
+
+   setf(sigs)
+      Set the signals of the current graph
+
 """
 
 from LinGraph import *
@@ -75,12 +82,6 @@ class Figure:
         gr = LinGraph(sigs)
         self.graphs.append(gr)
         self.select(len(self.graphs) - 1)
-
-    def setf(self, sigs = None):
-        """ Set the signals of the current graph
-        By default, do nothing
-        """
-        self.graphs[self.curgraph].setg(sigs)
 
     def delete(self, num = 0):
         """ Delete a graph from the figure
@@ -118,11 +119,42 @@ class Figure:
             # Update the graph
             g.update(ug, dg)
 
+    def select(self, graph = 0):
+        """ Select the current graph
+        """
+        if graph < 0 or graph > len(self.graphs):
+            return
+        self.curgraph = graph
+
     def list(self):
         """ List the graphs from the figure
         """
         for i, g in enumerate(self.graphs):
             print "  Graph :", i, g
+
+    def setmode(self, gmode):
+        """ Set the mode of the current graph
+        """
+        if type(gmode) == StringType:
+            if gmode == "lin":
+                g = LinGraph(self.graphs[self.curgraph])
+                self.graphs[self.curgraph] = g
+            elif gmode == "logx":
+                g = LogxGraph(self.graphs[self.curgraph])
+                self.graphs[self.curgraph] = g
+                
+    def setlayout(self, layout = "quad"):
+        """ Set the layout of the figure, default is quad
+        horiz : graphs are horizontaly aligned
+        vert  : graphs are verticaly aligned
+        quad  : graphs are 2 x 2 at maximum
+        Other values are ignored
+        """
+        if layout == "horiz" or layout == "vert" or layout == "quad":
+            self.layout = layout
+            return
+        else:
+            return
 
     def plot(self):
         """ Plot the figure
@@ -159,50 +191,6 @@ class Figure:
             g.plot()
         return
 
-    def setlayout(self, layout = "quad"):
-        """ Set the layout of the figure, default is quad
-        horiz : graphs are horizontaly aligned
-        vert  : graphs are verticaly aligned
-        quad  : graphs are 2 x 2 at maximum
-        Other values are ignored
-        """
-        if layout == "horiz" or layout == "vert" or layout == "quad":
-            self.layout = layout
-            return
-        else:
-            return
-
-    def select(self, graph = 0):
-        """ Select the current graph
-        """
-        if graph < 0 or graph > len(self.graphs):
-            return
-        self.curgraph = graph
-
-    def setsigs(self, sigs = None):
-        """ Add signals into the current graph
-        """
-        self.graphs[curgraph].insert(sigs)
-
-    def getsigs(self):
-        """ Return the list of signals in all graphs
-        """
-        sigs = []
-        for i, g in enumerate(self.graphs):
-            sigs.extend(g.getsigs())
-        return sigs
-
-    def setmode(self, gmode):
-        """ Set the mode of the current graph
-        """
-        if type(gmode) == StringType:
-            if gmode == "lin":
-                g = LinGraph(self.graphs[self.curgraph])
-                self.graphs[self.curgraph] = g
-            elif gmode == "logx":
-                g = LogxGraph(self.graphs[self.curgraph])
-                self.graphs[self.curgraph] = g
-                
     def insert(self, sigs):
         """ Add a signal into the current graph
         """
@@ -216,3 +204,23 @@ class Figure:
         if self.curgraph < 0 or self.curgraph > len(self.graphs):
             return
         self.graphs[self.curgraph].remove(sigs)
+
+#    def setsigs(self, sigs = None):
+#        """ Add signals into the current graph
+#        """
+#        self.graphs[curgraph].insert(sigs)
+
+    def getsigs(self):
+        """ Return the list of signals in all graphs
+        """
+        sigs = []
+        for i, g in enumerate(self.graphs):
+            sigs.extend(g.getsigs())
+        return sigs
+
+    def setf(self, sigs = None):
+        """ Set the signals of the current graph
+        By default, do nothing
+        """
+        self.graphs[self.curgraph].setg(sigs)
+

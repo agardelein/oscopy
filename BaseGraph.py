@@ -14,17 +14,20 @@ Class BaseGraph -- Handle the representation of a list of signals
    __init__(sigs)
       Create a graph and fill it with the sigs
 
+   __str__()
+      Return a string with the list of signals, and abscisse name
+
    insert(sigs)
       Add signal list to the graph, set the abscisse name
 
-   setg(sigs)
-      Set the signal list of the graphs
+   remove(sigs)
+      Delete signals from the graph
 
    plot()
       Plot the graph
 
-   __str__()
-      Return a string with the list of signals, and abscisse name
+   getsigs()
+      Return a list of the signal names
 
    setaxes()
       Define the type of the axes. To be overloaded by deriving classes.
@@ -32,8 +35,9 @@ Class BaseGraph -- Handle the representation of a list of signals
    gettype()
       Return a string with the type of graph, to be overloaded.
 
-   remove(sigs)
-      Delete signals from the graph
+   setg(sigs)
+      Set the signal list of the graphs
+
 """
 
 from Axe import Axe
@@ -60,6 +64,15 @@ class BaseGraph:
                 self.insert(sigs)
                 return
 
+    def __str__(self):
+        """ Return a string with the type and the signal list of the graph
+        """
+        a = self.gettype() + " "
+        for n, s in self.sigs.iteritems():
+            a = a + n
+            a = a + " "
+        return a
+
     def insert(self, sigs = None):
         """ Add a list of signals into the graph
         The first signal to be added defines the abscisse.
@@ -81,13 +94,22 @@ class BaseGraph:
                     # Ignore signal
                     print "Not the same ref:", s.name, "-", self.xaxis,"-"
 
-    def setg(self, sigs = None):
-        """ Set the signal dict
-        The old signal list is deleted, as well as the abscisse name
+    def remove(self, sigs = None):
+        """ Delete signals from the graph
         """
-        self.sigs = {}
-        self.xaxis = ""
-        self.insert(sigs)
+        for s in sigs:
+            if s.name in self.sigs.keys():
+                del self.sigs[s.name]
+        return
+
+    def update(self, u, d):
+        """ Update the signals with reread values
+        """
+        for k, s in u.iteritems():
+            self.sigs[k] = s
+        for k in d:
+            del self.sigs[k]
+        return None
 
     def plot(self):
         """ Plot the graph
@@ -104,24 +126,6 @@ class BaseGraph:
         hold(False)
         xlabel(self.xaxis)
 
-    def __str__(self):
-        """ Return a string with the type and the signal list of the graph
-        """
-        a = self.gettype() + " "
-        for n, s in self.sigs.iteritems():
-            a = a + n
-            a = a + " "
-        return a
-
-    def update(self, u, d):
-        """ Update the signals with reread values
-        """
-        for k, s in u.iteritems():
-            self.sigs[k] = s
-        for k in d:
-            del self.sigs[k]
-        return None
-
     def getsigs(self):
         """ Return a list of the signal names
         """
@@ -132,16 +136,18 @@ class BaseGraph:
         To be overloaded by derived classes.
         """
         return
+
     def gettype(self):
         """ Return a string with the type of the graph
         To be overloaded by derived classes.
         """
         return
     
-    def remove(self, sigs = None):
-        """ Delete signals from the graph
+    def setg(self, sigs = None):
+        """ Set the signal dict
+        The old signal list is deleted, as well as the abscisse name
         """
-        for s in sigs:
-            if s.name in self.sigs.keys():
-                del self.sigs[s.name]
-        return
+        self.sigs = {}
+        self.xaxis = ""
+        self.insert(sigs)
+

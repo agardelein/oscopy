@@ -6,18 +6,20 @@ Class Cmds: Commands callables from scope commandline
    __init__()
    Create empty lists of figures, readers and signals
 
-   load(args)
-   Read signals from a file
+   create(args)
+   Create a new figure, and assign signals if provided
 
-   update(args)
-   Reread all signals from files
+   destroy(args)
+   Delete a figure
 
-   setplot(args)
-   Assign signals to the current graph of the current figure,
-   create a new figure if none exist
+   select(args)
+   Select the figure to become the current one
 
    layout(args)
    set the layout of the current figure
+
+   figlist(args)
+   Print a list of figures
 
    plot(args)
    plot all the figure
@@ -28,24 +30,14 @@ Class Cmds: Commands callables from scope commandline
    delete(args)
    Delete a graph from the current figure
 
-   gettoplot(args)
-   Return a list of the signal names from the arguments provided by the user
-   Should not be called from the command line
+   mode(args)
+   Set the mode of the current graph
 
-   figlist(args)
-   Print a list of figures
+   load(args)
+   Read signals from a file
 
-   create(args)
-   Create a new figure, and assign signals if provided
-
-   siglist(args)
-   List all the signals
-
-   destroy(args)
-   Delete a figure
-
-   select(args)
-   Select the figure to become the current one
+   update(args)
+   Reread all signals from files
 
    insert(args)
    Add signals to the current graph of the current figure
@@ -53,8 +45,19 @@ Class Cmds: Commands callables from scope commandline
    remove(args)
    Remove signals from the current graph of the current figure
 
-   mode(args)
-   Set the mode of the current graph
+   siglist(args)
+   List all the signals
+
+   help(args)
+   Print help message
+
+   gettoplot(args)
+   Return a list of the signal names from the arguments provided by the user
+   Should not be called from the command line
+
+   setplot(args)
+   Assign signals to the current graph of the current figure,
+   create a new figure if none exist
 """
 
 from GnucapReader import *
@@ -87,6 +90,108 @@ class Cmds:
         self.figs = []
         self.sigs = {}
         
+    def create(self, toplot):
+        """ Create a new figure and set it as current
+        Can be either called from commandline or a function.
+        When called from commandline, call gettoplot to retrieve
+        the signal list
+        When called from a function, if the argument is not a list
+        then return.
+        After those tests, the figure is created with the signal list.
+        """
+        if toplot == "help":
+            print "Usage : new [SIG [, SIG [, SIG]...]]"
+            print "   Create a new figure, set it as current, add the signals"
+            return
+
+        if type(toplot) == StringType:
+            # Called from commandline,
+            # Get the signal list from args
+            if not toplot == "":
+                toplot = self.gettoplot(toplot)
+            else:
+                # No signal list provided
+                toplot = None
+        elif not type(toplot) == ListType:
+            return
+        # toplot is now a list
+        f = Figure(toplot)
+        self.figs.append(f)
+        self.curfig = self.figs.index(f)
+
+    def destroy(self, args):
+        """ Delete a figure
+        User must provide the figure number.
+        If the number is out of range, then return
+        Act as a "pop" with self.curfig
+        """
+        if args == "help":
+            print "Usage : delete FIG#"
+            print "   Delete a figure"
+            return
+        
+        num = eval(args)
+        if num > len(self.figs) or num < 1:
+            return
+        del self.figs[num - 1]
+        # Handle self.curfig.
+        # By default, next figure becomes the current
+        if len(self.figs) == 0:
+            self.curfig = -1
+        elif self.curfig > len(self.figs):
+            self.curfig = len(self.figs) - 1
+        print "Curfig : ", self.curfig
+
+    def select(self, args):
+        """ Select the current figure
+        """
+        if args == "help":
+            print "Usage: select FIG#"
+            print "   Select the current figure"
+            return
+
+        num = eval(args)
+        if num > len(self.figs) or num < 1:
+            return
+        self.curfig = num - 1
+
+    def layout(self, args):
+        """ Define the layout of the current figure
+        """
+        if args == "help":
+            print "Usage : layout horiz|vert|quad"
+            print "   Define the layout of the current figure"
+            return
+
+        self.figs[self.curfig].setlayout(args)
+
+    def figlist(self, args):
+        """ Print the list of figures
+        """
+        if args == "help":
+            print "Usage : figlist"
+            print "   Print the list of figures"
+            return
+
+        for i, f in enumerate(self.figs):
+            print "Figure", i + 1, ":", f.layout
+            f.list()
+
+    def plot(self, args):
+        """ Plot the figures, and enter in the matplotlib main loop
+        """
+        if args == "help":
+            print "Usage : plot"
+            print "   Draw and show the figures"
+            return
+
+        if self.figs == []:
+            return
+        for i, f in enumerate(self.figs):
+            pyfig(i + 1)
+            f.plot()
+        show()
+
     def load(self, args):
         """ Read signals from file.
         Duplicate signal names overwrite the previous one.
@@ -150,51 +255,6 @@ class Cmds:
             # Update the figure
             f.update(fu, fd)
 
-    def setplot(self, args):
-        """ Set the signals of the current graph of the current figure.
-        If no figure exist, create a new one.
-        FOR DEBUG ONLY
-        """
-        if args == "help":
-            print "Usage : setplot SIG [, SIG [, SIG]...]"
-            print "   Set the signals of the current graph of the current figure"
-            print "FOR DEBUG ONLY"
-            return
-
-        toplot = self.gettoplot(args)
-        if toplot == None:
-            return
-        # Can now prepare the plot
-        if self.figs == []:
-            self.create(toplot)
-        else:
-            self.figs[self.curfig].setf(toplot)
-
-    def layout(self, args):
-        """ Define the layout of the current figure
-        """
-        if args == "help":
-            print "Usage : layout horiz|vert|quad"
-            print "   Define the layout of the current figure"
-            return
-
-        self.figs[self.curfig].setlayout(args)
-
-    def plot(self, args):
-        """ Plot the figures, and enter in the matplotlib main loop
-        """
-        if args == "help":
-            print "Usage : plot"
-            print "   Draw and show the figures"
-            return
-
-        if self.figs == []:
-            return
-        for i, f in enumerate(self.figs):
-            pyfig(i + 1)
-            f.plot()
-        show()
-
     def add(self, args):
         """ Add a graph to the current figure
         The signal list is a coma separated list of signal names
@@ -224,150 +284,6 @@ class Cmds:
 
         self.figs[self.curfig].delete(args)
         return
-
-    def gettoplot(self, args):
-        """ Return the signal list extracted from the commandline
-        The list must be a coma separated list of signal names.
-        If no signals are loaded of no signal are found, return None
-        """
-        toplot = []
-        # Are there signals ?
-        if self.sigs == []:
-            print "No signal loaded"
-            return None
-
-        # Prepare the signal list
-        for s in args.split(","):
-            s = s.strip()
-            if s in self.sigs.keys():
-                toplot.append(self.sigs[s])
-            else:
-                print s + ": Not here"
-
-        # No signals found
-        if len(toplot) < 1:
-            print "No signals found"
-            return None
-        return toplot
-
-    def figlist(self, args):
-        """ Print the list of figures
-        """
-        if args == "help":
-            print "Usage : figlist"
-            print "   Print the list of figures"
-            return
-
-        for i, f in enumerate(self.figs):
-            print "Figure", i + 1, ":", f.layout
-            f.list()
-
-    def create(self, toplot):
-        """ Create a new figure and set it as current
-        Can be either called from commandline or a function.
-        When called from commandline, call gettoplot to retrieve
-        the signal list
-        When called from a function, if the argument is not a list
-        then return.
-        After those tests, the figure is created with the signal list.
-        """
-        if toplot == "help":
-            print "Usage : new [SIG [, SIG [, SIG]...]]"
-            print "   Create a new figure, set it as current, add the signals"
-            return
-
-        if type(toplot) == StringType:
-            # Called from commandline,
-            # Get the signal list from args
-            if not toplot == "":
-                toplot = self.gettoplot(toplot)
-            else:
-                # No signal list provided
-                toplot = None
-        elif not type(toplot) == ListType:
-            return
-        # toplot is now a list
-        f = Figure(toplot)
-        self.figs.append(f)
-        self.curfig = self.figs.index(f)
-
-    def siglist(self, args):
-        """ List loaded signals
-        """
-        if args == "help":
-            print "Usage : siglist"
-            print "   List loaded signals"
-            return
-
-        for n, s in self.sigs.iteritems():
-            print s
-
-    def destroy(self, args):
-        """ Delete a figure
-        User must provide the figure number.
-        If the number is out of range, then return
-        Act as a "pop" with self.curfig
-        """
-        if args == "help":
-            print "Usage : delete FIG#"
-            print "   Delete a figure"
-            return
-        
-        num = eval(args)
-        if num > len(self.figs) or num < 1:
-            return
-        del self.figs[num - 1]
-        # Handle self.curfig.
-        # By default, next figure becomes the current
-        if len(self.figs) == 0:
-            self.curfig = -1
-        elif self.curfig > len(self.figs):
-            self.curfig = len(self.figs) - 1
-        print "Curfig : ", self.curfig
-
-    def select(self, args):
-        """ Select the current figure
-        """
-        if args == "help":
-            print "Usage: select FIG#"
-            print "   Select the current figure"
-            return
-
-        num = eval(args)
-        if num > len(self.figs) or num < 1:
-            return
-        self.curfig = num - 1
-
-    def help(self, args):
-        """ Display general help message or individual command help
-        """
-        if args == "":
-            print "\
-Commands related to figures:\n\
-   create      create a new figure\n\
-   destroy     delete a figure\n\
-   select      define the current figure\n\
-   layout      set the layout (either horiz, vert or quad)\n\
-   figlist     list the existing figures\n\
-   plot        draw and show the figures\n\
-Commands related to graphs:\n\
-   add         add a graph to the current figure\n\
-   delete      delete a graph from the current figure\n\
-   mode        set the mode of the current graph of the current figure\n\
-Commands related to signals:\n\
-   load        read signals from file\n\
-   update      reread signals from file(s)\n\
-   siglist     list the signals\n\
-   insert      add a signal to the current graph of the current figure\n\
-   remove      delete a signal from the current graph of the current figure\n\
-Misc commands:\n\
-   quit, exit  exit the program\n\
-   help        display this help message\n\
-\n\
-Help for individual command can be obtained with 'help COMMAND'\n\
-"
-        else:
-            eval("self." + args + "(\"help\")")
 
     def mode(self, args):
         """ Set the mode of the current graph of the current figure
@@ -409,3 +325,91 @@ Help for individual command can be obtained with 'help COMMAND'\n\
         sigs = self.gettoplot(args)
         self.figs[self.curfig].remove(sigs)
         return
+
+    def siglist(self, args):
+        """ List loaded signals
+        """
+        if args == "help":
+            print "Usage : siglist"
+            print "   List loaded signals"
+            return
+
+        for n, s in self.sigs.iteritems():
+            print s
+
+    def help(self, args):
+        """ Display general help message or individual command help
+        """
+        if args == "":
+            print "\
+Commands related to figures:\n\
+   create      create a new figure\n\
+   destroy     delete a figure\n\
+   select      define the current figure\n\
+   layout      set the layout (either horiz, vert or quad)\n\
+   figlist     list the existing figures\n\
+   plot        draw and show the figures\n\
+Commands related to graphs:\n\
+   add         add a graph to the current figure\n\
+   delete      delete a graph from the current figure\n\
+   mode        set the mode of the current graph of the current figure\n\
+Commands related to signals:\n\
+   load        read signals from file\n\
+   update      reread signals from file(s)\n\
+   insert      add a signal to the current graph of the current figure\n\
+   remove      delete a signal from the current graph of the current figure\n\
+   siglist     list the signals\n\
+Misc commands:\n\
+   quit, exit  exit the program\n\
+   help        display this help message\n\
+\n\
+Help for individual command can be obtained with 'help COMMAND'\n\
+"
+        else:
+            eval("self." + args + "(\"help\")")
+
+    def gettoplot(self, args):
+        """ Return the signal list extracted from the commandline
+        The list must be a coma separated list of signal names.
+        If no signals are loaded of no signal are found, return None
+        """
+        toplot = []
+        # Are there signals ?
+        if self.sigs == []:
+            print "No signal loaded"
+            return None
+
+        # Prepare the signal list
+        for s in args.split(","):
+            s = s.strip()
+            if s in self.sigs.keys():
+                toplot.append(self.sigs[s])
+            else:
+                print s + ": Not here"
+
+        # No signals found
+        if len(toplot) < 1:
+            print "No signals found"
+            return None
+        return toplot
+
+    def setplot(self, args):
+        """ Set the signals of the current graph of the current figure.
+        If no figure exist, create a new one.
+        FOR DEBUG ONLY
+        """
+        if args == "help":
+            print "Usage : setplot SIG [, SIG [, SIG]...]"
+            print "   Set the signals of the current graph of the current figure"
+            print "FOR DEBUG ONLY"
+            return
+
+        toplot = self.gettoplot(args)
+        if toplot == None:
+            return
+        # Can now prepare the plot
+        if self.figs == []:
+            self.create(toplot)
+        else:
+            self.figs[self.curfig].setf(toplot)
+
