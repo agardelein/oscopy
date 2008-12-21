@@ -10,7 +10,7 @@ between parenthesis.
 The signal name presented to the user is the one read from the file with the
 parenthesis stripped, e.g. v(gs) -> vgs or i(Rd) -> iRd.
 
-Class GnucapRead:
+Class GnucapReader:
    method:
    getsiglist():
       Read the signals from a file to gnucap output format.

@@ -19,12 +19,12 @@ Class ReaderBase -- Define the common functions for reader objects
       Read the signals from the file, fill slist
       and return a dict of the signals, with the signame as key.
 
-   __str__()
-      Return the filename
-
    update()
       Reread the file and return a dict of the reread signals,
       together with a list of the updated, deleted and added signals
+
+   __str__()
+      Return the filename
 
 """
 
@@ -62,11 +62,6 @@ class ReaderBase:
         """
         return {}
 
-    def __str__(self):
-        """ Return the signal name.
-        """
-        return self.fn
-
     # Re-read the data file
     # Return signal list and names of updated, deleted and new signals
     def update(self):
@@ -102,3 +97,9 @@ class ReaderBase:
                 #   then add
                 n.append(s)
         return sdict, u, d, n
+
+    def __str__(self):
+        """ Return the signal name.
+        """
+        return self.fn
+
