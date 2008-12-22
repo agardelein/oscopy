@@ -51,6 +51,9 @@ Class Cmds: Commands callables from scope commandline
    help(args)
    Print help message
 
+   math(expr)
+   Create a signal from a mathematical expression
+
    gettoplot(args)
    Return a list of the signal names from the arguments provided by the user
    Should not be called from the command line
@@ -61,6 +64,7 @@ Class Cmds: Commands callables from scope commandline
 """
 
 from GnucapReader import *
+from MathReader import *
 from Signal import *
 from Figure import *
 from pylab import show
@@ -220,7 +224,6 @@ class Cmds:
 
     def update(self, args):
         """ Reread signal from files.
-        TODO : Update signals in figures !
         For each file, reread it, and for updated, new and deleted signal,
         update the signal dict accordingly.
         """
@@ -367,6 +370,34 @@ Help for individual command can be obtained with 'help COMMAND'\n\
 "
         else:
             eval("self." + args + "(\"help\")")
+
+    def math(self, inp):
+        """ Create a signal from mathematical expression
+        """
+        sigs = {}
+
+        # Build the list of signals to be used
+        for k, s in self.sigs.iteritems():
+            if inp.find(k) > 0:
+                sigs[k] = s
+        if sigs == {}:
+            # No sigs, nothing to do
+            return
+#        for k in sigs.keys():
+#            print k
+
+        # Split left hand and right hand
+        tmp = inp.split("=", 1)
+        lh = tmp[0]
+        rh = tmp[1]
+
+        # Create the expression
+        r = MathReader(sigs)
+        ss = r.loadfile(inp)
+        for k, s in ss.iteritems():
+            self.sigs[k] = s
+            print k
+        return
 
     def gettoplot(self, args):
         """ Return the signal list extracted from the commandline

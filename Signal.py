@@ -35,5 +35,5 @@ class Signal:
         b = ""
         if len(self.pts) > 10:
             for i in range(0, 9):
-                b = b + self.pts[i] + "|"
+                b = b + str(self.pts[i]) + "|"
         return a

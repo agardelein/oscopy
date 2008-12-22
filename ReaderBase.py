@@ -41,8 +41,10 @@ class ReaderBase:
     """ Reader Base -- Provide common function for signal file reading
     The derived class must redefine getsiglist()
     """
-    fn = ""
-    slist = []
+    def __init__(self):
+        self.fn = ""
+        self.slist = []
+
     # Certify the path is valid and is a file
     def loadfile(self, fi):
         """ Check if the path is a valid file and call getsiglist

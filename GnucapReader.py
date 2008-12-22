@@ -50,7 +50,7 @@ class GnucapReader(ReaderBase):
         for names in fil:
             vallist = names.split()
             for i, v in enumerate(vallist):
-                self.slist[i].pts.append(v)
+                self.slist[i].pts.append(float(v))
         fil.close()
 
         # Assign abscisse to signals

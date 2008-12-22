@@ -17,6 +17,11 @@ cmds = Cmds()
 while True:
     try:
         inp = raw_input(p)
+        # Check if command is assignment
+        if inp.find("=") >= 0:
+            cmds.math(inp)
+            continue
+
         # Separate command from args
         if inp.find(" ") >= 0:
             st = inp.split(' ', 1)    
