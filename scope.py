@@ -42,16 +42,16 @@ while True:
     except EOFError:
         break
 
-#    except AttributeError:
-#        print "Unknown command..."
-#        continue
+    except AttributeError, e:
+        print "Unknown command:", e.message
+        continue
 
-#    except NameError:
-#        print "Unknown command"
-#        continue
+    except NameError, e:
+        print "Unknown command", e.message
+        continue
 
-    except SyntaxError:
-        print "Syntax Error"
+    except SyntaxError, e:
+        print "Syntax Error", e.message
         continue
 
     except LoadFileError, e:

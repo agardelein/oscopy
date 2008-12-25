@@ -38,11 +38,20 @@ Class BaseGraph -- Handle the representation of a list of signals
    setg(sigs)
       Set the signal list of the graphs
 
+   fft()
+      Do fft of signals before plotting
+
+   iff()
+      Do ifft of signal before plotting
+
+   nofft()
+      Do neither fft nor ifft
 """
 
 from Axe import Axe
 import matplotlib.pyplot as plt
 from pylab import *
+from scipy.fftpack import fft,ifft
 
 class BaseGraph:
     def __init__(self, sigs = None):
@@ -54,10 +63,12 @@ class BaseGraph:
         if isinstance(sigs, BaseGraph):
             self.sigs = sigs.sigs
             self.xaxis = sigs.xaxis
+            self.dofft = sigs.dofft
             return
         else:
             self.sigs = {}
             self.xaxis = ""
+            self.dofft = 0
             if sigs == None:
                 return
             else:
@@ -120,8 +131,24 @@ class BaseGraph:
         self.setaxes()
         hold(True)
         for n, s in self.sigs.iteritems():
-            x = s.ref.pts
-            y = s.pts
+            if self.dofft == 0:
+                x = s.ref.pts
+                y = s.pts
+            elif self.dofft > 0:
+                y = fft(s.pts)
+                y = y[0:int(len(y)/2)-1]
+                x = []
+                for i in range(0, len(y)):
+                    x.append(i / (abs(s.ref.pts[1] - s.ref.pts[0]) \
+                                      * len(s.ref.pts)))
+                print "!!!!", len(x), len(y)
+            else:
+                y = ifft(s.pts)
+                y = y[0:int(len(y)/2)-1]
+                x = []
+                for i in range(0, len(y)):
+                    x.append(i / (abs(s.ref.pts[1] - s.ref.pts[0]) \
+                                      * len(s.ref.pts)))
             plot(x, y)
         hold(False)
         xlabel(self.xaxis)
@@ -151,3 +178,17 @@ class BaseGraph:
         self.xaxis = ""
         self.insert(sigs)
 
+    def fft(self):
+        """ Do a fft of signals before plotting
+        """
+        self.dofft = 1
+
+    def ifft(self):
+        """ Do a ifft of signals before plotting
+        """
+        self.dofft = -1
+
+    def nofft(self):
+        """ Do neither a fft or ifft before plotting
+        """
+        self.dofft = 0

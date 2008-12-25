@@ -48,6 +48,14 @@ Figure -- Handle a list of graphs
    setf(sigs)
       Set the signals of the current graph
 
+   fft()
+      Do fft of signals of current graph before plotting
+
+   iff()
+      Do ifft of signal of current graph before plotting
+
+   nofft()
+      Do neither fft nor ifft
 """
 
 from LinGraph import *
@@ -222,5 +230,27 @@ class Figure:
         """ Set the signals of the current graph
         By default, do nothing
         """
+        if self.curgraph < 0 or self.curgraph > len(self.graphs):
+            return
         self.graphs[self.curgraph].setg(sigs)
 
+    def fft(self):
+        """ Set fft mode to the current graph
+        """
+        if self.curgraph < 0 or self.curgraph > len(self.graphs):
+            return
+        self.graphs[self.curgraph].fft()
+
+    def ifft(self):
+        """ Set ifft mode to the current graph
+        """
+        if self.curgraph < 0 or self.curgraph > len(self.graphs):
+            return
+        self.graphs[self.curgraph].ifft()
+
+    def nofft(self):
+        """ Set no fft mode to the current graph
+        """
+        if self.curgraph < 0 or self.curgraph > len(self.graphs):
+            return
+        self.graphs[self.curgraph].nofft()
