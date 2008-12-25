@@ -304,6 +304,11 @@ class Cmds:
         if args == "help":
             print "Usage: mode MODE"
             print "   Set the type of the current graph of the current figure"
+            print "Available modes :\n\
+   lin      x and y linear\n\
+   logx     x log, y linear\n\
+   logy     x linear, y log\n\
+   loglog   x and y log"
             return
 
         self.figs[self.curfig].setmode(args)

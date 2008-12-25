@@ -59,7 +59,7 @@ Figure -- Handle a list of graphs
 """
 
 from LinGraph import *
-from LogxGraph import *
+from LogGraphs import *
 import matplotlib.pyplot as plt
 from pylab import *
 from types import *
@@ -149,6 +149,12 @@ class Figure:
                 self.graphs[self.curgraph] = g
             elif gmode == "logx":
                 g = LogxGraph(self.graphs[self.curgraph])
+                self.graphs[self.curgraph] = g
+            elif gmode == "logy":
+                g = LogyGraph(self.graphs[self.curgraph])
+                self.graphs[self.curgraph] = g
+            elif gmode == "loglog":
+                g = LoglogGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
                 
     def setlayout(self, layout = "quad"):
