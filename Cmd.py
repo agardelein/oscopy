@@ -256,21 +256,21 @@ class Cmds:
             for s in d:
                 del self.sigs[s]
         # Update in figures
-        for f in self.figs:
-            # Get the signals list from the figure
-            fsigs = f.getsigs()
-            # Generate the dict of updated signals for the figure
-            fu = {}
-            for k in u:
-                if k in fsigs:
-                    fu[k] = sigs[k]
-            # Generate the list of the name of deleted signals for the figure
-            fd = []
-            for k in d:
-                if k in fsigs:
-                    fd.append(k)
-            # Update the figure
-            f.update(fu, fd)
+            for f in self.figs:
+                # Get the signals list from the figure
+                fsigs = f.getsigs()
+                # Generate the dict of updated signals for the figure
+                fu = {}
+                for k in u:
+                    if k in fsigs:
+                        fu[k] = sigs[k]
+                # Generate the list of the name of deleted signals for the figure
+                fd = []
+                for k in d:
+                    if k in fsigs:
+                        fd.append(k)
+                # Update the figure
+                f.update(fu, fd)
 
     def add(self, args):
         """ Add a graph to the current figure
@@ -415,7 +415,8 @@ Help for individual command can be obtained with 'help COMMAND'\n\
         ss = r.loadfile(inp)
         for k, s in ss.iteritems():
             self.sigs[k] = s
-            print k
+        if len(ss) > 0:
+            self.readers[inp] = r
         return
 
     def gettoplot(self, args):
