@@ -141,7 +141,7 @@ class BaseGraph:
                 for i in range(0, len(y)):
                     x.append(i / (abs(s.ref.pts[1] - s.ref.pts[0]) \
                                       * len(s.ref.pts)))
-                print "!!!!", len(x), len(y)
+#                print "!!!!", len(x), len(y)
             else:
                 y = ifft(s.pts)
                 y = y[0:int(len(y)/2)-1]
@@ -149,9 +149,10 @@ class BaseGraph:
                 for i in range(0, len(y)):
                     x.append(i / (abs(s.ref.pts[1] - s.ref.pts[0]) \
                                       * len(s.ref.pts)))
-            plot(x, y)
+            plot(x, y, label=n)
         hold(False)
         xlabel(self.xaxis)
+        legend()
 
     def getsigs(self):
         """ Return a list of the signal names
