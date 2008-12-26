@@ -13,7 +13,7 @@ Class Cmds: Commands callables from scope commandline
    Delete a figure
 
    select(args)
-   Select the figure to become the current one
+   Select the figure and the graph to become the current ones
 
    layout(args)
    set the layout of the current figure
@@ -160,14 +160,18 @@ class Cmds:
         """ Select the current figure
         """
         if args == "help":
-            print "Usage: select FIG#"
-            print "   Select the current figure"
+            print "Usage: select FIG#[, GRAPH#]"
+            print "   Select the current figure and the current graph"
             return
 
-        num = eval(args)
+        s = args.split(',')
+
+        num = eval(s[0])
         if num > len(self.figs) or num < 1:
             return
         self.curfig = num - 1
+        if len(s) > 1:
+            self.figs[self.curfig].select(eval(s[1]))
 
     def layout(self, args):
         """ Define the layout of the current figure
