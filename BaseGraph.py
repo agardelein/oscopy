@@ -149,7 +149,13 @@ class BaseGraph:
                 for i in range(0, len(y)):
                     x.append(i / (abs(s.ref.pts[1] - s.ref.pts[0]) \
                                       * len(s.ref.pts)))
-            plot(x, y, label=n)
+            try:
+                plot(x, y, label=n)
+            except OverflowError, e:
+                print "OverflowError in plot:", e.message, "log(0) somewhere ?"
+                hold(False)
+                xlabel(self.xaxis)
+                return
         hold(False)
         xlabel(self.xaxis)
         legend()
