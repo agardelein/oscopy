@@ -114,7 +114,7 @@ class Cmds:
         After those tests, the figure is created with the signal list.
         """
         if toplot == "help":
-            print "Usage : new [SIG [, SIG [, SIG]...]]"
+            print "Usage : create [SIG [, SIG [, SIG]...]]"
             print "   Create a new figure, set it as current, add the signals"
             return
 
@@ -283,12 +283,11 @@ class Cmds:
             return
 
         if len(self.figs) < 1:
-            self.setplot(args)
+            self.create(args)
         else:
             toplot = self.gettoplot(args)
             if toplot == None:
                 return
-            print "Adding into figure"
             self.figs[self.curfig].add(toplot)
 
     def delete(self, args):
@@ -367,7 +366,7 @@ class Cmds:
 Commands related to figures:\n\
    create      create a new figure\n\
    destroy     delete a figure\n\
-   select      define the current figure\n\
+   select      define the current figure and the current graph\n\
    layout      set the layout (either horiz, vert or quad)\n\
    figlist     list the existing figures\n\
    plot        draw and show the figures\n\
