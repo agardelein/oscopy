@@ -71,9 +71,9 @@ class ReaderBase:
         signals, as well as a list of the name of updated, deleted
         and new signals
         """
-        u = []
-        d = []
-        n = []
+        u = {}
+        d = {}
+        n = {}
         old = {}
         # Old signal list
         for s in self.slist:
@@ -84,20 +84,20 @@ class ReaderBase:
 
         # Find updated signals
         # Go through the old list
-        for s in old.keys():
+        for k, s in old.iteritems():
             # Signal in the new list
-            if sdict.has_key(s):
+            if k in sdict.keys():
                 # updated signal
-                u.append(s)
+                u[k] = sdict[k]
             else:
                 # deleted signal
-                d.append(s)
+                d[k] = s
         # Go through the new list
-        for s in sdict.keys():
+        for k, s in sdict.iteritems():
             # Signal not in the old list
-            if not old.has_key(s):
-                #   then add
-                n.append(s)
+            if k not in old.keys():
+                #   then add as new
+                n[k] = s
         return sdict, u, d, n
 
     def __str__(self):

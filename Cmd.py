@@ -58,10 +58,6 @@ Class Cmds: Commands callables from scope commandline
    Return a list of the signal names from the arguments provided by the user
    Should not be called from the command line
 
-   setplot(args)
-   Assign signals to the current graph of the current figure,
-   create a new figure if none exist
-
    fft(args)
       Do fft of signals of current graph of the current figure before plotting
 
@@ -126,7 +122,7 @@ class Cmds:
             else:
                 # No signal list provided
                 toplot = None
-        elif not type(toplot) == ListType:
+        elif not type(toplot) == DictType:
             return
         # toplot is now a list
         f = Figure(toplot)
@@ -229,17 +225,19 @@ class Cmds:
         r = GnucapReader() # for now only Gnucap is supported
         sigs = r.loadfile(args)
         # Insert signals into the dict
-        for v in sigs.keys():
-            self.sigs[v] = sigs[v]
+        for sn in sigs.keys():
+            self.sigs[sn] = sigs[sn]
         print args, ":"
-        for ns, si in self.sigs.iteritems():
-            print si
+        for s in self.sigs.itervalues():
+            print s
         self.readers[args] = r
 
     def update(self, args):
         """ Reread signal from files.
         For each file, reread it, and for updated, new and deleted signal,
         update the signal dict accordingly.
+        Avoid sending the whole signal dict to each figure by asking each one
+        its signal list and tailoring the updated and deleted signals dicts
         """
         if args == "help":
             print "Usage : update"
@@ -247,28 +245,23 @@ class Cmds:
             return
 
         # Reread the files
-        for v in self.readers.keys():
-            sigs, u, d, n = self.readers[v].update()
-            for s in u:
-                self.sigs[s] = sigs[s]
-            for s in n:
-                self.sigs[s] = sigs[s]
-            for s in d:
-                del self.sigs[s]
-        # Update in figures
+        for rn in self.readers.keys():
+            sigs, u, d, n = self.readers[rn].update()
+            self.sigs.update(u)
+            self.sigs.update(n)
+            for k in d.keys():
+                if k in self.sigs:
+                    del self.sigs[k]
+            # Update in figures
             for f in self.figs:
-                # Get the signals list from the figure
-                fsigs = f.getsigs()
-                # Generate the dict of updated signals for the figure
                 fu = {}
-                for k in u:
-                    if k in fsigs:
-                        fu[k] = sigs[k]
-                # Generate the list of the name of deleted signals for the figure
-                fd = []
-                for k in d:
-                    if k in fsigs:
-                        fd.append(k)
+                fd = {}
+                # Iterate through the graphs to get the signames
+                for sn in f.getsigs():
+                    if sn in u.keys():
+                        fu[sn] = u[sn]
+                    elif sn in d.keys():
+                        fd[sn] = d[sn]
                 # Update the figure
                 f.update(fu, fd)
 
@@ -355,7 +348,7 @@ class Cmds:
             print "   List loaded signals"
             return
 
-        for n, s in self.sigs.iteritems():
+        for s in self.sigs.itervalues():
             print s
 
     def help(self, args):
@@ -395,14 +388,12 @@ Help for individual command can be obtained with 'help COMMAND'\n\
         sigs = {}
 
         # Build the list of signals to be used
-        for k, s in self.sigs.iteritems():
-            if inp.find(k) > 0:
-                sigs[k] = s
+        for sn, s in self.sigs.iteritems():
+            if inp.find(sn) > 0:
+                sigs[sn] = s
         if sigs == {}:
             # No sigs, nothing to do
             return
-#        for k in sigs.keys():
-#            print k
 
         # Split left hand and right hand
         tmp = inp.split("=", 1)
@@ -412,8 +403,8 @@ Help for individual command can be obtained with 'help COMMAND'\n\
         # Create the expression
         r = MathReader(sigs)
         ss = r.loadfile(inp)
-        for k, s in ss.iteritems():
-            self.sigs[k] = s
+        for sn, s in ss.iteritems():
+            self.sigs[sn] = s
         if len(ss) > 0:
             self.readers[inp] = r
         return
@@ -423,45 +414,25 @@ Help for individual command can be obtained with 'help COMMAND'\n\
         The list must be a coma separated list of signal names.
         If no signals are loaded of no signal are found, return None
         """
-        toplot = []
+        toplot = {}
         # Are there signals ?
         if self.sigs == []:
             print "No signal loaded"
             return None
 
         # Prepare the signal list
-        for s in args.split(","):
-            s = s.strip()
-            if s in self.sigs.keys():
-                toplot.append(self.sigs[s])
+        for sn in args.split(","):
+            sn = sn.strip()
+            if sn in self.sigs.keys():
+                toplot[sn] = self.sigs[sn]
             else:
-                print s + ": Not here"
+                print sn + ": Not here"
 
         # No signals found
         if len(toplot) < 1:
             print "No signals found"
             return None
         return toplot
-
-    def setplot(self, args):
-        """ Set the signals of the current graph of the current figure.
-        If no figure exist, create a new one.
-        FOR DEBUG ONLY
-        """
-        if args == "help":
-            print "Usage : setplot SIG [, SIG [, SIG]...]"
-            print "   Set the signals of the current graph of the current figure"
-            print "FOR DEBUG ONLY"
-            return
-
-        toplot = self.gettoplot(args)
-        if toplot == None:
-            return
-        # Can now prepare the plot
-        if self.figs == []:
-            self.create(toplot)
-        else:
-            self.figs[self.curfig].setf(toplot)
 
     def fft(self, args):
         """ Set fft mode to the current graph of the current figure

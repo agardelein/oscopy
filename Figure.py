@@ -76,8 +76,8 @@ class Figure:
         self.curgraph = -1
         if sigs == None:
             return
-        gr = LinGraph(sigs)
-        self.graphs.append(gr)
+        else:
+            self.add(sigs)
 
     def add(self, sigs = None):
         """ Add a graph into the figure and set it as current graph.
@@ -89,7 +89,7 @@ class Figure:
             return
         gr = LinGraph(sigs)
         self.graphs.append(gr)
-        self.select(len(self.graphs) - 1)
+        self.select(self.graphs.index(gr))
 
     def delete(self, num = 0):
         """ Delete a graph from the figure
@@ -108,24 +108,18 @@ class Figure:
             self.curgraph = len(self.graphs) - 1
 
     def update(self, u, d):
-        # TODO : update
         """ Update the graphs
         """
         for g in self.graphs:
-            # Get the signal list from the graph
-            sg = g.getsigs()
-            # Generate the list of updated signals
             ug = {}
-            for k, s in u.iteritems():
-                if k in sg:
-                    ug[k] = u[k]
-            # Generate the list of deleted signals
-            dg = []
-            for k in d:
-                if k in sg:
-                    dg.append(k)
-            # Update the graph
-            g.update(ug, dg)
+            dg = {}
+            for sn in g.getsigs():
+                if sn in u:
+                    ug[sn] = u[sn]
+                elif sn in d:
+                    dg[sn] = d[sn]
+            g.insert(ug)
+            g.remove(dg)
 
     def select(self, graph = 0):
         """ Select the current graph
@@ -208,6 +202,7 @@ class Figure:
     def insert(self, sigs):
         """ Add a signal into the current graph
         """
+        print self.curgraph
         if self.curgraph < 0 or self.curgraph > len(self.graphs):
             return
         self.graphs[self.curgraph].insert(sigs)
@@ -227,10 +222,9 @@ class Figure:
     def getsigs(self):
         """ Return the list of signals in all graphs
         """
-        sigs = []
-        for i, g in enumerate(self.graphs):
-            sigs.extend(g.getsigs())
-        return sigs
+        for g in self.graphs:
+            for sn in g.getsigs():
+                yield sn
 
     def setf(self, sigs = None):
         """ Set the signals of the current graph

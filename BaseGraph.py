@@ -79,9 +79,8 @@ class BaseGraph:
         """ Return a string with the type and the signal list of the graph
         """
         a = self.gettype() + " "
-        for n, s in self.sigs.iteritems():
-            a = a + n
-            a = a + " "
+        for sn, s in self.sigs.iteritems():
+            a = a + sn + " "
         return a
 
     def insert(self, sigs = None):
@@ -91,36 +90,38 @@ class BaseGraph:
         otherwise they are ignored
         """
         if sigs == None:
-            return
-        for s in sigs:
+            return len(self.sigs)
+        for sn, s in sigs.iteritems():
             if len(self.sigs) == 0:
                 # First signal, set the abscisse name and add signal
                 self.xaxis = s.ref.name
-                self.sigs[s.name] = s
+                self.sigs[sn] = s
             else:
                 if s.ref.name == self.xaxis:
                     # Add signal
-                    self.sigs[s.name] = s
+                    self.sigs[sn] = s
                 else:
                     # Ignore signal
-                    print "Not the same ref:", s.name, "-", self.xaxis,"-"
+                    print "Not the same ref:", sn, "-", self.xaxis,"-"
+        return len(self.sigs)
 
     def remove(self, sigs = None):
         """ Delete signals from the graph
         """
-        for s in sigs:
-            if s.name in self.sigs.keys():
-                del self.sigs[s.name]
-        return
+        for sn, s in sigs.iteritems():
+            if sn in self.sigs.keys():
+                del self.sigs[sn]
+        return len(self.sigs)
 
-    def update(self, u, d):
-        """ Update the signals with reread values
-        """
-        for k, s in u.iteritems():
-            self.sigs[k] = s
-        for k in d:
-            del self.sigs[k]
-        return None
+#     def update(self, u, d):
+#         """ Update the signals with reread values
+#         """
+#         self.sigs.update(u)
+# #        for k, s in u.iteritems():
+# #            self.sigs[k] = s
+#         for k in d:
+#             del self.sigs[k]
+#         return None
 
     def plot(self):
         """ Plot the graph
@@ -130,7 +131,7 @@ class BaseGraph:
         """
         self.setaxes()
         hold(True)
-        for n, s in self.sigs.iteritems():
+        for sn, s in self.sigs.iteritems():
             if self.dofft == 0:
                 x = s.ref.pts
                 y = s.pts
@@ -141,7 +142,6 @@ class BaseGraph:
                 for i in range(0, len(y)):
                     x.append(i / (abs(s.ref.pts[1] - s.ref.pts[0]) \
                                       * len(s.ref.pts)))
-#                print "!!!!", len(x), len(y)
             else:
                 y = ifft(s.pts)
                 y = y[0:int(len(y)/2)-1]
@@ -150,9 +150,9 @@ class BaseGraph:
                     x.append(i / (abs(s.ref.pts[1] - s.ref.pts[0]) \
                                       * len(s.ref.pts)))
             try:
-                plot(x, y, label=n)
+                plot(x, y, label=sn)
             except OverflowError, e:
-                print "OverflowError in plot:", e.message, "log(0) somewhere ?"
+                print "OverflowError in plot:", e.message, ", log(0) somewhere ?"
                 hold(False)
                 xlabel(self.xaxis)
                 return
@@ -163,7 +163,8 @@ class BaseGraph:
     def getsigs(self):
         """ Return a list of the signal names
         """
-        return self.sigs.keys()
+        for sn in self.sigs:
+            yield sn
 
     def setaxes(self):
         """ Define the axes type, called by plot()
@@ -199,3 +200,4 @@ class BaseGraph:
         """ Do neither a fft or ifft before plotting
         """
         self.dofft = 0
+
