@@ -12,6 +12,27 @@ To run the program, just do ./scope.
 
 To get any info on available commands, type help.
 
+EXAMPLE:
+-------
+./scope.py
+load tran.dat
+load ac.dat
+add vsqu
+v1=vsqu*3+2
+siglist
+add v1
+add vsqu
+fft
+figlist
+create
+add vout
+mode loglog
+figlist
+plot
+(change something in deom.sch, e.g. vsqu amplitude)
+update
+plot
+
 EXTENDING THE PROGRAM:
 ---------------------
 New data file format can be added by deriving ReaderBase and

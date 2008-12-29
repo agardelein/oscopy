@@ -43,15 +43,9 @@ Figure -- Handle a list of graphs
    plot()
       Plot the figure
 
-#   setsigs(sigs)
-#      Add signals into the current graph
-#   
    getsigs()
       Return a list of the signals in all graphs
 
-#   setf(sigs)
-#      Set the signals of the current graph
-#
    fft()
       Do fft of signals of current graph before plotting
 
@@ -137,7 +131,7 @@ class Figure:
         """ List the graphs from the figure
         """
         for gn, g in enumerate(self.graphs):
-            print "  Graph :", gn, g
+            print "  Graph", gn + 1, ":", g
 
     def setmode(self, gmode):
         """ Set the mode of the current graph
@@ -219,11 +213,6 @@ class Figure:
             return
         self.graphs[self.curgraph].remove(sigs)
 
-#    def setsigs(self, sigs = None):
-#        """ Add signals into the current graph
-#        """
-#        self.graphs[curgraph].insert(sigs)
-
     def getsigs(self):
         """ Return the list of signals in all graphs
         """
@@ -231,14 +220,6 @@ class Figure:
             for sn in g.getsigs():
                 yield sn
 
-#    def setf(self, sigs = None):
-#        """ Set the signals of the current graph
-#        By default, do nothing
-#        """
-#        if self.curgraph < 0 or self.curgraph > len(self.graphs):
-#            return
-#        self.graphs[self.curgraph].setg(sigs)
-#
     def fft(self):
         """ Set fft mode to the current graph
         """

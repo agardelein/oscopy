@@ -8,6 +8,9 @@ Signals are managed as a dict, where the key is the signal name.
 In a graph, signals with a different sampling, but with the same abscisse
 can be plotted together.
 
+sn: signal name
+s : signal
+
 Class BaseGraph -- Handle the representation of a list of signals
 
    methods:
@@ -78,7 +81,11 @@ class BaseGraph:
     def __str__(self):
         """ Return a string with the type and the signal list of the graph
         """
-        a = self.gettype() + " "
+        a = "(" + self.gettype() + ") "
+        if self.dofft == 1:
+            a = a + "(fft)" + " "
+        elif self.dofft == -1:
+            a = a + "(ifft)" + " "
         for sn, s in self.sigs.iteritems():
             a = a + sn + " "
         return a
@@ -112,16 +119,6 @@ class BaseGraph:
             if sn in self.sigs.keys():
                 del self.sigs[sn]
         return len(self.sigs)
-
-#     def update(self, u, d):
-#         """ Update the signals with reread values
-#         """
-#         self.sigs.update(u)
-# #        for k, s in u.iteritems():
-# #            self.sigs[k] = s
-#         for k in d:
-#             del self.sigs[k]
-#         return None
 
     def plot(self):
         """ Plot the graph
@@ -157,7 +154,13 @@ class BaseGraph:
                 xlabel(self.xaxis)
                 return
         hold(False)
-        xlabel(self.xaxis)
+        if self.dofft == 0:
+            xlabel(self.xaxis)
+        elif self.dofft > 0:
+            xlabel("Freq")
+        else:
+            xlabel("Time")
+
         legend()
 
     def getsigs(self):
