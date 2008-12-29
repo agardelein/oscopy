@@ -5,7 +5,11 @@ Signal list are passed directly to each graph.
 Layout can be either all graphs stacked verticaly, horizontaly or in quad
 
 The variable curgraph represent the active graph on which operations setf and setsigs can be done.
-Valitidy interval : 0..3, -1 when the figure is empty.
+Valitidy interval : 1..4, 0 when the figure is empty.
+
+gn : graph number
+g : graph
+sn : signal name
 
 class:
 
@@ -41,13 +45,13 @@ Figure -- Handle a list of graphs
 
 #   setsigs(sigs)
 #      Add signals into the current graph
-   
+#   
    getsigs()
       Return a list of the signals in all graphs
 
-   setf(sigs)
-      Set the signals of the current graph
-
+#   setf(sigs)
+#      Set the signals of the current graph
+#
    fft()
       Do fft of signals of current graph before plotting
 
@@ -73,7 +77,7 @@ class Figure:
         """
         self.graphs = []
         self.layout = "horiz"
-        self.curgraph = -1
+        self.curgraph = 0
         if sigs == None:
             return
         else:
@@ -89,23 +93,24 @@ class Figure:
             return
         gr = LinGraph(sigs)
         self.graphs.append(gr)
-        self.select(self.graphs.index(gr))
+        self.select(self.graphs.index(gr) + 1)
 
-    def delete(self, num = 0):
+    def delete(self, num = 1):
         """ Delete a graph from the figure
         By default, delete the first graph.
         Act as a "pop" with curgraph variable.
         """
-        if len(self.graphs) < 1 or eval(num) > len(self.graphs) - 1:
+        gn = eval(num)   # Graph number
+        if len(self.graphs) < 1 or gn < 1 or gn > len(self.graphs):
             return
-        del self.graphs[eval(num)]
+        del self.graphs[gn - 1]
         
         # Handle self.curgraph
         # By default, next figure becomes the current
         if len(self.graphs) == 0:
-            self.curgraph = -1
+            self.curgraph = 0
         elif self.curgraph > len(self.graphs):
-            self.curgraph = len(self.graphs) - 1
+            self.curgraph = len(self.graphs)
 
     def update(self, u, d):
         """ Update the graphs
@@ -121,18 +126,18 @@ class Figure:
             g.insert(ug)
             g.remove(dg)
 
-    def select(self, graph = 0):
+    def select(self, gn = 0):
         """ Select the current graph
         """
-        if graph < 0 or graph > len(self.graphs):
+        if gn < 1 or gn > len(self.graphs):
             return
-        self.curgraph = graph
+        self.curgraph = gn - 1
 
     def list(self):
         """ List the graphs from the figure
         """
-        for i, g in enumerate(self.graphs):
-            print "  Graph :", i, g
+        for gn, g in enumerate(self.graphs):
+            print "  Graph :", gn, g
 
     def setmode(self, gmode):
         """ Set the mode of the current graph
@@ -194,8 +199,8 @@ class Figure:
             ny = 2
 
         # Plot the whole figure
-        for i, g in enumerate(self.graphs):
-            subplot(nx, ny, i+1)
+        for gn, g in enumerate(self.graphs):
+            subplot(nx, ny, gn+1)
             g.plot()
         return
 
@@ -226,31 +231,31 @@ class Figure:
             for sn in g.getsigs():
                 yield sn
 
-    def setf(self, sigs = None):
-        """ Set the signals of the current graph
-        By default, do nothing
-        """
-        if self.curgraph < 0 or self.curgraph > len(self.graphs):
-            return
-        self.graphs[self.curgraph].setg(sigs)
-
+#    def setf(self, sigs = None):
+#        """ Set the signals of the current graph
+#        By default, do nothing
+#        """
+#        if self.curgraph < 0 or self.curgraph > len(self.graphs):
+#            return
+#        self.graphs[self.curgraph].setg(sigs)
+#
     def fft(self):
         """ Set fft mode to the current graph
         """
-        if self.curgraph < 0 or self.curgraph > len(self.graphs):
+        if self.curgraph < 1 or self.curgraph > len(self.graphs):
             return
         self.graphs[self.curgraph].fft()
 
     def ifft(self):
         """ Set ifft mode to the current graph
         """
-        if self.curgraph < 0 or self.curgraph > len(self.graphs):
+        if self.curgraph < 1 or self.curgraph > len(self.graphs):
             return
         self.graphs[self.curgraph].ifft()
 
     def nofft(self):
         """ Set no fft mode to the current graph
         """
-        if self.curgraph < 0 or self.curgraph > len(self.graphs):
+        if self.curgraph < 1 or self.curgraph > len(self.graphs):
             return
         self.graphs[self.curgraph].nofft()
