@@ -66,11 +66,13 @@ class BaseGraph:
         if isinstance(sigs, BaseGraph):
             self.sigs = sigs.sigs
             self.xaxis = sigs.xaxis
+            self.yaxis = sigs.yaxis
             self.dofft = sigs.dofft
             return
         else:
             self.sigs = {}
             self.xaxis = ""
+            self.yaxis = ""
             self.dofft = 0
             if sigs == None:
                 return
@@ -102,6 +104,7 @@ class BaseGraph:
             if len(self.sigs) == 0:
                 # First signal, set the abscisse name and add signal
                 self.xaxis = s.ref.name
+                self.yaxis = "Signals"  # To change
                 self.sigs[sn] = s
             else:
                 if s.ref.name == self.xaxis:
@@ -126,12 +129,42 @@ class BaseGraph:
         In this way, signals with a different sampling can be plotted together.
         The x axis is labelled with the abscisse name of the graph.
         """
+
+        # Prepare the axis labels
+        if self.dofft == 0:
+            xl = self.xaxis
+            fx, l = self.findscalefact("X")
+            xl = xl + " " + l
+        elif self.dofft > 0:
+            xl = "Freq"
+        else:
+            xl = "Time"
+        yl = self.yaxis
+        fy, l = self.findscalefact("Y")
+        yl = yl + " " + l
+        
         self.setaxes()
+        # Plot the signals
         hold(True)
+#        mx = 0
+#        my = 0
+#        for s in self.itersigs():
+#            try:
+#                plot(s.ref.pts, s.pts, label=s.name)
+#            except OverflowError, e:
+#                print "OverflowError in plot:", e.message, ", log(0) somewhere ?"
+#                break
+
         for sn, s in self.sigs.iteritems():
             if self.dofft == 0:
-                x = s.ref.pts
-                y = s.pts
+                # The hard way...
+                x = []
+                for i in s.ref.pts:
+                    x.append(i * pow(10, fx))
+                # The hard way, once again
+                y = []
+                for i in s.pts:
+                    y.append(i * pow(10, fy))
             elif self.dofft > 0:
                 y = fft(s.pts)
                 y = y[0:int(len(y)/2)-1]
@@ -151,16 +184,12 @@ class BaseGraph:
             except OverflowError, e:
                 print "OverflowError in plot:", e.message, ", log(0) somewhere ?"
                 hold(False)
-                xlabel(self.xaxis)
+                xlabel(xl)
+                ylabel(yl)
                 return
         hold(False)
-        if self.dofft == 0:
-            xlabel(self.xaxis)
-        elif self.dofft > 0:
-            xlabel("Freq")
-        else:
-            xlabel("Time")
-
+        xlabel(xl)
+        ylabel(yl)
         legend()
 
     def getsigs(self):
@@ -204,3 +233,38 @@ class BaseGraph:
         """
         self.dofft = 0
 
+    def findscalefact(self, a):
+        """ Choose the right scale for data on axis a
+        Return the scale factor an a string with the abbrev.
+        """
+        scnames = {-18: "a", -15:"f", -12:"p", -9:"n", -6:"u", -3:"m", \
+            0:"", 3:"k", 6:"M", 9:"G", 12:"T", 15:"P", 18:"E"}
+
+        # Find the absolute maximum of the data
+        mxs = []
+        mns = []
+        for s in self.sigs.itervalues():
+            if a == "X":
+                mxs.append(max(s.ref.pts))
+                mns.append(min(s.ref.pts))
+            else:
+                mxs.append(max(s.pts))
+                mns.append(min(s.pts))
+        mx = abs(max(mxs))
+        mn = abs(min(mns))
+        mx = max(mx, mn)
+
+        # Find the scaling factor using the absolute maximum
+        if abs(mx) > 1:
+            fct = -3
+        else:
+            fct = 3
+        f = 0
+        while not (abs(mx * pow(10, f)) < 1000 \
+                       and abs(mx * pow(10, f)) > 1):
+            f = f + fct
+        if scnames.has_key(-f):
+            l = scnames[-f]
+        else:
+            l = "10e" + str(-f)
+        return f, l
