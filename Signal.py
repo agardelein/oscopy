@@ -21,14 +21,24 @@ Class Signal -- Contains the signal points and other information
       Returns a string with the signal name, the reference name
       and the reader name.
 """
+from types import *
 
 # Signals class
 class Signal:
     def __init__(self, name = "", reader = None):
-        self.pts = []            # Data points
-        self.name = name         # Identifier
-        self.ref = None          # Reference signal
-        self.reader = reader     # Reader object
+        if isinstance(name, Signal):
+            self.pts = name.pts
+            self.name = name.name
+            if name.ref == None:
+                self.ref = name.ref
+            else:
+                self.ref = Signal(name.ref)
+            self.reader = name.reader
+        else:
+            self.pts = []            # Data points
+            self.name = name         # Identifier
+            self.ref = None          # Reference signal
+            self.reader = reader     # Reader object
 
     def __str__(self):
         a = self.name + " / " + (self.ref.name) + " (" + str(self.reader) + ") "

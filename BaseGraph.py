@@ -38,23 +38,10 @@ Class BaseGraph -- Handle the representation of a list of signals
    gettype()
       Return a string with the type of graph, to be overloaded.
 
-   setg(sigs)
-      Set the signal list of the graphs
-
-   fft()
-      Do fft of signals before plotting
-
-   iff()
-      Do ifft of signal before plotting
-
-   nofft()
-      Do neither fft nor ifft
 """
 
-from Axe import Axe
 import matplotlib.pyplot as plt
 from pylab import *
-from scipy.fftpack import fft,ifft
 
 class BaseGraph:
     def __init__(self, sigs = None):
@@ -63,17 +50,15 @@ class BaseGraph:
         Signals are assumed to exist and to be valid
         If first argument is a BaseGraph, then copy things
         """
+        self.sigs = {}
         if isinstance(sigs, BaseGraph):
-            self.sigs = sigs.sigs
-            self.xaxis = sigs.xaxis
-            self.yaxis = sigs.yaxis
-            self.dofft = sigs.dofft
+            mysigs = {}
+            mysigs = sigs.sigs.copy()
+            self.insert(mysigs)
             return
         else:
-            self.sigs = {}
             self.xaxis = ""
             self.yaxis = ""
-            self.dofft = 0
             if sigs == None:
                 return
             else:
@@ -84,11 +69,7 @@ class BaseGraph:
         """ Return a string with the type and the signal list of the graph
         """
         a = "(" + self.gettype() + ") "
-        if self.dofft == 1:
-            a = a + "(fft)" + " "
-        elif self.dofft == -1:
-            a = a + "(ifft)" + " "
-        for sn, s in self.sigs.iteritems():
+        for sn in self.sigs.keys():
             a = a + sn + " "
         return a
 
@@ -118,7 +99,7 @@ class BaseGraph:
     def remove(self, sigs = None):
         """ Delete signals from the graph
         """
-        for sn, s in sigs.iteritems():
+        for sn in sigs.iterkeys():
             if sn in self.sigs.keys():
                 del self.sigs[sn]
         return len(self.sigs)
@@ -129,16 +110,10 @@ class BaseGraph:
         In this way, signals with a different sampling can be plotted together.
         The x axis is labelled with the abscisse name of the graph.
         """
-
         # Prepare the axis labels
-        if self.dofft == 0:
-            xl = self.xaxis
-            fx, l = self.findscalefact("X")
-            xl = xl + " " + l
-        elif self.dofft > 0:
-            xl = "Freq"
-        else:
-            xl = "Time"
+        xl = self.xaxis
+        fx, l = self.findscalefact("X")
+        xl = xl + " " + l
         yl = self.yaxis
         fy, l = self.findscalefact("Y")
         yl = yl + " " + l
@@ -156,29 +131,15 @@ class BaseGraph:
 #                break
 
         for sn, s in self.sigs.iteritems():
-            if self.dofft == 0:
-                # The hard way...
-                x = []
-                for i in s.ref.pts:
-                    x.append(i * pow(10, fx))
-                # The hard way, once again
-                y = []
-                for i in s.pts:
-                    y.append(i * pow(10, fy))
-            elif self.dofft > 0:
-                y = fft(s.pts)
-                y = y[0:int(len(y)/2)-1]
-                x = []
-                for i in range(0, len(y)):
-                    x.append(i / (abs(s.ref.pts[1] - s.ref.pts[0]) \
-                                      * len(s.ref.pts)))
-            else:
-                y = ifft(s.pts)
-                y = y[0:int(len(y)/2)-1]
-                x = []
-                for i in range(0, len(y)):
-                    x.append(i / (abs(s.ref.pts[1] - s.ref.pts[0]) \
-                                      * len(s.ref.pts)))
+            # Scaling factor
+            # The hard way...
+            x = []
+            for i in s.ref.pts:
+                x.append(i * pow(10, fx))
+            # The hard way, once again
+            y = []
+            for i in s.pts:
+                y.append(i * pow(10, fy))
             try:
                 plot(x, y, label=sn)
             except OverflowError, e:
@@ -210,29 +171,6 @@ class BaseGraph:
         """
         return
     
-    def setg(self, sigs = None):
-        """ Set the signal dict
-        The old signal list is deleted, as well as the abscisse name
-        """
-        self.sigs = {}
-        self.xaxis = ""
-        self.insert(sigs)
-
-    def fft(self):
-        """ Do a fft of signals before plotting
-        """
-        self.dofft = 1
-
-    def ifft(self):
-        """ Do a ifft of signals before plotting
-        """
-        self.dofft = -1
-
-    def nofft(self):
-        """ Do neither a fft or ifft before plotting
-        """
-        self.dofft = 0
-
     def findscalefact(self, a):
         """ Choose the right scale for data on axis a
         Return the scale factor an a string with the abbrev.

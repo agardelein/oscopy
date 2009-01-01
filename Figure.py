@@ -4,7 +4,7 @@ A figure consist of a list of up to 4 graphs, with a layout.
 Signal list are passed directly to each graph.
 Layout can be either all graphs stacked verticaly, horizontaly or in quad
 
-The variable curgraph represent the active graph on which operations setf and setsigs can be done.
+The variable curgraph represent the active graph on which operations are done.
 Valitidy interval : 1..4, 0 when the figure is empty.
 
 gn : graph number
@@ -45,15 +45,6 @@ Figure -- Handle a list of graphs
 
    getsigs()
       Return a list of the signals in all graphs
-
-   fft()
-      Do fft of signals of current graph before plotting
-
-   iff()
-      Do ifft of signal of current graph before plotting
-
-   nofft()
-      Do neither fft nor ifft
 """
 
 from LinGraph import *
@@ -140,6 +131,12 @@ class Figure:
             if gmode == "lin":
                 g = LinGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
+            elif gmode == "fftlin":
+                g = FFTLinGraph(self.graphs[self.curgraph])
+                self.graphs[self.curgraph] = g                
+            elif gmode == "ifftlin":
+                g = IFFTLinGraph(self.graphs[self.curgraph])
+                self.graphs[self.curgraph] = g                
             elif gmode == "logx":
                 g = LogxGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
@@ -148,6 +145,24 @@ class Figure:
                 self.graphs[self.curgraph] = g
             elif gmode == "loglog":
                 g = LoglogGraph(self.graphs[self.curgraph])
+                self.graphs[self.curgraph] = g
+            elif gmode == "fftlogx":
+                g = FFTLogxGraph(self.graphs[self.curgraph])
+                self.graphs[self.curgraph] = g
+            elif gmode == "fftlogy":
+                g = FFTLogyGraph(self.graphs[self.curgraph])
+                self.graphs[self.curgraph] = g
+            elif gmode == "fftloglog":
+                g = FFTLoglogGraph(self.graphs[self.curgraph])
+                self.graphs[self.curgraph] = g
+            elif gmode == "ifftlogx":
+                g = IFFTLogxGraph(self.graphs[self.curgraph])
+                self.graphs[self.curgraph] = g
+            elif gmode == "ifftlogy":
+                g = IFFTLogyGraph(self.graphs[self.curgraph])
+                self.graphs[self.curgraph] = g
+            elif gmode == "ifftloglog":
+                g = IFFTLoglogGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
                 
     def setlayout(self, layout = "quad"):
@@ -219,24 +234,3 @@ class Figure:
         for g in self.graphs:
             for sn in g.getsigs():
                 yield sn
-
-    def fft(self):
-        """ Set fft mode to the current graph
-        """
-        if self.curgraph < 1 or self.curgraph > len(self.graphs):
-            return
-        self.graphs[self.curgraph].fft()
-
-    def ifft(self):
-        """ Set ifft mode to the current graph
-        """
-        if self.curgraph < 1 or self.curgraph > len(self.graphs):
-            return
-        self.graphs[self.curgraph].ifft()
-
-    def nofft(self):
-        """ Set no fft mode to the current graph
-        """
-        if self.curgraph < 1 or self.curgraph > len(self.graphs):
-            return
-        self.graphs[self.curgraph].nofft()

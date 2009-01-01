@@ -57,16 +57,6 @@ Class Cmds: Commands callables from scope commandline
    gettoplot(args)
    Return a list of the signal names from the arguments provided by the user
    Should not be called from the command line
-
-   fft(args)
-      Do fft of signals of current graph of the current figure before plotting
-
-   iff(args)
-      Do ifft of signal of current graph of the current figure before plotting
-
-   nofft(args)
-      Do neither fft nor ifft for the current graph of the current figure
-
 """
 
 from GnucapReader import *
@@ -433,24 +423,3 @@ Help for individual command can be obtained with 'help COMMAND'\n\
             print "No signals found"
             return None
         return toplot
-
-    def fft(self, args):
-        """ Set fft mode to the current graph of the current figure
-        """
-        if self.curfig < 0 or self.curfig > len(self.figs):
-            return
-        self.figs[self.curfig].fft()
-
-    def ifft(self, args):
-        """ Set ifft mode to the current graph of the current figure
-        """
-        if self.curfig < 0 or self.curfig > len(self.figs):
-            return
-        self.figs[self.curfig].ifft()
-
-    def nofft(self, args):
-        """ Set no fft mode to the current graph of the current figure
-        """
-        if self.curfig < 0 or self.curfig > len(self.figs):
-            return
-        self.figs[self.curfig].nofft()
