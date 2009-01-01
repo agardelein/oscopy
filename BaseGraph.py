@@ -85,7 +85,9 @@ class BaseGraph:
             if len(self.sigs) == 0:
                 # First signal, set the abscisse name and add signal
                 self.xaxis = s.ref.name
+                self.xunit = s.ref.unit
                 self.yaxis = "Signals"  # To change
+                self.yunit = s.unit
                 self.sigs[sn] = s
             else:
                 if s.ref.name == self.xaxis:
@@ -112,11 +114,13 @@ class BaseGraph:
         """
         # Prepare the axis labels
         xl = self.xaxis
+        xu = self.xunit
         fx, l = self.findscalefact("X")
-        xl = xl + " " + l
+        xl = xl + " (" + l + xu + ")"
         yl = self.yaxis
+        yu = self.yunit
         fy, l = self.findscalefact("Y")
-        yl = yl + " " + l
+        yl = yl + " (" + l + yu + ")"
         
         self.setaxes()
         # Plot the signals

@@ -25,7 +25,7 @@ from types import *
 
 # Signals class
 class Signal:
-    def __init__(self, name = "", reader = None):
+    def __init__(self, name = "", reader = None, unit = ""):
         if isinstance(name, Signal):
             self.pts = name.pts
             self.name = name.name
@@ -34,14 +34,18 @@ class Signal:
             else:
                 self.ref = Signal(name.ref)
             self.reader = name.reader
+            self.unit = name.unit
         else:
             self.pts = []            # Data points
             self.name = name         # Identifier
             self.ref = None          # Reference signal
             self.reader = reader     # Reader object
+            self.unit = unit
 
     def __str__(self):
-        a = self.name + " / " + (self.ref.name) + " (" + str(self.reader) + ") "
+        a = self.name + " / " + (self.ref.name) \
+            + " " + self.unit \
+            + " (" + str(self.reader) + ") "
         b = ""
         if len(self.pts) > 10:
             for i in range(0, 9):

@@ -42,8 +42,9 @@ class GnucapReader(ReaderBase):
             break  # Read only the first line
 
         for name in nlist: # Extract signal names
+            u = self.unitfromprobe(name.split('(', 1)[0])
             name = filter(f, name.strip())
-            s = Signal(name, self)
+            s = Signal(name, self, u)
             self.slist.append(s)
 
         # Read values and assign to signals
@@ -59,3 +60,18 @@ class GnucapReader(ReaderBase):
             s.ref = ref
             sdict[s.name] = s
         return sdict
+
+    def unitfromprobe(self, pn = ""):
+        """ Return the unit name from the probe name
+        """
+        if pn == "":
+            return pn
+
+        # For now only element probe
+        uns = {"v":"V", "vout":"V", "vin":"V", "i":"A", "p":"W",\
+                   "nv":"", "ev":"", "r":"Ohms", "y":"S",\
+                   "Time":"s", "Freq":"Hz"}
+        if uns.has_key(pn):
+            return uns[pn]
+        else:
+            return ""
