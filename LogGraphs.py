@@ -104,10 +104,10 @@ Class IFFTLinGraph -- Draw graph with log scale on X and Y axis and IFFT
 
 """
 
-from BaseGraph import *
+from Graph import *
 from FFTGraph import *
 
-class LogxGraph(BaseGraph):
+class LogxGraph(Graph):
     def setaxes(self):
         """ The x axis is log, the y axis is linear
         """
@@ -125,9 +125,9 @@ class LogxGraph(BaseGraph):
         if a == "X":
             return 0, ""
         else:
-            return BaseGraph.findscalefact(self, a)
+            return Graph.findscalefact(self, a)
 
-class LogyGraph(BaseGraph):
+class LogyGraph(Graph):
     def setaxes(self):
         """ The y axis is log, the x axis is linear
         """
@@ -143,11 +143,11 @@ class LogyGraph(BaseGraph):
         """ No scale factor for Y axis
         """
         if a == "X":
-            return BaseGraph.findscalefact(self, a)
+            return Graph.findscalefact(self, a)
         else:
             return 0, ""
 
-class LoglogGraph(BaseGraph):
+class LoglogGraph(Graph):
     def setaxes(self):
         """ The x and y axis are both log
         """

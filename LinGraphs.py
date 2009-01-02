@@ -32,10 +32,10 @@ Class IFFTLinGraph -- Draw graph with linear scale on X and Y axis and IFFT
       Return the mode of the graph, "ifftlin"
 """
 
-from BaseGraph import *
+from Graph import *
 from FFTGraph import *
 
-class LinGraph(BaseGraph):
+class LinGraph(Graph):
     def setaxes(self):
         """ Set the X and Y axis in linear mode
         """

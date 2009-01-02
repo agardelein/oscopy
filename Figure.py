@@ -47,7 +47,7 @@ Figure -- Handle a list of graphs
       Return a list of the signals in all graphs
 """
 
-from LinGraph import *
+from LinGraphs import *
 from LogGraphs import *
 import matplotlib.pyplot as plt
 from pylab import *

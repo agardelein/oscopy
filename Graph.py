@@ -1,4 +1,4 @@
-""" BaseGraph Handler
+""" Graph Handler
 
 A graph consist of several signals that share the same abscisse,
 and plotted according a to mode, which is currently scalar.
@@ -11,7 +11,7 @@ can be plotted together.
 sn: signal name
 s : signal
 
-Class BaseGraph -- Handle the representation of a list of signals
+Class Graph -- Handle the representation of a list of signals
 
    methods:
    __init__(sigs)
@@ -43,15 +43,23 @@ Class BaseGraph -- Handle the representation of a list of signals
 import matplotlib.pyplot as plt
 from pylab import *
 
-class BaseGraph:
+class Graph:
     def __init__(self, sigs = None):
         """ Create a graph
         If signals are provided, fill in the graph otherwise the graph is empty
         Signals are assumed to exist and to be valid
-        If first argument is a BaseGraph, then copy things
+        If first argument is a Graph, then copy things
         """
         self.sigs = {}
-        if isinstance(sigs, BaseGraph):
+        if isinstance(sigs, Graph):
+            # Warn on some conversion that may lead to nasty things
+            if (sigs.gettype().find('fft') == 0 \
+                    and self.gettype().find('ifft') == 0) \
+                    or (sigs.gettype().find('ifft') == 0 \
+                            and self.gettype().find('fft') == 0):
+                print "Warning: fft <=> ifft conversions and vice versa \
+may lead to uncertain results"
+
             mysigs = {}
             mysigs = sigs.sigs.copy()
             self.insert(mysigs)
