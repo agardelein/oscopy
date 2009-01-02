@@ -37,7 +37,7 @@ class LoadFileError:
     def __str__(self):
         return "File error :", value
 
-class ReaderBase:
+class Reader:
     """ Reader Base -- Provide common function for signal file reading
     The derived class must redefine getsiglist()
     """
