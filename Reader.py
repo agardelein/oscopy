@@ -8,13 +8,13 @@ Class LoadFileError -- Errors encountered when loading file
    __str__()
       Return a string with the error message
 
-Class ReaderBase -- Define the common functions for reader objects
+Class Reader -- Define the common functions for reader objects
 
    methods:
-   loadfile(fi)
-      Check if the file can be opened before calling getsiglist(),
+   read(fi)
+      Check if the file can be opened before calling readsigs(),
 
-   getsiglist()
+   readsigs()
       To be defined into the derived objects
       Read the signals from the file, fill slist
       and return a dict of the signals, with the signame as key.
@@ -38,16 +38,16 @@ class LoadFileError:
         return "File error :", value
 
 class Reader:
-    """ Reader Base -- Provide common function for signal file reading
-    The derived class must redefine getsiglist()
+    """ Reader -- Provide common function for signal file reading
+    The derived class must redefine readsigs()
     """
     def __init__(self):
         self.fn = ""
         self.slist = []
 
     # Certify the path is valid and is a file
-    def loadfile(self, fi):
-        """ Check if the path is a valid file and call getsiglist
+    def read(self, fi):
+        """ Check if the path is a valid file and call readsigs
         """
         if fi == "":
             raise LoadFileError("No file specified")
@@ -56,9 +56,9 @@ class Reader:
         if not os.path.isfile(fi):
             raise LoadFileError("File is not a file")
         self.fn = fi
-        return self.getsiglist()
+        return self.readsigs()
 
-    def getsiglist(self):
+    def readsigs(self):
         """ Read the signal list from the file, fill self.slist
         and return a dict of the signals, with the signal name as a key
         """
@@ -80,7 +80,7 @@ class Reader:
             old[s.name] = s
 
         # New signal list
-        sdict = self.getsiglist()
+        sdict = self.readsigs()
 
         # Find updated signals
         # Go through the old list

@@ -12,16 +12,16 @@ parenthesis stripped, e.g. v(gs) -> vgs or i(Rd) -> iRd.
 
 Class GnucapReader:
    method:
-   getsiglist():
+   readsigs():
       Read the signals from a file to gnucap output format.
 """
 
 from __future__ import with_statement
 from Signal import Signal
-from ReaderBase import *
+from Reader import *
 
-class GnucapReader(ReaderBase):
-    def getsiglist(self):
+class GnucapReader(Reader):
+    def readsigs(self):
         """ Read the signals from the file
 
         First get the signal names from the first line, the abscisse

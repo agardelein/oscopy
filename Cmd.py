@@ -213,12 +213,12 @@ class Cmds:
             return
             
         r = GnucapReader() # for now only Gnucap is supported
-        sigs = r.loadfile(args)
+        sigs = r.read(args)
         # Insert signals into the dict
         for sn in sigs.keys():
             self.sigs[sn] = sigs[sn]
         print args, ":"
-        for s in self.sigs.itervalues():
+        for s in sigs.itervalues():
             print s
         self.readers[args] = r
 
@@ -392,7 +392,7 @@ Help for individual command can be obtained with 'help COMMAND'\n\
 
         # Create the expression
         r = MathReader(sigs)
-        ss = r.loadfile(inp)
+        ss = r.read(inp)
         for sn, s in ss.iteritems():
             self.sigs[sn] = s
         if len(ss) > 0:

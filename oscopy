@@ -10,7 +10,7 @@ hist_file = ".scope_history"
 readline.read_history_file(hist_file)
 
 # Prompt
-p = "scope> "
+p = "oscopy> "
 cmds = Cmds()
 
 # Main loop
