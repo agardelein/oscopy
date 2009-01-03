@@ -1,17 +1,28 @@
 #!/usr/bin/python
-# Hello world
 import readline
+import os.path
 
 from Examples import *
 from Cmd import *
 
 # Readline configuration
-hist_file = ".scope_history"
+hist_file = ".oscopy_hist"
+if not os.path.exists(hist_file):
+    f=open(hist_file, "w")
+    f.write("figlist")
+    f.close()
 readline.read_history_file(hist_file)
 
 # Prompt
 p = "oscopy> "
 cmds = Cmds()
+
+print "This is oscopy, a program to view electrical simulation results\n\
+Copyright (C) 2009 Arnaud Gardelein.\n\
+This is free software, you are invited to redistribute it \n\
+under certain conditions.\n\
+There is ABSOLUTELY NO WARRANTY; not even for MERCHANTIBILITY or\n\
+FITNESS FOR A PARTICULAR PURPOSE."
 
 # Main loop
 while True:
