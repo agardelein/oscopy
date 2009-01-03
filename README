@@ -1,20 +1,22 @@
-scope -- A program to view electrical simulation results
+oscopy -- A program to view electrical simulation results
 
-This is scope, a program to view 2D electrical simulation results.
-It is designed to easily new input data file formats, new
-types of plots.
+This is oscopy, an oscilloscope in python, to view 2D electrical
+simulation results. It is designed to easily new input data file formats
+and new types of plots.
 This program use matplotlib to plot the data.
 
-scope is an example of use of the available functions,
+oscopy is an example of use of the available functions,
 implemented as a simple command line program.
 
-To run the program, just do ./scope.
+To run the program, just do ./oscopy.
 
-To get any info on available commands, type help.
+To get any info on available commands, type 'help'.
 
 EXAMPLE:
 -------
-./scope.py
+gnetlist -g spice-sdb -s -o demo.net demo.sch
+gnucap -b demo.net
+./oscopy
 load tran.dat
 load ac.dat
 add vsqu
@@ -22,26 +24,26 @@ v1=vsqu*3+2
 siglist
 add v1
 add vsqu
-fft
+mode fftlin
 figlist
 create
 add vout
 mode loglog
 figlist
 plot
-(change something in deom.sch, e.g. vsqu amplitude)
+(change something in demo.sch, e.g. vsqu amplitude)
 update
 plot
 
 EXTENDING THE PROGRAM:
 ---------------------
-New data file format can be added by deriving ReaderBase and
-redefining the function getsiglist(), which fills the list
-of signals self.siglist and return a dict of signals.
-During execution, ReaderBase.loadfile() check the validity
-of the provided path, and then call getsiglist().
+New data file format can be added by deriving Reader and
+redefining the function readsigs(), which fills the list
+of signals self.sigs and return a dict of signals.
+During execution, Reader.read() check the validity
+of the provided path, and then call readsigs().
 
-New graph mode can be added by deriving BaseGraph and redefining
+New graph mode can be added by deriving Graph and redefining
 the function setaxes() which if called by plot(), or eventually 
 redefining plot().
 NOTE : Figure.setmode() has to be updated when new mode are added !

@@ -122,11 +122,17 @@ may lead to uncertain results"
         """
         # Prepare the axis labels
         xl = self.xaxis
-        xu = self.xunit
+        if self.xunit == "":
+            xu = "a.u."
+        else:
+            xu = self.xunit
         fx, l = self.findscalefact("X")
         xl = xl + " (" + l + xu + ")"
         yl = self.yaxis
-        yu = self.yunit
+        if self.yunit == "":
+            yu = "a.u."
+        else:
+            yu = self.yunit
         fy, l = self.findscalefact("Y")
         yl = yl + " (" + l + yu + ")"
         
@@ -193,6 +199,7 @@ may lead to uncertain results"
         # Find the absolute maximum of the data
         mxs = []
         mns = []
+
         for s in self.sigs.itervalues():
             if a == "X":
                 mxs.append(max(s.ref.pts))
@@ -210,11 +217,15 @@ may lead to uncertain results"
         else:
             fct = 3
         f = 0
-        while not (abs(mx * pow(10, f)) < 1000 \
-                       and abs(mx * pow(10, f)) > 1):
+        while not (abs(mx * pow(10.0, f)) < 1000.0 \
+                       and abs(mx * pow(10.0, f)) >= 1.0):
             f = f + fct
-        if scnames.has_key(-f):
+        if scnames.has_key(-f) and ((self.xunit != "" and a == "X") \
+                or (self.yunit != "" and a != "X")):
             l = scnames[-f]
         else:
-            l = "10e" + str(-f)
+            if f == 0:
+                l = ""
+            else:
+                l = "10e" + str(-f) + " "
         return f, l
