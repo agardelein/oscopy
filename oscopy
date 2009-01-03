@@ -54,8 +54,8 @@ while True:
         print "Syntax Error", e.message
         continue
 
-    except LoadFileError, e:
-        print "Error in loadfile :", e.value
+    except ReadError, e:
+        print "Error in read :", e.value
 
 readline.write_history_file(hist_file)
 

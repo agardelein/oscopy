@@ -24,19 +24,19 @@ value=pulse 0 10 10n 10n 100n 5u 10u
 }
 C 40900 48700 1 0 0 gnd-1.sym
 C 40900 46700 1 0 0 gnd-1.sym
-C 41100 50100 1 0 0 output-1.sym
+C 41000 50100 1 0 0 output-1.sym
 {
-T 41200 50400 5 10 0 0 0 0 1
+T 41100 50400 5 10 0 0 0 0 1
 device=OUTPUT
-T 42000 50100 5 10 0 0 0 0 1
-netname=sin
+T 41200 50400 5 10 1 0 0 0 1
+net=sin:1
 }
-C 41200 48100 1 0 0 output-1.sym
+C 41000 48100 1 0 0 output-1.sym
 {
-T 41300 48400 5 10 0 0 0 0 1
+T 41100 48400 5 10 0 0 0 0 1
 device=OUTPUT
-T 42100 48100 5 10 0 0 0 0 1
-netname=squ
+T 41000 48400 5 10 1 0 0 0 1
+net=squ:1
 }
 C 45500 49300 1 90 0 capacitor-1.sym
 {
@@ -59,12 +59,12 @@ T 44600 50400 5 10 1 1 0 0 1
 value=10k
 }
 C 45200 49000 1 0 0 gnd-1.sym
-C 43500 50100 1 0 0 input-1.sym
+C 43600 50100 1 0 0 input-1.sym
 {
-T 43500 50400 5 10 0 0 0 0 1
+T 43600 50400 5 10 0 0 0 0 1
 device=INPUT
-T 43300 49600 5 10 0 0 0 0 1
-netname=squ
+T 43600 50400 5 10 1 0 0 0 1
+net=sin:1
 }
 C 45400 50100 1 0 0 output-1.sym
 {
@@ -89,7 +89,7 @@ device=directive
 T 40600 44200 5 10 1 1 0 0 1
 refdes=A4
 T 40600 43900 5 10 1 1 0 0 1
-value=.tran 0 100u 100n > tran.dat
+value=.tran 0 10u 1n > tran.dat
 }
 C 40500 45200 1 0 0 gnucap-directive-1.sym
 {
@@ -109,21 +109,6 @@ refdes=A3
 T 40600 44500 5 10 1 1 0 0 1
 value=.ac 1k 10meg 10k decade 100 > ac.dat
 }
-N 41000 48200 41200 48200 4
-{
-T 42100 48200 5 10 1 0 0 0 1
-netname=squ
-}
-N 41000 50200 41100 50200 4
-{
-T 42000 50200 5 10 1 0 0 0 1
-netname=sin
-}
-N 44300 50200 44400 50200 4
-{
-T 43500 49900 5 10 1 0 0 0 1
-netname=sin
-}
 N 45300 50200 45400 50200 4
 {
 T 46300 50200 5 10 1 0 0 0 1
@@ -141,3 +126,95 @@ T 50000 40400 9 10 1 0 0 0 1
 demo.sch
 T 51700 41000 9 10 1 0 0 0 1
 Demonstration scheme for oscopy
+C 53800 42500 1 0 0 vdc-1.sym
+{
+T 54500 43150 5 10 1 1 0 0 1
+refdes=V4
+T 54500 42950 5 10 1 1 0 0 1
+value=50
+}
+C 50000 42500 1 0 0 vpulse-1.sym
+{
+T 50700 43150 5 10 1 1 0 0 1
+refdes=V3
+T 50700 42950 5 10 1 1 0 0 1
+value=pulse 0 10 10n 10n 10n 1u 10u
+}
+C 53900 43700 1 0 0 12V-plus-1.sym
+C 50200 42200 1 0 0 gnd-1.sym
+C 54000 42200 1 0 0 gnd-1.sym
+C 50300 43600 1 0 0 output-2.sym
+{
+T 50500 43900 5 10 1 0 0 0 1
+net=gs:1
+}
+C 53200 46400 1 0 0 12V-plus-1.sym
+C 53300 44200 1 0 0 gnd-1.sym
+C 53500 45500 1 90 0 resistor-2.sym
+{
+T 53150 45900 5 10 0 0 90 0 1
+device=RESISTOR
+T 52900 46200 5 10 1 1 0 0 1
+refdes=RD
+T 52900 46000 5 10 1 1 0 0 1
+value=2.9
+}
+C 50600 44600 1 0 0 input-2.sym
+{
+T 51200 44900 5 10 1 0 0 0 1
+net=gs:1
+}
+C 52000 49200 1 0 0 gnucap-model-1.sym
+{
+T 52100 49800 5 10 0 1 0 0 1
+device=model
+T 52100 49700 5 10 1 1 0 0 1
+refdes=A5
+T 53300 49400 5 10 1 1 0 0 1
+model-name=irf540n
+T 52500 49200 5 10 1 1 0 0 1
+file=irf540n.sub
+}
+C 52000 48500 1 0 0 gnucap-directive-1.sym
+{
+T 52100 48700 5 10 0 1 0 0 1
+device=directive
+T 52100 48800 5 10 1 1 0 0 1
+refdes=A6
+T 52100 48500 5 10 1 1 0 0 1
+value=.print tran v(gs) v(ds) i(RD)
+}
+C 52000 47800 1 0 0 gnucap-directive-1.sym
+{
+T 52100 48000 5 10 0 1 0 0 1
+device=directive
+T 52100 48100 5 10 1 1 0 0 1
+refdes=A7
+T 52100 47800 5 10 1 1 0 0 1
+value=.tran 0 2u 2n > irf540.dat
+}
+N 53400 45500 53400 45300 4
+{
+T 53500 45400 5 10 1 1 0 0 1
+netname=ds
+}
+C 52900 44500 1 0 0 nmos-3.sym
+{
+T 53500 45000 5 10 0 0 0 0 1
+device=IC
+T 53600 45100 5 10 1 1 0 0 1
+refdes=X1
+T 53600 44900 5 10 1 1 0 0 1
+value=irf540
+T 53600 44700 5 10 1 0 0 0 1
+model-name=irf540n
+}
+C 52000 44600 1 0 0 resistor-2.sym
+{
+T 52400 44950 5 10 0 0 0 0 1
+device=RESISTOR
+T 52200 44900 5 10 1 1 0 0 1
+refdes=RG
+T 52200 44400 5 10 1 1 0 0 1
+value=9.1
+}

@@ -1,6 +1,6 @@
 """ Common file read functions
 
-Class LoadFileError -- Errors encountered when loading file
+Class ReadError -- Errors encountered when loading file
    methods:
    __init__(value)
       Assign the error message
@@ -30,7 +30,7 @@ Class Reader -- Define the common functions for reader objects
 
 import os.path
 
-class LoadFileError:
+class ReadError:
     def __init__(self, value):
         self.value = value
 
@@ -50,11 +50,11 @@ class Reader:
         """ Check if the path is a valid file and call readsigs
         """
         if fi == "":
-            raise LoadFileError("No file specified")
+            raise ReadError("No file specified")
         if not os.path.exists(fi):
-            raise LoadFileError("File do not exist")
+            raise ReadError("File do not exist")
         if not os.path.isfile(fi):
-            raise LoadFileError("File is not a file")
+            raise ReadError("File is not a file")
         self.fn = fi
         return self.readsigs()
 

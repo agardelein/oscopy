@@ -1,8 +1,9 @@
 oscopy -- A program to view electrical simulation results
 
-This is oscopy, an oscilloscope in python, to view 2D electrical
+This is oscopy, a kind of oscilloscope in python, to view 2D electrical
 simulation results. It is designed to easily new input data file formats
 and new types of plots.
+Support for basic mathematic with signals is implemented.
 This program use matplotlib to plot the data.
 
 oscopy is an example of use of the available functions,
@@ -17,25 +18,30 @@ EXAMPLE:
 gnetlist -g spice-sdb -s -o demo.net demo.sch
 gnucap -b demo.net
 ./oscopy
-load tran.dat
 load ac.dat
-add vsqu
-v1=vsqu*3+2
-siglist
-add v1
-add vsqu
-mode fftlin
-figlist
-create
 add vout
 mode loglog
+load tran.dat
+create
+siglist
+add vsqu
+add vsqu
+mode fftlin
+load irf540.dat
+create
+add vgs
+add iRD
+add vds
+pw=-iRD*vds
+add pw
+layout quad
 figlist
 plot
-(change something in demo.sch, e.g. vsqu amplitude)
+(change something in demo.sch, e.g. vsqu amplitude, C1 value, etc...)
 update
 plot
 
-EXTENDING THE PROGRAM:
+EXTENDING OSCOPY:
 ---------------------
 New data file format can be added by deriving Reader and
 redefining the function readsigs(), which fills the list
