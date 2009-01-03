@@ -44,7 +44,7 @@ import matplotlib.pyplot as plt
 from pylab import *
 
 class Graph:
-    def __init__(self, sigs = None):
+    def __init__(self, sigs = {}):
         """ Create a graph
         If signals are provided, fill in the graph otherwise the graph is empty
         Signals are assumed to exist and to be valid
@@ -63,15 +63,10 @@ may lead to uncertain results"
             mysigs = {}
             mysigs = sigs.sigs.copy()
             self.insert(mysigs)
-            return
         else:
             self.xaxis = ""
             self.yaxis = ""
-            if sigs == None:
-                return
-            else:
-                self.insert(sigs)
-                return
+            self.insert(sigs)
 
     def __str__(self):
         """ Return a string with the type and the signal list of the graph
@@ -81,14 +76,12 @@ may lead to uncertain results"
             a = a + sn + " "
         return a
 
-    def insert(self, sigs = None):
+    def insert(self, sigs = {}):
         """ Add a list of signals into the graph
         The first signal to be added defines the abscisse.
         The remaining signals to be added must have the same abscisse name,
         otherwise they are ignored
         """
-        if sigs == None:
-            return len(self.sigs)
         for sn, s in sigs.iteritems():
             if len(self.sigs) == 0:
                 # First signal, set the abscisse name and add signal
@@ -106,7 +99,7 @@ may lead to uncertain results"
                     print "Not the same ref:", sn, "-", self.xaxis,"-"
         return len(self.sigs)
 
-    def remove(self, sigs = None):
+    def remove(self, sigs = {}):
         """ Delete signals from the graph
         """
         for sn in sigs.iterkeys():
@@ -120,7 +113,9 @@ may lead to uncertain results"
         In this way, signals with a different sampling can be plotted together.
         The x axis is labelled with the abscisse name of the graph.
         """
-        # Prepare the axis labels
+        if len(self.sigs) == 0:
+            return
+        # Prepare labels
         xl = self.xaxis
         if self.xunit == "":
             xu = "a.u."
@@ -139,15 +134,6 @@ may lead to uncertain results"
         self.setaxes()
         # Plot the signals
         hold(True)
-#        mx = 0
-#        my = 0
-#        for s in self.itersigs():
-#            try:
-#                plot(s.ref.pts, s.pts, label=s.name)
-#            except OverflowError, e:
-#                print "OverflowError in plot:", e.message, ", log(0) somewhere ?"
-#                break
-
         for sn, s in self.sigs.iteritems():
             # Scaling factor
             # The hard way...

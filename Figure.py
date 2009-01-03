@@ -55,7 +55,7 @@ from types import *
 
 class Figure:
 
-    def __init__(self, sigs = None):
+    def __init__(self, sigs = {}):
         """ Create a Figure.
         If a signal list is provided, add a graph with the signal list
         By default, create an empty list of graph and set the layout to horiz
@@ -63,12 +63,14 @@ class Figure:
         self.graphs = []
         self.layout = "horiz"
         self.curgraph = 0
-        if sigs == None:
+        if sigs == {}:
             return
-        else:
+        elif type(sigs) == DictType:
             self.add(sigs)
+        else:
+            return
 
-    def add(self, sigs = None):
+    def add(self, sigs = {}):
         """ Add a graph into the figure and set it as current graph.
         Up to four graphs can be plotted on the same figure.
         Additionnal attemps are ignored.
@@ -100,6 +102,11 @@ class Figure:
     def update(self, u, d):
         """ Update the graphs
         """
+        if type(u) != DictType:
+            return
+        if type(d) != DictType:
+            return
+
         for g in self.graphs:
             ug = {}
             dg = {}
@@ -122,7 +129,11 @@ class Figure:
         """ List the graphs from the figure
         """
         for gn, g in enumerate(self.graphs):
-            print "  Graph", gn + 1, ":", g
+            if gn == self.curgraph:
+                print "   *",
+            else:
+                print "    ",
+            print "Graph", gn + 1, ":", g
 
     def setmode(self, gmode):
         """ Set the mode of the current graph
@@ -211,20 +222,18 @@ class Figure:
         for gn, g in enumerate(self.graphs):
             subplot(nx, ny, gn+1)
             g.plot()
-        return
 
     def insert(self, sigs):
         """ Add a signal into the current graph
         """
-        print self.curgraph
-        if self.curgraph < 0 or self.curgraph > len(self.graphs):
+        if self.curgraph < 1 or self.curgraph > len(self.graphs):
             return
         self.graphs[self.curgraph].insert(sigs)
 
     def remove(self, sigs):
         """ Delete a signal from the current graph
         """
-        if self.curgraph < 0 or self.curgraph > len(self.graphs):
+        if self.curgraph < 1 or self.curgraph > len(self.graphs):
             return
         self.graphs[self.curgraph].remove(sigs)
 

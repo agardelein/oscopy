@@ -111,7 +111,7 @@ class Cmds:
                 toplot = self.gettoplot(toplot)
             else:
                 # No signal list provided
-                toplot = None
+                toplot = {}
         elif not type(toplot) == DictType:
             return
         # toplot is now a list
@@ -150,7 +150,7 @@ class Cmds:
             print "   Select the current figure and the current graph"
             return
 
-        s = args.split(',')
+        s = args.split('-')
 
         num = eval(s[0])
         if num > len(self.figs) or num < 1:
@@ -178,6 +178,10 @@ class Cmds:
             return
 
         for i, f in enumerate(self.figs):
+            if i == self.curfig:
+                print "*",
+            else:
+                print " ",
             print "Figure", i + 1, ":", f.layout
             f.list()
 
@@ -269,8 +273,6 @@ class Cmds:
             self.create(args)
         else:
             toplot = self.gettoplot(args)
-            if toplot == None:
-                return
             self.figs[self.curfig].add(toplot)
 
     def delete(self, args):
@@ -404,11 +406,14 @@ Help for individual command can be obtained with 'help COMMAND'\n\
         The list must be a coma separated list of signal names.
         If no signals are loaded of no signal are found, return None
         """
+        if args == "":
+            return {}
+
         toplot = {}
         # Are there signals ?
         if self.sigs == []:
             print "No signal loaded"
-            return None
+            return {}
 
         # Prepare the signal list
         for sn in args.split(","):
@@ -421,5 +426,5 @@ Help for individual command can be obtained with 'help COMMAND'\n\
         # No signals found
         if len(toplot) < 1:
             print "No signals found"
-            return None
+            return {}
         return toplot
