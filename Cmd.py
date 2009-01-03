@@ -1,6 +1,6 @@
 """ Scope commands
 
-Class Cmds: Commands callables from scope commandline
+Class Cmds: Commands callables from oscopy commandline
 
    Methods:
    __init__()
