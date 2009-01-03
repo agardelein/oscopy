@@ -296,7 +296,9 @@ class Cmds:
    lin      x and y linear\n\
    logx     x log, y linear\n\
    logy     x linear, y log\n\
-   loglog   x and y log"
+   loglog   x and y log\n\
+   fftlin, fftlogx, fftlogy, fftloglog\n\
+            Fast Fourier Transform (FFT) with lin, logx, logy or loglog mode"
             return
 
         self.figs[self.curfig].setmode(args)
