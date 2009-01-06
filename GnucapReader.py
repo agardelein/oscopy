@@ -65,7 +65,7 @@ class GnucapReader(Reader):
         return sdict
 
     def unitfromprobe(self, pn = ""):
-        """ Return the unit name from the probe name
+        """ Return the unit name (un) from the probe name (pn)
         """
         if pn == "":
             return pn

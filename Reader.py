@@ -70,6 +70,8 @@ class Reader:
         """ Reread the file, update self.slist and return a dict of the
         signals, as well as a list of the name of updated, deleted
         and new signals
+        If readsigs returns nothing (file is deleted or whatever), all
+        signals are considered deleted
         """
         u = {}
         d = {}
@@ -82,6 +84,7 @@ class Reader:
         # New signal list
         sdict = self.readsigs()
         if len(sdict) == 0:
+            # No signal returned, hence mark all signals as deleted
             d = old
             return sdict, u, d, n
 

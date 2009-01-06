@@ -39,24 +39,34 @@ class MathReader(Reader):
                 self.origsigs[f] = [n]
         return
 
-    def read(self, inp = None):
-        """ Validate the expression
+    def read(self, inp = ""):
+        """ Validate the expression : each word should be in self.sigs
+        or math module
         """
-        # Validate the expression:word should be in sigs or math module
+        if inp == "":
+            return {}
+
         l=re.findall(r"(?i)\b[a-z0-9]*", inp.split("=")[1])
         vs = []
         for v in self.origsigs.values():
+            # Create a single list of signals from self.origsigs.values()
+            # which is a list of lists
             vs.extend(v)
         for e in l:
             if e == "":
+                # Nothing to evaluate
                 continue
             if e in vs:
+                # Into the signal list
                 continue
-            elif math.__dict__.has_key(e):
+            elif math.__dict__.has_key(e):  # Ugly, isn't it ?
+                # Math function
                 continue
             elif e.isdigit():
+                # Number
                 continue
             else:
+                # Unknown
                 print "What's this", e, "?"
                 return {}
         self.fn = inp
