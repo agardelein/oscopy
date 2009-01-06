@@ -81,6 +81,9 @@ class Reader:
 
         # New signal list
         sdict = self.readsigs()
+        if len(sdict) == 0:
+            d = old
+            return sdict, u, d, n
 
         # Find updated signals
         # Go through the old list

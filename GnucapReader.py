@@ -33,7 +33,10 @@ class GnucapReader(Reader):
         """
         self.slist = []
         sdict = {}
-        fil = open(self.fn)
+        try:
+            fil = open(self.fn)
+        except IOError:
+            return {}
 
         # Get signal names from first line, remove leading "#"
         def f(c): return c != "(" and c != ")" # remove ()

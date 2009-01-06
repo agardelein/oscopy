@@ -89,7 +89,7 @@ device=directive
 T 40600 44200 5 10 1 1 0 0 1
 refdes=A4
 T 40600 43900 5 10 1 1 0 0 1
-value=.tran 0 10u 1n > tran.dat
+value=.tran 0 10.1u 1n > tran.dat
 }
 C 40500 45200 1 0 0 gnucap-directive-1.sym
 {
