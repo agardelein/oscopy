@@ -23,6 +23,9 @@ Class Reader -- Define the common functions for reader objects
       Reread the file and return a dict of the reread signals,
       together with a list of the updated, deleted and added signals
 
+   detect(fn)
+      Return  if the object recognize the file
+
    __str__()
       Return the filename
 
@@ -106,8 +109,12 @@ class Reader:
                 n[k] = s
         return sdict, u, d, n
 
+    def detect(self, fn):
+        """ Check if the file provided can be read by this object
+        """
+        return False
+
     def __str__(self):
         """ Return the signal name.
         """
         return self.fn
-

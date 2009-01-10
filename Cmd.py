@@ -59,8 +59,12 @@ Class Cmds: Commands callables from oscopy commandline
    Should not be called from the command line
 """
 
+import sys
+sys.path.insert(0, 'Readers')
+
 from GnucapReader import *
 from MathReader import *
+from DetectReader import *
 from Signal import *
 from Figure import *
 from pylab import show
@@ -215,9 +219,13 @@ class Cmds:
         if args in self.readers.keys():
             print "File already loaded"
             return
-            
-        r = GnucapReader() # for now only Gnucap is supported
+
+        r = DetectReader(args)
+        if r == None:
+            print "File format unknown"
+            return
         sigs = r.read(args)
+
         # Insert signals into the dict
         for sn in sigs.keys():
             self.sigs[sn] = sigs[sn]

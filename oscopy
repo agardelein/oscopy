@@ -1,12 +1,21 @@
 #!/usr/bin/python
 import readline
 import os.path
+import sys
 
 from Examples import *
+
+# Some variables
+hist_file = ".oscopy_hist"
+readers_dir = "Readers"
+
+# Path
+#sys.path.insert(0, readers_dir)
+
 from Cmd import *
 
+
 # Readline configuration
-hist_file = ".oscopy_hist"
 if not os.path.exists(hist_file):
     f=open(hist_file, "w")
     f.write("figlist")

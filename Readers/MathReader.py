@@ -14,6 +14,9 @@ class MathReader:
 
    readsigs()
       Load the signals from files, and compute the result
+
+   setorigsigs()
+      Store the signals name and their original file to be used in readsigs()
 """
 
 from Reader import *
@@ -21,28 +24,27 @@ from GnucapReader import *
 from pylab import *
 import re
 import math
+import sys
+import sys
+sys.path.insert(0, '..')
+from DetectReader import *
 
 class MathReader(Reader):
-    def __init__(self, sigs):
-        """ Create the object, here get the filenames and the signal names
-        from the list of signals
+    def __init__(self, sigs = {}):
+        """ Create the object
         """
         self.fn = ""
         self.slist = []
         self.origsigs = {}   # Dict of list of signames, key is filename
-        for k, s in sigs.iteritems():
-            f = s.reader.fn
-            n = s.name
-            if self.origsigs.has_key(f):
-                self.origsigs[f].append(n)
-            else:
-                self.origsigs[f] = [n]
-        return
+        self.setorigsigs(sigs)
 
     def read(self, inp = ""):
         """ Validate the expression : each word should be in self.sigs
         or math module
         """
+        if self.origsigs == {}:
+            return {}
+
         if inp == "":
             return {}
 
@@ -76,10 +78,15 @@ class MathReader(Reader):
         """ Return a dict with only the signal computed
         The signal is done here since it can change between two updates
         """
+        if self.origsigs == {}:
+            return {}
+
         _sigs = {}
         # Read the signals from the files
         for f, snames in self.origsigs.iteritems():
-            r = GnucapReader()
+            r = DetectReader(f)
+            if isinstance(r, MathReader):
+                r.setorigsigs(self.origsigs)
             sigsfile = r.read(f)
             for s in snames:
                 if s in sigsfile.keys():
@@ -150,3 +157,24 @@ class MathReader(Reader):
             print "TypeError:", e.message
             return {}
         return _ret
+
+    def setorigsigs(self, sigs = {}):
+        """ Get the filenames and the signal names from the list of signals
+        Key is filename, values are signals.
+        """
+
+        for k, s in sigs.iteritems():
+            f = s.reader.fn
+            n = s.name
+            if self.origsigs.has_key(f):
+                self.origsigs[f].append(n)
+            else:
+                self.origsigs[f] = [n]
+
+    def detect(self, fn):
+        """ If the filename contains "=", then this is managed
+        """
+        if fn.find("=") >= 0:
+            return True
+        else:
+            return False

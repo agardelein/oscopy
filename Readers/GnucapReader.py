@@ -19,6 +19,7 @@ Class GnucapReader:
 from __future__ import with_statement
 from Signal import Signal
 from Reader import *
+import re
 
 class GnucapReader(Reader):
     def readsigs(self):
@@ -78,3 +79,17 @@ class GnucapReader(Reader):
             return uns[pn]
         else:
             return ""
+
+    def detect(self, fn):
+        """ Look at the header, if it if something like
+        #Name probe(name)
+        """
+        try:
+            f = open(fn)
+        except IOError, e:
+            print e.message
+            return False
+        s = f.readline()
+        f.close()
+        # A better regex which looks at all probe should be better !
+        return len(re.findall('^#\w+\s+[\w\(\)]+', s)) > 0
