@@ -225,14 +225,14 @@ class Figure:
     def insert(self, sigs):
         """ Add a signal into the current graph
         """
-        if self.curgraph < 1 or self.curgraph > len(self.graphs):
+        if self.curgraph < 0 or self.curgraph > len(self.graphs) - 1:
             return
         self.graphs[self.curgraph].insert(sigs)
 
     def remove(self, sigs):
         """ Delete a signal from the current graph
         """
-        if self.curgraph < 1 or self.curgraph > len(self.graphs):
+        if self.curgraph < 0 or self.curgraph > len(self.graphs) - 1:
             return
         self.graphs[self.curgraph].remove(sigs)
 
