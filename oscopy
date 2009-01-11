@@ -57,9 +57,9 @@ while True:
     except EOFError:
         break
 
-    except AttributeError, e:
-        print "Unknown command:", e.message
-        continue
+#    except AttributeError, e:
+#        print "Unknown command:", e.message
+#        continue
 
 #    except NameError, e:
 #        print "Unknown command", e.message

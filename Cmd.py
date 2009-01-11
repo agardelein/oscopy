@@ -221,7 +221,6 @@ class Cmds:
             print "File format unknown"
             return
         sigs = r.read(args)
-
         # Insert signals into the dict
         for sn in sigs.keys():
             self.sigs[sn] = sigs[sn]
@@ -400,7 +399,9 @@ Help for individual command can be obtained with 'help COMMAND'\n\
 
         # Create the expression
         r = DetectReader.DetectReader(inp)
-        r.setorigsigs(sigs)
+        if hasattr(r, "setorigsigs"):
+            if callable(r.setorigigs):
+                r.setorigsigs(sigs)
         ss = r.read(inp)
         for sn, s in ss.iteritems():
             self.sigs[sn] = s

@@ -75,7 +75,7 @@ class MathReader(Reader.Reader):
 
     def readsigs(self):
         """ Return a dict with only the signal computed
-        The signal is done here since it can change between two updates
+        The signal is computed here since it can change between two updates
         """
         if self.origsigs == {}:
             return {}
@@ -162,7 +162,6 @@ class MathReader(Reader.Reader):
         """ Get the filenames and the signal names from the list of signals
         Key is filename, values are signals.
         """
-
         for k, s in sigs.iteritems():
             f = s.reader.fn
             n = s.name

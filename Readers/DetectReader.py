@@ -17,12 +17,10 @@ def DetectReader(fn):
     """
     if type(fn) != StringType:
         return None
-    a = MathReader()
     endl = "\n"
     for rd in rds:
         s = "tmp = " + rd + "()" + endl \
             + "res = tmp.detect(fn)"
-        print "exec : ", s
         exec(s)
         if res == True:
             return tmp
