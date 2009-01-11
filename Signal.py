@@ -21,7 +21,6 @@ Class Signal -- Contains the signal points and other information
       Returns a string with the signal name, the reference name
       and the reader name.
 """
-from types import *
 
 # Signals class
 class Signal:

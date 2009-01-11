@@ -3,17 +3,12 @@ import readline
 import os.path
 import sys
 
-from Examples import *
-
 # Some variables
 hist_file = ".oscopy_hist"
 readers_dir = "Readers"
 
-# Path
-#sys.path.insert(0, readers_dir)
-
-from Cmd import *
-
+import Cmd
+import Reader
 
 # Readline configuration
 if not os.path.exists(hist_file):
@@ -24,7 +19,7 @@ readline.read_history_file(hist_file)
 
 # Prompt
 p = "oscopy> "
-cmds = Cmds()
+cmds = Cmd.Cmds()
 
 print "This is oscopy, a program to view electrical simulation results\n\
 Copyright (C) 2009 Arnaud Gardelein.\n\
@@ -66,15 +61,15 @@ while True:
         print "Unknown command:", e.message
         continue
 
-    except NameError, e:
-        print "Unknown command", e.message
-        continue
+#    except NameError, e:
+#        print "Unknown command", e.message
+#        continue
 
     except SyntaxError, e:
         print "Syntax Error", e.message
         continue
 
-    except ReadError, e:
+    except Reader.ReadError, e:
         print "Error in read :", e.value
 
 readline.write_history_file(hist_file)

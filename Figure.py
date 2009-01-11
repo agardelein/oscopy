@@ -47,11 +47,10 @@ Figure -- Handle a list of graphs
       Return a list of the signals in all graphs
 """
 
-from LinGraphs import *
-from LogGraphs import *
-import matplotlib.pyplot as plt
-from pylab import *
-from types import *
+import LinGraphs
+import LogGraphs
+import pylab
+import types
 
 class Figure:
 
@@ -65,7 +64,7 @@ class Figure:
         self.curgraph = 0
         if sigs == {}:
             return
-        elif type(sigs) == DictType:
+        elif type(sigs) == types.DictType:
             self.add(sigs)
         else:
             return
@@ -78,7 +77,7 @@ class Figure:
         """
         if len(self.graphs) > 3:
             return
-        gr = LinGraph(sigs)
+        gr = LinGraphs.LinGraph(sigs)
         self.graphs.append(gr)
         self.select(self.graphs.index(gr) + 1)
 
@@ -102,9 +101,9 @@ class Figure:
     def update(self, u, d):
         """ Update the graphs
         """
-        if type(u) != DictType:
+        if type(u) != types.DictType:
             return
-        if type(d) != DictType:
+        if type(d) != types.DictType:
             return
 
         for g in self.graphs:
@@ -138,42 +137,42 @@ class Figure:
     def setmode(self, gmode):
         """ Set the mode of the current graph
         """
-        if type(gmode) == StringType:
+        if type(gmode) == types.StringType:
             if gmode == "lin":
-                g = LinGraph(self.graphs[self.curgraph])
+                g = LinGraphs.LinGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "fftlin":
-                g = FFTLinGraph(self.graphs[self.curgraph])
+                g = LinGraphs.FFTLinGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g                
             elif gmode == "ifftlin":
-                g = IFFTLinGraph(self.graphs[self.curgraph])
+                g = LinGraphs.IFFTLinGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g                
             elif gmode == "logx":
-                g = LogxGraph(self.graphs[self.curgraph])
+                g = LogGraphs.LogxGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "logy":
-                g = LogyGraph(self.graphs[self.curgraph])
+                g = LogGraphs.LogyGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "loglog":
-                g = LoglogGraph(self.graphs[self.curgraph])
+                g = LogGraphs.LoglogGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "fftlogx":
-                g = FFTLogxGraph(self.graphs[self.curgraph])
+                g = LogGraphs.FFTLogxGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "fftlogy":
-                g = FFTLogyGraph(self.graphs[self.curgraph])
+                g = LogGraphs.FFTLogyGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "fftloglog":
-                g = FFTLoglogGraph(self.graphs[self.curgraph])
+                g = LogGraphs.FFTLoglogGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "ifftlogx":
-                g = IFFTLogxGraph(self.graphs[self.curgraph])
+                g = LogGraphs.IFFTLogxGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "ifftlogy":
-                g = IFFTLogyGraph(self.graphs[self.curgraph])
+                g = LogGraphs.IFFTLogyGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "ifftloglog":
-                g = IFFTLoglogGraph(self.graphs[self.curgraph])
+                g = LogGraphs.IFFTLoglogGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
                 
     def setlayout(self, layout = "quad"):
@@ -220,7 +219,7 @@ class Figure:
 
         # Plot the whole figure
         for gn, g in enumerate(self.graphs):
-            subplot(nx, ny, gn+1)
+            pylab.subplot(nx, ny, gn+1)
             g.plot()
 
     def insert(self, sigs):

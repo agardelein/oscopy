@@ -13,10 +13,11 @@ Class IFFTGraph -- Do an inverse fft when inserting signals
       Add signals to the graph, do an inverse fft
 
 """
-from Graph import *
-from Signal import *
+import Graph
+import Signal 
+import pylab
 
-class FFTGraph(Graph):
+class FFTGraph(Graph.Graph):
     
     def insert(self, sigs):
         """ Add a list of signals to the graph
@@ -26,13 +27,13 @@ class FFTGraph(Graph):
         """
         mysigs = {}
         for s in sigs.itervalues():
-            s2 = Signal(s)
+            s2 = Signal.Signal(s)
             # Check whether ref sig is Time
             if s.ref.name != "Time":
                 print "Warning : ref sig of", s.name ,"is not 'Time'.\
  I hope you know what you do !"
             # Do a fft
-            y = fft(s.pts)
+            y = pylab.fft(s.pts)
             y = y[0:int(len(y)/2)-1]
             s2.pts = y
             # Change the ref sig from Time to Freq
@@ -46,9 +47,9 @@ class FFTGraph(Graph):
             mysigs[s2.name] = s2
 
         # Insert sigs into siglist
-        return Graph.insert(self, mysigs)    
+        return Graph.Graph.insert(self, mysigs)    
 
-class IFFTGraph(Graph):
+class IFFTGraph(Graph.Graph):
     def insert(self, sigs):
         """ Add a list of signals to the graph
         For each one, check whether the ref sig is Freq,
@@ -58,12 +59,12 @@ class IFFTGraph(Graph):
         mysigs = {}
         for s in sigs.itervalues():
             # Check whether ref sig is Freq
-            s2 = Signal(s)
+            s2 = Signal.Signal(s)
             if s.ref.name != "Freq":
                 print "Warning : ref sig of", s.name ,"is not 'Freq'.\
  I hope you know what you do !"
             # Do a fft
-            y = ifft(s.pts)
+            y = pylab.ifft(s.pts)
             y = y[0:int(len(y)/2)-1]
             s2.pts = y
             # Change the ref sig from Time to Freq
@@ -77,4 +78,4 @@ class IFFTGraph(Graph):
             mysigs[s2.name] = s2
 
         # Insert sigs into siglist
-        return Graph.insert(self, mysigs)    
+        return Graph.Graph.insert(self, mysigs)    

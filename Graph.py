@@ -41,7 +41,7 @@ Class Graph -- Handle the representation of a list of signals
 """
 
 import matplotlib.pyplot as plt
-from pylab import *
+import pylab
 
 class Graph:
     def __init__(self, sigs = {}):
@@ -133,7 +133,7 @@ may lead to uncertain results"
         
         self.setaxes()
         # Plot the signals
-        hold(True)
+        pylab.hold(True)
         for sn, s in self.sigs.iteritems():
             # Scaling factor
             # The hard way...
@@ -145,17 +145,17 @@ may lead to uncertain results"
             for i in s.pts:
                 y.append(i * pow(10, fy))
             try:
-                plot(x, y, label=sn)
+                pylab.plot(x, y, label=sn)
             except OverflowError, e:
                 print "OverflowError in plot:", e.message, ", log(0) somewhere ?"
-                hold(False)
-                xlabel(xl)
-                ylabel(yl)
+                pylab.hold(False)
+                pylab.xlabel(xl)
+                pylab.ylabel(yl)
                 return
-        hold(False)
-        xlabel(xl)
-        ylabel(yl)
-        legend()
+        pylab.hold(False)
+        pylab.xlabel(xl)
+        pylab.ylabel(yl)
+        pylab.legend()
 
     def getsigs(self):
         """ Return a list of the signal names

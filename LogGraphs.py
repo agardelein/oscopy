@@ -104,15 +104,16 @@ Class IFFTLinGraph -- Draw graph with log scale on X and Y axis and IFFT
 
 """
 
-from Graph import *
-from FFTGraph import *
+import Graph
+import FFTGraph
+import pylab
 
-class LogxGraph(Graph):
+class LogxGraph(Graph.Graph):
     def setaxes(self):
         """ The x axis is log, the y axis is linear
         """
-        xscale("log")
-        yscale("linear")
+        pylab.xscale("log")
+        pylab.yscale("linear")
 
     def gettype(self):
         """ Return 'linear', the type of the graph
@@ -125,14 +126,14 @@ class LogxGraph(Graph):
         if a == "X":
             return 0, ""
         else:
-            return Graph.findscalefact(self, a)
+            return Graph.Graph.findscalefact(self, a)
 
-class LogyGraph(Graph):
+class LogyGraph(Graph.Graph):
     def setaxes(self):
         """ The y axis is log, the x axis is linear
         """
-        xscale("linear")
-        yscale("log")
+        pylab.xscale("linear")
+        pylab.yscale("log")
 
     def gettype(self):
         """ Return 'logy', the type of the graph
@@ -143,16 +144,16 @@ class LogyGraph(Graph):
         """ No scale factor for Y axis
         """
         if a == "X":
-            return Graph.findscalefact(self, a)
+            return Graph.Graph.findscalefact(self, a)
         else:
             return 0, ""
 
-class LoglogGraph(Graph):
+class LoglogGraph(Graph.Graph):
     def setaxes(self):
         """ The x and y axis are both log
         """
-        xscale("log")
-        yscale("log")
+        pylab.xscale("log")
+        pylab.yscale("log")
 
     def gettype(self):
         """ Return 'loglog', the type of the graph
@@ -164,7 +165,7 @@ class LoglogGraph(Graph):
         """
         return 0, ""
 
-class FFTLogxGraph(LogxGraph, FFTGraph):
+class FFTLogxGraph(LogxGraph, FFTGraph.FFTGraph):
     def setaxes(self):
         """ Logxear mode from LogxGraph
         """
@@ -173,14 +174,14 @@ class FFTLogxGraph(LogxGraph, FFTGraph):
     def insert(self, sigs):
         """ Insert FFT Signals from FFTGraph
         """
-        return FFTGraph.insert(self, sigs)
+        return FFTGraph.FFTGraph.insert(self, sigs)
 
     def gettype(self):
         """ Return the type of the graph
         """
         return "fftlogx"
 
-class IFFTLogxGraph(LogxGraph, IFFTGraph):
+class IFFTLogxGraph(LogxGraph, FFTGraph.IFFTGraph):
     def setaxes(self):
         """ Semilogx mode from LogxGraph
         """
@@ -189,14 +190,14 @@ class IFFTLogxGraph(LogxGraph, IFFTGraph):
     def insert(self, sigs):
         """ Insert inverse FFT Signals from IFFTGraph
         """
-        return IFFTGraph.insert(self, sigs)
+        return FFTGraph.IFFTGraph.insert(self, sigs)
 
     def gettype(self):
         """ Return the type of the graph
         """
         return "ifftlogx"
 
-class FFTLogyGraph(LogyGraph, FFTGraph):
+class FFTLogyGraph(LogyGraph, FFTGraph.FFTGraph):
     def setaxes(self):
         """ Logxear mode from LogyGraph
         """
@@ -205,14 +206,14 @@ class FFTLogyGraph(LogyGraph, FFTGraph):
     def insert(self, sigs):
         """ Insert FFT Signals from FFTGraph
         """
-        return FFTGraph.insert(self, sigs)
+        return FFTGraph.FFTGraph.insert(self, sigs)
 
     def gettype(self):
         """ Return the type of the graph
         """
         return "fftlogy"
 
-class IFFTLogyGraph(LogyGraph, IFFTGraph):
+class IFFTLogyGraph(LogyGraph, FFTGraph.IFFTGraph):
     def setaxes(self):
         """ Semilogy mode from LogyGraph
         """
@@ -221,14 +222,14 @@ class IFFTLogyGraph(LogyGraph, IFFTGraph):
     def insert(self, sigs):
         """ Insert inverse FFT Signals from IFFTGraph
         """
-        return IFFTGraph.insert(self, sigs)
+        return FFTGraph.IFFTGraph.insert(self, sigs)
 
     def gettype(self):
         """ Return the type of the graph
         """
         return "ifftlogy"
 
-class FFTLoglogGraph(LoglogGraph, FFTGraph):
+class FFTLoglogGraph(LoglogGraph, FFTGraph.FFTGraph):
     def setaxes(self):
         """ Logx mode from LoglogGraph
         """
@@ -237,14 +238,14 @@ class FFTLoglogGraph(LoglogGraph, FFTGraph):
     def insert(self, sigs):
         """ Insert FFT Signals from FFTGraph
         """
-        return FFTGraph.insert(self, sigs)
+        return FFTGraph.FFTGraph.insert(self, sigs)
 
     def gettype(self):
         """ Return the type of the graph
         """
         return "fftloglog"
 
-class IFFTLoglogGraph(LoglogGraph, IFFTGraph):
+class IFFTLoglogGraph(LoglogGraph, FFTGraph.IFFTGraph):
     def setaxes(self):
         """ Loglog mode from LoglogGraph
         """
@@ -253,10 +254,9 @@ class IFFTLoglogGraph(LoglogGraph, IFFTGraph):
     def insert(self, sigs):
         """ Insert inverse FFT Signals from IFFTGraph
         """
-        return IFFTGraph.insert(self, sigs)
+        return FFTGraph.IFFTGraph.insert(self, sigs)
 
     def gettype(self):
         """ Return the type of the graph
         """
         return "ifftloglog"
-

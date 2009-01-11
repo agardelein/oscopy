@@ -16,12 +16,11 @@ Class GnucapReader:
       Read the signals from a file to gnucap output format.
 """
 
-from __future__ import with_statement
-from Signal import Signal
-from Reader import *
+import Signal
+import Reader
 import re
 
-class GnucapReader(Reader):
+class GnucapReader(Reader.Reader):
     def readsigs(self):
         """ Read the signals from the file
 
@@ -48,7 +47,7 @@ class GnucapReader(Reader):
         for name in nlist: # Extract signal names
             u = self.unitfromprobe(name.split('(', 1)[0])
             name = filter(f, name.strip())
-            s = Signal(name, self, u)
+            s = Signal.Signal(name, self, u)
             self.slist.append(s)
 
         # Read values and assign to signals

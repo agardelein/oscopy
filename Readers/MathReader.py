@@ -19,17 +19,16 @@ class MathReader:
       Store the signals name and their original file to be used in readsigs()
 """
 
-from Reader import *
-from GnucapReader import *
-from pylab import *
+import Reader
+import DetectReader
+import Signal
+import pylab
 import re
 import math
 import sys
-import sys
-sys.path.insert(0, '..')
-from DetectReader import *
+#sys.path.insert(0, '..')
 
-class MathReader(Reader):
+class MathReader(Reader.Reader):
     def __init__(self, sigs = {}):
         """ Create the object
         """
@@ -61,7 +60,7 @@ class MathReader(Reader):
             if e in vs:
                 # Into the signal list
                 continue
-            elif math.__dict__.has_key(e):  # Ugly, isn't it ?
+            elif e in dir(math):
                 # Math function
                 continue
             elif e.isdigit():
@@ -84,9 +83,10 @@ class MathReader(Reader):
         _sigs = {}
         # Read the signals from the files
         for f, snames in self.origsigs.iteritems():
-            r = DetectReader(f)
-            if isinstance(r, MathReader):
-                r.setorigsigs(self.origsigs)
+            r = DetectReader.DetectReader(f)
+            if hasattr(r, "setorigsigs"):
+                if callable(r.setorigsigs):
+                    r.setorigsigs(self.origsigs)
             sigsfile = r.read(f)
             for s in snames:
                 if s in sigsfile.keys():
@@ -130,7 +130,7 @@ class MathReader(Reader):
         _endl = "\n"        # Newline code
         _ret = {}           # Value to be returned
         _sn = self.fn.split("=", 1)[0].strip()  # Result signal name
-        _expr = _expr + "_tmp = Signal(\"" + _sn + "\")" + _endl
+        _expr = _expr + "_tmp = Signal.Signal(\"" + _sn + "\")" + _endl
         _expr = _expr + "_tmp.pts = []" + _endl
         _expr = _expr + "# The slow way" + _endl
         _expr = _expr + "for _i in range(0, len(_refpts)):" + _endl

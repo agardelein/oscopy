@@ -3,6 +3,7 @@ FFT: is X axis right ?
 
 To be fixed :
 Support for recursive maths (i.e. v1=vsqu*2+3 then v2=v1+6)
+insert/remove do not work in log mode
 
 To be added :
 Support for HDF5

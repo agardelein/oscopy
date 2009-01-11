@@ -32,22 +32,23 @@ Class IFFTLinGraph -- Draw graph with linear scale on X and Y axis and IFFT
       Return the mode of the graph, "ifftlin"
 """
 
-from Graph import *
-from FFTGraph import *
+import Graph
+import FFTGraph
+import pylab
 
-class LinGraph(Graph):
+class LinGraph(Graph.Graph):
     def setaxes(self):
         """ Set the X and Y axis in linear mode
         """
-        xscale('linear')
-        yscale('linear')
+        pylab.xscale('linear')
+        pylab.yscale('linear')
 
     def gettype(self):
         """ Return 'linear', the type of the graph
         """
         return "linear"
 
-class FFTLinGraph(LinGraph, FFTGraph):
+class FFTLinGraph(LinGraph, FFTGraph.FFTGraph):
     def setaxes(self):
         """ Linear mode from LinGraph
         """
@@ -56,14 +57,14 @@ class FFTLinGraph(LinGraph, FFTGraph):
     def insert(self, sigs):
         """ Insert FFT Signals from FFTGraph
         """
-        return FFTGraph.insert(self, sigs)
+        return FFTGraph.FFTGraph.insert(self, sigs)
 
     def gettype(self):
         """ Return the type of the graph
         """
         return "fftlin"
 
-class IFFTLinGraph(LinGraph, IFFTGraph):
+class IFFTLinGraph(LinGraph, FFTGraph.IFFTGraph):
     def setaxes(self):
         """ Linear mode from LinGraph
         """
@@ -72,7 +73,7 @@ class IFFTLinGraph(LinGraph, IFFTGraph):
     def insert(self, sigs):
         """ Insert inverse FFT Signals from IFFTGraph
         """
-        return IFFTGraph.insert(self, sigs)
+        return FFTGraph.IFFTGraph.insert(self, sigs)
 
     def gettype(self):
         """ Return the type of the graph

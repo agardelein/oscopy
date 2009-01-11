@@ -61,15 +61,11 @@ Class Cmds: Commands callables from oscopy commandline
 
 import sys
 sys.path.insert(0, 'Readers')
-
-from GnucapReader import *
-from MathReader import *
-from DetectReader import *
-from Signal import *
-from Figure import *
+import DetectReader
+import Figure
 from pylab import show
 from pylab import figure as pyfig
-from types import *
+import types
 
 class Cmds:
     """ Class cmd -- Handle command line
@@ -108,7 +104,7 @@ class Cmds:
             print "   Create a new figure, set it as current, add the signals"
             return
 
-        if type(toplot) == StringType:
+        if type(toplot) == types.StringType:
             # Called from commandline,
             # Get the signal list from args
             if not toplot == "":
@@ -116,10 +112,10 @@ class Cmds:
             else:
                 # No signal list provided
                 toplot = {}
-        elif not type(toplot) == DictType:
+        elif not type(toplot) == types.DictType:
             return
         # toplot is now a list
-        f = Figure(toplot)
+        f = Figure.Figure(toplot)
         self.figs.append(f)
         self.curfig = self.figs.index(f)
 
@@ -220,7 +216,7 @@ class Cmds:
             print "File already loaded"
             return
 
-        r = DetectReader(args)
+        r = DetectReader.DetectReader(args)
         if r == None:
             print "File format unknown"
             return
@@ -403,7 +399,8 @@ Help for individual command can be obtained with 'help COMMAND'\n\
         rh = tmp[1]
 
         # Create the expression
-        r = MathReader(sigs)
+        r = DetectReader.DetectReader(inp)
+        r.setorigsigs(sigs)
         ss = r.read(inp)
         for sn, s in ss.iteritems():
             self.sigs[sn] = s
