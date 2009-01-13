@@ -85,13 +85,13 @@ may lead to uncertain results"
         for sn, s in sigs.iteritems():
             if len(self.sigs) == 0:
                 # First signal, set the abscisse name and add signal
-                self.xaxis = s.ref.name
-                self.xunit = s.ref.unit
+                self.xaxis = s.getref().getname()
+                self.xunit = s.getref().getunit()
                 self.yaxis = "Signals"  # To change
-                self.yunit = s.unit
+                self.yunit = s.getunit()
                 self.sigs[sn] = s
             else:
-                if s.ref.name == self.xaxis:
+                if s.getref().getname() == self.xaxis:
                     # Add signal
                     self.sigs[sn] = s
                 else:
@@ -138,11 +138,11 @@ may lead to uncertain results"
             # Scaling factor
             # The hard way...
             x = []
-            for i in s.ref.pts:
+            for i in s.getref().getpts():
                 x.append(i * pow(10, fx))
             # The hard way, once again
             y = []
-            for i in s.pts:
+            for i in s.getpts():
                 y.append(i * pow(10, fy))
             try:
                 pylab.plot(x, y, label=sn)
@@ -188,11 +188,11 @@ may lead to uncertain results"
 
         for s in self.sigs.itervalues():
             if a == "X":
-                mxs.append(max(s.ref.pts))
-                mns.append(min(s.ref.pts))
+                mxs.append(max(s.getref().getpts()))
+                mns.append(min(s.getref().getpts()))
             else:
-                mxs.append(max(s.pts))
-                mns.append(min(s.pts))
+                mxs.append(max(s.getpts()))
+                mns.append(min(s.getpts()))
         mx = abs(max(mxs))
         mn = abs(min(mns))
         mx = max(mx, mn)

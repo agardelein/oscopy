@@ -17,6 +17,13 @@ Class Signal -- Contains the signal points and other information
       Create an empty signal.
       If given, set the name and the reader.
 
+   set[pts|ref]()
+      Set the data points of the signal and the reference signal respectively
+
+   get[pts|ref|name|unit]()
+      Return the signal data points, reference signal signal name
+      and unit respectively
+
    __str__()
       Returns a string with the signal name, the reference name
       and the reader name.
@@ -40,6 +47,41 @@ class Signal:
             self.ref = None          # Reference signal
             self.reader = reader     # Reader object
             self.unit = unit
+
+    def setpts(self, pts = []):
+        """ Set the data points of the signal
+        """
+        if len(pts) > 0:
+            self.pts = pts
+
+    def getpts(self):
+        """ Return the list of point of the signal
+        """
+        return self.pts
+
+    def setref(self, ref = None):
+        """ Set the reference signal
+        If set to None, then signal is a reference signal (Time, Freq)
+        """
+        if ref == None or isinstance(ref, Signal):
+            self.ref = ref
+        else:
+            return
+
+    def getref(self):
+        """ Return the reference signal
+        """
+        return self.ref
+
+    def getname(self):
+        """ Return the signal name
+        """
+        return self.name
+
+    def getunit(self):
+        """ Return the unit of the signal
+        """
+        return self.unit
 
     def __str__(self):
         a = self.name + " / " + (self.ref.name) \

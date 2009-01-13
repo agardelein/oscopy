@@ -4,6 +4,8 @@ FFT: is X axis right ?
 To be fixed :
 Support for recursive maths (i.e. v1=vsqu*2+3 then v2=v1+6)
 pylab.sin instead of math.sin, and replace sin by pylab.sin into expression
+Update signal rather than readers. Use a kind of counter in Readers to distinguish between multiple call for the same update
+
 
 To be added :
 Support for HDF5

@@ -29,22 +29,22 @@ class FFTGraph(Graph.Graph):
         for s in sigs.itervalues():
             s2 = Signal.Signal(s)
             # Check whether ref sig is Time
-            if s.ref.name != "Time":
-                print "Warning : ref sig of", s.name ,"is not 'Time'.\
+            if s.getref().getname() != "Time":
+                print "Warning : ref sig of", s.getname() ,"is not 'Time'.\
  I hope you know what you do !"
             # Do a fft
-            y = pylab.fft(s.pts)
+            y = pylab.fft(s.getpts())
             y = y[0:int(len(y)/2)-1]
-            s2.pts = y
+            s2.setpts(y)
             # Change the ref sig from Time to Freq
             x = []
             for i in range(0, len(y)):
-                x.append(i / (abs(s.ref.pts[1] - s.ref.pts[0]) \
-                                  * len(s.ref.pts)))
-            s2.ref.pts = x
-            s2.ref.name = "Freq"
-            s2.ref.unit = "Hz"
-            mysigs[s2.name] = s2
+                x.append(i / (abs(s.getref().getpts()[1]\
+                                      - s.getref().getpts()[0])\
+                                  * len(s.getref().getpts())))
+            s2.setref(Signal.Signal("Freq", None, "Hz"))
+            s2.getref().setpts(x)
+            mysigs[s2.getname()] = s2
 
         # Insert sigs into siglist
         return Graph.Graph.insert(self, mysigs)    
@@ -60,22 +60,22 @@ class IFFTGraph(Graph.Graph):
         for s in sigs.itervalues():
             # Check whether ref sig is Freq
             s2 = Signal.Signal(s)
-            if s.ref.name != "Freq":
-                print "Warning : ref sig of", s.name ,"is not 'Freq'.\
+            if s.getref().getname() != "Freq":
+                print "Warning : ref sig of", s.getname() ,"is not 'Freq'.\
  I hope you know what you do !"
-            # Do a fft
-            y = pylab.ifft(s.pts)
+            # Do a inverse fft
+            y = pylab.ifft(s.getpts())
             y = y[0:int(len(y)/2)-1]
-            s2.pts = y
+            s2.setpts(y)
             # Change the ref sig from Time to Freq
             x = []
             for i in range(0, len(y)):
-                x.append(i / (abs(s.ref.pts[1] - s.ref.pts[0]) \
-                                  * len(s.ref.pts)))
-            s2.ref.pts = x
-            s2.ref.name = "Time"
-            s2.ref.unit = "s"
-            mysigs[s2.name] = s2
+                x.append(i / (abs(s.getref().getpts()[1]\
+                                      - s.getref().getpts()[0]) \
+                                  * len(s.getref().getpts())))
+            s2.setref(Signal.Signal("Time", None, "s"))
+            s2.getref().setpts(x)
+            mysigs[s2.getname()] = s2
 
         # Insert sigs into siglist
         return Graph.Graph.insert(self, mysigs)    

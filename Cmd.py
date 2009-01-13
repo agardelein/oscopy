@@ -221,6 +221,7 @@ class Cmds:
             print "File format unknown"
             return
         sigs = r.read(args)
+
         # Insert signals into the dict
         for sn in sigs.keys():
             self.sigs[sn] = sigs[sn]

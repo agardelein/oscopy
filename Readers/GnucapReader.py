@@ -44,24 +44,29 @@ class GnucapReader(Reader.Reader):
             nlist = names.lstrip('#').split()
             break  # Read only the first line
 
+        plist = []
         for name in nlist: # Extract signal names
             u = self.unitfromprobe(name.split('(', 1)[0])
             name = filter(f, name.strip())
             s = Signal.Signal(name, self, u)
             self.slist.append(s)
+            plist.append([])
 
         # Read values and assign to signals
-        for names in fil:
-            vallist = names.split()
+        # First put the points into a table of list
+        for vals in fil:
+            vallist = vals.split()
             for i, v in enumerate(vallist):
-                self.slist[i].pts.append(float(v))
+                plist[i].append(float(v))
         fil.close()
 
         # Assign abscisse to signals
         ref = self.slist.pop(0)
-        for s in self.slist:
-            s.ref = ref
-            sdict[s.name] = s
+        ref.setpts(plist.pop(0))
+        for i, s in enumerate(self.slist):
+            s.setref(ref)
+            s.setpts(plist[i])
+            sdict[s.getname()] = s
         return sdict
 
     def unitfromprobe(self, pn = ""):
