@@ -401,7 +401,7 @@ Help for individual command can be obtained with 'help COMMAND'\n\
         # Create the expression
         r = DetectReader.DetectReader(inp)
         if hasattr(r, "setorigsigs"):
-            if callable(r.setorigigs):
+            if callable(r.setorigsigs):
                 r.setorigsigs(sigs)
         ss = r.read(inp)
         for sn, s in ss.iteritems():
