@@ -46,7 +46,8 @@ class Reader:
     """
     def __init__(self):
         self.fn = ""
-        self.slist = []
+        self.sigs = {}
+        self.upn = -1  # Update number
 
     # Certify the path is valid and is a file
     def read(self, fi):
@@ -69,45 +70,53 @@ class Reader:
 
     # Re-read the data file
     # Return signal list and names of updated, deleted and new signals
-    def update(self):
-        """ Reread the file, update self.slist and return a dict of the
-        signals, as well as a list of the name of updated, deleted
-        and new signals
+    def update(self, sig, upn, keep = True):
+        """ On new update requests (upn > self.upn), reread the file
+        and update self.slist.
+        Update sig, but if unit or reference is not found set pts to
+        None 
         If readsigs returns nothing (file is deleted or whatever), all
         signals are considered deleted
+        If signal is not found or either reference or unit changed, de
+        Return dict of new signals
         """
-        u = {}
-        d = {}
         n = {}
-        old = {}
-        # Old signal list
-        for s in self.slist:
-            old[s.name] = s
-
-        # New signal list
-        sdict = self.readsigs()
-        if len(sdict) == 0:
-            # No signal returned, hence mark all signals as deleted
-            d = old
-            return sdict, u, d, n
-
-        # Find updated signals
-        # Go through the old list
-        for k, s in old.iteritems():
-            # Signal in the new list
-            if k in sdict.keys():
-                # updated signal
-                u[k] = sdict[k]
+        if upn > self.upn:
+            oldl = self.slist
+            sigs = self.readsigs()
+            # Find new signals
+            for sn, s in sigs.iteritems():
+                found = 0
+                for os in oldl:
+                    if os.name == sn:
+                        found = 1
+                        break
+                if not found:
+                    n[sn] = s
+            self.upn = upn
+        else:
+            sigs = {}
+            for s in self.slist:
+                sigs[s.name] = s
+        sn = sig.name
+        if sigs.has_key(sn):
+            # Check unit, reference unit, reference name
+            if sigs[sn].getunit() == sig.getunit() \
+                    and sigs[sn].getref().getunit() == sig.getref().getunit() \
+                    and sigs[sn].getref().getname() == sig.getref().getname():
+                sig.getref().setpts(sigs[sn].getref().getpts())
+                sig.setpts(sigs[sn].getpts())
             else:
-                # deleted signal
-                d[k] = s
-        # Go through the new list
-        for k, s in sdict.iteritems():
-            # Signal not in the old list
-            if k not in old.keys():
-                #   then add as new
-                n[k] = s
-        return sdict, u, d, n
+                print "Signal", sn, "not updated: reference or unit has changed"
+                if not keep:
+                    sig.setpts(None)
+                return n
+        else:
+            print "Signal", sn, "not updated: signal name not found"
+            if not keep:
+                sig.setpts(None)
+            return {}
+        return n
 
     def detect(self, fn):
         """ Check if the file provided can be read by this object

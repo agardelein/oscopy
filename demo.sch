@@ -20,7 +20,7 @@ device=vpulse
 T 41400 48050 5 10 0 0 0 0 1
 footprint=none
 T 41400 47450 5 10 1 1 0 0 1
-value=pulse 0 1 10n 10n 100n 5u 10u
+value=pulse 0 10 10n 10n 100n 5u 10u
 }
 C 40900 48700 1 0 0 gnd-1.sym
 C 40900 46700 1 0 0 gnd-1.sym
@@ -47,7 +47,7 @@ refdes=C1
 T 44600 49500 5 10 0 0 90 0 1
 symversion=0.1
 T 45600 49500 5 10 1 1 0 0 1
-value=1.0n
+value=.10n
 }
 C 44400 50100 1 0 0 resistor-2.sym
 {

@@ -229,12 +229,16 @@ class Figure:
             return
         self.graphs[self.curgraph].insert(sigs)
 
-    def remove(self, sigs):
+    def remove(self, sigs, where = "current"):
         """ Delete a signal from the current graph
         """
-        if self.curgraph < 0 or self.curgraph > len(self.graphs) - 1:
-            return
-        self.graphs[self.curgraph].remove(sigs)
+        if where == "current":
+            if self.curgraph < 0 or self.curgraph > len(self.graphs) - 1:
+                return
+            self.graphs[self.curgraph].remove(sigs)
+        elif where == "all":
+            for g in self.graphs:
+                g.remove(sigs)
 
     def getsigs(self):
         """ Return the list of signals in all graphs

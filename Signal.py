@@ -24,6 +24,12 @@ Class Signal -- Contains the signal points and other information
       Return the signal data points, reference signal signal name
       and unit respectively
 
+   update()
+      Update the signal from the reader
+
+   freeze(True|False|None)
+      Toggle updating, if None return current status
+
    __str__()
       Returns a string with the signal name, the reference name
       and the reader name.
@@ -41,18 +47,22 @@ class Signal:
                 self.ref = Signal(name.ref)
             self.reader = name.reader
             self.unit = name.unit
+            self.frozen = name.frozen
         else:
             self.pts = []            # Data points
             self.name = name         # Identifier
             self.ref = None          # Reference signal
             self.reader = reader     # Reader object
-            self.unit = unit
+            self.unit = unit         # Unit of the signal
+            self.frozen = False      # Flag for update
 
     def setpts(self, pts = []):
         """ Set the data points of the signal
         """
-        if len(pts) > 0:
+        if pts == None:
             self.pts = pts
+        elif len(pts) > 0 :
+                self.pts = pts
 
     def getpts(self):
         """ Return the list of point of the signal
@@ -82,6 +92,29 @@ class Signal:
         """ Return the unit of the signal
         """
         return self.unit
+
+    def gerreader(self):
+        """ Return the reader
+        """
+        return self.reader
+
+    def update(self, upn, keep = True):
+        """ Update the signal trough the reader
+        Do not update if frozen is set.
+        If keep is false, erase points.
+        Return a list of new signals
+        """
+        if self.frozen == True:
+            return {}
+        # Update from the reader
+        return self.reader.update(self, upn, keep)
+
+    def freeze(self, frz = None):
+        """ Tell to update or not the signal
+        """
+        if not frz == None:
+            self.frozen = frz
+        return self.frozen
 
     def __str__(self):
         a = self.name + " / " + (self.ref.name) \

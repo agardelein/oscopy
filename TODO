@@ -9,3 +9,6 @@ Update signal rather than readers. Use a kind of counter in Readers to distingui
 
 To be added :
 Support for HDF5
+
+Open questions:
+Missing signals when updating: keep or delete ?

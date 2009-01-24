@@ -89,6 +89,7 @@ class Cmds:
         self.readers = {}
         self.figs = []
         self.sigs = {}
+        self.upn = -1
         
     def create(self, toplot):
         """ Create a new figure and set it as current
@@ -234,34 +235,27 @@ class Cmds:
         """ Reread signal from files.
         For each file, reread it, and for updated, new and deleted signal,
         update the signal dict accordingly.
-        Avoid sending the whole signal dict to each figure by asking each one
-        its signal list and tailoring the updated and deleted signals dicts
+        
         """
         if args == "help":
             print "Usage : update"
             print "   Reread data files"
             return
-
-        # Reread the files
-        for rn in self.readers.keys():
-            sigs, u, d, n = self.readers[rn].update()
-            self.sigs.update(u)
-            self.sigs.update(n)
-            for k in d.keys():
-                if k in self.sigs:
-                    del self.sigs[k]
-            # Update in figures
+        self.upn = self.upn + 1
+        d = []
+        n = {}
+        # Update the signal, the new signals list and sigs to be deleted
+        for sn, s in self.sigs.iteritems():
+            n.update(s.update(self.upn, False))
+            if s.getpts() == None:
+                d.append(sn)
+        # Insert new signals
+        self.sigs.update(n)
+        # Delete signals
+        for sn in d:
             for f in self.figs:
-                fu = {}
-                fd = {}
-                # Iterate through the graphs to get the signames
-                for sn in f.getsigs():
-                    if sn in u.keys():
-                        fu[sn] = u[sn]
-                    elif sn in d.keys():
-                        fd[sn] = d[sn]
-                # Update the figure
-                f.update(fu, fd)
+                f.remove({sn:self.sigs[sn]}, "all")
+            del self.sigs[sn]
 
     def add(self, args):
         """ Add a graph to the current figure

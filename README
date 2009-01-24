@@ -56,3 +56,17 @@ NOTE : Figure.setmode() has to be updated when new mode are added !
 
 Vocabular:
 A figure is CREATEd or DESTROYed, a graph is ADDed to a figure or DELETEd and a signal is INSERTed or REMOVEd from a graph.
+
+A SCHEME:
+---------
+
+   SIGNAL+        + FIGURE +-- GRAPH +-- SIGNAL
+   SIGNAL+        |        |         +-- SIGNAL
+   SIGNAL+        |        |
+	 |        |        +-- GRAPH +-- SIGNAL
+         |        |                  +-- SIGNAL
+	 |        + FIGURE ...
+         |        ...
+         |        |
+         +- CMDS -+
+
