@@ -45,6 +45,12 @@ Class Cmds: Commands callables from oscopy commandline
    remove(args)
    Remove signals from the current graph of the current figure
 
+   freeze(args)
+   Set the freeze flag of signals
+
+   unfreeze(args)
+   Unset the freeze flag of signals
+
    siglist(args)
    List all the signals
 
@@ -332,6 +338,26 @@ class Cmds:
         self.figs[self.curfig].remove(sigs)
         return
 
+    def freeze(self, args):
+        """ Set the freeze flag of signals
+        """
+        if args == "help":
+            print "Usage: freeze SIG [, SIG [, SIG]...]"
+            print "   Do not consider signal for subsequent updates"
+        sigs = self.gettoplot(args)
+        for s in sigs.itervalues():
+            s.freeze(True)
+
+    def unfreeze(self, args):
+        """ Unset the freeze flag of signals
+        """
+        if args == "help":
+            print "Usage: unfreeze SIG [, SIG [, SIG]...]"
+            print "   Consider signal for subsequent updates"
+        sigs = self.gettoplot(args)
+        for s in sigs.itervalues():
+            s.freeze(False)
+
     def siglist(self, args):
         """ List loaded signals
         """
@@ -364,6 +390,7 @@ Commands related to signals:\n\
    update      reread signals from file(s)\n\
    insert      add a signal to the current graph of the current figure\n\
    remove      delete a signal from the current graph of the current figure\n\
+   (un)freeze  toggle signal update\n\
    siglist     list the signals\n\
 Misc commands:\n\
    quit, exit  exit the program\n\

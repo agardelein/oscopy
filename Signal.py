@@ -113,7 +113,8 @@ class Signal:
         """ Tell to update or not the signal
         """
         if not frz == None:
-            self.frozen = frz
+            if frz == True or frz == False:
+                self.frozen = frz
         return self.frozen
 
     def __str__(self):
