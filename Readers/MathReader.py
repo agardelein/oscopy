@@ -7,16 +7,22 @@ readsigs() load the signals from file(s) and compute the expression.
 
 class MathReader:
    __init__(inp, sigs)
-      Create a signal from expression with signals
+   Create a signal from expression with signals
 
    read(f)
-      Validate the expression, check if all signals are here.
+   Validate the expression, check if all signals are here.
 
    readsigs()
-      Load the signals from files, and compute the result
+   Load the signals from files, and compute the result
+
+   missing()
+   Return the unrecognized name in the expression
 
    setorigsigs()
-      Store the signals name and their original file to be used in readsigs()
+   Store the signals name and their original file to be used in readsigs()
+
+   detect()
+   Return true if argument is an expression with a '='
 """
 
 import Reader
@@ -36,6 +42,7 @@ class MathReader(Reader.Reader):
         self.slist = []
         self.origsigs = {}   # Dict of list of signames, key is filename
         self.setorigsigs(sigs)
+        self.unkwn = []
 
     def read(self, inp = ""):
         """ Validate the expression : each word should be in self.sigs
@@ -69,6 +76,7 @@ class MathReader(Reader.Reader):
             else:
                 # Unknown
                 print "What's this", e, "?"
+                self.unkwn.append(e)
                 return {}
         self.fn = inp
         return self.readsigs()
@@ -157,6 +165,11 @@ class MathReader(Reader.Reader):
             print "TypeError:", e.message
             return {}
         return _ret
+
+    def missing(self):
+        """ Return the unknown names found when read() was last called
+        """
+        return self.unkwn
 
     def setorigsigs(self, sigs = {}):
         """ Get the filenames and the signal names from the list of signals
