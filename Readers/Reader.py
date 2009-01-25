@@ -82,6 +82,9 @@ class Reader:
         """
         n = {}
         if upn > self.upn:
+            if hasattr(self, "origsigs"):
+                for s in self.origsigs.itervalues():
+                    s.update(upn, keep)
             oldl = self.slist
             sigs = self.readsigs()
             # Find new signals

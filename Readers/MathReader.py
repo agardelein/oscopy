@@ -38,28 +38,22 @@ class MathReader(Reader.Reader):
     def __init__(self, sigs = {}):
         """ Create the object
         """
-        self.fn = ""
         self.slist = []
         self.origsigs = {}   # Dict of list of signames, key is filename
         self.setorigsigs(sigs)
         self.unkwn = []
+        Reader.Reader.__init__(self)
 
     def read(self, inp = ""):
         """ Validate the expression : each word should be in self.sigs
         or math module
         """
-        if self.origsigs == {}:
-            return {}
-
         if inp == "":
             return {}
 
         l=re.findall(r"(?i)\b[a-z0-9]*", inp.split("=")[1])
-        vs = []
-        for v in self.origsigs.values():
-            # Create a single list of signals from self.origsigs.values()
-            # which is a list of lists
-            vs.extend(v)
+        vs = self.origsigs.keys()
+
         for e in l:
             if e == "":
                 # Nothing to evaluate
@@ -88,30 +82,16 @@ class MathReader(Reader.Reader):
         if self.origsigs == {}:
             return {}
 
-        _sigs = {}
-        # Read the signals from the files
-        for f, snames in self.origsigs.iteritems():
-            r = DetectReader.DetectReader(f)
-            if hasattr(r, "setorigsigs"):
-                if callable(r.setorigsigs):
-                    r.setorigsigs(self.origsigs)
-            sigsfile = r.read(f)
-            for s in snames:
-                if s in sigsfile.keys():
-                    _sigs[s] = sigsfile[s]
-                else:
-                    print "Signal", s, "not found anymore in", f, "! "\
-                        "Not updating", self.fn.split("=", 1)[0].strip()
-                    return {}
-        
+        _sigs = self.origsigs
+
         # Check homogeneity of X: signals should have the same abscisse
         first = 1
         inval = []
         for k, s in _sigs.iteritems():
             if first:
-                _refname = s.ref.name
-                _refpts = s.ref.pts
-                _refsig = s.ref
+                _refname = s.getref().getname()
+                _refpts = s.getref().getpts()
+                _refsig = s.getref()
                 first = 0
             else:
                 # Check name
@@ -119,10 +99,10 @@ class MathReader(Reader.Reader):
                     inval.append(k)
                     continue
                 # Check values
-                if len(_refpts) != len(s.ref.pts):
+                if len(_refpts) != len(s.getref().getpts()):
                     inval.append(k)
                     continue
-                for vref, v in zip(_refpts, s.ref.pts):
+                for vref, v in zip(_refpts, s.getref().getpts()):
                     if vref != v:
                         inval.append(k)
                         break
@@ -172,16 +152,11 @@ class MathReader(Reader.Reader):
         return self.unkwn
 
     def setorigsigs(self, sigs = {}):
-        """ Get the filenames and the signal names from the list of signals
-        Key is filename, values are signals.
+        """ Update dependency signal dict only if there are missing
         """
-        for k, s in sigs.iteritems():
-            f = s.reader.fn
-            n = s.name
-            if self.origsigs.has_key(f):
-                self.origsigs[f].append(n)
-            else:
-                self.origsigs[f] = [n]
+        for sn, s in sigs.iteritems():
+            if sn in self.unkwn:
+                self.origsigs.update({sn:s})
 
     def detect(self, fn):
         """ If the filename contains "=", then this is managed

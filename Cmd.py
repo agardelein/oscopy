@@ -252,6 +252,7 @@ class Cmds:
         n = {}
         # Update the signal, the new signals list and sigs to be deleted
         for sn, s in self.sigs.iteritems():
+            print sn
             n.update(s.update(self.upn, False))
             if s.getpts() == None:
                 d.append(sn)
@@ -406,29 +407,20 @@ Help for individual command can be obtained with 'help COMMAND'\n\
         """
         sigs = {}
 
-        # Build the list of signals to be used
-        for sn, s in self.sigs.iteritems():
-            if inp.find(sn) > 0:
-                sigs[sn] = s
-        if sigs == {}:
-            # No sigs, nothing to do
-            return
-
-        # Split left hand and right hand
-        tmp = inp.split("=", 1)
-        lh = tmp[0]
-        rh = tmp[1]
-
         # Create the expression
         r = DetectReader.DetectReader(inp)
-        if hasattr(r, "setorigsigs"):
-            if callable(r.setorigsigs):
-                r.setorigsigs(sigs)
         ss = r.read(inp)
+        if len(ss) == 0:
+            if hasattr(r, "missing") and callable(r.missing):
+                sns = r.missing()
+                if hasattr(r, "setorigsigs") and callable(r.setorigsigs):
+                    for sn in sns:
+                        if self.sigs.has_key(sn):
+                            sigs[sn] = self.sigs[sn]
+                    r.setorigsigs(sigs)
+                    ss = r.read(inp)
         for sn, s in ss.iteritems():
             self.sigs[sn] = s
-        if len(ss) > 0:
-            self.readers[inp] = r
         return
 
     def gettoplot(self, args):
