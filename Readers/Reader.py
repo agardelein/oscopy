@@ -83,6 +83,7 @@ class Reader:
         n = {}
         if upn > self.upn:
             if hasattr(self, "origsigs"):
+                # Update dependencies first
                 for s in self.origsigs.itervalues():
                     s.update(upn, keep)
             oldl = self.slist

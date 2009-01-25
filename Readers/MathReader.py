@@ -47,6 +47,8 @@ class MathReader(Reader.Reader):
     def read(self, inp = ""):
         """ Validate the expression : each word should be in self.sigs
         or math module
+        If read failed, return {} and unknown word can be retrieved by
+        calling missing()
         """
         if inp == "":
             return {}
