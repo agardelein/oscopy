@@ -51,7 +51,10 @@ while True:
             break
 
         # Evaluate the command
-        eval("cmds." + cmd + "(args)")
+        if cmd in dir(cmds):
+            eval("cmds." + cmd + "(args)")
+        else:
+            print cmd, "not supported"
         continue
 
     except EOFError:

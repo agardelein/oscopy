@@ -1,9 +1,11 @@
 """ Handle mathematical expressions for signals
 
-The implementation is quite unoptimized to simplify the use of update()
-
 In parent class, read validate the path, here validate the expression.
 readsigs() load the signals from file(s) and compute the expression.
+
+Mathematical function are supported through the pylab module. However 
+this module contains a bunch of non-math function, so only the functions
+defined in the math modules are supported.
 
 class MathReader:
    __init__(inp, sigs)
