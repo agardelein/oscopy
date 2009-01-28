@@ -116,6 +116,11 @@ class MathReader(Reader.Reader):
         del first, inval
 
         # Prepare the expression to be executed
+        fn = self.fn
+        # Replace sin with pylab.sin but only for supported math functions
+        for on in dir(math):
+             fn = re.sub('\\b'+on+'\\b', 'pylab.'+on, fn)
+
         _expr = ""          # String for snippet code
         _endl = "\n"        # Newline code
         _ret = {}           # Value to be returned
@@ -127,7 +132,7 @@ class MathReader(Reader.Reader):
         for k, s in _sigs.iteritems():
             _expr = _expr + "\t" + s.name + "=" + \
                 "_sigs[\"" + s.name + "\"].pts[_i]" + _endl
-        _expr = _expr + "\t" + self.fn + _endl
+        _expr = _expr + "\t" + fn + _endl
         _expr = _expr + "\t_tmp.pts.append(" + _sn +")" + _endl
         _expr = _expr + "_tmp.ref = _refsig" + _endl
         _expr = _expr + "_tmp.reader = self" + _endl
