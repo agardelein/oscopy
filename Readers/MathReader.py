@@ -57,7 +57,9 @@ class MathReader(Reader.Reader):
 
         l=re.findall(r"(?i)\b[a-z0-9]*", inp.split("=")[1])
         vs = self.origsigs.keys()
-
+        # Allow Time and Freq keywords
+        tf = ["Time", "Freq"]
+        self.unkwn = []
         for e in l:
             if e == "":
                 # Nothing to evaluate
@@ -71,10 +73,16 @@ class MathReader(Reader.Reader):
             elif e.isdigit():
                 # Number
                 continue
+            elif e in tf:
+                # Other allowed names
+                continue
             else:
                 # Unknown
                 self.unkwn.append(e)
-                return {}
+                continue
+        if len(self.unkwn) > 0:
+            print self.unkwn
+            return {}
         self.fn = inp
         return self.readsigs()
 
@@ -121,6 +129,12 @@ class MathReader(Reader.Reader):
         # Replace sin with pylab.sin but only for supported math functions
         for on in dir(math):
              fn = re.sub('\\b'+on+'\\b', 'numpy.'+on, fn)
+        if fn.find("Time") > 0:
+            Time = _refpts
+            fn = re.sub('Time\(\w+\)', 'Time', fn)
+        if fn.find("Freq") > 0:
+            Freq = _refpts
+            fn = re.sub('Freq\(\w+\)', 'Freq', fn)
 
         _expr = ""          # String for snippet code
         _endl = "\n"        # Newline code
@@ -141,9 +155,9 @@ class MathReader(Reader.Reader):
         _expr = _expr + "self.slist.append(_tmp)" + _endl
 
         # Execute the expression
-#        print "Executing:\n---"
-#        print _expr
-#        print "---"
+        print "Executing:\n---"
+        print _expr
+        print "---"
         try:
             exec(_expr)
         except NameError, e:
