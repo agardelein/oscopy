@@ -78,7 +78,8 @@ class MathReader(Reader.Reader):
                 continue
             else:
                 # Unknown
-                self.unkwn.append(e)
+                if re.match('[-+]?\d*\.?\d+([eE][-+]?\d+)?', e) == None:
+                    self.unkwn.append(e)
                 continue
         if len(self.unkwn) > 0:
             print self.unkwn
@@ -126,7 +127,7 @@ class MathReader(Reader.Reader):
 
         # Prepare the expression to be executed
         fn = self.fn
-        # Replace sin with pylab.sin but only for supported math functions
+        # Replace sin with numpy.sin but only for supported math functions
         for on in dir(math):
              fn = re.sub('\\b'+on+'\\b', 'numpy.'+on, fn)
         if fn.find("Time") > 0:
