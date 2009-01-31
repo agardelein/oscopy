@@ -417,8 +417,12 @@ Help for individual command can be obtained with 'help COMMAND'\n\
                     for sn in sns:
                         if self.sigs.has_key(sn):
                             sigs[sn] = self.sigs[sn]
+                        else:
+                            print "What is", sn
                     r.setorigsigs(sigs)
                     ss = r.read(inp)
+                    if len(ss) == 0:
+                        print "Signal not generated"
         for sn, s in ss.iteritems():
             self.sigs[sn] = s
         return

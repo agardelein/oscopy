@@ -73,7 +73,6 @@ class MathReader(Reader.Reader):
                 continue
             else:
                 # Unknown
-                print "What's this", e, "?"
                 self.unkwn.append(e)
                 return {}
         self.fn = inp
@@ -126,18 +125,18 @@ class MathReader(Reader.Reader):
         _expr = ""          # String for snippet code
         _endl = "\n"        # Newline code
         _ret = {}           # Value to be returned
-        _sn = self.fn.split("=", 1)[0].strip()  # Result signal name
-        _expr = _expr + "_tmp = Signal.Signal(\"" + _sn + "\")" + _endl
-        _expr = _expr + "_tmp.pts = []" + _endl
+        _sn = fn.split("=", 1)[0].strip()  # Result signal name
+        _expr = _expr + "_tmp = Signal.Signal(\"" + _sn + "\", self)" + _endl
+        _expr = _expr + "_pts = []" + _endl
         _expr = _expr + "# The slow way" + _endl
         _expr = _expr + "for _i in range(0, len(_refpts)):" + _endl
         for k, s in _sigs.iteritems():
             _expr = _expr + "\t" + s.name + "=" + \
                 "_sigs[\"" + s.name + "\"].pts[_i]" + _endl
         _expr = _expr + "\t" + fn + _endl
-        _expr = _expr + "\t_tmp.pts.append(" + _sn +")" + _endl
-        _expr = _expr + "_tmp.ref = _refsig" + _endl
-        _expr = _expr + "_tmp.reader = self" + _endl
+        _expr = _expr + "\t_pts.append(" + _sn +")" + _endl
+        _expr = _expr + "_tmp.setpts(_pts)" + _endl
+        _expr = _expr + "_tmp.setref(_refsig)" + _endl
         _expr = _expr + "_ret[\"" + _sn + "\"] = _tmp" + _endl
         _expr = _expr + "self.slist.append(_tmp)" + _endl
 

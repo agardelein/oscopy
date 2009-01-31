@@ -91,7 +91,6 @@ class GnucapReader(Reader.Reader):
         try:
             f = open(fn)
         except IOError, e:
-            print e.message
             return False
         s = f.readline()
         f.close()
