@@ -36,7 +36,7 @@ Class Cmds: Commands callables from oscopy commandline
    unit(args)
    Set the unit of current graph from current figure
 
-   load(args)
+   read(args)
    Read signals from a file
 
    update(args)
@@ -210,7 +210,7 @@ class Cmds:
             f.plot()
         show()
 
-    def load(self, args):
+    def read(self, args):
         """ Read signals from file.
         Duplicate signal names overwrite the previous one.
         For new only gnucap files are supported.
@@ -316,7 +316,7 @@ class Cmds:
         """
         if args == "help":
             print "Usage: unit [XUNIT,] YUNIT"
-            print "   set the unit to be displayed on graph axis\n"
+            print "   Set the unit to be displayed on graph axis\n"
             return
 
         if self.curfig < 0 and self.curfig > len(self.figs):
@@ -411,7 +411,7 @@ Commands related to graphs:\n\
    mode        set the mode of the current graph of the current figure\n\
    unit        set the units of the current graph of the current figure\n\
 Commands related to signals:\n\
-   load        read signals from file\n\
+   read        read signals from file\n\
    update      reread signals from file(s)\n\
    insert      add a signal to the current graph of the current figure\n\
    remove      delete a signal from the current graph of the current figure\n\
