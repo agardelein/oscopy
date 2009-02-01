@@ -38,6 +38,9 @@ Class Graph -- Handle the representation of a list of signals
    gettype()
       Return a string with the type of graph, to be overloaded.
 
+   setunits()
+      Define the axis unit
+
 """
 
 import matplotlib.pyplot as plt
@@ -66,6 +69,8 @@ may lead to uncertain results"
         else:
             self.xaxis = ""
             self.yaxis = ""
+            self.xunit = ""
+            self.yunit = ""
             self.insert(sigs)
 
     def __str__(self):
@@ -215,3 +220,13 @@ may lead to uncertain results"
             else:
                 l = "10e" + str(-f) + " "
         return f, l
+
+    def setunit(self, xu, yu = ""):
+        """ Define the graph units. If only one argument is provided,
+        set y axis, if both are provided, set both.
+        """
+        if yu == "":
+            self.yunit = xu
+        else:
+            self.xunit = xu
+            self.yunit = yu

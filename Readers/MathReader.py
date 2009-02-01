@@ -144,21 +144,19 @@ class MathReader(Reader.Reader):
         _expr = _expr + "_tmp = Signal.Signal(\"" + _sn + "\", self)" + _endl
         _expr = _expr + "_pts = []" + _endl
         _expr = _expr + "# The slow way" + _endl
-#        _expr = _expr + "for _i in range(0, len(_refpts)):" + _endl
         for k, s in _sigs.iteritems():
             _expr = _expr + s.name + "=" + \
                 "_sigs[\"" + s.name + "\"].getpts()" + _endl
         _expr = _expr + fn + _endl
-#        _expr = _expr + "\t_pts.append(" + _sn +")" + _endl
         _expr = _expr + "_tmp.setpts("+ _sn +")" + _endl
         _expr = _expr + "_tmp.setref(_refsig)" + _endl
         _expr = _expr + "_ret[\"" + _sn + "\"] = _tmp" + _endl
         _expr = _expr + "self.slist.append(_tmp)" + _endl
 
         # Execute the expression
-        print "Executing:\n---"
-        print _expr
-        print "---"
+#        print "Executing:\n---"
+#        print _expr
+#        print "---"
         try:
             exec(_expr)
         except NameError, e:

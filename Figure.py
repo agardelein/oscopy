@@ -45,6 +45,9 @@ Figure -- Handle a list of graphs
 
    getsigs()
       Return a list of the signals in all graphs
+
+   setunit()
+      Set the current graph units
 """
 
 import LinGraphs
@@ -246,3 +249,9 @@ class Figure:
         for g in self.graphs:
             for sn in g.getsigs():
                 yield sn
+    def setunit(self, xu, yu = ""):
+        """ Set the current graph units
+        """
+        if self.curgraph < 0 or self.curgraph > len(self.graphs) - 1:
+            return
+        self.graphs[self.curgraph].setunit(xu, yu)

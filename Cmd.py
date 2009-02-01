@@ -33,6 +33,9 @@ Class Cmds: Commands callables from oscopy commandline
    mode(args)
    Set the mode of the current graph
 
+   unit(args)
+   Set the unit of current graph from current figure
+
    load(args)
    Read signals from a file
 
@@ -308,6 +311,26 @@ class Cmds:
 
         self.figs[self.curfig].setmode(args)
 
+    def unit(self, args):
+        """ Set the units of current graph of current figure
+        """
+        if args == "help":
+            print "Usage: unit [XUNIT,] YUNIT"
+            print "   set the unit to be displayed on graph axis\n"
+            return
+
+        if self.curfig < 0 and self.curfig > len(self.figs):
+            return
+        us = args.split(",", 1)
+        if len(us) < 1:
+            return
+        elif len(us) == 1:
+            self.figs[self.curfig].setunit(us[0].strip())
+        elif len(us) == 2:
+            self.figs[self.curfig].setunit(us[0].strip(), us[1].strip())
+        else:
+            return
+            
     def insert(self, args):
         """ Insert a list of signals into the current graph 
         of the current figure
@@ -386,6 +409,7 @@ Commands related to graphs:\n\
    add         add a graph to the current figure\n\
    delete      delete a graph from the current figure\n\
    mode        set the mode of the current graph of the current figure\n\
+   unit        set the units of the current graph of the current figure\n\
 Commands related to signals:\n\
    load        read signals from file\n\
    update      reread signals from file(s)\n\
