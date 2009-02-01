@@ -311,6 +311,14 @@ class Cmds:
 
         self.figs[self.curfig].setmode(args)
 
+    def scale(self, args):
+        """ Set the axis scale of the current graph of the current figure
+        """
+        if args == "help":
+            print "Usage: scale [lin|logx|logy|loglog]"
+            return
+        self.figs[self.curfig].setscale(args)
+
     def unit(self, args):
         """ Set the units of current graph of current figure
         """

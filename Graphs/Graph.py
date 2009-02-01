@@ -41,10 +41,13 @@ Class Graph -- Handle the representation of a list of signals
    setunits()
       Define the axis unit
 
+   setscale()
+      Set plot axei scale (lin, logx, logy, loglog)
 """
 
 import matplotlib.pyplot as plt
 import pylab
+import types
 
 class Graph:
     def __init__(self, sigs = {}):
@@ -72,6 +75,7 @@ may lead to uncertain results"
             self.xunit = ""
             self.yunit = ""
             self.insert(sigs)
+            self.plotf = pylab.plot
 
     def __str__(self):
         """ Return a string with the type and the signal list of the graph
@@ -150,7 +154,7 @@ may lead to uncertain results"
             for i in s.getpts():
                 y.append(i * pow(10, fy))
             try:
-                pylab.plot(x, y, label=sn)
+                self.plotf(x, y, label=sn)
             except OverflowError, e:
                 print "OverflowError in plot:", e.message, ", log(0) somewhere ?"
                 pylab.hold(False)
@@ -230,3 +234,16 @@ may lead to uncertain results"
         else:
             self.xunit = xu
             self.yunit = yu
+
+    def setscale(self, a):
+        """ Set axes scale, either lin, logx, logy or loglog
+        """
+        if type(a) == types.StringType:
+            if a == "lin":
+                self.plotf = pylab.plot
+            elif a == "logx":
+                self.plotf = pylab.semilogx
+            elif a == "logy":
+                self.plotf = pylab.semilogy
+            elif a == "loglog":
+                self.plotf = pylab.loglog

@@ -257,3 +257,10 @@ class Figure:
         if self.curgraph < 0 or self.curgraph > len(self.graphs) - 1:
             return
         self.graphs[self.curgraph].setunit(xu, yu)
+
+    def setscale(self, a):
+        """ Set the current graph axis scale
+        """
+        if self.curgraph < 0 or self.curgraph > len(self.graphs) - 1:
+            return
+        self.graphs[self.curgraph].setscale(a)
