@@ -50,8 +50,10 @@ Figure -- Handle a list of graphs
       Set the current graph units
 """
 
-import LinGraphs
-import LogGraphs
+import Graphs
+import Graphs.LinGraphs
+import Graphs.LogGraphs
+#import Graphs
 import pylab
 import types
 
@@ -80,7 +82,7 @@ class Figure:
         """
         if len(self.graphs) > 3:
             return
-        gr = LinGraphs.LinGraph(sigs)
+        gr = Graphs.LinGraphs.LinGraph(sigs)
         self.graphs.append(gr)
         self.select(self.graphs.index(gr) + 1)
 
@@ -142,40 +144,40 @@ class Figure:
         """
         if type(gmode) == types.StringType:
             if gmode == "lin":
-                g = LinGraphs.LinGraph(self.graphs[self.curgraph])
+                g = Graphs.LinGraphs.LinGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "fftlin":
-                g = LinGraphs.FFTLinGraph(self.graphs[self.curgraph])
+                g = Graphs.LinGraphs.FFTLinGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g                
             elif gmode == "ifftlin":
-                g = LinGraphs.IFFTLinGraph(self.graphs[self.curgraph])
+                g = Graphs.LinGraphs.IFFTLinGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g                
             elif gmode == "logx":
-                g = LogGraphs.LogxGraph(self.graphs[self.curgraph])
+                g = Graphs.LogGraphs.LogxGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "logy":
-                g = LogGraphs.LogyGraph(self.graphs[self.curgraph])
+                g = Graphs.LogGraphs.LogyGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "loglog":
-                g = LogGraphs.LoglogGraph(self.graphs[self.curgraph])
+                g = Graphs.LogGraphs.LoglogGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "fftlogx":
-                g = LogGraphs.FFTLogxGraph(self.graphs[self.curgraph])
+                g = Graphs.LogGraphs.FFTLogxGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "fftlogy":
-                g = LogGraphs.FFTLogyGraph(self.graphs[self.curgraph])
+                g = Graphs.LogGraphs.FFTLogyGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "fftloglog":
-                g = LogGraphs.FFTLoglogGraph(self.graphs[self.curgraph])
+                g = Graphs.LogGraphs.FFTLoglogGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "ifftlogx":
-                g = LogGraphs.IFFTLogxGraph(self.graphs[self.curgraph])
+                g = Graphs.LogGraphs.IFFTLogxGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "ifftlogy":
-                g = LogGraphs.IFFTLogyGraph(self.graphs[self.curgraph])
+                g = Graphs.LogGraphs.IFFTLogyGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
             elif gmode == "ifftloglog":
-                g = LogGraphs.IFFTLoglogGraph(self.graphs[self.curgraph])
+                g = Graphs.LogGraphs.IFFTLoglogGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
                 
     def setlayout(self, layout = "quad"):
