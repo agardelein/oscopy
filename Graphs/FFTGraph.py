@@ -1,39 +1,46 @@
 """ A graph with FFT or inverse FFT
 
-Class FFTGraph -- Do an fft when inserting signals
+Class FFTGraph -- Do an fft when plotting
 
    methods:
-   insert(sigs)
-      Add signals to the graph, do an fft
+   plot()
+   Plot the fft of the signals
 
-Class IFFTGraph -- Do an inverse fft when inserting signals
+   gettype()
+   Return "fft", the type of the graph
+
+Class IFFTGraph -- Do an inverse fft when plotting signals
 
    methods:
-   insert(sigs)
-      Add signals to the graph, do an inverse fft
+   plot()
+   Plot the inverse fft of signals
 
+   gettype()
+   Return "ifft", the type of the graph
 """
 import Graph
 import Signal 
-import pylab
+import numpy.fft
 
 class FFTGraph(Graph.Graph):
-    
-    def insert(self, sigs):
-        """ Add a list of signals to the graph
-        For each one, check whether the ref sig is Time,
-        do a fft of the sig and change the ref sig from
-        Time to Freq, then add it by calling Graph.insert()
+
+    def plot(self):
+        """ Plot the fft of signals.
+        First calculate the fft of each signal
+        and then call the parent function
         """
-        mysigs = {}
-        for s in sigs.itervalues():
-            s2 = Signal.Signal(s)
+        # Save signals
+        origsigs = self.sigs
+        self.sigs = {}
+        # Compute FFT for all signals
+        for sn, s in origsigs.iteritems():
+            s2 = Signal.Signal(sn, None, s.getunit())
             # Check whether ref sig is Time
             if s.getref().getname() != "Time":
                 print "Warning : ref sig of", s.getname() ,"is not 'Time'.\
  I hope you know what you do !"
             # Do a fft
-            y = pylab.fft(s.getpts())
+            y = numpy.fft.fft(s.getpts())
             y = y[0:int(len(y)/2)-1]
             s2.setpts(y)
             # Change the ref sig from Time to Freq
@@ -44,27 +51,44 @@ class FFTGraph(Graph.Graph):
                                   * len(s.getref().getpts())))
             s2.setref(Signal.Signal("Freq", None, "Hz"))
             s2.getref().setpts(x)
-            mysigs[s2.getname()] = s2
+            self.sigs[sn] = s2
 
-        # Insert sigs into siglist
-        return Graph.Graph.insert(self, mysigs)    
+        self.xunit = "Hz"
+        self.xaxis = "Freq"
+        Graph.Graph.plot(self)
+
+        # Restore signals
+        self.sigs = origsigs
+        return
+
+    def gettype(self):
+        """ Return the type of graph, here fft
+        """
+        return "fft"
 
 class IFFTGraph(Graph.Graph):
-    def insert(self, sigs):
-        """ Add a list of signals to the graph
-        For each one, check whether the ref sig is Freq,
-        do an inverse fft of the sig and change the ref sig from
-        Freq to Time, then add it by calling Graph.insert()
+    def gettype(self):
+        """ Return the type of graph, here ifft
         """
-        mysigs = {}
-        for s in sigs.itervalues():
+        return "ifft"
+
+    def plot(self):
+        """ Plot the inverse fft of signals.
+        First calculate the inverse fft of each signal
+        and then call the parent function
+        """
+        # Save signals
+        origsigs = self.sigs
+        self.sigs = {}
+        # Compute FFT for all signals
+        for sn, s in origsigs.iteritems():
             # Check whether ref sig is Freq
             s2 = Signal.Signal(s)
             if s.getref().getname() != "Freq":
                 print "Warning : ref sig of", s.getname() ,"is not 'Freq'.\
  I hope you know what you do !"
             # Do a inverse fft
-            y = pylab.ifft(s.getpts())
+            y = numpy.fft.ifft(s.getpts())
             y = y[0:int(len(y)/2)-1]
             s2.setpts(y)
             # Change the ref sig from Time to Freq
@@ -75,7 +99,12 @@ class IFFTGraph(Graph.Graph):
                                   * len(s.getref().getpts())))
             s2.setref(Signal.Signal("Time", None, "s"))
             s2.getref().setpts(x)
-            mysigs[s2.getname()] = s2
+            self.sigs[sn] = s2
 
-        # Insert sigs into siglist
-        return Graph.Graph.insert(self, mysigs)    
+        self.xunit = "s"
+        self.xaxis = "Time"
+        Graph.Graph.plot(self)
+
+        # Restore signals
+        self.sigs = origsigs
+        return

@@ -301,12 +301,9 @@ class Cmds:
             print "Usage: mode MODE"
             print "   Set the type of the current graph of the current figure"
             print "Available modes :\n\
-   lin      x and y linear\n\
-   logx     x log, y linear\n\
-   logy     x linear, y log\n\
-   loglog   x and y log\n\
-   fftlin, fftlogx, fftlogy, fftloglog\n\
-            Fast Fourier Transform (FFT) with lin, logx, logy or loglog mode"
+   lin      Linear graph\n\
+   fft      Fast Fourier Transform (FFT) of signals\n\
+   ifft     Inverse FFT of signals"
             return
 
         self.figs[self.curfig].setmode(args)
@@ -316,6 +313,7 @@ class Cmds:
         """
         if args == "help":
             print "Usage: scale [lin|logx|logy|loglog]"
+            print "   Set the axis scale"
             return
         self.figs[self.curfig].setscale(args)
 
@@ -324,7 +322,7 @@ class Cmds:
         """
         if args == "help":
             print "Usage: unit [XUNIT,] YUNIT"
-            print "   Set the unit to be displayed on graph axis\n"
+            print "   Set the unit to be displayed on graph axis"
             return
 
         if self.curfig < 0 and self.curfig > len(self.figs):
@@ -418,6 +416,7 @@ Commands related to graphs:\n\
    delete      delete a graph from the current figure\n\
    mode        set the mode of the current graph of the current figure\n\
    unit        set the units of the current graph of the current figure\n\
+   scale       set the scale of the current graph of the current figure\n\
 Commands related to signals:\n\
    read        read signals from file\n\
    update      reread signals from file(s)\n\
@@ -429,7 +428,7 @@ Misc commands:\n\
    quit, exit  exit the program\n\
    help        display this help message\n\
 \n\
-Help for individual command can be obtained with 'help COMMAND'\n\
+Help for individual command can be obtained with 'help COMMAND'\
 "
         else:
             eval("self." + args + "(\"help\")")

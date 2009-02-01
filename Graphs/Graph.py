@@ -32,9 +32,6 @@ Class Graph -- Handle the representation of a list of signals
    getsigs()
       Return a list of the signal names
 
-   setaxes()
-      Define the type of the axes. To be overloaded by deriving classes.
-
    gettype()
       Return a string with the type of graph, to be overloaded.
 
@@ -69,6 +66,7 @@ may lead to uncertain results"
             mysigs = {}
             mysigs = sigs.sigs.copy()
             self.insert(mysigs)
+            self.plotf = sigs.plotf
         else:
             self.xaxis = ""
             self.yaxis = ""
@@ -140,7 +138,6 @@ may lead to uncertain results"
         fy, l = self.findscalefact("Y")
         yl = yl + " (" + l + yu + ")"
         
-        self.setaxes()
         # Plot the signals
         pylab.hold(True)
         for sn, s in self.sigs.iteritems():
@@ -171,12 +168,6 @@ may lead to uncertain results"
         """
         for sn in self.sigs:
             yield sn
-
-    def setaxes(self):
-        """ Define the axes type, called by plot()
-        To be overloaded by derived classes.
-        """
-        return
 
     def gettype(self):
         """ Return a string with the type of the graph

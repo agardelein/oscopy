@@ -52,8 +52,7 @@ Figure -- Handle a list of graphs
 
 import Graphs
 import Graphs.LinGraphs
-import Graphs.LogGraphs
-#import Graphs
+import Graphs.FFTGraph
 import pylab
 import types
 
@@ -146,39 +145,12 @@ class Figure:
             if gmode == "lin":
                 g = Graphs.LinGraphs.LinGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g
-            elif gmode == "fftlin":
-                g = Graphs.LinGraphs.FFTLinGraph(self.graphs[self.curgraph])
+            elif gmode == "fft":
+                g = Graphs.FFTGraph.FFTGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g                
-            elif gmode == "ifftlin":
-                g = Graphs.LinGraphs.IFFTLinGraph(self.graphs[self.curgraph])
+            elif gmode == "ifft":
+                g = Graphs.FFTGraph.IFFTGraph(self.graphs[self.curgraph])
                 self.graphs[self.curgraph] = g                
-            elif gmode == "logx":
-                g = Graphs.LogGraphs.LogxGraph(self.graphs[self.curgraph])
-                self.graphs[self.curgraph] = g
-            elif gmode == "logy":
-                g = Graphs.LogGraphs.LogyGraph(self.graphs[self.curgraph])
-                self.graphs[self.curgraph] = g
-            elif gmode == "loglog":
-                g = Graphs.LogGraphs.LoglogGraph(self.graphs[self.curgraph])
-                self.graphs[self.curgraph] = g
-            elif gmode == "fftlogx":
-                g = Graphs.LogGraphs.FFTLogxGraph(self.graphs[self.curgraph])
-                self.graphs[self.curgraph] = g
-            elif gmode == "fftlogy":
-                g = Graphs.LogGraphs.FFTLogyGraph(self.graphs[self.curgraph])
-                self.graphs[self.curgraph] = g
-            elif gmode == "fftloglog":
-                g = Graphs.LogGraphs.FFTLoglogGraph(self.graphs[self.curgraph])
-                self.graphs[self.curgraph] = g
-            elif gmode == "ifftlogx":
-                g = Graphs.LogGraphs.IFFTLogxGraph(self.graphs[self.curgraph])
-                self.graphs[self.curgraph] = g
-            elif gmode == "ifftlogy":
-                g = Graphs.LogGraphs.IFFTLogyGraph(self.graphs[self.curgraph])
-                self.graphs[self.curgraph] = g
-            elif gmode == "ifftloglog":
-                g = Graphs.LogGraphs.IFFTLoglogGraph(self.graphs[self.curgraph])
-                self.graphs[self.curgraph] = g
                 
     def setlayout(self, layout = "quad"):
         """ Set the layout of the figure, default is quad

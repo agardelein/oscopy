@@ -98,7 +98,7 @@ class Signal:
         """
         return self.unit
 
-    def gerreader(self):
+    def getreader(self):
         """ Return the reader
         """
         return self.reader
