@@ -2,8 +2,6 @@ To be checked :
 FFT: is X axis right ?
 
 To be fixed :
-Reduce # of Graph classes: add a axes command to set to lin, logx, logy, loglog
-Roundtrip lin -> fft -> ifft -> lin
 
 To be added :
 Support for HDF5

@@ -23,6 +23,9 @@ class MathReader:
    setorigsigs()
    Store the signals name and their original file to be used in readsigs()
 
+   check()
+   No check to do since no file are used
+
    detect()
    Return true if argument is an expression with a '='
 """
@@ -178,6 +181,11 @@ class MathReader(Reader.Reader):
         for sn, s in sigs.iteritems():
             if sn in self.unkwn:
                 self.origsigs.update({sn:s})
+
+    def check(self, fn):
+        """ No file are needed, so no access problems !
+        """
+        return
 
     def detect(self, fn):
         """ If the filename contains "=", then this is managed

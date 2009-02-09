@@ -26,6 +26,9 @@ Class Reader -- Define the common functions for reader objects
    detect(fn)
       Return  if the object recognize the file
 
+   check(fn)
+      Raise ReadError exception if file fn is not accessible
+
    __str__()
       Return the filename
 
@@ -38,11 +41,11 @@ class ReadError:
         self.value = value
 
     def __str__(self):
-        return "File error :", value
+        return self.value
 
 class Reader:
     """ Reader -- Provide common function for signal file reading
-    The derived class must redefine readsigs()
+    The derived class must redefine readsigs() and detect()
     """
     def __init__(self):
         self.fn = ""
@@ -50,16 +53,11 @@ class Reader:
         self.upn = -1  # Update number
 
     # Certify the path is valid and is a file
-    def read(self, fi):
+    def read(self, fn):
         """ Check if the path is a valid file and call readsigs
         """
-        if fi == "":
-            raise ReadError("No file specified")
-        if not os.path.exists(fi):
-            raise ReadError("File do not exist")
-        if not os.path.isfile(fi):
-            raise ReadError("File is not a file")
-        self.fn = fi
+        self.check(fn)
+        self.fn = fn
         return self.readsigs()
 
     def readsigs(self):
@@ -126,6 +124,17 @@ class Reader:
         """ Check if the file provided can be read by this object
         """
         return False
+
+    def check(self, fn):
+        """ Check if the file is accessible
+        Raise ReadError exception if not accessible
+        """
+        if fn == "":
+            raise ReadError("No file specified")
+        if not os.path.exists(fn):
+            raise ReadError("File do not exist")
+        if not os.path.isfile(fn):
+            raise ReadError("File is not a file")
 
     def __str__(self):
         """ Return the signal name.

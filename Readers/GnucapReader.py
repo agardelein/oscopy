@@ -88,6 +88,7 @@ class GnucapReader(Reader.Reader):
         """ Look at the header, if it if something like
         #Name probe(name)
         """
+        self.check(fn)
         try:
             f = open(fn)
         except IOError, e:

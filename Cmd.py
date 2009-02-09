@@ -69,8 +69,9 @@ Class Cmds: Commands callables from oscopy commandline
 """
 
 import sys
-sys.path.insert(0, 'Readers')
-import DetectReader
+#sys.path.insert(0, 'Readers')
+import Readers.DetectReader
+import Writers.DetectWriter
 import Figure
 from pylab import show
 from pylab import figure as pyfig
@@ -225,8 +226,12 @@ class Cmds:
         if args in self.readers.keys():
             print "File already loaded"
             return
+        try:
+            r = Readers.DetectReader.DetectReader(args)
+        except Readers.Reader.ReadError, e:
+            print "Read error:", e
+            return
 
-        r = DetectReader.DetectReader(args)
         if r == None:
             print "File format unknown"
             return
@@ -240,11 +245,37 @@ class Cmds:
             print s
         self.readers[args] = r
 
+    def write(self, args):
+        """ Write signals to file
+        """
+        if args == "help":
+            print "Usage: write FILE FORMAT SIG [, SIG [, SIG]...]"
+
+        # Extract format and signal list
+        tmp = args.split(" ", 2)
+        if len(tmp) < 3:
+            print "What format ? Where ? Which signals ?"
+            return
+        fmt = tmp[0]
+        fn = tmp[1]
+        sigs = self.gettoplot(tmp[2])
+
+        # Create the object
+        try:
+            w = Writers.DetectWriter.DetectWriter(fmt, fn, True)
+        except Writers.Writer.WriteError, e:
+            print "Write error:", e
+            return
+        if w != None:
+            try:
+                w.write(fn, sigs)
+            except Writers.Writer.WriteError, e:
+                print "Write error:", e
+
     def update(self, args):
         """ Reread signal from files.
         For each file, reread it, and for updated, new and deleted signal,
         update the signal dict accordingly.
-        
         """
         if args == "help":
             print "Usage : update"
@@ -439,7 +470,7 @@ Help for individual command can be obtained with 'help COMMAND'\
         sigs = {}
 
         # Create the expression
-        r = DetectReader.DetectReader(inp)
+        r = Readers.DetectReader.DetectReader(inp)
         ss = r.read(inp)
         if len(ss) == 0:
             if hasattr(r, "missing") and callable(r.missing):

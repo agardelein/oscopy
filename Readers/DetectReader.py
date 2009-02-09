@@ -5,23 +5,31 @@ Detect(file)
 """
 import sys
 sys.path.insert(0, 'Readers')
-
-from GnucapReader import *
-from MathReader import *
-from types import *
+import os.path
+import Readers
+import GnucapReader
+import MathReader
+import types
 
 rds = ["GnucapReader", "MathReader"]
 
 def DetectReader(fn):
     """ Return a reader object on the file
     """
-    if type(fn) != StringType:
+    if type(fn) != types.StringType:
         return None
     endl = "\n"
+    excpt = None
     for rd in rds:
-        s = "tmp = " + rd + "()" + endl \
+        s = "tmp = " + rd + "." + rd + "()" + endl \
             + "res = tmp.detect(fn)"
-        exec(s)
+        try:
+            exec(s)
+        except Readers.Reader.ReadError, e:
+            excpt = e
+            continue
         if res == True:
             return tmp
+    if not excpt == None:
+        raise excpt
     return None
