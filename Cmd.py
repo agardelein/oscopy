@@ -76,6 +76,7 @@ import Figure
 from pylab import show
 from pylab import figure as pyfig
 import types
+import re
 
 class Cmds:
     """ Class cmd -- Handle command line
@@ -249,17 +250,24 @@ class Cmds:
         """ Write signals to file
         """
         if args == "help":
-            print "Usage: write FILE FORMAT SIG [, SIG [, SIG]...]"
+            print "Usage: write [(OPTIONS)] FILE FORMAT SIG [, SIG [, SIG]...]"
+            return
+        # Extract format, options and signal list
+        tmp = re.search(r'(?P<fmt>\w+)\s*(?P<opts>\([^\)]*\))?\s+(?P<fn>[\w\.]+)\s+(?P<sigs>\w+(\s*,\s*\w+)*)', args)
 
-        # Extract format and signal list
-        tmp = args.split(" ", 2)
-        if len(tmp) < 3:
+        if tmp == None:
             print "What format ? Where ? Which signals ?"
             return
-        fmt = tmp[0]
-        fn = tmp[1]
-        sigs = self.gettoplot(tmp[2])
-
+        fmt = tmp.group('fmt')
+        fn = tmp.group('fn')
+        opt = tmp.group('opts')
+        sigs = self.gettoplot(tmp.group('sigs'))
+        opts = {}
+        if opt != None:
+            for on in opt.strip('()').split(','):
+                tmp = on.split(':', 1)
+                if len(tmp) == 2:
+                    opts[tmp[0]] = tmp[1]
         # Create the object
         try:
             w = Writers.DetectWriter.DetectWriter(fmt, fn, True)
@@ -268,7 +276,7 @@ class Cmds:
             return
         if w != None:
             try:
-                w.write(fn, sigs)
+                w.write(fn, sigs, opts)
             except Writers.Writer.WriteError, e:
                 print "Write error:", e
 
