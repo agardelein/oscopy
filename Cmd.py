@@ -33,6 +33,12 @@ Class Cmds: Commands callables from oscopy commandline
    mode(args)
    Set the mode of the current graph
 
+   scale(arg)
+   Set the axis scale of the current graph
+
+   range(args)
+   Set the axis range of the current graph
+
    unit(args)
    Set the unit of current graph from current figure
 
@@ -251,6 +257,7 @@ class Cmds:
         """
         if args == "help":
             print "Usage: write [(OPTIONS)] FILE FORMAT SIG [, SIG [, SIG]...]"
+            print "   Write signals to file"
             return
         # Extract format, options and signal list
         tmp = re.search(r'(?P<fmt>\w+)\s*(?P<opts>\([^\)]*\))?\s+(?P<fn>[\w\.]+)\s+(?P<sigs>\w+(\s*,\s*\w+)*)', args)
@@ -356,6 +363,23 @@ class Cmds:
             return
         self.figs[self.curfig].setscale(args)
 
+    def range(self, args):
+        """ Set the axis range of the current graph of the current figure
+        """
+        if args == "help":
+            print "Usage: range [x|y min max]|[xmin xmax ymin ymax]|[reset]"
+            print "   Set the axis range of the current graph of the current figure"
+            return
+        tmp = args.split()
+        if len(tmp) == 1:
+            if tmp[0] == "reset":
+                self.figs[self.curfig].setrange(tmp[0])
+        elif len(tmp) == 3:
+            if tmp[0] == 'x' or tmp[0] == 'y':
+                self.figs[self.curfig].setrange(tmp[0], float(tmp[1]), float(tmp[2]))
+        elif len(tmp) == 4:
+            self.figs[self.curfig].setrange(float(tmp[0]), float(tmp[1]), float(tmp[2]), float(tmp[3]))
+
     def unit(self, args):
         """ Set the units of current graph of current figure
         """
@@ -456,8 +480,10 @@ Commands related to graphs:\n\
    mode        set the mode of the current graph of the current figure\n\
    unit        set the units of the current graph of the current figure\n\
    scale       set the scale of the current graph of the current figure\n\
+   range       set the axis range of the current graph of the current figure\n\
 Commands related to signals:\n\
    read        read signals from file\n\
+   write       write signals to file\n\
    update      reread signals from file(s)\n\
    insert      add a signal to the current graph of the current figure\n\
    remove      delete a signal from the current graph of the current figure\n\

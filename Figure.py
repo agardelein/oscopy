@@ -48,6 +48,12 @@ Figure -- Handle a list of graphs
 
    setunit()
       Set the current graph units
+
+   setscale()
+      Set the current graph axis scale
+
+   setrange()
+      Set the current graph axis range
 """
 
 import Graphs
@@ -236,3 +242,11 @@ class Figure:
         if self.curgraph < 0 or self.curgraph > len(self.graphs) - 1:
             return
         self.graphs[self.curgraph].setscale(a)
+
+    def setrange(self, a1 = "reset", a2 = None, a3 = None, a4 = None):
+        """ Set the axis range of the current graph
+        """
+        if self.curgraph < 0 or self.curgraph > len(self.graphs) - 1:
+            return
+        self.graphs[self.curgraph].setrange(a1, a2, a3, a4)
+

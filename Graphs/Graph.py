@@ -39,7 +39,10 @@ Class Graph -- Handle the representation of a list of signals
       Define the axis unit
 
    setscale()
-      Set plot axei scale (lin, logx, logy, loglog)
+      Set plot axis scale (lin, logx, logy, loglog)
+
+   setrange()
+      Set plot axis range
 """
 
 import matplotlib.pyplot as plt
@@ -67,11 +70,15 @@ may lead to uncertain results"
             mysigs = sigs.sigs.copy()
             self.insert(mysigs)
             self.plotf = sigs.plotf
+            self.xrange = sigs.xrange
+            self.yrange = sigs.yrange
         else:
             self.xaxis = ""
             self.yaxis = ""
             self.xunit = ""
             self.yunit = ""
+            self.xrange = []
+            self.yrange = []
             self.insert(sigs)
             self.plotf = pylab.plot
 
@@ -161,6 +168,10 @@ may lead to uncertain results"
         pylab.hold(False)
         pylab.xlabel(xl)
         pylab.ylabel(yl)
+        if len(self.xrange) == 2:
+            pylab.xlim(self.xrange[0], self.xrange[1])
+        if len(self.yrange) == 2:
+            pylab.ylim(self.yrange[0], self.yrange[1])
         pylab.legend()
 
     def getsigs(self):
@@ -238,3 +249,25 @@ may lead to uncertain results"
                 self.plotf = pylab.semilogy
             elif a == "loglog":
                 self.plotf = pylab.loglog
+
+    def setrange(self, a1 = "reset", a2 = None, a3 = None, a4 = None):
+        """ Set axis range
+        Form 1: setrange("reset")                delete range specs
+        Form 2: setrange("x", xmin, xmax)        set range for x axis
+                setrange("y", ymin, ymax)        set range for y axis
+        Form 3: setrange(xmin, xmax, ymin, ymax) set range for both axis
+        """
+        if type(a1) == types.StringType and a1 == "reset":
+            # Delete range specs
+            self.xrange = []
+            self.yrange = []
+        if a4 == None:
+            # Set either x or y range
+            if a1 == 'x':
+                self.xrange = [a2, a3]
+            elif a1 == 'y':
+                self.yrange = [a2, a3]
+        else:
+            # Set range for both axis
+            self.xrange = [a1, a2]
+            self.yrange = [a3, a4]
