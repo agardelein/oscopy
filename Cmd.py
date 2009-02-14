@@ -256,7 +256,7 @@ class Cmds:
         """ Write signals to file
         """
         if args == "help":
-            print "Usage: write [(OPTIONS)] FILE FORMAT SIG [, SIG [, SIG]...]"
+            print "Usage: write format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]"
             print "   Write signals to file"
             return
         # Extract format, options and signal list

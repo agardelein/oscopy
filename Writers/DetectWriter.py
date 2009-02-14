@@ -7,6 +7,7 @@ Automagically return a Writer to use for file writing
 import sys
 import types
 import Writers.Writer
+import Writers.GnucapWriter
 import os.path
 
 wrts = ['GnucapWriter']
@@ -26,7 +27,7 @@ def DetectWriter(fmt, fn, ov = False):
 
     endl = "\n"
     for wrt in wrts:
-        s = "tmp = Writers.Writer." + wrt + "()" + endl \
+        s = "tmp = Writers." + wrt + "." + wrt + "()" + endl \
             + "res = tmp.detect(fmt)"
         exec(s)
         if res == True:
