@@ -57,6 +57,53 @@ NOTE : Figure.setmode() has to be updated when new mode are added !
 Vocabular:
 A figure is CREATEd or DESTROYed, a graph is ADDed to a figure or DELETEd and a signal is INSERTed or REMOVEd from a graph.
 
+Template for new import format:
+---
+import Signal
+import Readers
+
+class xxxReader(Readers.Reader.Reader):
+      def readsigs(self):
+      ... read the signals from file, fill self.slist
+          and return a dict of sigs where key is signal name
+
+      def detect(self, fn):
+          return True if file fn can be read using this Reader
+---
+When a importing a signal, first detect is called.
+If format is supported, read and subsequent updates will call readsigs
+
+Template for new export format:
+---
+import Signal
+import Writers
+
+class xxxWriter(Writers.Writer.Writer):
+      def getfmtname(self):
+      ... return a string containing the name of the format
+
+      def fmtcheck(self, sigs):
+      ... return True if format can be use to write dict of signals sigs
+
+      def writesigs(self, sigs)
+      ... write signals to file
+---
+When an export command is issued, the format name is compared to the
+one provided by the class, and then the signals are passed to the class
+to check whether it can write them properly, e.g. if they have the same
+abscisse. If eveyrthing is fine, writesigs() is called.
+Options passed by user can be found in self.opts.
+
+Template for new graphs:
+---
+import Graphs
+import Signal
+
+class xxxGraph(Graphs.Graph.Graph):
+      def plot():
+      ... define the plot function, using signals in self.sigs
+---
+
 A SCHEME:
 ---------
 
