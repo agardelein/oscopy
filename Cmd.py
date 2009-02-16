@@ -117,12 +117,7 @@ class Cmds:
         then return.
         After those tests, the figure is created with the signal list.
         """
-        if toplot == "help":
-            print "Usage : create [SIG [, SIG [, SIG]...]]"
-            print "   Create a new figure, set it as current, add the signals"
-            return
-
-        if type(toplot) == types.StringType:
+        if type(toplot) == types.ListType:
             # Called from commandline,
             # Get the signal list from args
             if not toplot == "":
@@ -137,18 +132,12 @@ class Cmds:
         self.figs.append(f)
         self.curfig = self.figs.index(f)
 
-    def destroy(self, args):
+    def destroy(self, num):
         """ Delete a figure
         User must provide the figure number.
         If the number is out of range, then return
         Act as a "pop" with self.curfig
         """
-        if args == "help":
-            print "Usage : delete FIG#"
-            print "   Delete a figure"
-            return
-        
-        num = eval(args)
         if num > len(self.figs) or num < 1:
             return
         del self.figs[num - 1]
@@ -160,41 +149,23 @@ class Cmds:
             self.curfig = len(self.figs) - 1
         print "Curfig : ", self.curfig
 
-    def select(self, args):
+    def select(self, num, gn = 0):
         """ Select the current figure
         """
-        if args == "help":
-            print "Usage: select FIG#[, GRAPH#]"
-            print "   Select the current figure and the current graph"
-            return
-
-        s = args.split('-')
-
-        num = eval(s[0])
         if num > len(self.figs) or num < 1:
             return
         self.curfig = num - 1
-        if len(s) > 1:
-            self.figs[self.curfig].select(eval(s[1]))
+        if gn > 0:
+            self.figs[self.curfig].select(gn)
 
-    def layout(self, args):
+    def layout(self, l):
         """ Define the layout of the current figure
         """
-        if args == "help":
-            print "Usage : layout horiz|vert|quad"
-            print "   Define the layout of the current figure"
-            return
+        self.figs[self.curfig].setlayout(l)
 
-        self.figs[self.curfig].setlayout(args)
-
-    def figlist(self, args):
+    def figlist(self):
         """ Print the list of figures
         """
-        if args == "help":
-            print "Usage : figlist"
-            print "   Print the list of figures"
-            return
-
         for i, f in enumerate(self.figs):
             if i == self.curfig:
                 print "*",
@@ -203,14 +174,9 @@ class Cmds:
             print "Figure", i + 1, ":", f.layout
             f.list()
 
-    def plot(self, args):
+    def plot(self):
         """ Plot the figures, and enter in the matplotlib main loop
         """
-        if args == "help":
-            print "Usage : plot"
-            print "   Draw and show the figures"
-            return
-
         if self.figs == []:
             return
         for i, f in enumerate(self.figs):
@@ -218,23 +184,18 @@ class Cmds:
             f.plot()
         show()
 
-    def read(self, args):
+    def read(self, fn):
         """ Read signals from file.
         Duplicate signal names overwrite the previous one.
         For new only gnucap files are supported.
         Do not load the same file twice.
         """
-        if args == "help":
-            print "Usage : load DATAFILE"
-            print "   Load signal file"
-            return
-
         # File already loaded ?
-        if args in self.readers.keys():
+        if fn in self.readers.keys():
             print "File already loaded"
             return
         try:
-            r = Readers.DetectReader.DetectReader(args)
+            r = Readers.DetectReader.DetectReader(fn)
         except Readers.Reader.ReadError, e:
             print "Read error:", e
             return
@@ -242,40 +203,23 @@ class Cmds:
         if r == None:
             print "File format unknown"
             return
-        sigs = r.read(args)
+        sigs = r.read(fn)
 
         # Insert signals into the dict
         for sn in sigs.keys():
             self.sigs[sn] = sigs[sn]
-        print args, ":"
+        print fn, ":"
         for s in sigs.itervalues():
             print s
-        self.readers[args] = r
+        self.readers[fn] = r
 
-    def write(self, args):
+    def write(self, fn, fmt, sns, opts):
         """ Write signals to file
         """
-        if args == "help":
-            print "Usage: write format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]"
-            print "   Write signals to file"
-            return
-        # Extract format, options and signal list
-        tmp = re.search(r'(?P<fmt>\w+)\s*(?P<opts>\([^\)]*\))?\s+(?P<fn>[\w\.]+)\s+(?P<sigs>\w+(\s*,\s*\w+)*)', args)
-
-        if tmp == None:
-            print "What format ? Where ? Which signals ?"
-            return
-        fmt = tmp.group('fmt')
-        fn = tmp.group('fn')
-        opt = tmp.group('opts')
-        sigs = self.gettoplot(tmp.group('sigs'))
-        opts = {}
-        if opt != None:
-            for on in opt.strip('()').split(','):
-                tmp = on.split(':', 1)
-                if len(tmp) == 2:
-                    opts[tmp[0]] = tmp[1]
         # Create the object
+        sigs = self.gettoplot(sns)
+        if sigs == {}:
+            return
         try:
             w = Writers.DetectWriter.DetectWriter(fmt, fn, True)
         except Writers.Writer.WriteError, e:
@@ -287,15 +231,11 @@ class Cmds:
             except Writers.Writer.WriteError, e:
                 print "Write error:", e
 
-    def update(self, args):
+    def update(self):
         """ Reread signal from files.
         For each file, reread it, and for updated, new and deleted signal,
         update the signal dict accordingly.
         """
-        if args == "help":
-            print "Usage : update"
-            print "   Reread data files"
-            return
         self.upn = self.upn + 1
         d = []
         n = {}
@@ -313,190 +253,85 @@ class Cmds:
                 f.remove({sn:self.sigs[sn]}, "all")
             del self.sigs[sn]
 
-    def add(self, args):
+    def add(self, sns):
         """ Add a graph to the current figure
         The signal list is a coma separated list of signal names
         If no figure exist, create a new one.
         """
-        if args == "help":
-            print "Usage : add SIG [, SIG [, SIG]...]"
-            print "   Add a graph to the current figure"
-            return
-
         if len(self.figs) < 1:
-            self.create(args)
+            self.create(sns)
         else:
-            toplot = self.gettoplot(args)
-            self.figs[self.curfig].add(toplot)
+            sigs = self.gettoplot(sns)
+            self.figs[self.curfig].add(sigs)
 
-    def delete(self, args):
+    def delete(self, gn):
         """ Delete a graph from the current figure
         """
-        if args == "help":
-            print "Usage : delete GRAPH#"
-            print "   Delete a graph from the current figure"
-            return
+        self.figs[self.curfig].delete(gn)
 
-        self.figs[self.curfig].delete(args)
-        return
-
-    def mode(self, args):
+    def mode(self, mode):
         """ Set the mode of the current graph of the current figure
         """
-        if args == "help":
-            print "Usage: mode MODE"
-            print "   Set the type of the current graph of the current figure"
-            print "Available modes :\n\
-   lin      Linear graph\n\
-   fft      Fast Fourier Transform (FFT) of signals\n\
-   ifft     Inverse FFT of signals"
-            return
+        self.figs[self.curfig].setmode(mode)
 
-        self.figs[self.curfig].setmode(args)
-
-    def scale(self, args):
+    def scale(self, sc):
         """ Set the axis scale of the current graph of the current figure
         """
-        if args == "help":
-            print "Usage: scale [lin|logx|logy|loglog]"
-            print "   Set the axis scale"
-            return
-        self.figs[self.curfig].setscale(args)
+        self.figs[self.curfig].setscale(sc)
 
-    def range(self, args):
+    def range(self, a1 = "reset", a2 = None, a3 = None, a4 = None):
         """ Set the axis range of the current graph of the current figure
         """
-        if args == "help":
-            print "Usage: range [x|y min max]|[xmin xmax ymin ymax]|[reset]"
-            print "   Set the axis range of the current graph of the current figure"
-            return
-        tmp = args.split()
-        if len(tmp) == 1:
-            if tmp[0] == "reset":
-                self.figs[self.curfig].setrange(tmp[0])
-        elif len(tmp) == 3:
-            if tmp[0] == 'x' or tmp[0] == 'y':
-                self.figs[self.curfig].setrange(tmp[0], float(tmp[1]), float(tmp[2]))
-        elif len(tmp) == 4:
-            self.figs[self.curfig].setrange(float(tmp[0]), float(tmp[1]), float(tmp[2]), float(tmp[3]))
+        self.figs[self.curfig].setrange(a1, a2, a3, a4)
 
-    def unit(self, args):
+    def unit(self, xu, yu = ""):
         """ Set the units of current graph of current figure
         """
-        if args == "help":
-            print "Usage: unit [XUNIT,] YUNIT"
-            print "   Set the unit to be displayed on graph axis"
-            return
-
         if self.curfig < 0 and self.curfig > len(self.figs):
             return
-        us = args.split(",", 1)
-        if len(us) < 1:
-            return
-        elif len(us) == 1:
-            self.figs[self.curfig].setunit(us[0].strip())
-        elif len(us) == 2:
-            self.figs[self.curfig].setunit(us[0].strip(), us[1].strip())
-        else:
-            return
+        self.figs[self.curfig].setunit(xu, yu)        
             
-    def insert(self, args):
+    def insert(self, sns):
         """ Insert a list of signals into the current graph 
         of the current figure
         """
-        if args == "help":
-            print "Usage: insert SIG [, SIG [, SIG]...]"
-            print "   Insert a list of signals into the current graph"
-            return
-
         if self.figs == []:
             return
 
-        sigs = self.gettoplot(args)
+        sigs = self.gettoplot(sns)
         self.figs[self.curfig].insert(sigs)
         return
 
-    def remove(self, args):
+    def remove(self, sns):
         """ Remove a list of signals from the current graph
         of the current figure
         """
-        if args == "help":
-            print "Usage: remove SIG [, SIG [, SIG]...]"
-            print "   Delete a list of signals into from current graph"
-            return
         if self.figs == []:
             return
 
-        sigs = self.gettoplot(args)
+        sigs = self.gettoplot(sns)
         self.figs[self.curfig].remove(sigs)
         return
 
-    def freeze(self, args):
+    def freeze(self, sns):
         """ Set the freeze flag of signals
         """
-        if args == "help":
-            print "Usage: freeze SIG [, SIG [, SIG]...]"
-            print "   Do not consider signal for subsequent updates"
-        sigs = self.gettoplot(args)
+        sigs = self.gettoplot(sns)
         for s in sigs.itervalues():
             s.freeze(True)
 
-    def unfreeze(self, args):
+    def unfreeze(self, sns):
         """ Unset the freeze flag of signals
         """
-        if args == "help":
-            print "Usage: unfreeze SIG [, SIG [, SIG]...]"
-            print "   Consider signal for subsequent updates"
-        sigs = self.gettoplot(args)
+        sigs = self.gettoplot(sns)
         for s in sigs.itervalues():
             s.freeze(False)
 
-    def siglist(self, args):
+    def siglist(self):
         """ List loaded signals
         """
-        if args == "help":
-            print "Usage : siglist"
-            print "   List loaded signals"
-            return
-
         for s in self.sigs.itervalues():
             print s
-
-    def help(self, args):
-        """ Display general help message or individual command help
-        """
-        if args == "":
-            print "\
-Commands related to figures:\n\
-   create      create a new figure\n\
-   destroy     delete a figure\n\
-   select      define the current figure and the current graph\n\
-   layout      set the layout (either horiz, vert or quad)\n\
-   figlist     list the existing figures\n\
-   plot        draw and show the figures\n\
-Commands related to graphs:\n\
-   add         add a graph to the current figure\n\
-   delete      delete a graph from the current figure\n\
-   mode        set the mode of the current graph of the current figure\n\
-   unit        set the units of the current graph of the current figure\n\
-   scale       set the scale of the current graph of the current figure\n\
-   range       set the axis range of the current graph of the current figure\n\
-Commands related to signals:\n\
-   read        read signals from file\n\
-   write       write signals to file\n\
-   update      reread signals from file(s)\n\
-   insert      add a signal to the current graph of the current figure\n\
-   remove      delete a signal from the current graph of the current figure\n\
-   (un)freeze  toggle signal update\n\
-   siglist     list the signals\n\
-Misc commands:\n\
-   quit, exit  exit the program\n\
-   help        display this help message\n\
-\n\
-Help for individual command can be obtained with 'help COMMAND'\
-"
-        else:
-            eval("self." + args + "(\"help\")")
 
     def math(self, inp):
         """ Create a signal from mathematical expression
@@ -523,12 +358,12 @@ Help for individual command can be obtained with 'help COMMAND'\
             self.sigs[sn] = s
         return
 
-    def gettoplot(self, args):
+    def gettoplot(self, sns):
         """ Return the signal list extracted from the commandline
         The list must be a coma separated list of signal names.
         If no signals are loaded of no signal are found, return None
         """
-        if args == "":
+        if sns == "":
             return {}
 
         toplot = {}
@@ -538,8 +373,7 @@ Help for individual command can be obtained with 'help COMMAND'\
             return {}
 
         # Prepare the signal list
-        for sn in args.split(","):
-            sn = sn.strip()
+        for sn in sns:
             if sn in self.sigs.keys():
                 toplot[sn] = self.sigs[sn]
             else:
