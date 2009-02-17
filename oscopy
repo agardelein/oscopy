@@ -255,7 +255,12 @@ Help for individual command can be obtained with 'help COMMAND'\
             else:
                 print "Unknown command", args
 
-        
+    def echo(self, args):
+        if args == "help":
+            print "Usage: echo [TEXT]"
+            print "   Print text"
+            return
+        print args        
 
 # Readline configuration
 if not os.path.exists(hist_file):
@@ -279,6 +284,9 @@ FITNESS FOR A PARTICULAR PURPOSE."
 while True:
     try:
         inp = raw_input(p)
+        # Check if line is a comment
+        if inp.lstrip().startswith("#"):
+            continue
         # Check if command is assignment
         if inp.find("=") >= 0:
             cmds.math(inp)
@@ -286,7 +294,7 @@ while True:
 
         # Separate command from args
         if inp.find(" ") >= 0:
-            st = inp.split(' ', 1)    
+            st = inp.lstrip().split(' ', 1)    
             cmd = st[0]
             args = st[1]
         else:
