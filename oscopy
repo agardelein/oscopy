@@ -2,6 +2,8 @@
 import readline
 import os.path
 import sys
+import re
+from optparse import OptionParser
 
 # Some variables
 hist_file = ".oscopy_hist"
@@ -9,7 +11,6 @@ readers_dir = "Readers"
 
 import Cmd
 import Reader
-import re
 
 class Oscopy:
     """ Analyse command arguments and call function from Cmd
@@ -269,11 +270,31 @@ if not os.path.exists(hist_file):
     f.close()
 readline.read_history_file(hist_file)
 
+# Parse command line arguments
+parser = OptionParser()
+parser.add_option("-b", "--batch", dest="fn", help="Execute commands in FILE then exit", metavar="FILE")
+parser.add_option("-i", "--interactive", action="store_true", dest="inter", help="Go to interactive mode after executing batch file")
+parser.add_option("-q", "--quiet", action="store_true", dest="quiet", help="Do not display startup message")
+(options, args) = parser.parse_args()
+if options.fn == None:
+    f = None
+else:
+    try:
+        f = open(options.fn, 'r')
+    except IOError, e:
+        print "Unable to access batch file:", e
+        f = None
+if options.inter == True:
+    batch = False
+else:
+    batch = True
+
 # Prompt
 p = "oscopy> "
 cmds = Oscopy()
 
-print "This is oscopy, a program to view electrical simulation results\n\
+if options.quiet == None:
+    print "This is oscopy, a program to view electrical simulation results\n\
 Copyright (C) 2009 Arnaud Gardelein.\n\
 This is free software, you are invited to redistribute it \n\
 under certain conditions.\n\
@@ -283,7 +304,23 @@ FITNESS FOR A PARTICULAR PURPOSE."
 # Main loop
 while True:
     try:
-        inp = raw_input(p)
+        if f == None:
+            inp = raw_input(p)
+        else:
+            try:
+                inp = f.readline().rstrip("\n")
+                if inp == "":
+                    if batch == True:
+                        # Batch mode, exit at the end of script
+                        break
+                    else:
+                        # Interactive mode, continue with command line
+                        f = None
+                        continue
+            except IOError, e:
+                print "Script error:", e
+                f.close()
+                f = None
         # Check if line is a comment
         if inp.lstrip().startswith("#"):
             continue
@@ -297,6 +334,7 @@ while True:
             st = inp.lstrip().split(' ', 1)    
             cmd = st[0]
             args = st[1]
+#            print "cmd:", cmd, "args:", args
         else:
             cmd = inp
             args = ""
