@@ -245,6 +245,8 @@ Commands related to signals:\n\
    (un)freeze  toggle signal update\n\
    siglist     list the signals\n\
 Misc commands:\n\
+   echo        print a message\n\
+   pause       wait for the user to press enter\n\
    quit, exit  exit the program\n\
    help        display this help message\n\
 \n\
@@ -262,6 +264,13 @@ Help for individual command can be obtained with 'help COMMAND'\
             print "   Print text"
             return
         print args        
+
+    def pause(self, args):
+        if args == "help":
+            print "Usage: pause"
+            print "   Wait for the user to press enter"
+            return
+        inp = raw_input("Press enter")
 
 # Readline configuration
 if not os.path.exists(hist_file):

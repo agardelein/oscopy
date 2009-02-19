@@ -72,6 +72,12 @@ Class Cmds: Commands callables from oscopy commandline
    gettoplot(args)
    Return a list of the signal names from the arguments provided by the user
    Should not be called from the command line
+
+Abbreviations:
+sigs: dict of sigs
+sns : signal names
+opts: options
+fn  : filename
 """
 
 import sys
@@ -108,7 +114,7 @@ class Cmds:
         self.sigs = {}
         self.upn = -1
         
-    def create(self, toplot):
+    def create(self, sigs):
         """ Create a new figure and set it as current
         Can be either called from commandline or a function.
         When called from commandline, call gettoplot to retrieve
@@ -117,18 +123,18 @@ class Cmds:
         then return.
         After those tests, the figure is created with the signal list.
         """
-        if type(toplot) == types.ListType:
+        if type(sigs) == types.ListType:
             # Called from commandline,
             # Get the signal list from args
-            if not toplot == "":
-                toplot = self.gettoplot(toplot)
+            if not sigs == "":
+                sigs = self.gettoplot(sigs)
             else:
                 # No signal list provided
-                toplot = {}
-        elif not type(toplot) == types.DictType:
+                sigs = {}
+        elif not type(sigs) == types.DictType:
             return
         # toplot is now a list
-        f = Figure.Figure(toplot)
+        f = Figure.Figure(sigs)
         self.figs.append(f)
         self.curfig = self.figs.index(f)
 
@@ -365,7 +371,8 @@ class Cmds:
         """
         if sns == "":
             return {}
-
+        if len(sns) < 1:
+            return {}
         toplot = {}
         # Are there signals ?
         if self.sigs == []:
