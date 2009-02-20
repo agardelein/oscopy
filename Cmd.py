@@ -108,7 +108,7 @@ class Cmds:
         # self.curfig valid interval: [0..len(self.figs)-1]
         # There is a shift compared to the number displayed
         # by matplotlib, i.e. figure 1 is self.figs[0]
-        self.curfig = -1
+        self.curfig = None
         self.readers = {}
         self.figs = []
         self.sigs = {}
@@ -136,7 +136,7 @@ class Cmds:
         # toplot is now a list
         f = Figure.Figure(sigs)
         self.figs.append(f)
-        self.curfig = self.figs.index(f)
+        self.curfig = f
 
     def destroy(self, num):
         """ Delete a figure
@@ -146,34 +146,42 @@ class Cmds:
         """
         if num > len(self.figs) or num < 1:
             return
+        if self.curfig == self.figs[num - 1]:
+            if len(self.figs) == 1:
+                # Only one element remaining in the list
+                self.curfig = None
+            elif num == len(self.figs):
+                # Last element, go to the previous
+                self.curfig = self.figs[num - 2]
+            else:
+                # Go to next element
+                self.curfig = self.figs[num]
         del self.figs[num - 1]
-        # Handle self.curfig.
-        # By default, next figure becomes the current
-        if len(self.figs) == 0:
-            self.curfig = -1
-        elif self.curfig > len(self.figs):
-            self.curfig = len(self.figs) - 1
-        print "Curfig : ", self.curfig
+        if self.curfig != None:
+            print "Curfig : ", self.figs.index(self.curfig) + 1
+        else:
+            print "No figures"
 
     def select(self, num, gn = 0):
         """ Select the current figure
         """
         if num > len(self.figs) or num < 1:
             return
-        self.curfig = num - 1
+        self.curfig = self.figs[num - 1]
         if gn > 0:
-            self.figs[self.curfig].select(gn)
+            self.curfig.select(gn)
 
     def layout(self, l):
         """ Define the layout of the current figure
         """
-        self.figs[self.curfig].setlayout(l)
+        if self.curfig != None:
+            self.curfig.setlayout(l)
 
     def figlist(self):
         """ Print the list of figures
         """
         for i, f in enumerate(self.figs):
-            if i == self.curfig:
+            if f == self.curfig:
                 print "*",
             else:
                 print " ",
@@ -268,34 +276,37 @@ class Cmds:
             self.create(sns)
         else:
             sigs = self.gettoplot(sns)
-            self.figs[self.curfig].add(sigs)
+            self.curfig.add(sigs)
 
     def delete(self, gn):
         """ Delete a graph from the current figure
         """
-        self.figs[self.curfig].delete(gn)
+        if not self.curfig == None:
+            self.curfig.delete(gn)
 
     def mode(self, mode):
         """ Set the mode of the current graph of the current figure
         """
-        self.figs[self.curfig].setmode(mode)
+        if not self.curfig == None:
+            self.curfig.setmode(mode)
 
     def scale(self, sc):
         """ Set the axis scale of the current graph of the current figure
         """
-        self.figs[self.curfig].setscale(sc)
+        if not self.curfig == None:
+            self.curfig.setscale(sc)
 
     def range(self, a1 = "reset", a2 = None, a3 = None, a4 = None):
         """ Set the axis range of the current graph of the current figure
         """
-        self.figs[self.curfig].setrange(a1, a2, a3, a4)
+        if not self.curfig == None:
+            self.curfig.setrange(a1, a2, a3, a4)
 
     def unit(self, xu, yu = ""):
         """ Set the units of current graph of current figure
         """
-        if self.curfig < 0 and self.curfig > len(self.figs):
-            return
-        self.figs[self.curfig].setunit(xu, yu)        
+        if not self.curfig == None:
+            self.curfig.setunit(xu, yu)        
             
     def insert(self, sns):
         """ Insert a list of signals into the current graph 
@@ -305,8 +316,8 @@ class Cmds:
             return
 
         sigs = self.gettoplot(sns)
-        self.figs[self.curfig].insert(sigs)
-        return
+        if not self.curfig == None:
+            self.curfig.insert(sigs)
 
     def remove(self, sns):
         """ Remove a list of signals from the current graph
@@ -316,7 +327,8 @@ class Cmds:
             return
 
         sigs = self.gettoplot(sns)
-        self.figs[self.curfig].remove(sigs)
+        if not self.curfig == None:
+            self.curfig.remove(sigs)
         return
 
     def freeze(self, sns):

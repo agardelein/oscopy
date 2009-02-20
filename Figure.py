@@ -71,7 +71,7 @@ class Figure:
         """
         self.graphs = []
         self.layout = "horiz"
-        self.curgraph = 0
+        self.curgraph = None
         if sigs == {}:
             return
         elif type(sigs) == types.DictType:
@@ -99,15 +99,17 @@ class Figure:
         gn = eval(num)   # Graph number
         if len(self.graphs) < 1 or gn < 1 or gn > len(self.graphs):
             return
+        if self.curgraph == self.graphs[gn - 1]:
+            if len(self.graphs) == 1:
+                # Only one element in the list
+                self.curgraph = None
+            elif gn == len(self.graphs):
+                # Last element, go to the previous
+                self.curgraph = self.graphs[gn - 2]
+            else:
+                self.curgraph = self.graphs[gn]
         del self.graphs[gn - 1]
         
-        # Handle self.curgraph
-        # By default, next figure becomes the current
-        if len(self.graphs) == 0:
-            self.curgraph = 0
-        elif self.curgraph > len(self.graphs):
-            self.curgraph = len(self.graphs)
-
     def update(self, u, d):
         """ Update the graphs
         """
@@ -132,13 +134,13 @@ class Figure:
         """
         if gn < 1 or gn > len(self.graphs):
             return
-        self.curgraph = gn - 1
+        self.curgraph = self.graphs[gn - 1]
 
     def list(self):
         """ List the graphs from the figure
         """
         for gn, g in enumerate(self.graphs):
-            if gn == self.curgraph:
+            if g == self.curgraph:
                 print "   *",
             else:
                 print "    ",
@@ -147,16 +149,18 @@ class Figure:
     def setmode(self, gmode):
         """ Set the mode of the current graph
         """
+        if self.curgraph == None:
+            return
         if type(gmode) == types.StringType:
             if gmode == "lin":
-                g = Graphs.LinGraphs.LinGraph(self.graphs[self.curgraph])
-                self.graphs[self.curgraph] = g
+                g = Graphs.LinGraphs.LinGraph(self.curgraph)
+                self.curgraph = g
             elif gmode == "fft":
-                g = Graphs.FFTGraph.FFTGraph(self.graphs[self.curgraph])
-                self.graphs[self.curgraph] = g                
+                g = Graphs.FFTGraph.FFTGraph(self.curgraph)
+                self.curgraph = g                
             elif gmode == "ifft":
-                g = Graphs.FFTGraph.IFFTGraph(self.graphs[self.curgraph])
-                self.graphs[self.curgraph] = g                
+                g = Graphs.FFTGraph.IFFTGraph(self.curgraph)
+                self.curgraph = g                
                 
     def setlayout(self, layout = "quad"):
         """ Set the layout of the figure, default is quad
@@ -208,17 +212,15 @@ class Figure:
     def insert(self, sigs):
         """ Add a signal into the current graph
         """
-        if self.curgraph < 0 or self.curgraph > len(self.graphs) - 1:
-            return
-        self.graphs[self.curgraph].insert(sigs)
+        if not self.curgraph == None:
+            self.curgraph.insert(sigs)
 
     def remove(self, sigs, where = "current"):
         """ Delete a signal from the current graph
         """
         if where == "current":
-            if self.curgraph < 0 or self.curgraph > len(self.graphs) - 1:
-                return
-            self.graphs[self.curgraph].remove(sigs)
+            if not self.curgraph == None:
+                self.curgraph.remove(sigs)
         elif where == "all":
             for g in self.graphs:
                 g.remove(sigs)
@@ -229,24 +231,22 @@ class Figure:
         for g in self.graphs:
             for sn in g.getsigs():
                 yield sn
+
     def setunit(self, xu, yu = ""):
         """ Set the current graph units
         """
-        if self.curgraph < 0 or self.curgraph > len(self.graphs) - 1:
-            return
-        self.graphs[self.curgraph].setunit(xu, yu)
+        if not self.curgraph == None:
+            self.curgraph.setunit(xu, yu)
 
     def setscale(self, a):
         """ Set the current graph axis scale
         """
-        if self.curgraph < 0 or self.curgraph > len(self.graphs) - 1:
-            return
-        self.graphs[self.curgraph].setscale(a)
+        if not self.curgraph == None:
+            self.curgraph.setscale(a)
 
     def setrange(self, a1 = "reset", a2 = None, a3 = None, a4 = None):
         """ Set the axis range of the current graph
         """
-        if self.curgraph < 0 or self.curgraph > len(self.graphs) - 1:
-            return
-        self.graphs[self.curgraph].setrange(a1, a2, a3, a4)
+        if not self.curgraph == None:
+            self.curgraph.setrange(a1, a2, a3, a4)
 
