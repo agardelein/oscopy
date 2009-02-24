@@ -1,4 +1,4 @@
-""" Scope commands
+""" Interface between signals and figures
 
 Class Cmds: Commands callables from oscopy commandline
 
@@ -6,70 +6,70 @@ Class Cmds: Commands callables from oscopy commandline
    __init__()
    Create empty lists of figures, readers and signals
 
-   create(args)
+   create(sns)
    Create a new figure, and assign signals if provided
 
-   destroy(args)
+   destroy(num)
    Delete a figure
 
-   select(args)
+   select(num, gn = 0)
    Select the figure and the graph to become the current ones
 
-   layout(args)
+   layout(l)
    set the layout of the current figure
 
-   figlist(args)
+   figlist()
    Print a list of figures
 
-   plot(args)
+   plot()
    plot all the figure
 
-   add(args)
-   Add a graph to the current figure
+   read(fn)
+   Read signals from file fn
 
-   delete(args)
-   Delete a graph from the current figure
+   write(fn, fmt, sns, opts)
+   Write signals sns to file fn using format sns and options opts
 
-   mode(args)
-   Set the mode of the current graph
-
-   scale(arg)
-   Set the axis scale of the current graph
-
-   range(args)
-   Set the axis range of the current graph
-
-   unit(args)
-   Set the unit of current graph from current figure
-
-   read(args)
-   Read signals from a file
-
-   update(args)
+   update()
    Reread all signals from files
 
-   insert(args)
+   add(sns)
+   Add a graph to the current figure
+
+   delete(gn)
+   Delete a graph from the current figure
+
+   mode(mode)
+   Set the mode of the current graph
+
+   scale(sc)
+   Set the axis scale of the current graph e.g. log or lin
+
+   range(a1, a2, a3, a4)
+   Set the axis range of the current graph
+
+   unit(xu, yu)
+   Set the unit of current graph from current figure
+
+   insert(sns)
    Add signals to the current graph of the current figure
 
-   remove(args)
+   remove(sns)
    Remove signals from the current graph of the current figure
 
-   freeze(args)
+   freeze(sns)
    Set the freeze flag of signals
 
-   unfreeze(args)
+   unfreeze(sns)
    Unset the freeze flag of signals
 
-   siglist(args)
+   siglist()
    List all the signals
-
-   help(args)
-   Print help message
 
    math(expr)
    Create a signal from a mathematical expression
 
-   gettoplot(args)
+   gettoplot(sns)
    Return a list of the signal names from the arguments provided by the user
    Should not be called from the command line
 
@@ -78,6 +78,7 @@ sigs: dict of sigs
 sns : signal names
 opts: options
 fn  : filename
+gn  : graph number
 """
 
 import sys
@@ -92,13 +93,12 @@ from Writers.Writer import WriteError
 from Figure import Figure
 
 class Cmd:
-    """ Class cmd -- Handle command line
+    """ Class cmd -- Interface between signals and figures
 
-    This object maintain a list of figure, a dict of reader and of signals.
-    The current figure curfig has a valid interval [0..len(self.figs)-1]
-    which is different from the one presented to the user by matplotlib,
-    i.e. diplayed is Figure 2 and in this class it is self.figs[1]
-
+    This object is the interface between the signals and the figures,
+    e.g. it handle operations on figures, signals, readers and writers.
+    It maintain a list of figures, a dict of reader and a dict of signals.
+    
     The keys for the signal dict are the signal name, as presented to the user
     The keys for the reader dict are the file name.
     """
@@ -106,9 +106,6 @@ class Cmd:
     def __init__(self):
         """ Create the instance variables
         """
-        # self.curfig valid interval: [0..len(self.figs)-1]
-        # There is a shift compared to the number displayed
-        # by matplotlib, i.e. figure 1 is self.figs[0]
         self.curfig = None
         self.readers = {}
         self.figs = []

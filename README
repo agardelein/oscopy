@@ -15,31 +15,11 @@ To get any info on available commands, type 'help'.
 
 EXAMPLE:
 -------
+cd demo
 gnetlist -g spice-sdb -s -o demo.net demo.sch
 gnucap -b demo.net
-./oscopy
-load ac.dat
-add vout
-mode loglog
-load tran.dat
-create
-siglist
-add vsqu
-add vsqu
-mode fftlin
-load irf540.dat
-create
-add vgs
-add iRD
-add vds
-pw=-iRD*vds
-add pw
-layout quad
-figlist
-plot
-(change something in demo.sch, e.g. vsqu amplitude, C1 value, etc...)
-update
-plot
+cd ..
+./oscopy -b demo/demo.oscopy
 
 EXTENDING OSCOPY:
 ---------------------
@@ -64,11 +44,24 @@ import Readers
 
 class xxxReader(Readers.Reader.Reader):
       def readsigs(self):
-      ... read the signals from file, fill self.slist
-          and return a dict of sigs where key is signal name
+          #[...] read the signals data from file and for each signal:
+              #create signal:
+	      # Reference signal, or X axis
+	      sref = Signal("name_ref", self, "unit_ref")
+	      sref.setpts([with X data from file as a list or numpy.array])
+	      # Signal, or Y axis
+	      s = Signal("name_sig", self, "unit_sig")
+	      s.setpts([with data from file as a list or numpy.array])
+	      # Assign reference to signal
+	      s.setref(sref)
+          #fill self.slist
+	      self.slist.append(s)
+	      sigs["name_ref"] = s
+          #and return a dict of sigs where key is signal name
+	  return sigs
 
       def detect(self, fn):
-          return True if file fn can be read using this Reader
+          # return True if file fn can be read using this Reader
 ---
 When a importing a signal, first detect is called.
 If format is supported, read and subsequent updates will call readsigs

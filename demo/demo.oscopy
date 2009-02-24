@@ -35,13 +35,13 @@ select 3
 insert vo
 # Plot things
 echo *** Now plotting everything
-#plot
+plot
 # Updating
 echo *** Now change C value in schematic and rerun gnetlist + gnucap
 pause
 echo *** Updating
 update
 echo *** Now look at figure 3
-#plot
+plot
 # Saving results
 write gnucap (ow:1) demo/res.dat v1,vsqu

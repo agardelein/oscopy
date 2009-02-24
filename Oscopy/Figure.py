@@ -4,12 +4,10 @@ A figure consist of a list of up to 4 graphs, with a layout.
 Signal list are passed directly to each graph.
 Layout can be either all graphs stacked verticaly, horizontaly or in quad
 
-The variable curgraph represent the active graph on which operations are done.
-Valitidy interval : 1..4, 0 when the figure is empty.
-
-gn : graph number
-g : graph
-sn : signal name
+curgraph: alias to the current graph
+gn: graph number
+g: graph
+sn: signal name
 
 class:
 

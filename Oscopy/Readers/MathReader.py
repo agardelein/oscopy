@@ -143,7 +143,6 @@ class MathReader(Reader):
         _sn = fn.split("=", 1)[0].strip()  # Result signal name
         _expr = _expr + "_tmp = Signal(\"" + _sn + "\", self)" + _endl
         _expr = _expr + "_pts = []" + _endl
-        _expr = _expr + "# The slow way" + _endl
         for k, s in _sigs.iteritems():
             _expr = _expr + s.name + "=" + \
                 "_sigs[\"" + s.name + "\"].getpts()" + _endl
