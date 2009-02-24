@@ -30,16 +30,14 @@ class MathReader:
    Return true if argument is an expression with a '='
 """
 
-import Reader
-import DetectReader
-import Signal
 import numpy
 import re
 import math
 import sys
-#sys.path.insert(0, '..')
+from Reader import Reader
+from Oscopy.Signal import Signal
 
-class MathReader(Reader.Reader):
+class MathReader(Reader):
     def __init__(self, sigs = {}):
         """ Create the object
         """
@@ -47,7 +45,7 @@ class MathReader(Reader.Reader):
         self.origsigs = {}   # Dict of list of signames, key is filename
         self.setorigsigs(sigs)
         self.unkwn = []
-        Reader.Reader.__init__(self)
+        Reader.__init__(self)
 
     def read(self, inp = ""):
         """ Validate the expression : each word should be in self.sigs
@@ -85,7 +83,6 @@ class MathReader(Reader.Reader):
                     self.unkwn.append(e)
                 continue
         if len(self.unkwn) > 0:
-            print self.unkwn
             return {}
         self.fn = inp
         return self.readsigs()
@@ -144,7 +141,7 @@ class MathReader(Reader.Reader):
         _endl = "\n"        # Newline code
         _ret = {}           # Value to be returned
         _sn = fn.split("=", 1)[0].strip()  # Result signal name
-        _expr = _expr + "_tmp = Signal.Signal(\"" + _sn + "\", self)" + _endl
+        _expr = _expr + "_tmp = Signal(\"" + _sn + "\", self)" + _endl
         _expr = _expr + "_pts = []" + _endl
         _expr = _expr + "# The slow way" + _endl
         for k, s in _sigs.iteritems():

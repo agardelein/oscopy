@@ -1,0 +1,51 @@
+read demo/irf540.dat
+# Test curfig
+destroy 1
+delete
+mode fft
+scale logx
+range 0 1000
+unit "W"
+remove vgs
+insert vds
+add vgs
+create vds
+create iRD
+echo All figure created
+figlist
+destroy 2
+echo Fig 2 destroyed
+figlist
+destroy 2
+echo Fig 2 destroyed
+figlist
+destroy 1
+echo Fig 1 destroyed
+figlist
+# Now test curgraph
+echo Create a figure
+add vds
+add vgs
+add vds,vgs
+add iRD
+figlist
+echo Delete graph #3
+delete 3
+figlist
+echo Delete graph #1
+delete 1
+figlist
+echo Delete graph #2
+delete 2
+figlist
+echo Delete graph #1
+delete 1
+figlist
+echo Delete graph #1, but none exist: no error message should appear
+delete 1
+figlist
+unit W
+scale logx
+range 0 1000
+mode fft
+remove iRD

@@ -81,16 +81,17 @@ fn  : filename
 """
 
 import sys
-#sys.path.insert(0, 'Readers')
-import Readers.DetectReader
-import Writers.DetectWriter
-import Figure
-from pylab import show
-from pylab import figure as pyfig
 import types
 import re
+from pylab import show
+from pylab import figure as pyfig
+from Readers.DetectReader import DetectReader
+from Writers.DetectWriter import DetectWriter
+from Readers.Reader import ReadError
+from Writers.Writer import WriteError
+from Figure import Figure
 
-class Cmds:
+class Cmd:
     """ Class cmd -- Handle command line
 
     This object maintain a list of figure, a dict of reader and of signals.
@@ -134,7 +135,7 @@ class Cmds:
         elif not type(sigs) == types.DictType:
             return
         # toplot is now a list
-        f = Figure.Figure(sigs)
+        f = Figure(sigs)
         self.figs.append(f)
         self.curfig = f
 
@@ -209,8 +210,8 @@ class Cmds:
             print "File already loaded"
             return
         try:
-            r = Readers.DetectReader.DetectReader(fn)
-        except Readers.Reader.ReadError, e:
+            r = DetectReader(fn)
+        except ReadError, e:
             print "Read error:", e
             return
 
@@ -235,14 +236,14 @@ class Cmds:
         if sigs == {}:
             return
         try:
-            w = Writers.DetectWriter.DetectWriter(fmt, fn, True)
-        except Writers.Writer.WriteError, e:
+            w = DetectWriter(fmt, fn, True)
+        except WriteError, e:
             print "Write error:", e
             return
         if w != None:
             try:
                 w.write(fn, sigs, opts)
-            except Writers.Writer.WriteError, e:
+            except WriteError, e:
                 print "Write error:", e
 
     def update(self):
@@ -255,7 +256,6 @@ class Cmds:
         n = {}
         # Update the signal, the new signals list and sigs to be deleted
         for sn, s in self.sigs.iteritems():
-            print sn
             n.update(s.update(self.upn, False))
             if s.getpts() == None:
                 d.append(sn)
@@ -357,7 +357,7 @@ class Cmds:
         sigs = {}
 
         # Create the expression
-        r = Readers.DetectReader.DetectReader(inp)
+        r = DetectReader(inp)
         ss = r.read(inp)
         if len(ss) == 0:
             if hasattr(r, "missing") and callable(r.missing):

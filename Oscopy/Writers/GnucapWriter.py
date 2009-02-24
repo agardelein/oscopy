@@ -15,9 +15,9 @@ class GnucapWriter -- Handle gnucap format
    Convert signal name to gnucap format e.g. vgs -> v(gs)
 """
 
-import Writers.Writer
+from Writer import Writer
 
-class GnucapWriter(Writers.Writer.Writer):
+class GnucapWriter(Writer):
     """ Write signals to columns tab separated format used by Gnucap
     Signals should have the same reference
     """

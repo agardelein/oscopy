@@ -4,12 +4,11 @@ Detect(file)
    Automagically select the Reader to use for reading file
 """
 import sys
-sys.path.insert(0, 'Readers')
 import os.path
-import Readers
-import GnucapReader
-import MathReader
 import types
+from Reader import ReadError
+from GnucapReader import GnucapReader
+from MathReader import MathReader
 
 rds = ["GnucapReader", "MathReader"]
 
@@ -21,11 +20,11 @@ def DetectReader(fn):
     endl = "\n"
     excpt = None
     for rd in rds:
-        s = "tmp = " + rd + "." + rd + "()" + endl \
+        s = "tmp = " + rd + "()" + endl \
             + "res = tmp.detect(fn)"
         try:
             exec(s)
-        except Readers.Reader.ReadError, e:
+        except ReadError, e:
             excpt = e
             continue
         if res == True:

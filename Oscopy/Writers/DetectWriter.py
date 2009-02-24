@@ -6,9 +6,10 @@ Automagically return a Writer to use for file writing
 """
 import sys
 import types
-import Writers.Writer
-import Writers.GnucapWriter
 import os.path
+from os import access
+from Writer import WriteError
+from GnucapWriter import GnucapWriter
 
 wrts = ['GnucapWriter']
 
@@ -18,16 +19,17 @@ def DetectWriter(fmt, fn, ov = False):
     if type(fmt) != types.StringType or type(fn) != types.StringType:
         return None
     if fn == "":
-        raise Writers.Writer.WriteError("No file specified")
+        raise WriteError("No file specified")
     if os.path.exists(fn):
         if ov == False:
-            raise Writers.Writer.WriteError("File does exist")
+            raise WriteError("File does exist")
         elif not os.path.isfile(fn):
-            raise Writers.Writer.WriteError("File is not a file")
-
+            raise WriteError("File is not a file")
+        elif not os.access(fn, os.W_OK):
+            raise WriteError("Cannot access file")
     endl = "\n"
     for wrt in wrts:
-        s = "tmp = Writers." + wrt + "." + wrt + "()" + endl \
+        s = "tmp = " + wrt + "()" + endl \
             + "res = tmp.detect(fmt)"
         exec(s)
         if res == True:

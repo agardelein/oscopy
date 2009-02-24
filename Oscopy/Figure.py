@@ -56,11 +56,11 @@ Figure -- Handle a list of graphs
       Set the current graph axis range
 """
 
-import Graphs
-import Graphs.LinGraphs
-import Graphs.FFTGraph
 import pylab
 import types
+from Graphs import Graph
+from Graphs.LinGraphs import LinGraph
+from Graphs.FFTGraph import FFTGraph, IFFTGraph
 
 class Figure:
 
@@ -87,7 +87,7 @@ class Figure:
         """
         if len(self.graphs) > 3:
             return
-        gr = Graphs.LinGraphs.LinGraph(sigs)
+        gr = LinGraph(sigs)
         self.graphs.append(gr)
         self.select(self.graphs.index(gr) + 1)
 
@@ -153,13 +153,13 @@ class Figure:
             return
         if type(gmode) == types.StringType:
             if gmode == "lin":
-                g = Graphs.LinGraphs.LinGraph(self.curgraph)
+                g = LinGraph(self.curgraph)
                 self.curgraph = g
             elif gmode == "fft":
-                g = Graphs.FFTGraph.FFTGraph(self.curgraph)
+                g = FFTGraph(self.curgraph)
                 self.curgraph = g                
             elif gmode == "ifft":
-                g = Graphs.FFTGraph.IFFTGraph(self.curgraph)
+                g = IFFTGraph(self.curgraph)
                 self.curgraph = g                
                 
     def setlayout(self, layout = "quad"):

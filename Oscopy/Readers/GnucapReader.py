@@ -16,11 +16,11 @@ Class GnucapReader:
       Read the signals from a file to gnucap output format.
 """
 
-import Signal
-import Reader
 import re
+from Oscopy.Signal import Signal
+from Reader import Reader
 
-class GnucapReader(Reader.Reader):
+class GnucapReader(Reader):
     def readsigs(self):
         """ Read the signals from the file
 
@@ -48,7 +48,7 @@ class GnucapReader(Reader.Reader):
         for name in nlist: # Extract signal names
             u = self.unitfromprobe(name.split('(', 1)[0])
             name = filter(f, name.strip())
-            s = Signal.Signal(name, self, u)
+            s = Signal(name, self, u)
             self.slist.append(s)
             plist.append([])
 

@@ -12,10 +12,10 @@ Class XYGraph -- Draw a xy graph using signals pairs
       Return the mode of the graph "linear"
 """
 
-import Graph
+from Graph import Graph
 import pylab
 
-class LinGraph(Graph.Graph):
+class LinGraph(Graph):
     def gettype(self):
         """ Return 'linear', the type of the graph
         """

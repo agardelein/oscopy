@@ -18,11 +18,11 @@ Class IFFTGraph -- Do an inverse fft when plotting signals
    gettype()
    Return "ifft", the type of the graph
 """
-import Graph
-import Signal 
+from Graph import Graph
+from Oscopy.Signal import Signal
 import numpy.fft
 
-class FFTGraph(Graph.Graph):
+class FFTGraph(Graph):
 
     def plot(self):
         """ Plot the fft of signals.
@@ -34,7 +34,7 @@ class FFTGraph(Graph.Graph):
         self.sigs = {}
         # Compute FFT for all signals
         for sn, s in origsigs.iteritems():
-            s2 = Signal.Signal(sn, None, s.getunit())
+            s2 = Signal(sn, None, s.getunit())
             # Check whether ref sig is Time
             if s.getref().getname() != "Time":
                 print "Warning : ref sig of", s.getname() ,"is not 'Time'.\
@@ -49,13 +49,13 @@ class FFTGraph(Graph.Graph):
                 x.append(i / (abs(s.getref().getpts()[1]\
                                       - s.getref().getpts()[0])\
                                   * len(s.getref().getpts())))
-            s2.setref(Signal.Signal("Freq", None, "Hz"))
+            s2.setref(Signal("Freq", None, "Hz"))
             s2.getref().setpts(x)
             self.sigs[sn] = s2
 
         self.xunit = "Hz"
         self.xaxis = "Freq"
-        Graph.Graph.plot(self)
+        Graph.plot(self)
 
         # Restore signals
         self.sigs = origsigs
@@ -66,7 +66,7 @@ class FFTGraph(Graph.Graph):
         """
         return "fft"
 
-class IFFTGraph(Graph.Graph):
+class IFFTGraph(Graph):
     def gettype(self):
         """ Return the type of graph, here ifft
         """
@@ -83,7 +83,7 @@ class IFFTGraph(Graph.Graph):
         # Compute FFT for all signals
         for sn, s in origsigs.iteritems():
             # Check whether ref sig is Freq
-            s2 = Signal.Signal(s)
+            s2 = Signal(s)
             if s.getref().getname() != "Freq":
                 print "Warning : ref sig of", s.getname() ,"is not 'Freq'.\
  I hope you know what you do !"
@@ -97,13 +97,13 @@ class IFFTGraph(Graph.Graph):
                 x.append(i / (abs(s.getref().getpts()[1]\
                                       - s.getref().getpts()[0]) \
                                   * len(s.getref().getpts())))
-            s2.setref(Signal.Signal("Time", None, "s"))
+            s2.setref(Signal("Time", None, "s"))
             s2.getref().setpts(x)
             self.sigs[sn] = s2
 
         self.xunit = "s"
         self.xaxis = "Time"
-        Graph.Graph.plot(self)
+        Graph.plot(self)
 
         # Restore signals
         self.sigs = origsigs
