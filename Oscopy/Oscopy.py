@@ -244,6 +244,10 @@ Misc commands:\n\
    quit, exit  exit the program\n\
    help        display this help message\n\
 \n\
+During plot:\n\
+   1, 2        Toggle first and second vertical cursors\n\
+   3, 4        Toggle first and second horizontal cursors\n\
+\n\
 Help for individual command can be obtained with 'help COMMAND'\
 "
         else:

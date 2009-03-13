@@ -24,7 +24,7 @@ import numpy.fft
 
 class FFTGraph(Graph):
 
-    def plot(self):
+    def plot(self, ax = None):
         """ Plot the fft of signals.
         First calculate the fft of each signal
         and then call the parent function
@@ -55,7 +55,7 @@ class FFTGraph(Graph):
 
         self.xunit = "Hz"
         self.xaxis = "Freq"
-        Graph.plot(self)
+        Graph.plot(self, ax)
 
         # Restore signals
         self.sigs = origsigs
@@ -72,7 +72,7 @@ class IFFTGraph(Graph):
         """
         return "ifft"
 
-    def plot(self):
+    def plot(self, ax = None):
         """ Plot the inverse fft of signals.
         First calculate the inverse fft of each signal
         and then call the parent function
@@ -103,7 +103,7 @@ class IFFTGraph(Graph):
 
         self.xunit = "s"
         self.xaxis = "Time"
-        Graph.plot(self)
+        Graph.plot(self, ax)
 
         # Restore signals
         self.sigs = origsigs

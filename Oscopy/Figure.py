@@ -56,6 +56,7 @@ Figure -- Handle a list of graphs
 
 import pylab
 import types
+import matplotlib.pyplot as plt
 from Graphs import Graph
 from Graphs.LinGraphs import LinGraph
 from Graphs.FFTGraph import FFTGraph, IFFTGraph
@@ -173,8 +174,8 @@ class Figure:
         else:
             return
 
-    def plot(self):
-        """ Plot the figure
+    def plot(self, fig):
+        """ Plot the figure in Matplotlib Figure instance fig
         First compute the number of subplot and the layout
         And then really call the plot function of each graph
         """
@@ -204,8 +205,9 @@ class Figure:
 
         # Plot the whole figure
         for gn, g in enumerate(self.graphs):
-            pylab.subplot(nx, ny, gn+1)
-            g.plot()
+            ax = fig.add_subplot(nx, ny, gn+1)
+            g.plot(ax)
+        self.kid = fig.canvas.mpl_connect('key_press_event', self.key)
 
     def insert(self, sigs):
         """ Add a signal into the current graph
@@ -248,3 +250,41 @@ class Figure:
         if not self.curgraph == None:
             self.curgraph.setrange(a1, a2, a3, a4)
 
+#     def cursors(self, event):
+#         print "yo:", event.name, event.inaxes
+#         if event.inaxes == None:
+#             return
+#         for g in self.graphs:
+#             print g.ax, g.ax == event.inaxes
+        
+#         plt.text(.1,.1,"Yep",transform=event.inaxes.transAxes,axes=event.inaxes)
+#         event.canvas.draw()
+
+    def key(self, event):
+        """ Handle key press event
+        1, 2: toggle vertical cursors #0 and #1
+        3, 4: toggle horizontal cursors #0 and #1
+        """
+        if event.inaxes == None:
+            return
+        # Find graph
+        g = None
+        for g in self.graphs:
+            if g.ax == event.inaxes:
+                break
+            else:
+                g = None
+        if g == None:
+            return
+        # Set cursor for graph
+        if event.key == "1":
+            g.toggle_cursors("vert", 0, event.xdata)
+        elif event.key == "2":
+            g.toggle_cursors("vert", 1, event.xdata)
+        elif event.key == "3":
+            g.toggle_cursors("horiz", 0, event.ydata)
+        elif event.key == "4":
+            g.toggle_cursors("horiz", 1, event.ydata)
+        else:
+            return
+        event.canvas.draw()

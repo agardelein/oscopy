@@ -84,8 +84,7 @@ gn  : graph number
 import sys
 import types
 import re
-from pylab import show
-from pylab import figure as pyfig
+import matplotlib.pyplot as plt
 from Readers.DetectReader import DetectReader
 from Writers.DetectWriter import DetectWriter
 from Readers.Reader import ReadError
@@ -192,9 +191,9 @@ class Cmd:
         if self.figs == []:
             return
         for i, f in enumerate(self.figs):
-            pyfig(i + 1)
-            f.plot()
-        show()
+            fig = plt.figure(i + 1)
+            f.plot(fig)
+        plt.show()
 
     def read(self, fn):
         """ Read signals from file.

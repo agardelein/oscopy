@@ -2,6 +2,7 @@ To be checked :
 FFT: is X axis right ?
 
 To be fixed :
+A leading space is added in text when two cursors are present
 
 To be added :
 Support for HDF5

@@ -8,6 +8,9 @@ Signals are managed as a dict, where the key is the signal name.
 In a graph, signals with a different sampling, but with the same abscisse
 can be plotted together.
 
+Handle a cursor dict, for convenience limited to two horizontal
+and two vertical, limit can be removed. 
+
 sn: signal name
 s : signal
 
@@ -46,8 +49,89 @@ Class Graph -- Handle the representation of a list of signals
 """
 
 import matplotlib.pyplot as plt
-import pylab
+from matplotlib import rc
 import types
+
+class Cursor:
+    """ Handle cursors
+    Cursor can be visible or not, type "horiz" or "vert"
+    """
+    def __init__(self, val, type):
+        """ Set values
+        """
+        self.set_value(val)
+        self.set_visible(True)
+        self.line = None # Line2D
+        self.set_type(type)
+
+    def draw(self, ax = None, num = 0):
+        """ Draw cursor on axis ax, num is the linestyle
+        """
+        if self.line == None or not self.line.get_axes() == ax:
+            # Cursor do not exist on the graph, plot it
+            ax.hold(True)
+            if self.type == "horiz":
+                x = ax.get_xlim()
+                y = [self.val, self.val]
+            elif self.type == "vert":
+                x = [self.val, self.val]
+                y = ax.get_ylim()
+            else:
+                return
+            if num == 0:
+                lt = ""
+            else:
+                lt = "--"
+            self.line, = ax.plot(x, y, lt + "k")
+            self.line.set_visible(self.vis)
+            ax.hold(False)
+        elif ax == self.line.get_axes():
+            # Cursor already exist, just update visibility
+            if self.type == "horiz":
+                x = ax.get_xlim()
+                y = [self.val, self.val]
+            elif self.type == "vert":
+                x = [self.val, self.val]
+                y = ax.get_ylim()
+            self.line.set_data(x, y)
+            self.line.set_visible(self.vis)
+        else:
+            # Cursor exist already in this graph, nothing to do
+            pass
+
+    def get_type(self):
+        return self.type
+
+    def get_value(self):
+        return self.val
+
+    def get_visible(self):
+        return self.vis
+
+    def set_type(self, type = ""):
+        if not type == "":
+            if type == "horiz" or type == "vert":
+                self.type = type
+
+    def set_value(self, val = None):
+        if not val == None:
+            self.val = val
+
+    def set_visible(self, vis = None):
+        """ Toggle status if called without argument
+        otherwise set to the value
+        """ 
+        if not vis == None:
+            self.vis = vis
+        else:
+            if self.vis == True:
+                self.vis = False
+            else:
+                self.vis = True
+
+    def __str__(self):
+        return "val:" + str(self.val) + " type:" + self.type \
+            + " vis:" + str(self.vis)
 
 class Graph:
     def __init__(self, sigs = {}):
@@ -72,6 +156,9 @@ may lead to uncertain results"
             self.plotf = sigs.plotf
             self.xrange = sigs.xrange
             self.yrange = sigs.yrange
+            self.ax = sigs.ax
+            self.cursors = {"horiz": [None, None], "vert": [None, None]}
+            self.txt = None
         else:
             self.xaxis = ""
             self.yaxis = ""
@@ -80,7 +167,11 @@ may lead to uncertain results"
             self.xrange = []
             self.yrange = []
             self.insert(sigs)
-            self.plotf = pylab.plot
+            self.plotf = plt.plot
+            self.ax = None
+            # Cursors values, only two horiz and two vert but can be changed
+            self.cursors = {"horiz": [None, None], "vert": [None, None]}
+            self.txt = None
 
     def __str__(self):
         """ Return a string with the type and the signal list of the graph
@@ -121,8 +212,8 @@ may lead to uncertain results"
                 del self.sigs[sn]
         return len(self.sigs)
 
-    def plot(self):
-        """ Plot the graph
+    def plot(self, ax = None):
+        """ Plot the graph in Matplotlib Axes instance ax
         Each signal is plotted regarding to its proper abscisse.
         In this way, signals with a different sampling can be plotted together.
         The x axis is labelled with the abscisse name of the graph.
@@ -146,7 +237,7 @@ may lead to uncertain results"
         yl = yl + " (" + l + yu + ")"
         
         # Plot the signals
-        pylab.hold(True)
+        ax.hold(True)
         for sn, s in self.sigs.iteritems():
             # Scaling factor
             # The hard way...
@@ -161,18 +252,22 @@ may lead to uncertain results"
                 self.plotf(x, y, label=sn)
             except OverflowError, e:
                 print "OverflowError in plot:", e.message, ", log(0) somewhere ?"
-                pylab.hold(False)
-                pylab.xlabel(xl)
-                pylab.ylabel(yl)
+                ax.hold(False)
+                ax.set_xlabel(xl)
+                ax.set_ylabel(yl)
                 return
-        pylab.hold(False)
-        pylab.xlabel(xl)
-        pylab.ylabel(yl)
+        ax.hold(False)
+        ax.set_xlabel(xl)
+        ax.set_ylabel(yl)
         if len(self.xrange) == 2:
-            pylab.xlim(self.xrange[0], self.xrange[1])
+            ax.set_xlim(self.xrange[0], self.xrange[1])
         if len(self.yrange) == 2:
-            pylab.ylim(self.yrange[0], self.yrange[1])
-        pylab.legend()
+            ax.set_ylim(self.yrange[0], self.yrange[1])
+        ax.legend()
+
+        self.ax = ax
+        self.draw_cursors()
+        self.print_cursors()
 
     def getsigs(self):
         """ Return a list of the signal names
@@ -188,7 +283,7 @@ may lead to uncertain results"
     
     def findscalefact(self, a):
         """ Choose the right scale for data on axis a
-        Return the scale factor an a string with the abbrev.
+        Return the scale factor (f) and a string with the abbrev. (l)
         """
         scnames = {-18: "a", -15:"f", -12:"p", -9:"n", -6:"u", -3:"m", \
             0:"", 3:"k", 6:"M", 9:"G", 12:"T", 15:"P", 18:"E"}
@@ -242,13 +337,13 @@ may lead to uncertain results"
         """
         if type(a) == types.StringType:
             if a == "lin":
-                self.plotf = pylab.plot
+                self.plotf = plt.plot
             elif a == "logx":
-                self.plotf = pylab.semilogx
+                self.plotf = plt.semilogx
             elif a == "logy":
-                self.plotf = pylab.semilogy
+                self.plotf = plt.semilogy
             elif a == "loglog":
-                self.plotf = pylab.loglog
+                self.plotf = plt.loglog
 
     def setrange(self, a1 = "reset", a2 = None, a3 = None, a4 = None):
         """ Set axis range
@@ -271,3 +366,81 @@ may lead to uncertain results"
             # Set range for both axis
             self.xrange = [a1, a2]
             self.yrange = [a3, a4]
+        
+    def toggle_cursors(self, ctype = "", num = None, val = None):
+        """ Toggle the cursors in the graph
+        Call canvas.draw() shoud be called after to update the figure
+        cnt: cursor type
+        """
+        if ctype == "" or num == None or val == None:
+            return
+
+        if not ctype in ["horiz", "vert"]:
+            return
+        if num >= len(self.cursors[ctype]):
+            return
+        if val == None:
+            return
+        if self.cursors[ctype][num] == None:
+            self.set_cursor(ctype, num, val)
+        else:
+            self.cursors[ctype][num].set_value(val)
+            self.cursors[ctype][num].set_visible()
+            self.cursors[ctype][num].draw(self.ax)
+        self.print_cursors()
+        fx, lx = self.findscalefact("X")
+        fy, ly = self.findscalefact("Y")
+
+    def draw_cursors(self):
+        """ Draw the cursor lines on the graph
+        Called at the end of plot()
+        """
+        fx, lx = self.findscalefact("X")
+        fy, ly = self.findscalefact("Y")
+        l = {"horiz": ly, "vert": lx}
+        txt = {"horiz": "", "vert": ""}
+        for t, ct in self.cursors.iteritems():
+            for c in ct:
+                if not c == None:
+                    c.draw(self.ax, ct.index(c))
+
+    def set_cursor(self, ctype, num, val):
+        """ Add a cursor to the graph
+        """
+        if ctype in ["horiz", "vert"]:
+            if num >= 0 and num < 2:
+                # Just handle two cursor
+                self.cursors[ctype][num] = Cursor(val, ctype)
+                self.cursors[ctype][num].draw(self.ax, num)
+
+    def print_cursors(self):
+        """ Print cursors values on the graph
+        If both cursors are set, print difference (delta)
+        """
+        fx, lx = self.findscalefact("X")
+        fy, ly = self.findscalefact("Y")
+        l = {"horiz": ly, "vert": lx}
+        u = {"horiz": self.yunit, "vert": self.xunit}
+        txt = {"horiz": "", "vert": ""}
+        # Preapre string for each cursor type (i.e. "horiz" and "vert")
+        for t, cl in self.cursors.iteritems():
+            for c in cl:
+                if not c == None and c.get_visible() == True:
+                    # Add cursors value to text
+                    txt[t] += " %d: %8.3f %2s%-3s" \
+                        % (cl.index(c) + 1, float(c.get_value()), l[t], u[t])
+            if not None in cl and cl[0].get_visible() and cl[1].get_visible():
+                # Add cursors difference (delta)
+                txt[t] += " d%s: %8.3f %2s%-3s"\
+                    % (u[t], float(cl[1].get_value() - cl[0].get_value()),\
+                           l[t], u[t])
+
+        if self.txt == None or not self.txt.axes == self.ax:
+            # Add text to graph
+            rc('font', family='monospace')
+            self.txt = self.ax.text(0.02, 0.1, "",\
+                                        transform=self.ax.transAxes,\
+                                        axes=self.ax)
+            self.txt.set_size(0.75 * self.txt.get_size())
+        # Update text
+        self.txt.set_text("%s\n%s" % (txt["horiz"], txt["vert"]))
