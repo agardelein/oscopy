@@ -15,7 +15,7 @@ class Writer -- Define the common functions for writing files
    fmtcheck()
    Called for format specific check
 
-   getfmtname()
+   get_fmtname()
    Return a string containing format name
 
    detect()
@@ -35,7 +35,7 @@ class WriteError:
 
 class Writer:
     """ Writer -- Provide common function for exporting signals into files
-    The derived classes must redefine getfmtname and writesigs.
+    The derived classes must redefine get_fmtname and writesigs.
     """
     def __init__(self):
         self.fn = ""
@@ -83,7 +83,7 @@ class Writer:
         """
         return False
 
-    def getfmtname(self):
+    def get_fmtname(self):
         """ Return the format name
         """
         return None
@@ -91,7 +91,7 @@ class Writer:
     def detect(self, fmt):
         """ Return True if format fmt is supported
         """
-        if type(fmt) == types.StringType and fmt == self.getfmtname():
+        if type(fmt) == types.StringType and fmt == self.get_fmtname():
             return True
         else:
             return False

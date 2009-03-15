@@ -21,7 +21,7 @@ Class Reader -- Define the common functions for reader objects
 
    update()
       Reread the file and return a dict of the reread signals,
-      together with a list of the updated, deleted and added signals
+      toget_her with a list of the updated, deleted and added signals
 
    detect(fn)
       Return  if the object recognize the file
@@ -71,7 +71,7 @@ class Reader:
     def update(self, sig, upn, keep = True):
         """ On new update requests (upn > self.upn), reread the file
         and update self.slist.
-        Update sig, but if unit or reference is not found set pts to
+        Update sig, but if unit or reference is not found set_ pts to
         None 
         If readsigs returns nothing (file is deleted or whatever), all
         signals are considered deleted
@@ -103,20 +103,20 @@ class Reader:
         sn = sig.name
         if sigs.has_key(sn):
             # Check unit, reference unit, reference name
-            if sigs[sn].getunit() == sig.getunit() \
-                    and sigs[sn].getref().getunit() == sig.getref().getunit() \
-                    and sigs[sn].getref().getname() == sig.getref().getname():
-                sig.getref().setpts(sigs[sn].getref().getpts())
-                sig.setpts(sigs[sn].getpts())
+            if sigs[sn].get_unit() == sig.get_unit() \
+                    and sigs[sn].get_ref().get_unit() == sig.get_ref().get_unit() \
+                    and sigs[sn].get_ref().get_name() == sig.get_ref().get_name():
+                sig.get_ref().set_pts(sigs[sn].get_ref().get_pts())
+                sig.set_pts(sigs[sn].get_pts())
             else:
                 print "Signal", sn, "not updated: reference or unit has changed"
                 if not keep:
-                    sig.setpts(None)
+                    sig.set_pts(None)
                 return n
         else:
             print "Signal", sn, "not updated: signal name not found"
             if not keep:
-                sig.setpts(None)
+                sig.set_pts(None)
             return {}
         return n
 

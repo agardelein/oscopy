@@ -14,7 +14,7 @@ methods:
    Draw the cursor on the Axe ax with line style depending on num.
    If num is 0 then use solid line else use dashed style.
 
-   [get|set]_[value|visible|type](...)
+   [get_|set_]_[value|visible|type](...)
    Accessors to the object members
 
    __str()__
@@ -88,7 +88,7 @@ class Cursor:
 
     def set_visible(self, vis = None):
         """ Toggle status if called without argument
-        otherwise set to the value
+        otherwise set_ to the value
         """ 
         if not vis == None:
             self.vis = vis

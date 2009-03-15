@@ -6,7 +6,7 @@ and plotted according a to mode, which is currently scalar.
 Signals are managed as a dict, where the key is the signal name.
 
 In a graph, signals with a different sampling, but with the same abscisse
-can be plotted together.
+can be plotted toget_her.
 
 Handle a cursor dict, for convenience limited to two horizontal
 and two vertical, limit can be removed. 
@@ -24,7 +24,7 @@ Class Graph -- Handle the representation of a list of signals
       Return a string with the list of signals, and abscisse name
 
    insert(sigs)
-      Add signal list to the graph, set the abscisse name
+      Add signal list to the graph, set_ the abscisse name
 
    remove(sigs)
       Delete signals from the graph
@@ -32,19 +32,19 @@ Class Graph -- Handle the representation of a list of signals
    plot()
       Plot the graph
 
-   getsigs()
+   get_sigs()
       Return a list of the signal names
 
-   gettype()
+   get_type()
       Return a string with the type of graph, to be overloaded.
 
-   setunits()
+   set_units()
       Define the axis unit
 
-   setscale()
+   set_scale()
       Set plot axis scale (lin, logx, logy, loglog)
 
-   setrange()
+   set_range()
       Set plot axis range
 """
 
@@ -63,10 +63,10 @@ class Graph:
         self.sigs = {}
         if isinstance(sigs, Graph):
             # Warn on some conversion that may lead to nasty things
-            if (sigs.gettype().find('fft') == 0 \
-                    and self.gettype().find('ifft') == 0) \
-                    or (sigs.gettype().find('ifft') == 0 \
-                            and self.gettype().find('fft') == 0):
+            if (sigs.get_type().find('fft') == 0 \
+                    and self.get_type().find('ifft') == 0) \
+                    or (sigs.get_type().find('ifft') == 0 \
+                            and self.get_type().find('fft') == 0):
                 print "Warning: fft <=> ifft conversions and vice versa \
 may lead to uncertain results"
 
@@ -96,7 +96,7 @@ may lead to uncertain results"
     def __str__(self):
         """ Return a string with the type and the signal list of the graph
         """
-        a = "(" + self.gettype() + ") "
+        a = "(" + self.get_type() + ") "
         for sn in self.sigs.keys():
             a = a + sn + " "
         return a
@@ -109,14 +109,14 @@ may lead to uncertain results"
         """
         for sn, s in sigs.iteritems():
             if len(self.sigs) == 0:
-                # First signal, set the abscisse name and add signal
-                self.xaxis = s.getref().getname()
-                self.xunit = s.getref().getunit()
+                # First signal, set_ the abscisse name and add signal
+                self.xaxis = s.get_ref().get_name()
+                self.xunit = s.get_ref().get_unit()
                 self.yaxis = "Signals"  # To change
-                self.yunit = s.getunit()
+                self.yunit = s.get_unit()
                 self.sigs[sn] = s
             else:
-                if s.getref().getname() == self.xaxis:
+                if s.get_ref().get_name() == self.xaxis:
                     # Add signal
                     self.sigs[sn] = s
                 else:
@@ -135,7 +135,7 @@ may lead to uncertain results"
     def plot(self, ax = None):
         """ Plot the graph in Matplotlib Axes instance ax
         Each signal is plotted regarding to its proper abscisse.
-        In this way, signals with a different sampling can be plotted together.
+        In this way, signals with a different sampling can be plotted toget_her.
         The x axis is labelled with the abscisse name of the graph.
         """
         if len(self.sigs) == 0:
@@ -146,14 +146,14 @@ may lead to uncertain results"
             xu = "a.u."
         else:
             xu = self.xunit
-        fx, l = self.findscalefact("X")
+        fx, l = self.find_scale_factor("X")
         xl = xl + " (" + l + xu + ")"
         yl = self.yaxis
         if self.yunit == "":
             yu = "a.u."
         else:
             yu = self.yunit
-        fy, l = self.findscalefact("Y")
+        fy, l = self.find_scale_factor("Y")
         yl = yl + " (" + l + yu + ")"
         
         # Plot the signals
@@ -162,11 +162,11 @@ may lead to uncertain results"
             # Scaling factor
             # The hard way...
             x = []
-            for i in s.getref().getpts():
+            for i in s.get_ref().get_pts():
                 x.append(i * pow(10, fx))
             # The hard way, once again
             y = []
-            for i in s.getpts():
+            for i in s.get_pts():
                 y.append(i * pow(10, fy))
             try:
                 self.plotf(x, y, label=sn)
@@ -189,19 +189,19 @@ may lead to uncertain results"
         self.draw_cursors()
         self.print_cursors()
 
-    def getsigs(self):
+    def get_sigs(self):
         """ Return a list of the signal names
         """
         for sn in self.sigs:
             yield sn
 
-    def gettype(self):
+    def get_type(self):
         """ Return a string with the type of the graph
         To be overloaded by derived classes.
         """
         return
     
-    def findscalefact(self, a):
+    def find_scale_factor(self, a):
         """ Choose the right scale for data on axis a
         Return the scale factor (f) and a string with the abbrev. (l)
         """
@@ -214,11 +214,11 @@ may lead to uncertain results"
 
         for s in self.sigs.itervalues():
             if a == "X":
-                mxs.append(max(s.getref().getpts()))
-                mns.append(min(s.getref().getpts()))
+                mxs.append(max(s.get_ref().get_pts()))
+                mns.append(min(s.get_ref().get_pts()))
             else:
-                mxs.append(max(s.getpts()))
-                mns.append(min(s.getpts()))
+                mxs.append(max(s.get_pts()))
+                mns.append(min(s.get_pts()))
         mx = abs(max(mxs))
         mn = abs(min(mns))
         mx = max(mx, mn)
@@ -242,9 +242,9 @@ may lead to uncertain results"
                 l = "10e" + str(-f) + " "
         return f, l
 
-    def setunit(self, xu, yu = ""):
+    def set_unit(self, xu, yu = ""):
         """ Define the graph units. If only one argument is provided,
-        set y axis, if both are provided, set both.
+        set_ y axis, if both are provided, set_ both.
         """
         if yu == "":
             self.yunit = xu
@@ -252,7 +252,7 @@ may lead to uncertain results"
             self.xunit = xu
             self.yunit = yu
 
-    def setscale(self, a):
+    def set_scale(self, a):
         """ Set axes scale, either lin, logx, logy or loglog
         """
         if type(a) == types.StringType:
@@ -265,14 +265,14 @@ may lead to uncertain results"
             elif a == "loglog":
                 self.plotf = plt.loglog
 
-    def setrange(self, a1 = "reset", a2 = None, a3 = None, a4 = None):
+    def set_range(self, a1 = "reset_", a2 = None, a3 = None, a4 = None):
         """ Set axis range
-        Form 1: setrange("reset")                delete range specs
-        Form 2: setrange("x", xmin, xmax)        set range for x axis
-                setrange("y", ymin, ymax)        set range for y axis
-        Form 3: setrange(xmin, xmax, ymin, ymax) set range for both axis
+        Form 1: set_range("reset_")                delete range specs
+        Form 2: set_range("x", xmin, xmax)        set_ range for x axis
+                set_range("y", ymin, ymax)        set_ range for y axis
+        Form 3: set_range(xmin, xmax, ymin, ymax) set_ range for both axis
         """
-        if type(a1) == types.StringType and a1 == "reset":
+        if type(a1) == types.StringType and a1 == "reset_":
             # Delete range specs
             self.xrange = []
             self.yrange = []
@@ -308,15 +308,15 @@ may lead to uncertain results"
             self.cursors[ctype][num].set_visible()
             self.cursors[ctype][num].draw(self.ax)
         self.print_cursors()
-        fx, lx = self.findscalefact("X")
-        fy, ly = self.findscalefact("Y")
+        fx, lx = self.find_scale_factor("X")
+        fy, ly = self.find_scale_factor("Y")
 
     def draw_cursors(self):
         """ Draw the cursor lines on the graph
         Called at the end of plot()
         """
-        fx, lx = self.findscalefact("X")
-        fy, ly = self.findscalefact("Y")
+        fx, lx = self.find_scale_factor("X")
+        fy, ly = self.find_scale_factor("Y")
         l = {"horiz": ly, "vert": lx}
         txt = {"horiz": "", "vert": ""}
         for t, ct in self.cursors.iteritems():
@@ -335,10 +335,10 @@ may lead to uncertain results"
 
     def print_cursors(self):
         """ Print cursors values on the graph
-        If both cursors are set, print difference (delta)
+        If both cursors are set_, print difference (delta)
         """
-        fx, lx = self.findscalefact("X")
-        fy, ly = self.findscalefact("Y")
+        fx, lx = self.find_scale_factor("X")
+        fy, ly = self.find_scale_factor("Y")
         l = {"horiz": ly, "vert": lx}
         u = {"horiz": self.yunit, "vert": self.xunit}
         txt = {"horiz": "", "vert": ""}

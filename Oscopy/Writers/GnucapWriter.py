@@ -2,7 +2,7 @@
 
 class GnucapWriter -- Handle gnucap format
 
-   getfmtname()
+   get_fmtname()
    Return 'gnucap'
 
    fmtcheck()
@@ -21,7 +21,7 @@ class GnucapWriter(Writer):
     """ Write signals to columns tab separated format used by Gnucap
     Signals should have the same reference
     """
-    def getfmtname(self):
+    def get_fmtname(self):
         """ Return the format name
         """
         return 'gnucap'
@@ -40,8 +40,8 @@ class GnucapWriter(Writer):
                 else:
                     # Ugly but == on array returns an array of bool
                     # how to find a False into this ?
-                    for a, b in zip(s.getref().getpts(), \
-                                        prevs.getref().getpts()):
+                    for a, b in zip(s.get_ref().get_pts(), \
+                                        prevs.get_ref().get_pts()):
                         if a == b:
                             continue
                         else:
@@ -72,23 +72,23 @@ class GnucapWriter(Writer):
                 first = 1
                 # Variable names, beginning of for
                 f = "for "
-                f = f + s.getref().getname() + ","
+                f = f + s.get_ref().get_name() + ","
                 f = f + sn
                 # Zip part
-                z = "in zip(sigs[\"" + sn + "\"].getref().getpts()"
-                z = z + ", sigs[\"" + sn + "\"].getpts()"
+                z = "in zip(sigs[\"" + sn + "\"].get_ref().get_pts()"
+                z = z + ", sigs[\"" + sn + "\"].get_pts()"
                 # Header
                 h = "_f.write(\"#\" + \"" \
-                    + self.addpar(s.getref().getname()) + "\""
-                h = h + " + _sep + \"" + self.addpar(s.getname()) + "\""
-                # Data line, float conversion to get 1.234 instead of 1,234
-                d = "\t_f.write(str(float(" + s.getref().getname() + "))"
+                    + self.addpar(s.get_ref().get_name()) + "\""
+                h = h + " + _sep + \"" + self.addpar(s.get_name()) + "\""
+                # Data line, float conversion to get_ 1.234 instead of 1,234
+                d = "\t_f.write(str(float(" + s.get_ref().get_name() + "))"
                 d = d + " + _sep + str(float(" + sn + "))"
             else:
                 f = f + "," + sn 
-                z = z + ", sigs[\"" + sn + "\"].getpts()"
-                h = h + " + _sep + \"" + self.addpar(s.getname()) + "\""
-                # Float conversion to get 1.234 instead of 1,234
+                z = z + ", sigs[\"" + sn + "\"].get_pts()"
+                h = h + " + _sep + \"" + self.addpar(s.get_name()) + "\""
+                # Float conversion to get_ 1.234 instead of 1,234
                 d = d + " + _sep + str(float(" + sn + "))"
         h = h + " + \"\\n\")\n"
         f = f + " "
@@ -106,7 +106,7 @@ class GnucapWriter(Writer):
         with gnucap format
         """
         l = ['v', 'vout', 'vin', 'i', 'p', 'nv', 'ev', 'r', 'y',\
-                 'z', 'zraw', 'pd', 'ps', 'f', 'input', 'ioffset',\
+                 'z', 'zraw', 'pd', 'ps', 'f', 'input', 'ioffset_',\
                  'ipassive', 'pi', 'pidb', 'pm', 'pmdb', 'pp']
         l.sort()
         l.reverse()

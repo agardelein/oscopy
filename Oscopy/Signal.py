@@ -8,19 +8,19 @@ A signal contains a list of points, with an identifier, a reference (abscisse) a
 The identifier is the signal name, as presented to the user.
 The signal contains the ordinate values, while the abscisses are contained
 into the reference signal.
-The reference signal has its ref set to None.
+The reference signal has its ref set_ to None.
 
 The reader object is stored into the signal, if any use.
 
 Class Signal -- Contains the signal points and other information
    __init(name, reader)__
       Create an empty signal.
-      If given, set the name and the reader.
+      If given, set_ the name and the reader.
 
-   set[pts|ref]()
+   set_[pts|ref]()
       Set the data points of the signal and the reference signal respectively
 
-   get[pts|ref|name|unit]()
+   get_[pts|ref|name|unit]()
       Return the signal data points, reference signal signal name
       and unit respectively
 
@@ -58,7 +58,7 @@ class Signal:
             self.unit = unit         # Unit of the signal
             self.frozen = False      # Flag for update
 
-    def setpts(self, pts = []):
+    def set_pts(self, pts = []):
         """ Set the data points of the signal
         """
         if pts == None:
@@ -69,43 +69,43 @@ class Signal:
             elif isinstance(pts, numpy.ndarray):
                 self.pts = pts
 
-    def getpts(self):
+    def get_pts(self):
         """ Return the list of point of the signal
         """
         return self.pts
 
-    def setref(self, ref = None):
+    def set_ref(self, ref = None):
         """ Set the reference signal
-        If set to None, then signal is a reference signal (Time, Freq)
+        If set_ to None, then signal is a reference signal (Time, Freq)
         """
         if ref == None or isinstance(ref, Signal):
             self.ref = ref
         else:
             return
 
-    def getref(self):
+    def get_ref(self):
         """ Return the reference signal
         """
         return self.ref
 
-    def getname(self):
+    def get_name(self):
         """ Return the signal name
         """
         return self.name
 
-    def getunit(self):
+    def get_unit(self):
         """ Return the unit of the signal
         """
         return self.unit
 
-    def getreader(self):
+    def get_reader(self):
         """ Return the reader
         """
         return self.reader
 
     def update(self, upn, keep = True):
         """ Update the signal trough the reader
-        Do not update if frozen is set.
+        Do not update if frozen is set_.
         If keep is false, erase points.
         Return a list of new signals
         """

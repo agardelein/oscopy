@@ -32,25 +32,25 @@ Figure -- Handle a list of graphs
    list()
       List the graph of the current figure
 
-   setmode(mode)
+   set_mode(mode)
       Set the mode of the current graph
 
-   setlayout(layout)
+   set_layout(layout)
       Set the layout, either horiz, vert or quad
 
    plot()
       Plot the figure
 
-   getsigs()
+   get_sigs()
       Return a list of the signals in all graphs
 
-   setunit()
+   set_unit()
       Set the current graph units
 
-   setscale()
+   set_scale()
       Set the current graph axis scale
 
-   setrange()
+   set_range()
       Set the current graph axis range
 """
 
@@ -66,7 +66,7 @@ class Figure:
     def __init__(self, sigs = {}):
         """ Create a Figure.
         If a signal list is provided, add a graph with the signal list
-        By default, create an empty list of graph and set the layout to horiz
+        By default, create an empty list of graph and set_ the layout to horiz
         """
         self.graphs = []
         self.layout = "horiz"
@@ -79,7 +79,7 @@ class Figure:
             return
 
     def add(self, sigs = {}):
-        """ Add a graph into the figure and set it as current graph.
+        """ Add a graph into the figure and set_ it as current graph.
         Up to four graphs can be plotted on the same figure.
         Additionnal attemps are ignored.
         By default, do nothing.
@@ -120,7 +120,7 @@ class Figure:
         for g in self.graphs:
             ug = {}
             dg = {}
-            for sn in g.getsigs():
+            for sn in g.get_sigs():
                 if sn in u:
                     ug[sn] = u[sn]
                 elif sn in d:
@@ -145,7 +145,7 @@ class Figure:
                 print "    ",
             print "Graph", gn + 1, ":", g
 
-    def setmode(self, gmode):
+    def set_mode(self, gmode):
         """ Set the mode of the current graph
         """
         if self.curgraph == None:
@@ -161,7 +161,7 @@ class Figure:
                 g = IFFTGraph(self.curgraph)
                 self.curgraph = g                
                 
-    def setlayout(self, layout = "quad"):
+    def set_layout(self, layout = "quad"):
         """ Set the layout of the figure, default is quad
         horiz : graphs are horizontaly aligned
         vert  : graphs are verticaly aligned
@@ -225,30 +225,30 @@ class Figure:
             for g in self.graphs:
                 g.remove(sigs)
 
-    def getsigs(self):
+    def get_sigs(self):
         """ Return the list of signals in all graphs
         """
         for g in self.graphs:
-            for sn in g.getsigs():
+            for sn in g.get_sigs():
                 yield sn
 
-    def setunit(self, xu, yu = ""):
+    def set_unit(self, xu, yu = ""):
         """ Set the current graph units
         """
         if not self.curgraph == None:
-            self.curgraph.setunit(xu, yu)
+            self.curgraph.set_unit(xu, yu)
 
-    def setscale(self, a):
+    def set_scale(self, a):
         """ Set the current graph axis scale
         """
         if not self.curgraph == None:
-            self.curgraph.setscale(a)
+            self.curgraph.set_scale(a)
 
-    def setrange(self, a1 = "reset", a2 = None, a3 = None, a4 = None):
+    def set_range(self, a1 = "reset_", a2 = None, a3 = None, a4 = None):
         """ Set the axis range of the current graph
         """
         if not self.curgraph == None:
-            self.curgraph.setrange(a1, a2, a3, a4)
+            self.curgraph.set_range(a1, a2, a3, a4)
 
 #     def cursors(self, event):
 #         print "yo:", event.name, event.inaxes

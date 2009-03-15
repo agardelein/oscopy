@@ -24,7 +24,7 @@ class GnucapReader(Reader):
     def readsigs(self):
         """ Read the signals from the file
 
-        First get the signal names from the first line, the abscisse
+        First get_ the signal names from the first line, the abscisse
         is the first column
         Then read the values and assign them to the signals.
         Finally, assign the abscisse to each signal.
@@ -62,11 +62,11 @@ class GnucapReader(Reader):
 
         # Assign abscisse to signals
         ref = self.slist.pop(0)
-        ref.setpts(plist.pop(0))
+        ref.set_pts(plist.pop(0))
         for i, s in enumerate(self.slist):
-            s.setref(ref)
-            s.setpts(plist[i])
-            sdict[s.getname()] = s
+            s.set_ref(ref)
+            s.set_pts(plist[i])
+            sdict[s.get_name()] = s
         return sdict
 
     def unitfromprobe(self, pn = ""):

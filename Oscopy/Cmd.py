@@ -16,7 +16,7 @@ Class Cmds: Commands callables from oscopy commandline
    Select the figure and the graph to become the current ones
 
    layout(l)
-   set the layout of the current figure
+   set_ the layout of the current figure
 
    figlist()
    Print a list of figures
@@ -61,7 +61,7 @@ Class Cmds: Commands callables from oscopy commandline
    Set the freeze flag of signals
 
    unfreeze(sns)
-   Unset the freeze flag of signals
+   Unset_ the freeze flag of signals
 
    siglist()
    List all the signals
@@ -69,7 +69,7 @@ Class Cmds: Commands callables from oscopy commandline
    math(expr)
    Create a signal from a mathematical expression
 
-   gettoplot(sns)
+   get_toplot(sns)
    Return a list of the signal names from the arguments provided by the user
    Should not be called from the command line
 
@@ -112,9 +112,9 @@ class Cmd:
         self.upn = -1
         
     def create(self, sigs):
-        """ Create a new figure and set it as current
+        """ Create a new figure and set_ it as current
         Can be either called from commandline or a function.
-        When called from commandline, call gettoplot to retrieve
+        When called from commandline, call get_toplot to retrieve
         the signal list
         When called from a function, if the argument is not a list
         then return.
@@ -124,7 +124,7 @@ class Cmd:
             # Called from commandline,
             # Get the signal list from args
             if not sigs == "":
-                sigs = self.gettoplot(sigs)
+                sigs = self.get_toplot(sigs)
             else:
                 # No signal list provided
                 sigs = {}
@@ -172,7 +172,7 @@ class Cmd:
         """ Define the layout of the current figure
         """
         if self.curfig != None:
-            self.curfig.setlayout(l)
+            self.curfig.set_layout(l)
 
     def figlist(self):
         """ Print the list of figures
@@ -228,7 +228,7 @@ class Cmd:
         """ Write signals to file
         """
         # Create the object
-        sigs = self.gettoplot(sns)
+        sigs = self.get_toplot(sns)
         if sigs == {}:
             return
         try:
@@ -253,7 +253,7 @@ class Cmd:
         # Update the signal, the new signals list and sigs to be deleted
         for sn, s in self.sigs.iteritems():
             n.update(s.update(self.upn, False))
-            if s.getpts() == None:
+            if s.get_pts() == None:
                 d.append(sn)
         # Insert new signals
         self.sigs.update(n)
@@ -271,7 +271,7 @@ class Cmd:
         if len(self.figs) < 1:
             self.create(sns)
         else:
-            sigs = self.gettoplot(sns)
+            sigs = self.get_toplot(sns)
             self.curfig.add(sigs)
 
     def delete(self, gn):
@@ -284,25 +284,25 @@ class Cmd:
         """ Set the mode of the current graph of the current figure
         """
         if not self.curfig == None:
-            self.curfig.setmode(mode)
+            self.curfig.set_mode(mode)
 
     def scale(self, sc):
         """ Set the axis scale of the current graph of the current figure
         """
         if not self.curfig == None:
-            self.curfig.setscale(sc)
+            self.curfig.set_scale(sc)
 
-    def range(self, a1 = "reset", a2 = None, a3 = None, a4 = None):
+    def range(self, a1 = "reset_", a2 = None, a3 = None, a4 = None):
         """ Set the axis range of the current graph of the current figure
         """
         if not self.curfig == None:
-            self.curfig.setrange(a1, a2, a3, a4)
+            self.curfig.set_range(a1, a2, a3, a4)
 
     def unit(self, xu, yu = ""):
         """ Set the units of current graph of current figure
         """
         if not self.curfig == None:
-            self.curfig.setunit(xu, yu)        
+            self.curfig.set_unit(xu, yu)        
             
     def insert(self, sns):
         """ Insert a list of signals into the current graph 
@@ -311,7 +311,7 @@ class Cmd:
         if self.figs == []:
             return
 
-        sigs = self.gettoplot(sns)
+        sigs = self.get_toplot(sns)
         if not self.curfig == None:
             self.curfig.insert(sigs)
 
@@ -322,7 +322,7 @@ class Cmd:
         if self.figs == []:
             return
 
-        sigs = self.gettoplot(sns)
+        sigs = self.get_toplot(sns)
         if not self.curfig == None:
             self.curfig.remove(sigs)
         return
@@ -330,14 +330,14 @@ class Cmd:
     def freeze(self, sns):
         """ Set the freeze flag of signals
         """
-        sigs = self.gettoplot(sns)
+        sigs = self.get_toplot(sns)
         for s in sigs.itervalues():
             s.freeze(True)
 
     def unfreeze(self, sns):
-        """ Unset the freeze flag of signals
+        """ Unset_ the freeze flag of signals
         """
-        sigs = self.gettoplot(sns)
+        sigs = self.get_toplot(sns)
         for s in sigs.itervalues():
             s.freeze(False)
 
@@ -358,13 +358,13 @@ class Cmd:
         if len(ss) == 0:
             if hasattr(r, "missing") and callable(r.missing):
                 sns = r.missing()
-                if hasattr(r, "setorigsigs") and callable(r.setorigsigs):
+                if hasattr(r, "set_origsigs") and callable(r.set_origsigs):
                     for sn in sns:
                         if self.sigs.has_key(sn):
                             sigs[sn] = self.sigs[sn]
                         else:
                             print "What is", sn
-                    r.setorigsigs(sigs)
+                    r.set_origsigs(sigs)
                     ss = r.read(inp)
                     if len(ss) == 0:
                         print "Signal not generated"
@@ -372,7 +372,7 @@ class Cmd:
             self.sigs[sn] = s
         return
 
-    def gettoplot(self, sns):
+    def get_toplot(self, sns):
         """ Return the signal list extracted from the commandline
         The list must be a coma separated list of signal names.
         If no signals are loaded of no signal are found, return None

@@ -16,9 +16,9 @@ class Oscopy:
     def create(self, args):
         if args == "help":
             print "Usage : create [SIG [, SIG [, SIG]...]]"
-            print "   Create a new figure, set it as current, add the signals"
+            print "   Create a new figure, set_ it as current, add the signals"
             return
-        self.cmds.create(self.gettoplot(args))
+        self.cmds.create(self.get_toplot(args))
 
     def destroy(self, args):
         if args == "help":
@@ -83,7 +83,7 @@ class Oscopy:
         fmt = tmp.group('fmt')
         fn = tmp.group('fn')
         opt = tmp.group('opts')
-        sns = self.gettoplot(tmp.group('sigs'))
+        sns = self.get_toplot(tmp.group('sigs'))
         opts = {}
         if opt != None:
             for on in opt.strip('()').split(','):
@@ -104,7 +104,7 @@ class Oscopy:
             print "Usage : add SIG [, SIG [, SIG]...]"
             print "   Add a graph to the current figure"
             return
-        self.cmds.add(self.gettoplot(args))
+        self.cmds.add(self.get_toplot(args))
 
     def delete(self, args):
         if args == "help":
@@ -133,12 +133,12 @@ class Oscopy:
 
     def range(self, args):
         if args == "help":
-            print "Usage: range [x|y min max]|[xmin xmax ymin ymax]|[reset]"
+            print "Usage: range [x|y min max]|[xmin xmax ymin ymax]|[reset_]"
             print "   Set the axis range of the current graph of the current figure"
             return
         tmp = args.split()
         if len(tmp) == 1:
-            if tmp[0] == "reset":
+            if tmp[0] == "reset_":
                 self.cmds.range(tmp[0])
         elif len(tmp) == 3:
             if tmp[0] == 'x' or tmp[0] == 'y':
@@ -167,26 +167,26 @@ class Oscopy:
             print "Usage: insert SIG [, SIG [, SIG]...]"
             print "   Insert a list of signals into the current graph"
             return
-        self.cmds.insert(self.gettoplot(args))
+        self.cmds.insert(self.get_toplot(args))
 
     def remove(self, args):
         if args == "help":
             print "Usage: remove SIG [, SIG [, SIG]...]"
             print "   Delete a list of signals into from current graph"
             return
-        self.cmds.remove(self.gettoplot(args))
+        self.cmds.remove(self.get_toplot(args))
 
     def freeze(self, args):
         if args == "help":
             print "Usage: freeze SIG [, SIG [, SIG]...]"
             print "   Do not consider signal for subsequent updates"
-        self.cmds.freeze(self.gettoplot(args))
+        self.cmds.freeze(self.get_toplot(args))
 
     def unfreeze(self, args):
         if args == "help":
             print "Usage: unfreeze SIG [, SIG [, SIG]...]"
             print "   Consider signal for subsequent updates"
-        self.cmds.unfreeze(self.gettoplot(args))
+        self.cmds.unfreeze(self.get_toplot(args))
 
     def siglist(self, args):
         if args == "help":
@@ -202,7 +202,7 @@ class Oscopy:
             return
         self.cmds.math(inp)
 
-    def gettoplot(self, args):
+    def get_toplot(self, args):
         sns = []
         if args == "":
             sns = []
@@ -220,16 +220,16 @@ Commands related to figures:\n\
    create      create a new figure\n\
    destroy     delete a figure\n\
    select      define the current figure and the current graph\n\
-   layout      set the layout (either horiz, vert or quad)\n\
+   layout      set_ the layout (either horiz, vert or quad)\n\
    figlist     list the existing figures\n\
    plot        draw and show the figures\n\
 Commands related to graphs:\n\
    add         add a graph to the current figure\n\
    delete      delete a graph from the current figure\n\
-   mode        set the mode of the current graph of the current figure\n\
-   unit        set the units of the current graph of the current figure\n\
-   scale       set the scale of the current graph of the current figure\n\
-   range       set the axis range of the current graph of the current figure\n\
+   mode        set_ the mode of the current graph of the current figure\n\
+   unit        set_ the units of the current graph of the current figure\n\
+   scale       set_ the scale of the current graph of the current figure\n\
+   range       set_ the axis range of the current graph of the current figure\n\
 Commands related to signals:\n\
    read        read signals from file\n\
    write       write signals to file\n\

@@ -20,7 +20,7 @@ class MathReader:
    missing()
    Return the unrecognized name in the expression
 
-   setorigsigs()
+   set_origsigs()
    Store the signals name and their original file to be used in readsigs()
 
    check()
@@ -43,7 +43,7 @@ class MathReader(Reader):
         """
         self.slist = []
         self.origsigs = {}   # Dict of list of signames, key is filename
-        self.setorigsigs(sigs)
+        self.set_origsigs(sigs)
         self.unkwn = []
         Reader.__init__(self)
 
@@ -101,9 +101,9 @@ class MathReader(Reader):
         inval = []
         for k, s in _sigs.iteritems():
             if first:
-                _refname = s.getref().getname()
-                _refpts = s.getref().getpts()
-                _refsig = s.getref()
+                _refname = s.get_ref().get_name()
+                _refpts = s.get_ref().get_pts()
+                _refsig = s.get_ref()
                 first = 0
             else:
                 # Check name
@@ -111,10 +111,10 @@ class MathReader(Reader):
                     inval.append(k)
                     continue
                 # Check values
-                if len(_refpts) != len(s.getref().getpts()):
+                if len(_refpts) != len(s.get_ref().get_pts()):
                     inval.append(k)
                     continue
-                for vref, v in zip(_refpts, s.getref().getpts()):
+                for vref, v in zip(_refpts, s.get_ref().get_pts()):
                     if vref != v:
                         inval.append(k)
                         break
@@ -145,10 +145,10 @@ class MathReader(Reader):
         _expr = _expr + "_pts = []" + _endl
         for k, s in _sigs.iteritems():
             _expr = _expr + s.name + "=" + \
-                "_sigs[\"" + s.name + "\"].getpts()" + _endl
+                "_sigs[\"" + s.name + "\"].get_pts()" + _endl
         _expr = _expr + fn + _endl
-        _expr = _expr + "_tmp.setpts("+ _sn +")" + _endl
-        _expr = _expr + "_tmp.setref(_refsig)" + _endl
+        _expr = _expr + "_tmp.set_pts("+ _sn +")" + _endl
+        _expr = _expr + "_tmp.set_ref(_refsig)" + _endl
         _expr = _expr + "_ret[\"" + _sn + "\"] = _tmp" + _endl
         _expr = _expr + "self.slist.append(_tmp)" + _endl
 
@@ -171,7 +171,7 @@ class MathReader(Reader):
         """
         return self.unkwn
 
-    def setorigsigs(self, sigs = {}):
+    def set_origsigs(self, sigs = {}):
         """ Update dependency signal dict only if there are missing
         """
         for sn, s in sigs.iteritems():

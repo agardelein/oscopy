@@ -6,7 +6,7 @@ Class FFTGraph -- Do an fft when plotting
    plot()
    Plot the fft of the signals
 
-   gettype()
+   get_type()
    Return "fft", the type of the graph
 
 Class IFFTGraph -- Do an inverse fft when plotting signals
@@ -15,7 +15,7 @@ Class IFFTGraph -- Do an inverse fft when plotting signals
    plot()
    Plot the inverse fft of signals
 
-   gettype()
+   get_type()
    Return "ifft", the type of the graph
 """
 from Graph import Graph
@@ -34,23 +34,23 @@ class FFTGraph(Graph):
         self.sigs = {}
         # Compute FFT for all signals
         for sn, s in origsigs.iteritems():
-            s2 = Signal(sn, None, s.getunit())
+            s2 = Signal(sn, None, s.get_unit())
             # Check whether ref sig is Time
-            if s.getref().getname() != "Time":
-                print "Warning : ref sig of", s.getname() ,"is not 'Time'.\
+            if s.get_ref().get_name() != "Time":
+                print "Warning : ref sig of", s.get_name() ,"is not 'Time'.\
  I hope you know what you do !"
             # Do a fft
-            y = numpy.fft.fft(s.getpts())
+            y = numpy.fft.fft(s.get_pts())
             y = y[0:int(len(y)/2)-1]
-            s2.setpts(y)
+            s2.set_pts(y)
             # Change the ref sig from Time to Freq
             x = []
             for i in range(0, len(y)):
-                x.append(i / (abs(s.getref().getpts()[1]\
-                                      - s.getref().getpts()[0])\
-                                  * len(s.getref().getpts())))
-            s2.setref(Signal("Freq", None, "Hz"))
-            s2.getref().setpts(x)
+                x.append(i / (abs(s.get_ref().get_pts()[1]\
+                                      - s.get_ref().get_pts()[0])\
+                                  * len(s.get_ref().get_pts())))
+            s2.set_ref(Signal("Freq", None, "Hz"))
+            s2.get_ref().set_pts(x)
             self.sigs[sn] = s2
 
         self.xunit = "Hz"
@@ -61,13 +61,13 @@ class FFTGraph(Graph):
         self.sigs = origsigs
         return
 
-    def gettype(self):
+    def get_type(self):
         """ Return the type of graph, here fft
         """
         return "fft"
 
 class IFFTGraph(Graph):
-    def gettype(self):
+    def get_type(self):
         """ Return the type of graph, here ifft
         """
         return "ifft"
@@ -84,21 +84,21 @@ class IFFTGraph(Graph):
         for sn, s in origsigs.iteritems():
             # Check whether ref sig is Freq
             s2 = Signal(s)
-            if s.getref().getname() != "Freq":
-                print "Warning : ref sig of", s.getname() ,"is not 'Freq'.\
+            if s.get_ref().get_name() != "Freq":
+                print "Warning : ref sig of", s.get_name() ,"is not 'Freq'.\
  I hope you know what you do !"
             # Do a inverse fft
-            y = numpy.fft.ifft(s.getpts())
+            y = numpy.fft.ifft(s.get_pts())
             y = y[0:int(len(y)/2)-1]
-            s2.setpts(y)
+            s2.set_pts(y)
             # Change the ref sig from Time to Freq
             x = []
             for i in range(0, len(y)):
-                x.append(i / (abs(s.getref().getpts()[1]\
-                                      - s.getref().getpts()[0]) \
-                                  * len(s.getref().getpts())))
-            s2.setref(Signal("Time", None, "s"))
-            s2.getref().setpts(x)
+                x.append(i / (abs(s.get_ref().get_pts()[1]\
+                                      - s.get_ref().get_pts()[0]) \
+                                  * len(s.get_ref().get_pts())))
+            s2.set_ref(Signal("Time", None, "s"))
+            s2.get_ref().set_pts(x)
             self.sigs[sn] = s2
 
         self.xunit = "s"
