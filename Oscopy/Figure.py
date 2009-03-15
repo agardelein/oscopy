@@ -153,14 +153,15 @@ class Figure:
         if type(gmode) == types.StringType:
             if gmode == "lin":
                 g = LinGraph(self.curgraph)
-                self.curgraph = g
             elif gmode == "fft":
                 g = FFTGraph(self.curgraph)
-                self.curgraph = g                
             elif gmode == "ifft":
                 g = IFFTGraph(self.curgraph)
-                self.curgraph = g                
-                
+            else:
+                return
+            self.graphs[self.graphs.index(self.curgraph)] = g
+            self.curgraph = g
+
     def set_layout(self, layout = "quad"):
         """ Set the layout of the figure, default is quad
         horiz : graphs are horizontaly aligned
