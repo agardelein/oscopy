@@ -2,9 +2,8 @@
 """
 
 import re
-#from Oscopy.Cmd import Cmds
 from Cmd import Cmd
-
+from Readers.Reader import ReadError
 
 class Oscopy:
     """ Analyse command arguments and call function from Cmd
@@ -269,3 +268,71 @@ Help for individual command can be obtained with 'help COMMAND'\
             print "   Wait for the user to press enter"
             return
         inp = raw_input("Press enter")
+
+    def loop(self, p, f = None, batch = False):
+        # Main loop
+        while True:
+            try:
+                if f == None:
+                    inp = raw_input(p)
+                else:
+                    try:
+                        inp = f.readline().rstrip("\n")
+                        if inp == "":
+                            if batch == True:
+                                # Batch mode, exit at the end of script
+                                return
+                            else:
+                                # Interactive mode, continue with command line
+                                f = None
+                                continue
+                    except IOError, e:
+                        print "Script error:", e
+                        f.close()
+                        f = None
+                # Check if line is a comment
+                if inp.lstrip().startswith("#"):
+                    continue
+                # Check if command is assignment
+                if inp.find("=") >= 0:
+                    self.math(inp)
+                    continue
+
+                # Separate command from args
+                if inp.find(" ") >= 0:
+                    st = inp.lstrip().split(' ', 1)    
+                    cmd = st[0]
+                    args = st[1]
+                    # print "cmd:", cmd, "args:", args
+                else:
+                    cmd = inp
+                    args = ""
+            
+                # End of program
+                if cmd == "exit" or cmd == "quit":
+                    return
+
+                # Evaluate the command
+                if cmd in dir(self):
+                    eval("self." + cmd + "(args)")
+                else:
+                    print cmd, "not supported"
+                    continue
+    
+            except EOFError:
+                break
+
+            #    except AttributeError, e:
+            #        print "Unknown command:", e.message
+            #        continue
+            
+            #    except NameError, e:
+            #        print "Unknown command", e.message
+            #        continue
+
+            except SyntaxError, e:
+                print "Syntax Error", e.message
+                continue
+            
+            except ReadError, e:
+                print "Error in read :", e.value

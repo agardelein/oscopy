@@ -4,20 +4,22 @@ import os.path
 import sys
 import re
 from optparse import OptionParser
-from Oscopy.Readers.Reader import ReadError
 from Oscopy.Oscopy import Oscopy
 # Some variables
 hist_file = ".oscopy_hist"
-readers_dir = "Readers"
 
 # Readline configuration
 if not os.path.exists(hist_file):
-    f=open(hist_file, "w")
+    f = open(hist_file, "w")
     f.write("figlist")
     f.close()
 readline.read_history_file(hist_file)
 
 # Parse command line arguments
+# Current options:
+#   -b : batch mode, read commands from file
+#   -i : interactive mode, do not quit at the end of batch file
+#   -q : do not display startup message
 parser = OptionParser()
 parser.add_option("-b", "--batch", dest="fn", help="Execute commands in FILE then exit", metavar="FILE")
 parser.add_option("-i", "--interactive", action="store_true", dest="inter", help="Go to interactive mode after executing batch file")
@@ -38,8 +40,9 @@ else:
 
 # Prompt
 p = "oscopy> "
-cmds = Oscopy()
+o = Oscopy()
 
+# Startup message
 if options.quiet == None:
     print "This is oscopy, a program to view electrical simulation results\n\
 Copyright (C) 2009 Arnaud Gardelein.\n\
@@ -48,72 +51,8 @@ under certain conditions.\n\
 There is ABSOLUTELY NO WARRANTY; not even for MERCHANTIBILITY or\n\
 FITNESS FOR A PARTICULAR PURPOSE."
 
-# Main loop
-while True:
-    try:
-        if f == None:
-            inp = raw_input(p)
-        else:
-            try:
-                inp = f.readline().rstrip("\n")
-                if inp == "":
-                    if batch == True:
-                        # Batch mode, exit at the end of script
-                        break
-                    else:
-                        # Interactive mode, continue with command line
-                        f = None
-                        continue
-            except IOError, e:
-                print "Script error:", e
-                f.close()
-                f = None
-        # Check if line is a comment
-        if inp.lstrip().startswith("#"):
-            continue
-        # Check if command is assignment
-        if inp.find("=") >= 0:
-            cmds.math(inp)
-            continue
-
-        # Separate command from args
-        if inp.find(" ") >= 0:
-            st = inp.lstrip().split(' ', 1)    
-            cmd = st[0]
-            args = st[1]
-#            print "cmd:", cmd, "args:", args
-        else:
-            cmd = inp
-            args = ""
-            
-        # End of program
-        if cmd == "exit" or cmd == "quit":
-            break
-
-        # Evaluate the command
-        if cmd in dir(cmds):
-            eval("cmds." + cmd + "(args)")
-        else:
-            print cmd, "not supported"
-        continue
-
-    except EOFError:
-        break
-
-#    except AttributeError, e:
-#        print "Unknown command:", e.message
-#        continue
-
-#    except NameError, e:
-#        print "Unknown command", e.message
-#        continue
-
-    except SyntaxError, e:
-        print "Syntax Error", e.message
-        continue
-
-    except ReadError, e:
-        print "Error in read :", e.value
+# Start main loop
+o.loop(p, f, batch)
 
 readline.write_history_file(hist_file)
 
