@@ -102,7 +102,7 @@ class MathReader(Reader):
         for k, s in _sigs.iteritems():
             if first:
                 _refname = s.get_ref().get_name()
-                _refpts = s.get_ref().get_pts()
+                _refdata = s.get_ref().get_data()
                 _refsig = s.get_ref()
                 first = 0
             else:
@@ -111,10 +111,10 @@ class MathReader(Reader):
                     inval.append(k)
                     continue
                 # Check values
-                if len(_refpts) != len(s.get_ref().get_pts()):
+                if len(_refdata) != len(s.get_ref().get_data()):
                     inval.append(k)
                     continue
-                for vref, v in zip(_refpts, s.get_ref().get_pts()):
+                for vref, v in zip(_refdata, s.get_ref().get_data()):
                     if vref != v:
                         inval.append(k)
                         break
@@ -131,10 +131,10 @@ class MathReader(Reader):
         for on in dir(math):
              fn = re.sub('\\b'+on+'\\b', 'numpy.'+on, fn)
         if fn.find("Time") > 0:
-            Time = _refpts
+            Time = _refdata
             fn = re.sub('Time\(\w+\)', 'Time', fn)
         if fn.find("Freq") > 0:
-            Freq = _refpts
+            Freq = _refdata
             fn = re.sub('Freq\(\w+\)', 'Freq', fn)
 
         _expr = ""          # String for snippet code
@@ -142,12 +142,12 @@ class MathReader(Reader):
         _ret = {}           # Value to be returned
         _sn = fn.split("=", 1)[0].strip()  # Result signal name
         _expr = _expr + "_tmp = Signal(\"" + _sn + "\", self)" + _endl
-        _expr = _expr + "_pts = []" + _endl
+        _expr = _expr + "_data = []" + _endl
         for k, s in _sigs.iteritems():
             _expr = _expr + s.name + "=" + \
-                "_sigs[\"" + s.name + "\"].get_pts()" + _endl
+                "_sigs[\"" + s.name + "\"].get_data()" + _endl
         _expr = _expr + fn + _endl
-        _expr = _expr + "_tmp.set_pts("+ _sn +")" + _endl
+        _expr = _expr + "_tmp.set_data("+ _sn +")" + _endl
         _expr = _expr + "_tmp.set_ref(_refsig)" + _endl
         _expr = _expr + "_ret[\"" + _sn + "\"] = _tmp" + _endl
         _expr = _expr + "self.slist.append(_tmp)" + _endl

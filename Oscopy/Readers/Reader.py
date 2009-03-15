@@ -71,7 +71,7 @@ class Reader:
     def update(self, sig, upn, keep = True):
         """ On new update requests (upn > self.upn), reread the file
         and update self.slist.
-        Update sig, but if unit or reference is not found set_ pts to
+        Update sig, but if unit or reference is not found set_ data to
         None 
         If readsigs returns nothing (file is deleted or whatever), all
         signals are considered deleted
@@ -106,17 +106,17 @@ class Reader:
             if sigs[sn].get_unit() == sig.get_unit() \
                     and sigs[sn].get_ref().get_unit() == sig.get_ref().get_unit() \
                     and sigs[sn].get_ref().get_name() == sig.get_ref().get_name():
-                sig.get_ref().set_pts(sigs[sn].get_ref().get_pts())
-                sig.set_pts(sigs[sn].get_pts())
+                sig.get_ref().set_data(sigs[sn].get_ref().get_data())
+                sig.set_data(sigs[sn].get_data())
             else:
                 print "Signal", sn, "not updated: reference or unit has changed"
                 if not keep:
-                    sig.set_pts(None)
+                    sig.set_data(None)
                 return n
         else:
             print "Signal", sn, "not updated: signal name not found"
             if not keep:
-                sig.set_pts(None)
+                sig.set_data(None)
             return {}
         return n
 

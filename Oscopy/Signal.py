@@ -17,10 +17,10 @@ Class Signal -- Contains the signal points and other information
       Create an empty signal.
       If given, set_ the name and the reader.
 
-   set_[pts|ref]()
+   set_[data|ref]()
       Set the data points of the signal and the reference signal respectively
 
-   get_[pts|ref|name|unit]()
+   get_[data|ref|name|unit]()
       Return the signal data points, reference signal signal name
       and unit respectively
 
@@ -41,7 +41,7 @@ import numpy
 class Signal:
     def __init__(self, name = "", reader = None, unit = ""):
         if isinstance(name, Signal):
-            self.pts = name.pts
+            self.data = name.data
             self.name = name.name
             if name.ref == None:
                 self.ref = name.ref
@@ -51,28 +51,28 @@ class Signal:
             self.unit = name.unit
             self.frozen = name.frozen
         else:
-            self.pts = []            # Data points
+            self.data = []            # Data points
             self.name = name         # Identifier
             self.ref = None          # Reference signal
             self.reader = reader     # Reader object
             self.unit = unit         # Unit of the signal
             self.frozen = False      # Flag for update
 
-    def set_pts(self, pts = []):
+    def set_data(self, data = []):
         """ Set the data points of the signal
         """
-        if pts == None:
-            self.pts = pts
-        elif len(pts) > 0 :
-            if type(pts) == types.ListType:
-                self.pts = numpy.array(pts)
-            elif isinstance(pts, numpy.ndarray):
-                self.pts = pts
+        if data == None:
+            self.data = data
+        elif len(data) > 0 :
+            if type(data) == types.ListType:
+                self.data = numpy.array(data)
+            elif isinstance(data, numpy.ndarray):
+                self.data = data
 
-    def get_pts(self):
+    def get_data(self):
         """ Return the list of point of the signal
         """
-        return self.pts
+        return self.data
 
     def set_ref(self, ref = None):
         """ Set the reference signal
@@ -127,7 +127,7 @@ class Signal:
             + " " + self.unit \
             + " (" + str(self.reader) + ") "
         b = ""
-        if len(self.pts) > 10:
+        if len(self.data) > 10:
             for i in range(0, 9):
-                b = b + str(self.pts[i]) + "|"
+                b = b + str(self.data[i]) + "|"
         return a

@@ -253,7 +253,7 @@ class Cmd:
         # Update the signal, the new signals list and sigs to be deleted
         for sn, s in self.sigs.iteritems():
             n.update(s.update(self.upn, False))
-            if s.get_pts() == None:
+            if s.get_data() == None:
                 d.append(sn)
         # Insert new signals
         self.sigs.update(n)

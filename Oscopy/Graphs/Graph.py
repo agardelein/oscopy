@@ -162,11 +162,11 @@ may lead to uncertain results"
             # Scaling factor
             # The hard way...
             x = []
-            for i in s.get_ref().get_pts():
+            for i in s.get_ref().get_data():
                 x.append(i * pow(10, fx))
             # The hard way, once again
             y = []
-            for i in s.get_pts():
+            for i in s.get_data():
                 y.append(i * pow(10, fy))
             try:
                 self.plotf(x, y, label=sn)
@@ -214,11 +214,11 @@ may lead to uncertain results"
 
         for s in self.sigs.itervalues():
             if a == "X":
-                mxs.append(max(s.get_ref().get_pts()))
-                mns.append(min(s.get_ref().get_pts()))
+                mxs.append(max(s.get_ref().get_data()))
+                mns.append(min(s.get_ref().get_data()))
             else:
-                mxs.append(max(s.get_pts()))
-                mns.append(min(s.get_pts()))
+                mxs.append(max(s.get_data()))
+                mns.append(min(s.get_data()))
         mx = abs(max(mxs))
         mn = abs(min(mns))
         mx = max(mx, mn)

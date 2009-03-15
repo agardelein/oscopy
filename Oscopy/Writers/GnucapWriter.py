@@ -40,8 +40,8 @@ class GnucapWriter(Writer):
                 else:
                     # Ugly but == on array returns an array of bool
                     # how to find a False into this ?
-                    for a, b in zip(s.get_ref().get_pts(), \
-                                        prevs.get_ref().get_pts()):
+                    for a, b in zip(s.get_ref().get_data(), \
+                                        prevs.get_ref().get_data()):
                         if a == b:
                             continue
                         else:
@@ -75,8 +75,8 @@ class GnucapWriter(Writer):
                 f = f + s.get_ref().get_name() + ","
                 f = f + sn
                 # Zip part
-                z = "in zip(sigs[\"" + sn + "\"].get_ref().get_pts()"
-                z = z + ", sigs[\"" + sn + "\"].get_pts()"
+                z = "in zip(sigs[\"" + sn + "\"].get_ref().get_data()"
+                z = z + ", sigs[\"" + sn + "\"].get_data()"
                 # Header
                 h = "_f.write(\"#\" + \"" \
                     + self.addpar(s.get_ref().get_name()) + "\""
@@ -86,7 +86,7 @@ class GnucapWriter(Writer):
                 d = d + " + _sep + str(float(" + sn + "))"
             else:
                 f = f + "," + sn 
-                z = z + ", sigs[\"" + sn + "\"].get_pts()"
+                z = z + ", sigs[\"" + sn + "\"].get_data()"
                 h = h + " + _sep + \"" + self.addpar(s.get_name()) + "\""
                 # Float conversion to get_ 1.234 instead of 1,234
                 d = d + " + _sep + str(float(" + sn + "))"

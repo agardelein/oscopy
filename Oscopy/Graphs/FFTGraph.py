@@ -40,17 +40,17 @@ class FFTGraph(Graph):
                 print "Warning : ref sig of", s.get_name() ,"is not 'Time'.\
  I hope you know what you do !"
             # Do a fft
-            y = numpy.fft.fft(s.get_pts())
+            y = numpy.fft.fft(s.get_data())
             y = y[0:int(len(y)/2)-1]
-            s2.set_pts(y)
+            s2.set_data(y)
             # Change the ref sig from Time to Freq
             x = []
             for i in range(0, len(y)):
-                x.append(i / (abs(s.get_ref().get_pts()[1]\
-                                      - s.get_ref().get_pts()[0])\
-                                  * len(s.get_ref().get_pts())))
+                x.append(i / (abs(s.get_ref().get_data()[1]\
+                                      - s.get_ref().get_data()[0])\
+                                  * len(s.get_ref().get_data())))
             s2.set_ref(Signal("Freq", None, "Hz"))
-            s2.get_ref().set_pts(x)
+            s2.get_ref().set_data(x)
             self.sigs[sn] = s2
 
         self.xunit = "Hz"
@@ -88,17 +88,17 @@ class IFFTGraph(Graph):
                 print "Warning : ref sig of", s.get_name() ,"is not 'Freq'.\
  I hope you know what you do !"
             # Do a inverse fft
-            y = numpy.fft.ifft(s.get_pts())
+            y = numpy.fft.ifft(s.get_data())
             y = y[0:int(len(y)/2)-1]
-            s2.set_pts(y)
+            s2.set_data(y)
             # Change the ref sig from Time to Freq
             x = []
             for i in range(0, len(y)):
-                x.append(i / (abs(s.get_ref().get_pts()[1]\
-                                      - s.get_ref().get_pts()[0]) \
-                                  * len(s.get_ref().get_pts())))
+                x.append(i / (abs(s.get_ref().get_data()[1]\
+                                      - s.get_ref().get_data()[0]) \
+                                  * len(s.get_ref().get_data())))
             s2.set_ref(Signal("Time", None, "s"))
-            s2.get_ref().set_pts(x)
+            s2.get_ref().set_data(x)
             self.sigs[sn] = s2
 
         self.xunit = "s"

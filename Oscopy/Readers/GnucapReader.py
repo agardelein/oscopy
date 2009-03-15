@@ -62,10 +62,10 @@ class GnucapReader(Reader):
 
         # Assign abscisse to signals
         ref = self.slist.pop(0)
-        ref.set_pts(plist.pop(0))
+        ref.set_data(plist.pop(0))
         for i, s in enumerate(self.slist):
             s.set_ref(ref)
-            s.set_pts(plist[i])
+            s.set_data(plist[i])
             sdict[s.get_name()] = s
         return sdict
 
