@@ -17,7 +17,7 @@ class Oscopy:
             print "Usage : create [SIG [, SIG [, SIG]...]]"
             print "   Create a new figure, set_ it as current, add the signals"
             return
-        self.cmds.create(self.get_toplot(args))
+        self.cmds.create(self.get_signames(args))
 
     def destroy(self, args):
         if args == "help":
@@ -82,7 +82,7 @@ class Oscopy:
         fmt = tmp.group('fmt')
         fn = tmp.group('fn')
         opt = tmp.group('opts')
-        sns = self.get_toplot(tmp.group('sigs'))
+        sns = self.get_signames(tmp.group('sigs'))
         opts = {}
         if opt != None:
             for on in opt.strip('()').split(','):
@@ -103,7 +103,7 @@ class Oscopy:
             print "Usage : add SIG [, SIG [, SIG]...]"
             print "   Add a graph to the current figure"
             return
-        self.cmds.add(self.get_toplot(args))
+        self.cmds.add(self.get_signames(args))
 
     def delete(self, args):
         if args == "help":
@@ -166,26 +166,26 @@ class Oscopy:
             print "Usage: insert SIG [, SIG [, SIG]...]"
             print "   Insert a list of signals into the current graph"
             return
-        self.cmds.insert(self.get_toplot(args))
+        self.cmds.insert(self.get_signames(args))
 
     def remove(self, args):
         if args == "help":
             print "Usage: remove SIG [, SIG [, SIG]...]"
             print "   Delete a list of signals into from current graph"
             return
-        self.cmds.remove(self.get_toplot(args))
+        self.cmds.remove(self.get_signames(args))
 
     def freeze(self, args):
         if args == "help":
             print "Usage: freeze SIG [, SIG [, SIG]...]"
             print "   Do not consider signal for subsequent updates"
-        self.cmds.freeze(self.get_toplot(args))
+        self.cmds.freeze(self.get_signames(args))
 
     def unfreeze(self, args):
         if args == "help":
             print "Usage: unfreeze SIG [, SIG [, SIG]...]"
             print "   Consider signal for subsequent updates"
-        self.cmds.unfreeze(self.get_toplot(args))
+        self.cmds.unfreeze(self.get_signames(args))
 
     def siglist(self, args):
         if args == "help":
@@ -201,7 +201,11 @@ class Oscopy:
             return
         self.cmds.math(inp)
 
-    def get_toplot(self, args):
+    def get_signames(self, args):
+        """ Return the signal names list extracted from the commandline
+        The list must be a coma separated list of signal names.
+        If no signals are loaded of no signal are found, return []
+        """
         sns = []
         if args == "":
             sns = []

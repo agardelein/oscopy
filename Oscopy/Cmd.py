@@ -69,7 +69,7 @@ Class Cmds: Commands callables from oscopy commandline
    math(expr)
    Create a signal from a mathematical expression
 
-   get_toplot(sns)
+   signames_to_sigs(sns)
    Return a list of the signal names from the arguments provided by the user
    Should not be called from the command line
 
@@ -114,7 +114,7 @@ class Cmd:
     def create(self, sigs):
         """ Create a new figure and set_ it as current
         Can be either called from commandline or a function.
-        When called from commandline, call get_toplot to retrieve
+        When called from commandline, call signames_to_sigs to retrieve
         the signal list
         When called from a function, if the argument is not a list
         then return.
@@ -124,7 +124,7 @@ class Cmd:
             # Called from commandline,
             # Get the signal list from args
             if not sigs == "":
-                sigs = self.get_toplot(sigs)
+                sigs = self.signames_to_sigs(sigs)
             else:
                 # No signal list provided
                 sigs = {}
@@ -228,7 +228,7 @@ class Cmd:
         """ Write signals to file
         """
         # Create the object
-        sigs = self.get_toplot(sns)
+        sigs = self.signames_to_sigs(sns)
         if sigs == {}:
             return
         try:
@@ -271,7 +271,7 @@ class Cmd:
         if len(self.figs) < 1:
             self.create(sns)
         else:
-            sigs = self.get_toplot(sns)
+            sigs = self.signames_to_sigs(sns)
             self.curfig.add(sigs)
 
     def delete(self, gn):
@@ -311,7 +311,7 @@ class Cmd:
         if self.figs == []:
             return
 
-        sigs = self.get_toplot(sns)
+        sigs = self.signames_to_sigs(sns)
         if not self.curfig == None:
             self.curfig.insert(sigs)
 
@@ -322,7 +322,7 @@ class Cmd:
         if self.figs == []:
             return
 
-        sigs = self.get_toplot(sns)
+        sigs = self.signames_to_sigs(sns)
         if not self.curfig == None:
             self.curfig.remove(sigs)
         return
@@ -330,14 +330,14 @@ class Cmd:
     def freeze(self, sns):
         """ Set the freeze flag of signals
         """
-        sigs = self.get_toplot(sns)
+        sigs = self.signames_to_sigs(sns)
         for s in sigs.itervalues():
             s.freeze(True)
 
     def unfreeze(self, sns):
         """ Unset_ the freeze flag of signals
         """
-        sigs = self.get_toplot(sns)
+        sigs = self.signames_to_sigs(sns)
         for s in sigs.itervalues():
             s.freeze(False)
 
@@ -372,16 +372,15 @@ class Cmd:
             self.sigs[sn] = s
         return
 
-    def get_toplot(self, sns):
-        """ Return the signal list extracted from the commandline
-        The list must be a coma separated list of signal names.
-        If no signals are loaded of no signal are found, return None
+    def signames_to_sigs(self, sns):
+        """ Return a signal dict from the signal names list provided
+        If no signals are found, return {}
         """
         if sns == "":
             return {}
         if len(sns) < 1:
             return {}
-        toplot = {}
+        sigs = {}
         # Are there signals ?
         if self.sigs == []:
             print "No signal loaded"
@@ -390,12 +389,12 @@ class Cmd:
         # Prepare the signal list
         for sn in sns:
             if sn in self.sigs.keys():
-                toplot[sn] = self.sigs[sn]
+                sigs[sn] = self.sigs[sn]
             else:
                 print sn + ": Not here"
 
         # No signals found
-        if len(toplot) < 1:
+        if len(sigs) < 1:
             print "No signals found"
             return {}
-        return toplot
+        return sigs

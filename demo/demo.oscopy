@@ -26,6 +26,7 @@ add v1
 unit V
 select 4-2
 mode fft
+range 0 10 0.1
 echo ** List of figures
 figlist
 # Create a copy of vout and freeze it

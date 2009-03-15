@@ -160,14 +160,8 @@ may lead to uncertain results"
         ax.hold(True)
         for sn, s in self.sigs.iteritems():
             # Scaling factor
-            # The hard way...
-            x = []
-            for i in s.get_ref().get_data():
-                x.append(i * pow(10, fx))
-            # The hard way, once again
-            y = []
-            for i in s.get_data():
-                y.append(i * pow(10, fy))
+            x = s.get_ref().get_data() * pow(10, fx)
+            y = s.get_data() * pow(10, fy)
             try:
                 self.plotf(x, y, label=sn)
             except OverflowError, e:

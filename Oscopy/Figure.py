@@ -52,6 +52,9 @@ Figure -- Handle a list of graphs
 
    set_range()
       Set the current graph axis range
+
+   key()
+      Handle keystrokes during plot
 """
 
 import pylab
@@ -250,16 +253,6 @@ class Figure:
         """
         if not self.curgraph == None:
             self.curgraph.set_range(a1, a2, a3, a4)
-
-#     def cursors(self, event):
-#         print "yo:", event.name, event.inaxes
-#         if event.inaxes == None:
-#             return
-#         for g in self.graphs:
-#             print g.ax, g.ax == event.inaxes
-        
-#         plt.text(.1,.1,"Yep",transform=event.inaxes.transAxes,axes=event.inaxes)
-#         event.canvas.draw()
 
     def key(self, event):
         """ Handle key press event
