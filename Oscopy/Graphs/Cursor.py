@@ -34,8 +34,22 @@ class Cursor:
         self.set_type(type)
 
     def draw(self, ax = None, num = 0):
-        """ Draw cursor on axis ax, num is the linestyle
+        """ Draw cursor on axis ax, num is the linestyle 0 for solid,
+        non-zero for dashed
         """
+        # Check whether cursor is within the axis limits
+        if self.type == "horiz":
+            lim = ax.get_ylim()
+        elif self.type == "vert":
+            lim = ax.get_xlim()
+        else:
+            return
+        if self.val < lim[0] or self.val > lim[1]:
+            # Outside axe limits, delete line and that's it
+            self.line = None
+            return
+
+        # Cursor is within the limit
         if self.line == None or not self.line.get_axes() == ax:
             # Cursor do not exist on the graph, plot it
             ax.hold(True)

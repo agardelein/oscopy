@@ -57,7 +57,6 @@ Figure -- Handle a list of graphs
       Handle keystrokes during plot
 """
 
-import pylab
 import types
 import matplotlib.pyplot as plt
 from Graphs import Graph
@@ -98,6 +97,8 @@ class Figure:
         By default, delete the first graph.
         Act as a "pop" with curgraph variable.
         """
+        if not type(num) == types.IntType:
+            return
         gn = eval(num)   # Graph number
         if len(self.graphs) < 1 or gn < 1 or gn > len(self.graphs):
             return
