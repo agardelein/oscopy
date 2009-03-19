@@ -77,6 +77,9 @@ class MathReader(Reader):
             elif e in tf:
                 # Other allowed names
                 continue
+            elif e in ["fft", "ifft"]:
+                # FFT and inverse FFT
+                continue
             else:
                 # Unknown
                 if re.match('[-+]?\d*\.?\d+([eE][-+]?\d+)?', e) == None:
@@ -128,8 +131,13 @@ class MathReader(Reader):
         # Prepare the expression to be executed
         fn = self.fn
         # Replace sin with numpy.sin but only for supported math functions
+        # an also fft with numpy.fft.fft
+        # on: operand name
         for on in dir(math):
-             fn = re.sub('\\b'+on+'\\b', 'numpy.'+on, fn)
+            fn = re.sub('\\b'+on+'\\b', 'numpy.'+on, fn)
+        for on in ["fft", "ifft"]:
+            fn = re.sub('\\b'+on+'\\b', 'numpy.fft.'+on, fn)
+        # Support for Time and Freq
         if fn.find("Time") > 0:
             Time = _refdata
             fn = re.sub('Time\(\w+\)', 'Time', fn)
@@ -148,6 +156,31 @@ class MathReader(Reader):
                 "_sigs[\"" + s.name + "\"].get_data()" + _endl
         _expr = _expr + fn + _endl
         _expr = _expr + "_tmp.set_data("+ _sn +")" + _endl
+        # If there is an fft or ifft, compute new axis
+        if not re.search("\\bfft\\b", fn) == None\
+                or not re.search("\\bifft\\b", fn) == None:
+            if re.search("\\bifft\\b", fn) == None:
+                # FFT
+                _u = "Hz"
+                _n = "Freq"
+            else:
+                # IFFT
+                _u = "s"
+                _n = "Time"
+                pass
+            # Result is symetric, only take one half
+            _expr += "_len = int(len(_tmp.get_data()) / 2 - 1)" + _endl
+            _expr += "_tmp.set_data(_tmp.get_data()[0:_len])"\
+                + _endl
+            # Compute reference signal
+            _expr += "_delta = abs(_refsig.get_data()[1] \
+- _refsig.get_data()[0]) * len(_refsig.get_data())"\
+                + _endl
+            _expr += "_x = numpy.linspace(0, _len, _len) / _delta" + _endl
+            _expr += "" + _endl
+            _expr += "_refsig = Signal(\"" + _n + "\", self, \"" + _u + "\")"\
+                + _endl
+            _expr += "_refsig.set_data(_x)" + _endl
         _expr = _expr + "_tmp.set_ref(_refsig)" + _endl
         _expr = _expr + "_ret[\"" + _sn + "\"] = _tmp" + _endl
         _expr = _expr + "self.slist.append(_tmp)" + _endl

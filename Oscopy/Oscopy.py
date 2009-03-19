@@ -250,6 +250,10 @@ Misc commands:\n\
 During plot:\n\
    1, 2        Toggle first and second vertical cursors\n\
    3, 4        Toggle first and second horizontal cursors\n\
+Maths:\n\
+   SIG = EXPR  Compute a signal from mathematical expression\n\
+   SIG = [i]fft(SIG)\n\
+               Compute Fast Fourier Transform (FFT) or inverse FFT from SIG\n\
 \n\
 Help for individual command can be obtained with 'help COMMAND'\
 "
