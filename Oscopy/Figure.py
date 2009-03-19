@@ -157,10 +157,10 @@ class Figure:
         if type(gmode) == types.StringType:
             if gmode == "lin":
                 g = LinGraph(self.curgraph)
-            elif gmode == "fft":
-                g = FFTGraph(self.curgraph)
-            elif gmode == "ifft":
-                g = IFFTGraph(self.curgraph)
+#            elif gmode == "fft":
+#                g = FFTGraph(self.curgraph)
+#            elif gmode == "ifft":
+#                g = IFFTGraph(self.curgraph)
             else:
                 return
             self.graphs[self.graphs.index(self.curgraph)] = g

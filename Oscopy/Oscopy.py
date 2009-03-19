@@ -117,9 +117,9 @@ class Oscopy:
             print "Usage: mode MODE"
             print "   Set the type of the current graph of the current figure"
             print "Available modes :\n\
-   lin      Linear graph\n\
-   fft      Fast Fourier Transform (FFT) of signals\n\
-   ifft     Inverse FFT of signals"
+   lin      Linear graph\n"
+#   fft      Fast Fourier Transform (FFT) of signals\n\
+#   ifft     Inverse FFT of signals"
             return
         self.cmds.mode(args)
 
