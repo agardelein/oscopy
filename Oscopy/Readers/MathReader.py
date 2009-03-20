@@ -80,6 +80,9 @@ class MathReader(Reader):
             elif e in ["fft", "ifft"]:
                 # FFT and inverse FFT
                 continue
+            elif e in ["diff"]:
+                # diff
+                continue
             else:
                 # Unknown
                 if re.match('[-+]?\d*\.?\d+([eE][-+]?\d+)?', e) == None:
@@ -137,6 +140,8 @@ class MathReader(Reader):
             fn = re.sub('\\b'+on+'\\b', 'numpy.'+on, fn)
         for on in ["fft", "ifft"]:
             fn = re.sub('\\b'+on+'\\b', 'numpy.fft.'+on, fn)
+        for on in ["diff"]:
+            fn = re.sub('\\b'+on+'\\b', 'numpy.'+on, fn)
         # Support for Time and Freq
         if fn.find("Time") > 0:
             Time = _refdata
@@ -150,7 +155,6 @@ class MathReader(Reader):
         _ret = {}           # Value to be returned
         _sn = fn.split("=", 1)[0].strip()  # Result signal name
         _expr = _expr + "_tmp = Signal(\"" + _sn + "\", self)" + _endl
-        _expr = _expr + "_data = []" + _endl
         for k, s in _sigs.iteritems():
             _expr = _expr + s.name + "=" + \
                 "_sigs[\"" + s.name + "\"].get_data()" + _endl
@@ -167,7 +171,6 @@ class MathReader(Reader):
                 # IFFT
                 _u = "s"
                 _n = "Time"
-                pass
             # Result is symetric, only take one half
             _expr += "_len = int(len(_tmp.get_data()) / 2 - 1)" + _endl
             _expr += "_tmp.set_data(_tmp.get_data()[0:_len])"\
@@ -181,14 +184,21 @@ class MathReader(Reader):
             _expr += "_refsig = Signal(\"" + _n + "\", self, \"" + _u + "\")"\
                 + _endl
             _expr += "_refsig.set_data(_x)" + _endl
+        # If there is a diff, compute also new axis
+        if not re.search("\\bdiff\\b", fn) == None:
+            _expr += "_x = numpy.resize(_refsig.get_data(), len(_refsig.get_data()) - 1)" + _endl
+            _expr += "_refsig = Signal(_refsig.get_name(), self, _refsig.get_unit())" + _endl
+            _expr += "_refsig.set_data(_x)" + _endl
+            _expr += "print len(_refsig.get_data())" + _endl
+            _expr += "print len(_tmp.get_data())" + _endl
         _expr = _expr + "_tmp.set_ref(_refsig)" + _endl
         _expr = _expr + "_ret[\"" + _sn + "\"] = _tmp" + _endl
         _expr = _expr + "self.slist.append(_tmp)" + _endl
 
         # Execute the expression
-#        print "Executing:\n---"
-#        print _expr
-#        print "---"
+        print "Executing:\n---"
+        print _expr
+        print "---"
         try:
             exec(_expr)
         except NameError, e:
