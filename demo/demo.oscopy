@@ -20,13 +20,17 @@ scale loglog
 read demo/tran.dat
 create
 add vsqu
-add vsqu
+vsqufft=fft(vsqu)
+add vsqufft
+range 0 10 -0.2 0.2
+unit V
 v1=vsqu*3+10
 add v1
 unit V
-select 4-2
-mode fft
-range 0 10 0.1
+# Use of Time
+vs = sin(Time(vsqu)*1e6)
+create vs
+unit V
 echo ** List of figures
 figlist
 # Create a copy of vout and freeze it

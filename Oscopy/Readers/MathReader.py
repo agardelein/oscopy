@@ -154,12 +154,12 @@ class MathReader(Reader):
         _endl = "\n"        # Newline code
         _ret = {}           # Value to be returned
         _sn = fn.split("=", 1)[0].strip()  # Result signal name
-        _expr = _expr + "_tmp = Signal(\"" + _sn + "\", self)" + _endl
+        _expr += "_tmp = Signal(\"" + _sn + "\", self)" + _endl
         for k, s in _sigs.iteritems():
-            _expr = _expr + s.name + "=" + \
+            _expr += s.name + "=" + \
                 "_sigs[\"" + s.name + "\"].get_data()" + _endl
-        _expr = _expr + fn + _endl
-        _expr = _expr + "_tmp.set_data("+ _sn +")" + _endl
+        _expr += fn + _endl
+        _expr += "_tmp.set_data("+ _sn +")" + _endl
         # If there is an fft or ifft, compute new axis
         if not re.search("\\bfft\\b", fn) == None\
                 or not re.search("\\bifft\\b", fn) == None:
@@ -191,14 +191,14 @@ class MathReader(Reader):
             _expr += "_refsig.set_data(_x)" + _endl
             _expr += "print len(_refsig.get_data())" + _endl
             _expr += "print len(_tmp.get_data())" + _endl
-        _expr = _expr + "_tmp.set_ref(_refsig)" + _endl
-        _expr = _expr + "_ret[\"" + _sn + "\"] = _tmp" + _endl
-        _expr = _expr + "self.slist.append(_tmp)" + _endl
+        _expr += "_tmp.set_ref(_refsig)" + _endl
+        _expr += "_ret[\"" + _sn + "\"] = _tmp" + _endl
+        _expr += "self.slist.append(_tmp)" + _endl
 
         # Execute the expression
-        print "Executing:\n---"
-        print _expr
-        print "---"
+#        print "Executing:\n---"
+#        print _expr
+#        print "---"
         try:
             exec(_expr)
         except NameError, e:

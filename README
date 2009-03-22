@@ -1,13 +1,20 @@
-oscopy -- A program to view electrical simulation results
+oscopy -- An interactive program to view electrical results
 
 This is oscopy, a kind of oscilloscope in python, to view 2D electrical
-simulation results. It is designed to easily new input data file formats
-and new types of plots.
-Support for basic mathematic with signals is implemented.
-This program use matplotlib to plot the data.
+simulation or measurement results.
+It is designed to easily add new input data file formats and new types of plots.
 
-oscopy is an example of use of the available functions,
-implemented as a simple command line program.
+Features highlight:
+  * Post-processing: math expressions, fft, diffs
+  * View, examine: multiple windows, cursors
+  * Data import: gnucap
+  * Data export: gnucap, pictures
+  * Scripting
+
+Dependencies:
+  * Python
+  * Numpy
+  * Matplotlib
 
 To run the program, just do ./oscopy.
 
@@ -21,8 +28,17 @@ gnucap -b demo.net
 cd ..
 ./oscopy -b demo/demo.oscopy
 
+MATH WITH SIGNALS:
+------------------
+Support for mathematic with signals is implemented. Supported functions:
+trig, sqrt, log... 
+Support for (i)fft: fft(v1) + fft(v2) is possible, but please avoid
+things like ifft(fft(v1) + fft(v2))
+First order diff is supported: diff(v1) or diff(v1, 1)
+Access to X axis data is provided through Time and Freq, e.g. sin(Time(vsqu)*1e6)
+
 EXTENDING OSCOPY:
----------------------
+-----------------
 New data file format can be added by deriving Reader and
 redefining the function readsigs(), which fills the list
 of signals self.sigs and return a dict of signals.
@@ -30,9 +46,9 @@ During execution, Reader.read() check the validity
 of the provided path, and then call readsigs().
 
 New graph mode can be added by deriving Graph and redefining
-the function setaxes() which if called by plot(), or eventually 
-redefining plot().
-NOTE : Figure.setmode() has to be updated when new mode are added !
+the function set_axes() which if called by plot(), or eventually 
+redefining plot(). See FFTGraph.py for example.
+NOTE : Figure.set_mode() has to be updated when new mode are added !
 
 Vocabular:
 A figure is CREATEd or DESTROYed, a graph is ADDed to a figure or DELETEd and a signal is INSERTed or REMOVEd from a graph.
@@ -48,12 +64,12 @@ class xxxReader(Readers.Reader.Reader):
               #create signal:
 	      # Reference signal, or X axis
 	      sref = Signal("name_ref", self, "unit_ref")
-	      sref.setpts([with X data from file as a list or numpy.array])
+	      sref.set_pts([with X data from file as a list or numpy.array])
 	      # Signal, or Y axis
 	      s = Signal("name_sig", self, "unit_sig")
-	      s.setpts([with data from file as a list or numpy.array])
+	      s.set_pts([with data from file as a list or numpy.array])
 	      # Assign reference to signal
-	      s.setref(sref)
+	      s.set_ref(sref)
           #fill self.slist
 	      self.slist.append(s)
 	      sigs["name_ref"] = s
@@ -64,7 +80,7 @@ class xxxReader(Readers.Reader.Reader):
           # return True if file fn can be read using this Reader
 ---
 When a importing a signal, first detect is called.
-If format is supported, read and subsequent updates will call readsigs
+If format is supported, read() and subsequent update() will call readsigs()
 
 Template for new export format:
 ---
@@ -100,13 +116,13 @@ class xxxGraph(Graphs.Graph.Graph):
 A SCHEME:
 ---------
 
-   SIGNAL+        + FIGURE +-- GRAPH +-- SIGNAL
-   SIGNAL+        |        |         +-- SIGNAL
-   SIGNAL+        |        |
-	 |        |        +-- GRAPH +-- SIGNAL
-         |        |                  +-- SIGNAL
-	 |        + FIGURE ...
-         |        ...
-         |        |
-         +- CMDS -+
+   READER -- SIGNAL+        + FIGURE +-- GRAPH +-- SIGNAL
+          \- SIGNAL+        |        |         +-- SIGNAL
+   READER -- SIGNAL+        |        |
+                   |        |        +-- GRAPH +-- SIGNAL
+                   |        |                  +-- SIGNAL
+                   |        + FIGURE ...
+                   |        ...
+                   |        |
+                   +- CMDS -+
 
