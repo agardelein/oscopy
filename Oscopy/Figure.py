@@ -152,7 +152,7 @@ class Figure:
     def set_mode(self, gmode):
         """ Set the mode of the current graph
         """
-        if self.curgraph == None:
+        if self.curgraph is None:
             return
         if type(gmode) == types.StringType:
             if gmode == "lin":
@@ -217,14 +217,14 @@ class Figure:
     def insert(self, sigs):
         """ Add a signal into the current graph
         """
-        if not self.curgraph == None:
+        if self.curgraph is not None:
             self.curgraph.insert(sigs)
 
     def remove(self, sigs, where = "current"):
         """ Delete a signal from the current graph
         """
         if where == "current":
-            if not self.curgraph == None:
+            if self.curgraph is not None:
                 self.curgraph.remove(sigs)
         elif where == "all":
             for g in self.graphs:
@@ -240,19 +240,19 @@ class Figure:
     def set_unit(self, xu, yu = ""):
         """ Set the current graph units
         """
-        if not self.curgraph == None:
+        if self.curgraph is not None:
             self.curgraph.set_unit(xu, yu)
 
     def set_scale(self, a):
         """ Set the current graph axis scale
         """
-        if not self.curgraph == None:
+        if self.curgraph is not None:
             self.curgraph.set_scale(a)
 
     def set_range(self, a1 = "reset_", a2 = None, a3 = None, a4 = None):
         """ Set the axis range of the current graph
         """
-        if not self.curgraph == None:
+        if self.curgraph is not None:
             self.curgraph.set_range(a1, a2, a3, a4)
 
     def key(self, event):
@@ -260,7 +260,7 @@ class Figure:
         1, 2: toggle vertical cursors #0 and #1
         3, 4: toggle horizontal cursors #0 and #1
         """
-        if event.inaxes == None:
+        if event.inaxes is None:
             return
         # Find graph
         g = None
@@ -269,7 +269,7 @@ class Figure:
                 break
             else:
                 g = None
-        if g == None:
+        if g is None:
             return
         # Set cursor for graph
         if event.key == "1":

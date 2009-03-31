@@ -34,7 +34,7 @@ class GnucapWriter(Writer):
         elif len(sigs) > 1:
             prevs = None
             for s in sigs.itervalues():
-                if prevs == None:
+                if prevs is None:
                     # First iteration
                     prevs = s
                 else:
@@ -63,7 +63,7 @@ class GnucapWriter(Writer):
             mode = "a"
 #        print self.fn
         _f = open(self.fn, mode)
-        if _f == None:
+        if _f is None:
             print "Oops"
             return
         first = 0

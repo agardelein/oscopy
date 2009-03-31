@@ -270,7 +270,7 @@ may lead to uncertain results"
             # Delete range specs
             self.xrange = []
             self.yrange = []
-        if a4 == None:
+        if a4 is None:
             # Set either x or y range
             if a1 == 'x':
                 self.xrange = [a2, a3]
@@ -286,16 +286,16 @@ may lead to uncertain results"
         Call canvas.draw() shoud be called after to update the figure
         cnt: cursor type
         """
-        if ctype == "" or num == None or val == None:
+        if ctype == "" or num is None or val is None:
             return
 
         if not ctype in ["horiz", "vert"]:
             return
         if num >= len(self.cursors[ctype]):
             return
-        if val == None:
+        if val is None:
             return
-        if self.cursors[ctype][num] == None:
+        if self.cursors[ctype][num] is None:
             self.set_cursor(ctype, num, val)
         else:
             self.cursors[ctype][num].set_value(val)
@@ -315,7 +315,7 @@ may lead to uncertain results"
         txt = {"horiz": "", "vert": ""}
         for t, ct in self.cursors.iteritems():
             for c in ct:
-                if not c == None:
+                if c is not None:
                     c.draw(self.ax, ct.index(c))
 
     def set_cursor(self, ctype, num, val):
@@ -339,7 +339,7 @@ may lead to uncertain results"
         # Preapre string for each cursor type (i.e. "horiz" and "vert")
         for t, cl in self.cursors.iteritems():
             for c in cl:
-                if not c == None and c.get_visible() == True:
+                if c is not None and c.get_visible() == True:
                     # Add cursors value to text
                     txt[t] += " %d: %8.3f %2s%-3s" \
                         % (cl.index(c) + 1, float(c.get_value()), l[t], u[t])
@@ -349,7 +349,7 @@ may lead to uncertain results"
                     % (u[t], float(cl[1].get_value() - cl[0].get_value()),\
                            l[t], u[t])
 
-        if self.txt == None or not self.txt.axes == self.ax:
+        if self.txt is None or not self.txt.axes == self.ax:
             # Add text to graph
             rc('font', family='monospace')
             self.txt = self.ax.text(0.02, 0.1, "",\

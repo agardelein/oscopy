@@ -120,7 +120,7 @@ class Cmd:
         then return.
         After those tests, the figure is created with the signal list.
         """
-        if type(sigs) == types.ListType:
+        if isinstance(sigs, list):
             # Called from commandline,
             # Get the signal list from args
             if not sigs == "":
@@ -128,7 +128,7 @@ class Cmd:
             else:
                 # No signal list provided
                 sigs = {}
-        elif not type(sigs) == types.DictType:
+        elif not isinstance(sigs, dict):
             return
         # toplot is now a list
         f = Figure(sigs)
@@ -154,7 +154,7 @@ class Cmd:
                 # Go to next element
                 self.curfig = self.figs[num]
         del self.figs[num - 1]
-        if self.curfig != None:
+        if self.curfig is not None:
             print "Curfig : ", self.figs.index(self.curfig) + 1
         else:
             print "No figures"
@@ -171,7 +171,7 @@ class Cmd:
     def layout(self, l):
         """ Define the layout of the current figure
         """
-        if self.curfig != None:
+        if self.curfig is not None:
             self.curfig.set_layout(l)
 
     def figlist(self):
@@ -188,7 +188,7 @@ class Cmd:
     def plot(self):
         """ Plot the figures, and enter in the matplotlib main loop
         """
-        if self.figs == []:
+        if len(self.figs) == 0:
             return
         for i, f in enumerate(self.figs):
             fig = plt.figure(i + 1)
@@ -211,7 +211,7 @@ class Cmd:
             print "Read error:", e
             return
 
-        if r == None:
+        if r is None:
             print "File format unknown"
             return
         sigs = r.read(fn)
@@ -236,7 +236,7 @@ class Cmd:
         except WriteError, e:
             print "Write error:", e
             return
-        if w != None:
+        if w is not None:
             try:
                 w.write(fn, sigs, opts)
             except WriteError, e:
@@ -253,7 +253,7 @@ class Cmd:
         # Update the signal, the new signals list and sigs to be deleted
         for sn, s in self.sigs.iteritems():
             n.update(s.update(self.upn, False))
-            if s.get_data() == None:
+            if s.get_data() is None:
                 d.append(sn)
         # Insert new signals
         self.sigs.update(n)
@@ -277,55 +277,54 @@ class Cmd:
     def delete(self, gn):
         """ Delete a graph from the current figure
         """
-        if not self.curfig == None:
+        if self.curfig is not None:
             self.curfig.delete(gn)
 
     def mode(self, mode):
         """ Set the mode of the current graph of the current figure
         """
-        if not self.curfig == None:
+        if self.curfig is not None:
             self.curfig.set_mode(mode)
 
     def scale(self, sc):
         """ Set the axis scale of the current graph of the current figure
         """
-        if not self.curfig == None:
+        if self.curfig is not None:
             self.curfig.set_scale(sc)
 
     def range(self, a1 = "reset_", a2 = None, a3 = None, a4 = None):
         """ Set the axis range of the current graph of the current figure
         """
-        if not self.curfig == None:
+        if self.curfig is not None:
             self.curfig.set_range(a1, a2, a3, a4)
 
     def unit(self, xu, yu = ""):
         """ Set the units of current graph of current figure
         """
-        if not self.curfig == None:
+        if self.curfig is not None:
             self.curfig.set_unit(xu, yu)        
             
     def insert(self, sns):
         """ Insert a list of signals into the current graph 
         of the current figure
         """
-        if self.figs == []:
+        if len(self.figs) == 0:
             return
 
-        sigs = self.signames_to_sigs(sns)
-        if not self.curfig == None:
+        if self.curfig is not None:
+            sigs = self.signames_to_sigs(sns)
             self.curfig.insert(sigs)
 
     def remove(self, sns):
         """ Remove a list of signals from the current graph
         of the current figure
         """
-        if self.figs == []:
+        if len(self.figs) == 0:
             return
 
-        sigs = self.signames_to_sigs(sns)
-        if not self.curfig == None:
+        if self.curfig is not None:
+            sigs = self.signames_to_sigs(sns)
             self.curfig.remove(sigs)
-        return
 
     def freeze(self, sns):
         """ Set the freeze flag of signals
@@ -335,7 +334,7 @@ class Cmd:
             s.freeze(True)
 
     def unfreeze(self, sns):
-        """ Unset_ the freeze flag of signals
+        """ Unset the freeze flag of signals
         """
         sigs = self.signames_to_sigs(sns)
         for s in sigs.itervalues():
@@ -382,7 +381,7 @@ class Cmd:
             return {}
         sigs = {}
         # Are there signals ?
-        if self.sigs == []:
+        if len(self.sigs) == 0:
             print "No signal loaded"
             return {}
 

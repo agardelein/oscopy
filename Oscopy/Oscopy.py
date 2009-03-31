@@ -76,7 +76,7 @@ class Oscopy:
         # Extract format, options and signal list
         tmp = re.search(r'(?P<fmt>\w+)\s*(?P<opts>\([^\)]*\))?\s+(?P<fn>[\w\./]+)\s+(?P<sigs>\w+(\s*,\s*\w+)*)', args)
 
-        if tmp == None:
+        if tmp is None:
             print "What format ? Where ? Which signals ?"
             return
         fmt = tmp.group('fmt')
@@ -281,7 +281,7 @@ Help for individual command can be obtained with 'help COMMAND'\
         # Main loop
         while True:
             try:
-                if f == None:
+                if f is None:
                     inp = raw_input(p)
                 else:
                     try:

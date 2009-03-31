@@ -85,7 +85,7 @@ class MathReader(Reader):
                 continue
             else:
                 # Unknown
-                if re.match('[-+]?\d*\.?\d+([eE][-+]?\d+)?', e) == None:
+                if re.match('[-+]?\d*\.?\d+([eE][-+]?\d+)?', e) is None:
                     self.unkwn.append(e)
                 continue
         if len(self.unkwn) > 0:
@@ -161,9 +161,9 @@ class MathReader(Reader):
         _expr += fn + _endl
         _expr += "_tmp.set_data("+ _sn +")" + _endl
         # If there is an fft or ifft, compute new axis
-        if not re.search("\\bfft\\b", fn) == None\
-                or not re.search("\\bifft\\b", fn) == None:
-            if re.search("\\bifft\\b", fn) == None:
+        if re.search("\\bfft\\b", fn) is not None\
+                or re.search("\\bifft\\b", fn) is not None:
+            if re.search("\\bifft\\b", fn) is None:
                 # FFT
                 _u = "Hz"
                 _n = "Freq"
@@ -185,7 +185,7 @@ class MathReader(Reader):
                 + _endl
             _expr += "_refsig.set_data(_x)" + _endl
         # If there is a diff, compute also new axis
-        if not re.search("\\bdiff\\b", fn) == None:
+        if re.search("\\bdiff\\b", fn) is not None:
             _expr += "_x = numpy.resize(_refsig.get_data(), len(_refsig.get_data()) - 1)" + _endl
             _expr += "_refsig = Signal(_refsig.get_name(), self, _refsig.get_unit())" + _endl
             _expr += "_refsig.set_data(_x)" + _endl

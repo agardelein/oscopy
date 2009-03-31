@@ -25,7 +25,7 @@ parser.add_option("-b", "--batch", dest="fn", help="Execute commands in FILE the
 parser.add_option("-i", "--interactive", action="store_true", dest="inter", help="Go to interactive mode after executing batch file")
 parser.add_option("-q", "--quiet", action="store_true", dest="quiet", help="Do not display startup message")
 (options, args) = parser.parse_args()
-if options.fn == None:
+if options.fn is None:
     f = None
 else:
     try:
@@ -43,7 +43,7 @@ p = "oscopy> "
 o = Oscopy()
 
 # Startup message
-if options.quiet == None:
+if options.quiet is None:
     print "This is oscopy, a program to view electrical simulation results\n\
 Copyright (C) 2009 Arnaud Gardelein.\n\
 This is free software, you are invited to redistribute it \n\

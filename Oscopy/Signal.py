@@ -43,7 +43,7 @@ class Signal:
         if isinstance(name, Signal):
             self.data = name.data
             self.name = name.name
-            if name.ref == None:
+            if name.ref is None:
                 self.ref = name.ref
             else:
                 self.ref = Signal(name.ref)
@@ -61,7 +61,7 @@ class Signal:
     def set_data(self, data = []):
         """ Set the data points of the signal
         """
-        if data == None:
+        if data is None:
             self.data = data
         elif len(data) > 0 :
             if type(data) == types.ListType:
@@ -78,7 +78,7 @@ class Signal:
         """ Set the reference signal
         If set_ to None, then signal is a reference signal (Time, Freq)
         """
-        if ref == None or isinstance(ref, Signal):
+        if ref is None or isinstance(ref, Signal):
             self.ref = ref
         else:
             return
@@ -117,7 +117,7 @@ class Signal:
     def freeze(self, frz = None):
         """ Tell to update or not the signal
         """
-        if not frz == None:
+        if not frz is None:
             if frz == True or frz == False:
                 self.frozen = frz
         return self.frozen

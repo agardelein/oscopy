@@ -50,7 +50,7 @@ class Cursor:
             return
 
         # Cursor is within the limit
-        if self.line == None or not self.line.get_axes() == ax:
+        if self.line is None or not self.line.get_axes() == ax:
             # Cursor do not exist on the graph, plot it
             ax.hold(True)
             if self.type == "horiz":
@@ -97,14 +97,14 @@ class Cursor:
                 self.type = type
 
     def set_value(self, val = None):
-        if not val == None:
+        if val is not None:
             self.val = val
 
     def set_visible(self, vis = None):
         """ Toggle status if called without argument
         otherwise set_ to the value
         """ 
-        if not vis == None:
+        if vis is not None:
             self.vis = vis
         else:
             if self.vis == True:

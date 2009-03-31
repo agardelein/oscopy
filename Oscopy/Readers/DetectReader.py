@@ -29,6 +29,6 @@ def DetectReader(fn):
             continue
         if res == True:
             return tmp
-    if not excpt == None:
+    if excpt is not None:
         raise excpt
     return None
