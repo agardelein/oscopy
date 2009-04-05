@@ -57,7 +57,6 @@ Figure -- Handle a list of graphs
       Handle keystrokes during plot
 """
 
-import types
 import matplotlib.pyplot as plt
 from Graphs import Graph
 from Graphs.LinGraphs import LinGraph
@@ -75,7 +74,7 @@ class Figure:
         self.curgraph = None
         if sigs == {}:
             return
-        elif type(sigs) == types.DictType:
+        elif isinstance(sigs, dict):
             self.add(sigs)
         else:
             return
@@ -97,7 +96,7 @@ class Figure:
         By default, delete the first graph.
         Act as a "pop" with curgraph variable.
         """
-        if not type(num) == types.IntType:
+        if not isinstance(num, int):
             return
         gn = eval(num)   # Graph number
         if len(self.graphs) < 1 or gn < 1 or gn > len(self.graphs):
@@ -116,9 +115,9 @@ class Figure:
     def update(self, u, d):
         """ Update the graphs
         """
-        if type(u) != types.DictType:
+        if not isinstance(u, dict):
             return
-        if type(d) != types.DictType:
+        if not isinstance(d, dict):
             return
 
         for g in self.graphs:
@@ -154,7 +153,7 @@ class Figure:
         """
         if self.curgraph is None:
             return
-        if type(gmode) == types.StringType:
+        if isinstance(gmode, str):
             if gmode == "lin":
                 g = LinGraph(self.curgraph)
 #            elif gmode == "fft":
@@ -249,7 +248,7 @@ class Figure:
         if self.curgraph is not None:
             self.curgraph.set_scale(a)
 
-    def set_range(self, a1 = "reset_", a2 = None, a3 = None, a4 = None):
+    def set_range(self, a1 = "reset", a2 = None, a3 = None, a4 = None):
         """ Set the axis range of the current graph
         """
         if self.curgraph is not None:

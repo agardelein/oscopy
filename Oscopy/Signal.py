@@ -34,7 +34,6 @@ Class Signal -- Contains the signal points and other information
       Returns a string with the signal name, the reference name
       and the reader name.
 """
-import types
 import numpy
 
 # Signals class
@@ -64,7 +63,7 @@ class Signal:
         if data is None:
             self.data = data
         elif len(data) > 0 :
-            if type(data) == types.ListType:
+            if isinstance(data, list):
                 self.data = numpy.array(data)
             elif isinstance(data, numpy.ndarray):
                 self.data = data

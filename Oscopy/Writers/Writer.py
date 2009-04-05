@@ -23,7 +23,6 @@ class Writer -- Define the common functions for writing files
 """
 
 import os.path
-import types
 import numpy
 
 class WriteError:
@@ -45,7 +44,7 @@ class Writer:
     def write(self, fn, sigs, opts = {}):
         """ Do some checks before calling writesigs
         """
-        if type(opts) == types.DictType:
+        if isinstance(opts, dict):
             self.opts = opts
         # Overwrite option
         if self.opts.has_key("ow"):
@@ -61,7 +60,7 @@ class Writer:
     def check(self, fn):
         """ Common checks on file access
         """
-        if type(fn) != types.StringType:
+        if not isinstance(fn, str):
             raise WriteError("No string specified")
         if fn == "":
             raise WriteError("No file specified")
@@ -91,7 +90,7 @@ class Writer:
     def detect(self, fmt):
         """ Return True if format fmt is supported
         """
-        if type(fmt) == types.StringType and fmt == self.get_fmtname():
+        if isinstance(fmt, str) and fmt == self.get_fmtname():
             return True
         else:
             return False

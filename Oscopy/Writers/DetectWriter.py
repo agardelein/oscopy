@@ -4,8 +4,6 @@ DetectWriter(fmt, fn)
 Automagically return a Writer to use for file writing
 
 """
-import sys
-import types
 import os.path
 from os import access
 from Writer import WriteError
@@ -16,7 +14,7 @@ wrts = ['GnucapWriter']
 def DetectWriter(fmt, fn, ov = False):
     """ Return a writer on the file
     """
-    if type(fmt) != types.StringType or type(fn) != types.StringType:
+    if not isinstance(fmt, str) or not isinstance(fn, str):
         return None
     if fn == "":
         raise WriteError("No file specified")

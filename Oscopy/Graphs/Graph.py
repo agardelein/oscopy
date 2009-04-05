@@ -50,7 +50,6 @@ Class Graph -- Handle the representation of a list of signals
 
 import matplotlib.pyplot as plt
 from matplotlib import rc
-import types
 from Cursor import Cursor
 
 class Graph:
@@ -249,7 +248,7 @@ may lead to uncertain results"
     def set_scale(self, a):
         """ Set axes scale, either lin, logx, logy or loglog
         """
-        if type(a) == types.StringType:
+        if isinstance(a, str):
             if a == "lin":
                 self.plotf = plt.plot
             elif a == "logx":
@@ -259,14 +258,14 @@ may lead to uncertain results"
             elif a == "loglog":
                 self.plotf = plt.loglog
 
-    def set_range(self, a1 = "reset_", a2 = None, a3 = None, a4 = None):
+    def set_range(self, a1 = "reset", a2 = None, a3 = None, a4 = None):
         """ Set axis range
-        Form 1: set_range("reset_")                delete range specs
+        Form 1: set_range("reset")                delete range specs
         Form 2: set_range("x", xmin, xmax)        set_ range for x axis
                 set_range("y", ymin, ymax)        set_ range for y axis
         Form 3: set_range(xmin, xmax, ymin, ymax) set_ range for both axis
         """
-        if type(a1) == types.StringType and a1 == "reset_":
+        if isinstance(a1, str) and a1 == "reset":
             # Delete range specs
             self.xrange = []
             self.yrange = []

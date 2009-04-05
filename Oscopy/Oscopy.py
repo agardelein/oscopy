@@ -84,7 +84,7 @@ class Oscopy:
         opt = tmp.group('opts')
         sns = self.get_signames(tmp.group('sigs'))
         opts = {}
-        if opt != None:
+        if opt is not None:
             for on in opt.strip('()').split(','):
                 tmp = on.split(':', 1)
                 if len(tmp) == 2:
@@ -132,12 +132,12 @@ class Oscopy:
 
     def range(self, args):
         if args == "help":
-            print "Usage: range [x|y min max]|[xmin xmax ymin ymax]|[reset_]"
+            print "Usage: range [x|y min max]|[xmin xmax ymin ymax]|[reset]"
             print "   Set the axis range of the current graph of the current figure"
             return
         tmp = args.split()
         if len(tmp) == 1:
-            if tmp[0] == "reset_":
+            if tmp[0] == "reset":
                 self.cmds.range(tmp[0])
         elif len(tmp) == 3:
             if tmp[0] == 'x' or tmp[0] == 'y':

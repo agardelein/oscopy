@@ -3,9 +3,7 @@
 Detect(file)
    Automagically select the Reader to use for reading file
 """
-import sys
 import os.path
-import types
 from Reader import ReadError
 from GnucapReader import GnucapReader
 from MathReader import MathReader
@@ -15,7 +13,7 @@ rds = ["GnucapReader", "MathReader"]
 def DetectReader(fn):
     """ Return a reader object on the file
     """
-    if type(fn) != types.StringType:
+    if not isinstance(fn, str):
         return None
     endl = "\n"
     excpt = None

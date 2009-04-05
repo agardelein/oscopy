@@ -82,7 +82,6 @@ gn  : graph number
 """
 
 import sys
-import types
 import re
 import matplotlib.pyplot as plt
 from Readers.DetectReader import DetectReader
@@ -188,7 +187,7 @@ class Cmd:
     def plot(self):
         """ Plot the figures, and enter in the matplotlib main loop
         """
-        if len(self.figs) == 0:
+        if len(self.figs) < 1:
             return
         for i, f in enumerate(self.figs):
             fig = plt.figure(i + 1)
@@ -229,7 +228,7 @@ class Cmd:
         """
         # Create the object
         sigs = self.signames_to_sigs(sns)
-        if sigs == {}:
+        if len(sigs) < 1:
             return
         try:
             w = DetectWriter(fmt, fn, True)
@@ -292,7 +291,7 @@ class Cmd:
         if self.curfig is not None:
             self.curfig.set_scale(sc)
 
-    def range(self, a1 = "reset_", a2 = None, a3 = None, a4 = None):
+    def range(self, a1 = "reset", a2 = None, a3 = None, a4 = None):
         """ Set the axis range of the current graph of the current figure
         """
         if self.curfig is not None:
@@ -308,7 +307,7 @@ class Cmd:
         """ Insert a list of signals into the current graph 
         of the current figure
         """
-        if len(self.figs) == 0:
+        if len(self.figs) < 1:
             return
 
         if self.curfig is not None:
@@ -319,7 +318,7 @@ class Cmd:
         """ Remove a list of signals from the current graph
         of the current figure
         """
-        if len(self.figs) == 0:
+        if len(self.figs) < 1:
             return
 
         if self.curfig is not None:
