@@ -11,7 +11,7 @@ class GnucapWriter -- Handle gnucap format
    writesigs()
    Write the signals to file
 
-   addpar()
+   add_par()
    Convert signal name to gnucap format e.g. vgs -> v(gs)
 """
 
@@ -52,6 +52,29 @@ class GnucapWriter(Writer):
 
     def writesigs(self, sigs):
         """ Write signals to file
+        Loop through all the data of each signal to write
+        columns line by line.
+
+        Gnucap format is (tab separated):
+        Time|Freq v(x) v(y) v(aa) ...
+        1.234   1.234   1.234  1.234
+        1.234   1.234   1.234  1.234
+        1.234   1.234   1.234  1.234
+        ...
+
+        A for loop is build to have the following string, (then run by exec()):
+        _f.write("#" + "Time" + _sep + "v(x)" + _sep + ...)
+        for Time, x, y, z, ... in zip(sigs["x"].get_ref().get_data(), \
+                           sigs['x'].get_data(), \
+                           sigs['y'].get_data(), \
+                           sigs['z'].get_data(), \
+                           ...
+                           ):
+            _f.write(Time + _sep + x + _sep + y + _sep + z ...)
+        h contains the header writing line
+        f contains the for variable names
+        z contains the zip variables
+        d contains the data writing line
         """
         _sep = "\t"
 #        print "Writing gnucap file"
@@ -71,29 +94,27 @@ class GnucapWriter(Writer):
             if not first:
                 first = 1
                 # Variable names, beginning of for
-                f = "for "
-                f = f + s.get_ref().get_name() + ","
-                f = f + sn
+                f = "for %s, %s" % (s.get_ref().get_name(), sn)
                 # Zip part
-                z = "in zip(sigs[\"" + sn + "\"].get_ref().get_data()"
-                z = z + ", sigs[\"" + sn + "\"].get_data()"
+                z = "in zip(sigs[\"%s\"].get_ref().get_data()" % sn
+                z += ", sigs[\"%s\"].get_data()" % sn
                 # Header
-                h = "_f.write(\"#\" + \"" \
-                    + self.addpar(s.get_ref().get_name()) + "\""
-                h = h + " + _sep + \"" + self.addpar(s.get_name()) + "\""
-                # Data line, float conversion to get_ 1.234 instead of 1,234
-                d = "\t_f.write(str(float(" + s.get_ref().get_name() + "))"
-                d = d + " + _sep + str(float(" + sn + "))"
+                h = "_f.write(\"#\" + \"%s\" + _sep + \"%s\"" % \
+                    (self.add_par(s.get_ref().get_name()), \
+                    self.add_par(s.get_name()))
+                # Data line, float conversion to get 1.234 instead of 1,234
+                d = "\t_f.write(str(float(%s)) + _sep + str(float(%s))" % \
+                    (s.get_ref().get_name(), sn)
             else:
-                f = f + "," + sn 
-                z = z + ", sigs[\"" + sn + "\"].get_data()"
-                h = h + " + _sep + \"" + self.addpar(s.get_name()) + "\""
+                f += ", %s" % sn 
+                z += ", sigs[\"%s\"].get_data()" % sn
+                h += " + _sep + \"%s\"" % self.add_par(s.get_name())
                 # Float conversion to get_ 1.234 instead of 1,234
-                d = d + " + _sep + str(float(" + sn + "))"
-        h = h + " + \"\\n\")\n"
-        f = f + " "
-        z = z + "):\n"
-        d = d + "+\"\\n\")\n"
+                d += " + _sep + str(float(%s))" % sn
+        h += " + \"\\n\")\n"
+        f += " "
+        z += "):\n"
+        d += "+\"\\n\")\n"
         _expr = h + f + z + d
 #        print _expr
         del h, f, z, d, first, mode
@@ -101,8 +122,8 @@ class GnucapWriter(Writer):
         _f.close()
         return
 
-    def addpar(self, sn):
-        """ Add parenthesis to the signal name to be compatible
+    def add_par(self, sn):
+        """ Add parenthesis in the signal name to be compatible
         with gnucap format
         """
         l = ['v', 'vout', 'vin', 'i', 'p', 'nv', 'ev', 'r', 'y',\
