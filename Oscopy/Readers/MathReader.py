@@ -28,6 +28,9 @@ class MathReader:
 
    detect()
    Return true if argument is an expression with a '='
+
+   validate_expr()
+   Return True if the expression is valid, i.e. all elements are identified
 """
 
 import numpy
@@ -37,7 +40,7 @@ import sys
 from Reader import Reader
 from Oscopy.Signal import Signal
 
-class MathReader(Reader):
+class MathReader(Reader, object):
     def __init__(self, sigs={}):
         """ Create the object
         """
@@ -53,51 +56,19 @@ class MathReader(Reader):
         If read failed, return {} and unknown word can be retrieved by
         calling missing()
         """
-        if inp == "":
+        if not inp:
             return {}
-
-        l=re.findall(r"(?i)\b[a-z0-9]*", inp.split("=")[1])
-        vs = self.origsigs.keys()
-        # Allow Time and Freq keywords
-        tf = ["Time", "Freq"]
-        self.unkwn = []
-        for e in l:
-            if e == "":
-                # Nothing to evaluate
-                continue
-            if e in vs:
-                # Into the signal list
-                continue
-            elif e in dir(math):
-                # Math function
-                continue
-            elif e.isdigit():
-                # Number
-                continue
-            elif e in tf:
-                # Other allowed names
-                continue
-            elif e in ["fft", "ifft"]:
-                # FFT and inverse FFT
-                continue
-            elif e in ["diff"]:
-                # diff
-                continue
-            else:
-                # Unknown
-                if re.match('[-+]?\d*\.?\d+([eE][-+]?\d+)?', e) is None:
-                    self.unkwn.append(e)
-                continue
-        if len(self.unkwn) > 0:
+        if self.validate_expr(inp):
+            self.fn = inp
+            return self.read_sigs()
+        else:
             return {}
-        self.fn = inp
-        return self.read_sigs()
 
     def read_sigs(self):
         """ Return a dict with only the signal computed
         The signal is computed here since it can change between two updates
         """
-        if self.origsigs == {}:
+        if not self.origsigs:
             return {}
 
         _sigs = self.origsigs
@@ -124,7 +95,7 @@ class MathReader(Reader):
                     if vref != v:
                         inval.append(k)
                         break
-        if len(inval) > 0:
+        if inval:
             print "Abscisse is different:",
             for s in inval:
                 print s
@@ -188,8 +159,8 @@ _refsig.set_data(_x)\n\
 print len(_refsig.get_data())\n\
 print len(_tmp.get_data())"
         _expr += "_tmp.set_ref(_refsig)\n\
-_ret[\"" + _sn + "\"] = _tmp\n\
-self.slist.append(_tmp)\n"
+_ret[\"%s\"] = _tmp\n\
+self.slist.append(_tmp)\n" % _sn
 
         # Execute the expression
 #        print "Executing:\n---"
@@ -229,3 +200,42 @@ self.slist.append(_tmp)\n"
             return True
         else:
             return False
+    def validate_expr(self, inp=""):
+        """ Validate the expression
+        Parse the expression if a word is not rocognized,
+        add it to self.unkwn
+        """
+        l=re.findall(r"(?i)\b[a-z0-9]*", inp.split("=")[1])
+        vs = self.origsigs.keys()
+        # Allow Time and Freq keywords
+        tf = ["Time", "Freq"]
+        self.unkwn = []
+        for e in l:
+            if e == "":
+                # Nothing to evaluate
+                continue
+            if e in vs:
+                # Into the signal list
+                continue
+            elif e in dir(math):
+                # Math function
+                continue
+            elif e.isdigit():
+                # Number
+                continue
+            elif e in tf:
+                # Other allowed names
+                continue
+            elif e in ["fft", "ifft"]:
+                # FFT and inverse FFT
+                continue
+            elif e in ["diff"]:
+                # diff
+                continue
+            else:
+                # Unknown
+                if re.match('[-+]?\d*\.?\d+([eE][-+]?\d+)?', e) is None:
+                    self.unkwn.append(e)
+                continue
+
+        return len(self.unkwn) < 1

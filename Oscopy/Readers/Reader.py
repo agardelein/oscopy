@@ -36,14 +36,14 @@ Class Reader -- Define the common functions for reader objects
 
 import os.path
 
-class ReadError:
+class ReadError(Exception):
     def __init__(self, value):
         self.value = value
 
     def __str__(self):
         return self.value
 
-class Reader:
+class Reader(object):
     """ Reader -- Provide common function for signal file reading
     The derived class must redefine read_sigs() and detect()
     """
@@ -129,7 +129,7 @@ class Reader:
         """ Check if the file is accessible
         Raise ReadError exception if not accessible
         """
-        if fn == "":
+        if not fn:
             raise ReadError("No file specified")
         if not os.path.exists(fn):
             raise ReadError("File do not exist")

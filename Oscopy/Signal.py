@@ -37,7 +37,7 @@ Class Signal -- Contains the signal points and other information
 import numpy
 
 # Signals class
-class Signal:
+class Signal(object):
     def __init__(self, name="", reader=None, unit=""):
         if isinstance(name, Signal):
             self.data = name.data
@@ -108,7 +108,7 @@ class Signal:
         If keep is false, erase points.
         Return a list of new signals
         """
-        if self.frozen == True:
+        if self.frozen:
             return {}
         # Update from the reader
         return self.reader.update(self, upn, keep)
@@ -116,9 +116,8 @@ class Signal:
     def freeze(self, frz=None):
         """ Tell to update or not the signal
         """
-        if not frz is None:
-            if frz == True or frz == False:
-                self.frozen = frz
+        if isinstance(frz, bool) :
+            self.frozen = frz
         return self.frozen
 
     def __str__(self):

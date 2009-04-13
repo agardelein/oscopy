@@ -13,9 +13,8 @@ Class XYGraph -- Draw a xy graph using signals pairs
 """
 
 from Graph import Graph
-import pylab
 
-class LinGraph(Graph):
+class LinGraph(Graph, object):
     def get_type(self):
         """ Return 'linear', the type of the graph
         """

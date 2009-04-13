@@ -90,7 +90,7 @@ from Readers.Reader import ReadError
 from Writers.Writer import WriteError
 from Figure import Figure
 
-class Oscopy:
+class Oscopy(object):
     """ Class Oscopy -- Interface between signals and figures
 
     This object is the interface between the signals and the figures,
@@ -187,7 +187,7 @@ class Oscopy:
     def plot(self):
         """ Plot the figures, and enter in the matplotlib main loop
         """
-        if len(self.figs) < 1:
+        if not self.figs:
             return
         for i, f in enumerate(self.figs):
             fig = plt.figure(i + 1)
@@ -267,7 +267,7 @@ class Oscopy:
         The signal list is a coma separated list of signal names
         If no figure exist, create a new one.
         """
-        if len(self.figs) < 1:
+        if not self.figs:
             self.create(sns)
         else:
             sigs = self.signames_to_sigs(sns)
@@ -307,7 +307,7 @@ class Oscopy:
         """ Insert a list of signals into the current graph 
         of the current figure
         """
-        if len(self.figs) < 1:
+        if not self.figs:
             return
 
         if self.curfig is not None:
@@ -318,7 +318,7 @@ class Oscopy:
         """ Remove a list of signals from the current graph
         of the current figure
         """
-        if len(self.figs) < 1:
+        if not self.figs:
             return
 
         if self.curfig is not None:
@@ -353,7 +353,10 @@ class Oscopy:
         # Create the expression
         r = DetectReader(inp)
         ss = r.read(inp)
-        if len(ss) == 0:
+        if not ss:
+            # Failed to read file
+            # If reader provide a missing() and set_origsigs() functions
+            # and if signal names are found pass them to reader
             if hasattr(r, "missing") and callable(r.missing):
                 sns = r.missing()
                 if hasattr(r, "set_origsigs") and callable(r.set_origsigs):
@@ -364,7 +367,7 @@ class Oscopy:
                             print "What is", sn
                     r.set_origsigs(sigs)
                     ss = r.read(inp)
-                    if len(ss) == 0:
+                    if not ss:
                         print "Signal not generated"
         for sn, s in ss.iteritems():
             self.sigs[sn] = s
@@ -374,13 +377,11 @@ class Oscopy:
         """ Return a signal dict from the signal names list provided
         If no signals are found, return {}
         """
-        if sns == "":
-            return {}
-        if len(sns) < 1:
+        if not sns:
             return {}
         sigs = {}
         # Are there signals ?
-        if len(self.sigs) == 0:
+        if not self.sigs:
             print "No signal loaded"
             return {}
 
@@ -392,7 +393,7 @@ class Oscopy:
                 print sn + ": Not here"
 
         # No signals found
-        if len(sigs) < 1:
+        if not sigs:
             print "No signals found"
             return {}
         return sigs

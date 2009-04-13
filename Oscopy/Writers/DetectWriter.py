@@ -16,10 +16,10 @@ def DetectWriter(fmt, fn, ov = False):
     """
     if not isinstance(fmt, str) or not isinstance(fn, str):
         return None
-    if fn == "":
+    if not fn:
         raise WriteError("No file specified")
     if os.path.exists(fn):
-        if ov == False:
+        if not ov:
             raise WriteError("File does exist")
         elif not os.path.isfile(fn):
             raise WriteError("File is not a file")
@@ -27,9 +27,8 @@ def DetectWriter(fmt, fn, ov = False):
             raise WriteError("Cannot access file")
     endl = "\n"
     for wrt in wrts:
-        s = "tmp = " + wrt + "()" + endl \
-            + "res = tmp.detect(fmt)"
+        s = "tmp = %s()\nres = tmp.detect(fmt)" % wrt
         exec(s)
-        if res == True:
+        if res:
             return tmp
     return None

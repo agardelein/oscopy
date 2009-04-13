@@ -26,7 +26,7 @@ import re
 from Oscopy.Signal import Signal
 from Reader import Reader
 
-class GnucapReader(Reader):
+class GnucapReader(Reader, object):
     def read_sigs(self):
         """ Read the signals from the file
 
@@ -83,7 +83,7 @@ class GnucapReader(Reader):
         gnucap documentation:
         http://www.gnu.org/software/gnucap/gnucap-man-html/gnucap-man046.html
         """
-        if pn == "":
+        if not pn:
             return pn
 
         # For now only element probe

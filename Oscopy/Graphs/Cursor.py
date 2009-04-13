@@ -21,7 +21,7 @@ methods:
    Return a string containing the main values of the object
 """
 
-class Cursor:
+class Cursor(object):
     """ Handle cursors
     Cursor can be visible or not, type "horiz" or "vert"
     """
@@ -33,7 +33,7 @@ class Cursor:
         self.line = None # Line2D
         self.set_type(type)
 
-    def draw(self, ax = None, num = 0):
+    def draw(self, ax=None, num=0):
         """ Draw cursor on axis ax, num is the linestyle 0 for solid,
         non-zero for dashed
         """
@@ -91,23 +91,25 @@ class Cursor:
     def get_visible(self):
         return self.vis
 
-    def set_type(self, type = ""):
-        if not type == "":
+    def set_type(self, type=""):
+        if isinstance(type, str):
             if type == "horiz" or type == "vert":
                 self.type = type
 
-    def set_value(self, val = None):
+    def set_value(self, val=None):
         if val is not None:
             self.val = val
 
-    def set_visible(self, vis = None):
+    def set_visible(self, vis=None):
         """ Toggle status if called without argument
         otherwise set_ to the value
         """ 
-        if vis is not None:
+        if isinstance(vis, bool):
+            # Set
             self.vis = vis
         else:
-            if self.vis == True:
+            # Toggle
+            if self.vis:
                 self.vis = False
             else:
                 self.vis = True

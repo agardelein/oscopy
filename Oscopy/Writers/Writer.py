@@ -25,14 +25,14 @@ class Writer -- Define the common functions for writing files
 import os.path
 import numpy
 
-class WriteError:
+class WriteError(Exception):
     def __init__(self, msg):
         self.msg = msg
 
     def __str__(self):
         return self.msg
 
-class Writer:
+class Writer(object):
     """ Writer -- Provide common function for exporting signals into files
     The derived classes must redefine get_fmt_name and write_sigs.
     """
@@ -62,10 +62,10 @@ class Writer:
         """
         if not isinstance(fn, str):
             raise WriteError("No string specified")
-        if fn == "":
+        if not fn:
             raise WriteError("No file specified")
         if os.path.exists(fn):
-            if self.ow == False:
+            if not self.ow:
                 self.fn = fn
                 raise WriteError("File already exist")
             elif not os.path.isfile(fn):

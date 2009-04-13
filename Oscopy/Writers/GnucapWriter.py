@@ -17,7 +17,7 @@ class GnucapWriter -- Handle gnucap format
 
 from Writer import Writer
 
-class GnucapWriter(Writer):
+class GnucapWriter(Writer, object):
     """ Write signals to columns tab separated format used by Gnucap
     Signals should have the same reference
     """
@@ -29,9 +29,10 @@ class GnucapWriter(Writer):
     def fmt_check(self, sigs):
         """ Check if all signals have the same reference
         """
-        if len(sigs) < 1:
+        if not sigs:
             return False
         elif len(sigs) > 1:
+            # More than one signal, compare reference signals
             prevs = None
             for s in sigs.itervalues():
                 if prevs is None:
@@ -48,6 +49,7 @@ class GnucapWriter(Writer):
                             return False
             return True
         else:
+            # Only one signal, do not need to compare the reference
             return True
 
     def write_sigs(self, sigs):
@@ -80,7 +82,7 @@ class GnucapWriter(Writer):
 #        print "Writing gnucap file"
         # Overwrite file or not
         self.ow = True
-        if self.ow == True:
+        if self.ow:
             mode = "w"
         else:
             mode = "a"

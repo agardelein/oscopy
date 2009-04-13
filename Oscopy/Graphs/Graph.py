@@ -52,7 +52,7 @@ import matplotlib.pyplot as plt
 from matplotlib import rc
 from Cursor import Cursor
 
-class Graph:
+class Graph(object):
     def __init__(self, sigs={}):
         """ Create a graph
         If signals are provided, fill in the graph otherwise the graph is empty
@@ -107,7 +107,7 @@ may lead to uncertain results"
         otherwise they are ignored
         """
         for sn, s in sigs.iteritems():
-            if len(self.sigs) == 0:
+            if not self.sigs:
                 # First signal, set_ the abscisse name and add signal
                 self.xaxis = s.get_ref().get_name()
                 self.xunit = s.get_ref().get_unit()
@@ -137,18 +137,18 @@ may lead to uncertain results"
         In this way, signals with a different sampling can be plotted toget_her.
         The x axis is labelled with the abscisse name of the graph.
         """
-        if len(self.sigs) == 0:
+        if not self.sigs:
             return
         # Prepare labels
         xl = self.xaxis
-        if self.xunit == "":
+        if not self.xunit:
             xu = "a.u."
         else:
             xu = self.xunit
         fx, l = self.find_scale_factor("X")
         xl = xl + " (" + l + xu + ")"
         yl = self.yaxis
-        if self.yunit == "":
+        if not self.yunit:
             yu = "a.u."
         else:
             yu = self.yunit
@@ -239,7 +239,7 @@ may lead to uncertain results"
         """ Define the graph units. If only one argument is provided,
         set_ y axis, if both are provided, set_ both.
         """
-        if yu == "":
+        if not yu:
             self.yunit = xu
         else:
             self.xunit = xu
@@ -285,7 +285,7 @@ may lead to uncertain results"
         Call canvas.draw() shoud be called after to update the figure
         cnt: cursor type
         """
-        if ctype == "" or num is None or val is None:
+        if not ctype or num is None or val is None:
             return
 
         if not ctype in ["horiz", "vert"]:
@@ -338,7 +338,7 @@ may lead to uncertain results"
         # Preapre string for each cursor type (i.e. "horiz" and "vert")
         for t, cl in self.cursors.iteritems():
             for c in cl:
-                if c is not None and c.get_visible() == True:
+                if c is not None and c.get_visible():
                     # Add cursors value to text
                     txt[t] += " %d: %8.3f %2s%-3s" \
                         % (cl.index(c) + 1, float(c.get_value()), l[t], u[t])

@@ -62,7 +62,7 @@ from Graphs import Graph
 from Graphs.LinGraphs import LinGraph
 #from Graphs.FFTGraph import FFTGraph, IFFTGraph
 
-class Figure:
+class Figure(object):
 
     def __init__(self, sigs={}):
         """ Create a Figure.
@@ -72,7 +72,7 @@ class Figure:
         self.graphs = []
         self.layout = "horiz"
         self.curgraph = None
-        if sigs == {}:
+        if not sigs:
             return
         elif isinstance(sigs, dict):
             self.add(sigs)
@@ -184,7 +184,7 @@ class Figure:
         And then really call the plot function of each graph
         """
         # Set the number of lines and rows
-        if len(self.graphs) < 1:
+        if not self.graphs:
             return
         if self.layout == "horiz":
             nx = len(self.graphs)
