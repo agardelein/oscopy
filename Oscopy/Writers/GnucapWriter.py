@@ -2,16 +2,16 @@
 
 class GnucapWriter -- Handle gnucap format
 
-   get_fmtname()
+   get_fmt_name()
    Return 'gnucap'
 
-   fmtcheck()
+   fmt_check()
    Return True if all signals have the same reference
 
-   writesigs()
+   write_sigs()
    Write the signals to file
 
-   add_par()
+   format_sig_name()
    Convert signal name to gnucap format e.g. vgs -> v(gs)
 """
 
@@ -21,12 +21,12 @@ class GnucapWriter(Writer):
     """ Write signals to columns tab separated format used by Gnucap
     Signals should have the same reference
     """
-    def get_fmtname(self):
+    def get_fmt_name(self):
         """ Return the format name
         """
         return 'gnucap'
 
-    def fmtcheck(self, sigs):
+    def fmt_check(self, sigs):
         """ Check if all signals have the same reference
         """
         if len(sigs) < 1:
@@ -50,7 +50,7 @@ class GnucapWriter(Writer):
         else:
             return True
 
-    def writesigs(self, sigs):
+    def write_sigs(self, sigs):
         """ Write signals to file
         Loop through all the data of each signal to write
         columns line by line.
@@ -100,15 +100,15 @@ class GnucapWriter(Writer):
                 z += ", sigs[\"%s\"].get_data()" % sn
                 # Header
                 h = "_f.write(\"#\" + \"%s\" + _sep + \"%s\"" % \
-                    (self.add_par(s.get_ref().get_name()), \
-                    self.add_par(s.get_name()))
+                    (self.format_sig_name(s.get_ref().get_name()), \
+                    self.format_sig_name(s.get_name()))
                 # Data line, float conversion to get 1.234 instead of 1,234
                 d = "\t_f.write(str(float(%s)) + _sep + str(float(%s))" % \
                     (s.get_ref().get_name(), sn)
             else:
                 f += ", %s" % sn 
                 z += ", sigs[\"%s\"].get_data()" % sn
-                h += " + _sep + \"%s\"" % self.add_par(s.get_name())
+                h += " + _sep + \"%s\"" % self.format_sig_name(s.get_name())
                 # Float conversion to get_ 1.234 instead of 1,234
                 d += " + _sep + str(float(%s))" % sn
         h += " + \"\\n\")\n"
@@ -122,7 +122,7 @@ class GnucapWriter(Writer):
         _f.close()
         return
 
-    def add_par(self, sn):
+    def format_sig_name(self, sn):
         """ Add parenthesis in the signal name to be compatible
         with gnucap format
         """

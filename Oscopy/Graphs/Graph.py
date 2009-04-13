@@ -53,7 +53,7 @@ from matplotlib import rc
 from Cursor import Cursor
 
 class Graph:
-    def __init__(self, sigs = {}):
+    def __init__(self, sigs={}):
         """ Create a graph
         If signals are provided, fill in the graph otherwise the graph is empty
         Signals are assumed to exist and to be valid
@@ -89,7 +89,7 @@ may lead to uncertain results"
             self.plotf = plt.plot
             self.ax = None
             # Cursors values, only two horiz and two vert but can be changed
-            self.cursors = {"horiz": [None, None], "vert": [None, None]}
+            self.cursors = {"horiz":[None, None], "vert":[None, None]}
             self.txt = None
 
     def __str__(self):
@@ -100,7 +100,7 @@ may lead to uncertain results"
             a = a + sn + " "
         return a
 
-    def insert(self, sigs = {}):
+    def insert(self, sigs={}):
         """ Add a list of signals into the graph
         The first signal to be added defines the abscisse.
         The remaining signals to be added must have the same abscisse name,
@@ -123,7 +123,7 @@ may lead to uncertain results"
                     print "Not the same ref:", sn, "-", self.xaxis,"-"
         return len(self.sigs)
 
-    def remove(self, sigs = {}):
+    def remove(self, sigs={}):
         """ Delete signals from the graph
         """
         for sn in sigs.iterkeys():
@@ -131,7 +131,7 @@ may lead to uncertain results"
                 del self.sigs[sn]
         return len(self.sigs)
 
-    def plot(self, ax = None):
+    def plot(self, ax=None):
         """ Plot the graph in Matplotlib Axes instance ax
         Each signal is plotted regarding to its proper abscisse.
         In this way, signals with a different sampling can be plotted toget_her.
@@ -235,7 +235,7 @@ may lead to uncertain results"
                 l = "10e" + str(-f) + " "
         return f, l
 
-    def set_unit(self, xu, yu = ""):
+    def set_unit(self, xu, yu=""):
         """ Define the graph units. If only one argument is provided,
         set_ y axis, if both are provided, set_ both.
         """
@@ -258,7 +258,7 @@ may lead to uncertain results"
             elif a == "loglog":
                 self.plotf = plt.loglog
 
-    def set_range(self, a1 = "reset", a2 = None, a3 = None, a4 = None):
+    def set_range(self, a1="reset", a2=None, a3=None, a4=None):
         """ Set axis range
         Form 1: set_range("reset")                delete range specs
         Form 2: set_range("x", xmin, xmax)        set_ range for x axis
@@ -280,7 +280,7 @@ may lead to uncertain results"
             self.xrange = [a1, a2]
             self.yrange = [a3, a4]
         
-    def toggle_cursors(self, ctype = "", num = None, val = None):
+    def toggle_cursors(self, ctype="", num=None, val=None):
         """ Toggle the cursors in the graph
         Call canvas.draw() shoud be called after to update the figure
         cnt: cursor type

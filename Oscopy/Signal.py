@@ -38,7 +38,7 @@ import numpy
 
 # Signals class
 class Signal:
-    def __init__(self, name = "", reader = None, unit = ""):
+    def __init__(self, name="", reader=None, unit=""):
         if isinstance(name, Signal):
             self.data = name.data
             self.name = name.name
@@ -57,7 +57,7 @@ class Signal:
             self.unit = unit         # Unit of the signal
             self.frozen = False      # Flag for update
 
-    def set_data(self, data = []):
+    def set_data(self, data=[]):
         """ Set the data points of the signal
         """
         if data is None:
@@ -73,7 +73,7 @@ class Signal:
         """
         return self.data
 
-    def set_ref(self, ref = None):
+    def set_ref(self, ref=None):
         """ Set the reference signal
         If set_ to None, then signal is a reference signal (Time, Freq)
         """
@@ -102,7 +102,7 @@ class Signal:
         """
         return self.reader
 
-    def update(self, upn, keep = True):
+    def update(self, upn, keep=True):
         """ Update the signal trough the reader
         Do not update if frozen is set_.
         If keep is false, erase points.
@@ -113,7 +113,7 @@ class Signal:
         # Update from the reader
         return self.reader.update(self, upn, keep)
 
-    def freeze(self, frz = None):
+    def freeze(self, frz=None):
         """ Tell to update or not the signal
         """
         if not frz is None:

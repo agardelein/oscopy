@@ -60,11 +60,11 @@ Figure -- Handle a list of graphs
 import matplotlib.pyplot as plt
 from Graphs import Graph
 from Graphs.LinGraphs import LinGraph
-from Graphs.FFTGraph import FFTGraph, IFFTGraph
+#from Graphs.FFTGraph import FFTGraph, IFFTGraph
 
 class Figure:
 
-    def __init__(self, sigs = {}):
+    def __init__(self, sigs={}):
         """ Create a Figure.
         If a signal list is provided, add a graph with the signal list
         By default, create an empty list of graph and set_ the layout to horiz
@@ -79,7 +79,7 @@ class Figure:
         else:
             return
 
-    def add(self, sigs = {}):
+    def add(self, sigs={}):
         """ Add a graph into the figure and set_ it as current graph.
         Up to four graphs can be plotted on the same figure.
         Additionnal attemps are ignored.
@@ -91,7 +91,7 @@ class Figure:
         self.graphs.append(gr)
         self.select(self.graphs.index(gr) + 1)
 
-    def delete(self, num = 1):
+    def delete(self, num=1):
         """ Delete a graph from the figure
         By default, delete the first graph.
         Act as a "pop" with curgraph variable.
@@ -131,7 +131,7 @@ class Figure:
             g.insert(ug)
             g.remove(dg)
 
-    def select(self, gn = 0):
+    def select(self, gn=0):
         """ Select the current graph
         """
         if gn < 1 or gn > len(self.graphs):
@@ -165,7 +165,7 @@ class Figure:
             self.graphs[self.graphs.index(self.curgraph)] = g
             self.curgraph = g
 
-    def set_layout(self, layout = "quad"):
+    def set_layout(self, layout="quad"):
         """ Set the layout of the figure, default is quad
         horiz : graphs are horizontaly aligned
         vert  : graphs are verticaly aligned
@@ -219,7 +219,7 @@ class Figure:
         if self.curgraph is not None:
             self.curgraph.insert(sigs)
 
-    def remove(self, sigs, where = "current"):
+    def remove(self, sigs, where="current"):
         """ Delete a signal from the current graph
         """
         if where == "current":
@@ -236,7 +236,7 @@ class Figure:
             for sn in g.get_sigs():
                 yield sn
 
-    def set_unit(self, xu, yu = ""):
+    def set_unit(self, xu, yu=""):
         """ Set the current graph units
         """
         if self.curgraph is not None:
@@ -248,7 +248,7 @@ class Figure:
         if self.curgraph is not None:
             self.curgraph.set_scale(a)
 
-    def set_range(self, a1 = "reset", a2 = None, a3 = None, a4 = None):
+    def set_range(self, a1="reset", a2=None, a3=None, a4=None):
         """ Set the axis range of the current graph
         """
         if self.curgraph is not None:

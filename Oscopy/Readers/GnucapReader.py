@@ -12,8 +12,14 @@ parenthesis stripped, e.g. v(gs) -> vgs or i(Rd) -> iRd.
 
 Class GnucapReader:
    method:
-   readsigs():
-      Read the signals from a file to gnucap output format.
+   read_sigs():
+   Read the signals from a file to gnucap output format.
+
+   unit_from_probe():
+   Return the unit of the signal deduced from the probe name
+
+   detect():
+   Return true if the file is gnucap format
 """
 
 import re
@@ -21,7 +27,7 @@ from Oscopy.Signal import Signal
 from Reader import Reader
 
 class GnucapReader(Reader):
-    def readsigs(self):
+    def read_sigs(self):
         """ Read the signals from the file
 
         First get_ the signal names from the first line, the abscisse
@@ -46,7 +52,7 @@ class GnucapReader(Reader):
 
         plist = []
         for name in nlist: # Extract signal names
-            u = self.unitfromprobe(name.split('(', 1)[0])
+            u = self.unit_from_probe(name.split('(', 1)[0])
             name = filter(f, name.strip())
             s = Signal(name, self, u)
             self.slist.append(s)
@@ -69,8 +75,13 @@ class GnucapReader(Reader):
             sdict[s.get_name()] = s
         return sdict
 
-    def unitfromprobe(self, pn = ""):
+    def unit_from_probe(self, pn=""):
         """ Return the unit name (un) from the probe name (pn)
+        In Gnucap format, the header has the format:
+        Time|Freq probe(node) probe(node) probe(node)
+        The unit is deduced from the probe name as described in the
+        gnucap documentation:
+        http://www.gnu.org/software/gnucap/gnucap-man-html/gnucap-man046.html
         """
         if pn == "":
             return pn
@@ -95,5 +106,5 @@ class GnucapReader(Reader):
             return False
         s = f.readline()
         f.close()
-        # A better regex which looks at all probe should be better !
+        # A regex which looks at all probe should be better !
         return len(re.findall('^#\w+\s+[\w\(\)]+', s)) > 0

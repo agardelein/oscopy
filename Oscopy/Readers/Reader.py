@@ -12,9 +12,9 @@ Class Reader -- Define the common functions for reader objects
 
    methods:
    read(fi)
-      Check if the file can be opened before calling readsigs(),
+      Check if the file can be opened before calling read_sigs(),
 
-   readsigs()
+   read_sigs()
       To be defined into the derived objects
       Read the signals from the file, fill slist
       and return a dict of the signals, with the signame as key.
@@ -45,7 +45,7 @@ class ReadError:
 
 class Reader:
     """ Reader -- Provide common function for signal file reading
-    The derived class must redefine readsigs() and detect()
+    The derived class must redefine read_sigs() and detect()
     """
     def __init__(self):
         self.fn = ""
@@ -54,13 +54,13 @@ class Reader:
 
     # Certify the path is valid and is a file
     def read(self, fn):
-        """ Check if the path is a valid file and call readsigs
+        """ Check if the path is a valid file and call read_sigs
         """
         self.check(fn)
         self.fn = fn
-        return self.readsigs()
+        return self.read_sigs()
 
-    def readsigs(self):
+    def read_sigs(self):
         """ Read the signal list from the file, fill self.slist
         and return a dict of the signals, with the signal name as a key
         """
@@ -73,7 +73,7 @@ class Reader:
         and update self.slist.
         Update sig, but if unit or reference is not found set_ data to
         None 
-        If readsigs returns nothing (file is deleted or whatever), all
+        If read_sigs returns nothing (file is deleted or whatever), all
         signals are considered deleted
         If signal is not found or either reference or unit changed, de
         Return dict of new signals
@@ -85,7 +85,7 @@ class Reader:
                 for s in self.origsigs.itervalues():
                     s.update(upn, keep)
             oldl = self.slist
-            sigs = self.readsigs()
+            sigs = self.read_sigs()
             # Find new signals
             for sn, s in sigs.iteritems():
                 found = 0

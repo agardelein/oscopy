@@ -1,5 +1,7 @@
 #!/usr/bin/python
-
+"""
+Sample command line application
+"""
 import re
 import readline
 import os.path

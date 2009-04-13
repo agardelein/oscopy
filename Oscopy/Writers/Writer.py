@@ -4,18 +4,18 @@ class Writer -- Define the common functions for writing files
 
    methods:
    write()
-   Do some checks and call writesigs
+   Do some checks and call write_sigs
 
-   writesigs()
+   write_sigs()
    Write signals to files
 
    check()
    Mainly check if file is writable
 
-   fmtcheck()
+   fmt_check()
    Called for format specific check
 
-   get_fmtname()
+   get_fmt_name()
    Return a string containing format name
 
    detect()
@@ -34,7 +34,7 @@ class WriteError:
 
 class Writer:
     """ Writer -- Provide common function for exporting signals into files
-    The derived classes must redefine get_fmtname and writesigs.
+    The derived classes must redefine get_fmt_name and write_sigs.
     """
     def __init__(self):
         self.fn = ""
@@ -42,7 +42,7 @@ class Writer:
         self.opts = {}    # Options passed to write()
 
     def write(self, fn, sigs, opts = {}):
-        """ Do some checks before calling writesigs
+        """ Do some checks before calling write_sigs
         """
         if isinstance(opts, dict):
             self.opts = opts
@@ -52,8 +52,8 @@ class Writer:
                 self.ow = True
             else:
                 self.ow = False
-        if self.check(fn) and self.fmtcheck(sigs):
-            return self.writesigs(sigs)
+        if self.check(fn) and self.fmt_check(sigs):
+            return self.write_sigs(sigs)
         else:
             return False
 
@@ -77,12 +77,12 @@ class Writer:
         self.fn = fn
         return True
 
-    def fmtcheck(self, sigs):
+    def fmt_check(self, sigs):
         """ Format specific checks, to be overridden by derived classes
         """
         return False
 
-    def get_fmtname(self):
+    def get_fmt_name(self):
         """ Return the format name
         """
         return None
@@ -90,7 +90,7 @@ class Writer:
     def detect(self, fmt):
         """ Return True if format fmt is supported
         """
-        if isinstance(fmt, str) and fmt == self.get_fmtname():
+        if isinstance(fmt, str) and fmt == self.get_fmt_name():
             return True
         else:
             return False

@@ -1,7 +1,7 @@
 """ Handle mathematical expressions for signals
 
 In parent class, read validate the path, here validate the expression.
-readsigs() load the signals from file(s) and compute the expression.
+read_sigs() load the signals from file(s) and compute the expression.
 
 Mathematical function are supported through the pylab module. However 
 this module contains a bunch of non-math function, so only the functions
@@ -14,14 +14,14 @@ class MathReader:
    read(f)
    Validate the expression, check if all signals are here.
 
-   readsigs()
+   read_sigs()
    Load the signals from files, and compute the result
 
    missing()
    Return the unrecognized name in the expression
 
    set_origsigs()
-   Store the signals name and their original file to be used in readsigs()
+   Store the signals name and their original file to be used in read_sigs()
 
    check()
    No check to do since no file are used
@@ -38,7 +38,7 @@ from Reader import Reader
 from Oscopy.Signal import Signal
 
 class MathReader(Reader):
-    def __init__(self, sigs = {}):
+    def __init__(self, sigs={}):
         """ Create the object
         """
         self.slist = []
@@ -47,7 +47,7 @@ class MathReader(Reader):
         self.unkwn = []
         Reader.__init__(self)
 
-    def read(self, inp = ""):
+    def read(self, inp=""):
         """ Validate the expression : each word should be in self.sigs
         or math module
         If read failed, return {} and unknown word can be retrieved by
@@ -91,9 +91,9 @@ class MathReader(Reader):
         if len(self.unkwn) > 0:
             return {}
         self.fn = inp
-        return self.readsigs()
+        return self.read_sigs()
 
-    def readsigs(self):
+    def read_sigs(self):
         """ Return a dict with only the signal computed
         The signal is computed here since it can change between two updates
         """
@@ -172,28 +172,24 @@ class MathReader(Reader):
                 _u = "s"
                 _n = "Time"
             # Result is symetric, only take one half
-            _expr += "_len = int(len(_tmp.get_data()) / 2 - 1)" + _endl
-            _expr += "_tmp.set_data(_tmp.get_data()[0:_len])"\
-                + _endl
-            # Compute reference signal
-            _expr += "_delta = abs(_refsig.get_data()[1] \
-- _refsig.get_data()[0]) * len(_refsig.get_data())"\
-                + _endl
-            _expr += "_x = numpy.linspace(0, _len, _len) / _delta" + _endl
-            _expr += "" + _endl
-            _expr += "_refsig = Signal(\"" + _n + "\", self, \"" + _u + "\")"\
-                + _endl
-            _expr += "_refsig.set_data(_x)" + _endl
+            _expr += "_len = int(len(_tmp.get_data()) / 2 - 1)\n\
+_tmp.set_data(_tmp.get_data()[0:_len])\n\
+# Compute reference signal\n\
+_delta = abs(_refsig.get_data()[1] \
+- _refsig.get_data()[0]) * len(_refsig.get_data())\n\
+_x = numpy.linspace(0, _len, _len) / _delta\n"
+            _expr += "_refsig = Signal(\"%s\", self, \"%s\")\n" % (_n, _u)
+            _expr += "_refsig.set_data(_x)\n"
         # If there is a diff, compute also new axis
         if re.search("\\bdiff\\b", fn) is not None:
-            _expr += "_x = numpy.resize(_refsig.get_data(), len(_refsig.get_data()) - 1)" + _endl
-            _expr += "_refsig = Signal(_refsig.get_name(), self, _refsig.get_unit())" + _endl
-            _expr += "_refsig.set_data(_x)" + _endl
-            _expr += "print len(_refsig.get_data())" + _endl
-            _expr += "print len(_tmp.get_data())" + _endl
-        _expr += "_tmp.set_ref(_refsig)" + _endl
-        _expr += "_ret[\"" + _sn + "\"] = _tmp" + _endl
-        _expr += "self.slist.append(_tmp)" + _endl
+            _expr += "_x = numpy.resize(_refsig.get_data(), len(_refsig.get_data()) - 1)\n\
+_refsig = Signal(_refsig.get_name(), self, _refsig.get_unit())\n\
+_refsig.set_data(_x)\n\
+print len(_refsig.get_data())\n\
+print len(_tmp.get_data())"
+        _expr += "_tmp.set_ref(_refsig)\n\
+_ret[\"" + _sn + "\"] = _tmp\n\
+self.slist.append(_tmp)\n"
 
         # Execute the expression
 #        print "Executing:\n---"
@@ -214,7 +210,7 @@ class MathReader(Reader):
         """
         return self.unkwn
 
-    def set_origsigs(self, sigs = {}):
+    def set_origsigs(self, sigs={}):
         """ Update dependency signal dict only if there are missing
         """
         for sn, s in sigs.iteritems():
