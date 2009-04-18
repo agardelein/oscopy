@@ -34,7 +34,7 @@ class FFTGraph(Graph):
         self.sigs = {}
         # Compute FFT for all signals
         for sn, s in origsigs.iteritems():
-            s2 = Signal(sn, None, s.get_unit())
+            s2 = Signal(sn, s.get_unit())
             # Check whether ref sig is Time
             if s.get_ref().get_name() != "Time":
                 print "Warning : ref sig of", s.get_name() ,"is not 'Time'.\
@@ -49,7 +49,7 @@ class FFTGraph(Graph):
                 x.append(i / (abs(s.get_ref().get_data()[1]\
                                       - s.get_ref().get_data()[0])\
                                   * len(s.get_ref().get_data())))
-            s2.set_ref(Signal("Freq", None, "Hz"))
+            s2.set_ref(Signal("Freq", "Hz"))
             s2.get_ref().set_data(x)
             self.sigs[sn] = s2
 
@@ -97,7 +97,7 @@ class IFFTGraph(Graph):
                 x.append(i / (abs(s.get_ref().get_data()[1]\
                                       - s.get_ref().get_data()[0]) \
                                   * len(s.get_ref().get_data())))
-            s2.set_ref(Signal("Time", None, "s"))
+            s2.set_ref(Signal("Time", "s"))
             s2.get_ref().set_data(x)
             self.sigs[sn] = s2
 

@@ -55,7 +55,7 @@ class GnucapReader(Reader, object):
         for name in nlist: # Extract signal names
             u = self.unit_from_probe(name.split('(', 1)[0])
             name = filter(f, name.strip())
-            s = Signal(name, self, u)
+            s = Signal(name, u)
             self.sigs[name] = s
             plist[name] = []
             i_to_name.append(name)

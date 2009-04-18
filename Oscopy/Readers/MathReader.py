@@ -126,7 +126,7 @@ class MathReader(Reader, object):
         _endl = "\n"        # Newline code
         _ret = {}           # Value to be returned
         _sn = fn.split("=", 1)[0].strip()  # Result signal name
-        _expr += "_tmp = Signal(\"" + _sn + "\", self)" + _endl
+        _expr += "_tmp = Signal(\"" + _sn + "\")" + _endl
         for k, s in _sigs.iteritems():
             _expr += s.name + "=" + \
                 "_sigs[\"" + s.name + "\"].get_data()" + _endl
@@ -150,12 +150,12 @@ _tmp.set_data(_tmp.get_data()[0:_len])\n\
 _delta = abs(_refsig.get_data()[1] \
 - _refsig.get_data()[0]) * len(_refsig.get_data())\n\
 _x = numpy.linspace(0, _len, _len) / _delta\n"
-            _expr += "_refsig = Signal(\"%s\", self, \"%s\")\n" % (_n, _u)
+            _expr += "_refsig = Signal(\"%s\", \"%s\")\n" % (_n, _u)
             _expr += "_refsig.set_data(_x)\n"
         # If there is a diff, compute also new axis
         if re.search("\\bdiff\\b", fn) is not None:
             _expr += "_x = numpy.resize(_refsig.get_data(), len(_refsig.get_data()) - 1)\n\
-_refsig = Signal(_refsig.get_name(), self, _refsig.get_unit())\n\
+_refsig = Signal(_refsig.get_name(), _refsig.get_unit())\n\
 _refsig.set_data(_x)\n\
 #print len(_refsig.get_data())\n\
 #print len(_tmp.get_data())"

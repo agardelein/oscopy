@@ -38,7 +38,7 @@ import numpy
 
 # Signals class
 class Signal(object):
-    def __init__(self, name="", reader=None, unit=""):
+    def __init__(self, name="", unit=""):
         if isinstance(name, Signal):
             self.data = name.data
             self.name = name.name
@@ -46,14 +46,12 @@ class Signal(object):
                 self.ref = name.ref
             else:
                 self.ref = Signal(name.ref)
-            self.reader = name.reader
             self.unit = name.unit
             self.frozen = name.frozen
         else:
             self.data = []            # Data points
             self.name = name         # Identifier
             self.ref = None          # Reference signal
-            self.reader = reader     # Reader object
             self.unit = unit         # Unit of the signal
             self.frozen = False      # Flag for update
 
@@ -97,22 +95,6 @@ class Signal(object):
         """
         return self.unit
 
-    def get_reader(self):
-        """ Return the reader
-        """
-        return self.reader
-
-    def update(self, upn, keep=True):
-        """ Update the signal trough the reader
-        Do not update if frozen is set_.
-        If keep is false, erase points.
-        Return a list of new signals
-        """
-        if self.frozen:
-            return {}
-        # Update from the reader
-        return self.reader.update(self, upn, keep)
-
     def freeze(self, frz=None):
         """ Tell to update or not the signal
         """
@@ -122,8 +104,7 @@ class Signal(object):
 
     def __str__(self):
         a = self.name + " / " + (self.ref.name) \
-            + " " + self.unit \
-            + " (" + str(self.reader) + ") "
+            + " " + self.unit
         b = ""
         if len(self.data) > 10:
             for i in range(0, 9):
