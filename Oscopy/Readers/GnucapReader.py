@@ -37,8 +37,8 @@ class GnucapReader(Reader, object):
 
         The whole file is read at once, instead of reading col by col.
         """
-        self.slist = []
-        sdict = {}
+        self.sigs = {}
+#       sigs = {}
         try:
             fil = open(self.fn)
         except IOError:
@@ -50,30 +50,33 @@ class GnucapReader(Reader, object):
             nlist = names.lstrip('#').split()
             break  # Read only the first line
 
-        plist = []
+        plist = {}
+        i_to_name = []
         for name in nlist: # Extract signal names
             u = self.unit_from_probe(name.split('(', 1)[0])
             name = filter(f, name.strip())
             s = Signal(name, self, u)
-            self.slist.append(s)
-            plist.append([])
+            self.sigs[name] = s
+            plist[name] = []
+            i_to_name.append(name)
+            
 
         # Read values and assign to signals
         # First put the points into a table of list
         for vals in fil:
             vallist = vals.split()
             for i, v in enumerate(vallist):
-                plist[i].append(float(v))
+                plist[i_to_name[i]].append(float(v))
         fil.close()
 
         # Assign abscisse to signals
-        ref = self.slist.pop(0)
-        ref.set_data(plist.pop(0))
-        for i, s in enumerate(self.slist):
+        ref = self.sigs.pop(nlist[0])
+        ref.set_data(plist.pop(nlist[0]))
+        for sn, s in self.sigs.iteritems():
             s.set_ref(ref)
-            s.set_data(plist[i])
-            sdict[s.get_name()] = s
-        return sdict
+            s.set_data(plist[sn])
+#            sigs[s.get_name()] = s
+        return self.sigs
 
     def unit_from_probe(self, pn=""):
         """ Return the unit name (un) from the probe name (pn)

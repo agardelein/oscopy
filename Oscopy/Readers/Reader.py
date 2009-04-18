@@ -68,56 +68,65 @@ class Reader(object):
 
     # Re-read the data file
     # Return signal list and names of updated, deleted and new signals
-    def update(self, sig, upn, keep = True):
+    def update(self, upn, keep=True):
         """ On new update requests (upn > self.upn), reread the file
-        and update self.slist.
-        Update sig, but if unit or reference is not found set_ data to
-        None 
+        and update self.sigs.
+        Update signals, but if unit or reference is not found,
+        mark signal as being deleted if keep is False (see below)
         If read_sigs returns nothing (file is deleted or whatever), all
         signals are considered deleted
         If signal is not found or either reference or unit changed, de
+        If keep is False, the signal is marked as being deleted, i.e. its
+        data set to None
         Return dict of new signals
         """
-        n = {}
-        if upn > self.upn:
-            if hasattr(self, "origsigs"):
-                # Update dependencies first
-                for s in self.origsigs.itervalues():
-                    s.update(upn, keep)
-            oldl = self.slist
-            sigs = self.read_sigs()
-            # Find new signals
-            for sn, s in sigs.iteritems():
-                found = 0
-                for os in oldl:
-                    if os.name == sn:
-                        found = 1
-                        break
-                if not found:
-                    n[sn] = s
-            self.upn = upn
-        else:
-            sigs = {}
-            for s in self.slist:
-                sigs[s.name] = s
-        sn = sig.name
-        if sigs.has_key(sn):
-            # Check unit, reference unit, reference name
-            if sigs[sn].get_unit() == sig.get_unit() \
-                    and sigs[sn].get_ref().get_unit() == sig.get_ref().get_unit() \
-                    and sigs[sn].get_ref().get_name() == sig.get_ref().get_name():
-                sig.get_ref().set_data(sigs[sn].get_ref().get_data())
-                sig.set_data(sigs[sn].get_data())
-            else:
-                print "Signal", sn, "not updated: reference or unit has changed"
-                if not keep:
-                    sig.set_data(None)
-                return n
-        else:
-            print "Signal", sn, "not updated: signal name not found"
-            if not keep:
-                sig.set_data(None)
+        if upn <= self.upn:
+            # Already updated
             return {}
+
+        # Save the old list and reread the file
+        oldsigs = self.sigs
+        sigs = self.read_sigs()
+        # Update the old signal dict with new one
+        # Find the new signals, update signals not frozen, mark deleted signals
+        # and for updated signals check whether ref, ref unit or unit
+        # has changed
+        n = {}
+        for sn, s in sigs.iteritems():
+            if sn not in oldsigs:
+                # New signal
+                n[sn] = s
+                oldsigs[sn] = s
+ #               print "New signal:", sn
+            else:
+                if oldsigs[sn].freeze():
+                    # Signal is frozen, no update
+ #                   print sn, "is frozen"
+                    continue
+                os = oldsigs[sn]
+                ns = sigs[sn]
+                if os.get_unit() == ns.get_unit() and \
+                        os.get_ref().get_unit() == ns.get_ref().get_unit() and \
+                        os.get_ref().get_name() == ns.get_ref().get_name():
+                    # Unit, reference unit and reference name are the same so
+                    # Update !
+                    os.get_ref().set_data(ns.get_ref().get_data())
+                    os.set_data(ns.get_data())
+ #                   print os.get_name(), "updated !"
+                else:
+                    # Something changed, do not update
+                    if not keep:
+                        os.set_data(None)
+ #                   print os.get_name(), "not updated: something changed"
+
+        # Find deleted signals, i.e. present in old dict but not in new one
+        for sn, s in oldsigs.iteritems():
+            if sn not in sigs:
+                if not keep:
+                    s.set_data(None)
+ #                   print s.get_name(), "DELETED !"
+        self.upn = upn
+        self.sigs = oldsigs
         return n
 
     def detect(self, fn):

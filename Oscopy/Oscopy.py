@@ -109,6 +109,7 @@ class Oscopy(object):
         self.figs = []
         self.sigs = {}
         self.upn = -1
+        self.sn_to_r = {}
         
     def create(self, sigs):
         """ Create a new figure and set_ it as current
@@ -218,6 +219,7 @@ class Oscopy(object):
         # Insert signals into the dict
         for sn in sigs.keys():
             self.sigs[sn] = sigs[sn]
+            self.sn_to_r[sn] = r
         print fn, ":"
         for s in sigs.itervalues():
             print s
@@ -241,22 +243,39 @@ class Oscopy(object):
             except WriteError, e:
                 print "Write error:", e
 
-    def update(self):
+    def update(self, r=None, upn=-1):
         """ Reread signal from files.
         For each file, reread it, and for updated, new and deleted signal,
         update the signal dict accordingly.
         """
-        self.upn = self.upn + 1
+        n = {}    # New signals
+        if r is None:
+            # Normal call create the new list etc etc
+            self.upn += 1
+            for reader in self.readers.itervalues():
+                print "Updating signals from", reader.fn
+                n.update(self.update(reader, self.upn))
+        else:
+            # First look at its dependencies
+            if hasattr(r, "get_depends") and callable(r.get_depends):
+                for sn in r.get_depends():
+                    print " Updating signals from", self.sn_to_r[sn]
+                    n.update(self.update(self.sn_to_r[sn], self.upn))
+                    # TODO: Update depencies: what happens to vo when
+                    # vout is deleted ? It seems it is not deleted: it should!
+            # Update the reader
+            n.update(r.update(self.upn, keep=False))
+            return n
+
+        # Find deleted signals
         d = []
-        n = {}
-        # Update the signal, the new signals list and sigs to be deleted
         for sn, s in self.sigs.iteritems():
-            n.update(s.update(self.upn, False))
+            #n.update(s.update(self.upn, False))
             if s.get_data() is None:
                 d.append(sn)
         # Insert new signals
         self.sigs.update(n)
-        # Delete signals
+        # Delete signals: first from figure and after from dict
         for sn in d:
             for f in self.figs:
                 f.remove({sn:self.sigs[sn]}, "all")
@@ -371,7 +390,8 @@ class Oscopy(object):
                         print "Signal not generated"
         for sn, s in ss.iteritems():
             self.sigs[sn] = s
-        return
+            self.sn_to_r[sn] = inp
+        self.readers[inp] = r
 
     def signames_to_sigs(self, sns):
         """ Return a signal dict from the signal names list provided

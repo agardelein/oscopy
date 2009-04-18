@@ -116,7 +116,7 @@ class Signal(object):
     def freeze(self, frz=None):
         """ Tell to update or not the signal
         """
-        if isinstance(frz, bool) :
+        if isinstance(frz, bool):
             self.frozen = frz
         return self.frozen
 

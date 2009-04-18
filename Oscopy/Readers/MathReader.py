@@ -68,10 +68,11 @@ class MathReader(Reader, object):
         """ Return a dict with only the signal computed
         The signal is computed here since it can change between two updates
         """
-        if not self.origsigs:
+        if not self.origsigs or not self.validate_origsigs():
             return {}
 
         _sigs = self.origsigs
+        self.sigs = {}
 
         # Check homogeneity of X: signals should have the same abscisse
         first = 1
@@ -156,11 +157,11 @@ _x = numpy.linspace(0, _len, _len) / _delta\n"
             _expr += "_x = numpy.resize(_refsig.get_data(), len(_refsig.get_data()) - 1)\n\
 _refsig = Signal(_refsig.get_name(), self, _refsig.get_unit())\n\
 _refsig.set_data(_x)\n\
-print len(_refsig.get_data())\n\
-print len(_tmp.get_data())"
+#print len(_refsig.get_data())\n\
+#print len(_tmp.get_data())"
         _expr += "_tmp.set_ref(_refsig)\n\
 _ret[\"%s\"] = _tmp\n\
-self.slist.append(_tmp)\n" % _sn
+self.sigs[\"%s\"] = _tmp\n" % (_sn, _sn)
 
         # Execute the expression
 #        print "Executing:\n---"
@@ -188,6 +189,10 @@ self.slist.append(_tmp)\n" % _sn
             if sn in self.unkwn:
                 self.origsigs.update({sn:s})
 
+    def get_depends(self):
+        """ Return the list of signal names dependencies """
+        return self.origsigs.keys()
+
     def check(self, fn):
         """ No file are needed, so no access problems !
         """
@@ -200,21 +205,22 @@ self.slist.append(_tmp)\n" % _sn
             return True
         else:
             return False
+
     def validate_expr(self, inp=""):
         """ Validate the expression
         Parse the expression if a word is not rocognized,
         add it to self.unkwn
         """
-        l=re.findall(r"(?i)\b[a-z0-9]*", inp.split("=")[1])
-        vs = self.origsigs.keys()
         # Allow Time and Freq keywords
         tf = ["Time", "Freq"]
+
         self.unkwn = []
-        for e in l:
+        words = re.findall(r"(?i)\b[a-z0-9]*", inp.split("=")[1])
+        for e in words:
             if e == "":
                 # Nothing to evaluate
                 continue
-            if e in vs:
+            if e in self.origsigs.keys():
                 # Into the signal list
                 continue
             elif e in dir(math):
@@ -239,3 +245,11 @@ self.slist.append(_tmp)\n" % _sn
                 continue
 
         return len(self.unkwn) < 1
+
+    def validate_origsigs(self):
+        """ Return True if all the signals are valid, i.e. data is not None
+        """
+        for sn, s in self.origsigs.iteritems():
+            if s.get_data() is None or s.get_ref().get_data() is None:
+                return False
+        return True

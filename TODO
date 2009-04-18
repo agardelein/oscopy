@@ -5,3 +5,11 @@ To be fixed :
 
 To be added :
 Support for HDF5
+Make Signal derive from numpy.array
+Use property()
+
+Update: Reader.update() will set the deleted signals data to None and
+delete them from its list
+then go through the signal list and delete the signals from the list
+Then graphs are asked to remove deleted signals.
+Thus all references to delete signals are removed
