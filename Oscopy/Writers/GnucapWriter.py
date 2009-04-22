@@ -1,3 +1,4 @@
+from __future__ import with_statement
 """ Export signals to Gnucap format
 
 class GnucapWriter -- Handle gnucap format
@@ -15,6 +16,7 @@ class GnucapWriter -- Handle gnucap format
    Convert signal name to gnucap format e.g. vgs -> v(gs)
 """
 
+import itertools
 from Writer import Writer
 
 class GnucapWriter(Writer, object):
@@ -58,71 +60,34 @@ class GnucapWriter(Writer, object):
         columns line by line.
 
         Gnucap format is (tab separated):
-        Time|Freq v(x) v(y) v(aa) ...
+        #Time|Freq v(x) v(y) v(aa) ...
         1.234   1.234   1.234  1.234
         1.234   1.234   1.234  1.234
         1.234   1.234   1.234  1.234
         ...
 
-        A for loop is build to have the following string, (then run by exec()):
-        _f.write("#" + "Time" + _sep + "v(x)" + _sep + ...)
-        for Time, x, y, z, ... in zip(sigs["x"].ref.data, \
-                           sigs['x'].data, \
-                           sigs['y'].data, \
-                           sigs['z'].data, \
-                           ...
-                           ):
-            _f.write(Time + _sep + x + _sep + y + _sep + z ...)
-        h contains the header writing line
-        f contains the for variable names
-        z contains the zip variables
-        d contains the data writing line
         """
-        _sep = "\t"
-#        print "Writing gnucap file"
+        SEPARATOR = '\t'
         # Overwrite file or not
         self.ow = True
         if self.ow:
             mode = "w"
         else:
             mode = "a"
-#        print self.fn
-        _f = open(self.fn, mode)
-        if _f is None:
-            print "Oops"
-            return
-        first = 0
-        for sn, s in sigs.iteritems():
-            if not first:
-                first = 1
-                # Variable names, beginning of for
-                f = "for %s, %s" % (s.ref.name, sn)
-                # Zip part
-                z = "in zip(sigs[\"%s\"].ref.data" % sn
-                z += ", sigs[\"%s\"].data" % sn
-                # Header
-                h = "_f.write(\"#\" + \"%s\" + _sep + \"%s\"" % \
-                    (self.format_sig_name(s.ref.name), \
-                    self.format_sig_name(s.name))
-                # Data line, float conversion to get 1.234 instead of 1,234
-                d = "\t_f.write(str(float(%s)) + _sep + str(float(%s))" % \
-                    (s.ref.name, sn)
-            else:
-                f += ", %s" % sn 
-                z += ", sigs[\"%s\"].data" % sn
-                h += " + _sep + \"%s\"" % self.format_sig_name(s.name)
-                # Float conversion to get_ 1.234 instead of 1,234
-                d += " + _sep + str(float(%s))" % sn
-        h += " + \"\\n\")\n"
-        f += " "
-        z += "):\n"
-        d += "+\"\\n\")\n"
-        _expr = h + f + z + d
-#        print _expr
-        del h, f, z, d, first, mode
-        exec(_expr)
-        _f.close()
-        return
+
+        # construct a list of signals, with the reference signal first
+        s = sigs.values()
+        s.insert(0, s[0].ref)
+
+        with open(self.fn, mode) as f:
+            # write the header
+            names = map(self.format_sig_name, map(lambda x: x.name, s))
+            f.write('#%s\n' % SEPARATOR.join(names))
+
+            # write the data
+            data = (iter(x.data) for x in s)
+            for x in itertools.izip(*tuple(data)):
+                f.write('%s\n' % SEPARATOR.join(map(str, x)))
 
     def format_sig_name(self, sn):
         """ Add parenthesis in the signal name to be compatible
