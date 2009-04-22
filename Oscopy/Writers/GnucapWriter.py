@@ -23,6 +23,15 @@ class GnucapWriter(Writer, object):
     """ Write signals to columns tab separated format used by Gnucap
     Signals should have the same reference
     """
+
+    def __init__(self):
+        super(GnucapWriter, self).__init__()
+        self._prefixes = ['v', 'vout', 'vin', 'i', 'p', 'nv', 'ev', 'r', 'y',
+                          'z', 'zraw', 'pd', 'ps', 'f', 'input', 'ioffset_',
+                          'ipassive', 'pi', 'pidb', 'pm', 'pmdb', 'pp']
+        self._prefixes.sort()
+        self._prefixes.reverse()
+
     def get_fmt_name(self):
         """ Return the format name
         """
@@ -72,17 +81,12 @@ class GnucapWriter(Writer, object):
             for x in itertools.izip(*tuple(data)):
                 f.write('%s\n' % SEPARATOR.join(map(str, x)))
 
-    def format_sig_name(self, sn):
+    def format_sig_name(self, name):
         """ Add parenthesis in the signal name to be compatible
         with gnucap format
         """
-        l = ['v', 'vout', 'vin', 'i', 'p', 'nv', 'ev', 'r', 'y',\
-                 'z', 'zraw', 'pd', 'ps', 'f', 'input', 'ioffset_',\
-                 'ipassive', 'pi', 'pidb', 'pm', 'pmdb', 'pp']
-        l.sort()
-        l.reverse()
-        for n in l:
-            if sn.startswith(n):
-                return n + '(' + sn.replace(n, '', 1) + ')'
-                break
-        return sn
+        for p in self._prefixes:
+            if name.startswith(p):
+                return '%s(%s)' % (p, name.replace(p, '', 1))
+        return name
+
