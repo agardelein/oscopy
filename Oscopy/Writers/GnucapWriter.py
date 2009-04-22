@@ -41,8 +41,8 @@ class GnucapWriter(Writer, object):
                 else:
                     # Ugly but == on array returns an array of bool
                     # how to find a False into this ?
-                    for a, b in zip(s.get_ref().get_data(), \
-                                        prevs.get_ref().get_data()):
+                    for a, b in zip(s.ref.data, \
+                                        prevs.ref.data):
                         if a == b:
                             continue
                         else:
@@ -66,10 +66,10 @@ class GnucapWriter(Writer, object):
 
         A for loop is build to have the following string, (then run by exec()):
         _f.write("#" + "Time" + _sep + "v(x)" + _sep + ...)
-        for Time, x, y, z, ... in zip(sigs["x"].get_ref().get_data(), \
-                           sigs['x'].get_data(), \
-                           sigs['y'].get_data(), \
-                           sigs['z'].get_data(), \
+        for Time, x, y, z, ... in zip(sigs["x"].ref.data, \
+                           sigs['x'].data, \
+                           sigs['y'].data, \
+                           sigs['z'].data, \
                            ...
                            ):
             _f.write(Time + _sep + x + _sep + y + _sep + z ...)
@@ -96,21 +96,21 @@ class GnucapWriter(Writer, object):
             if not first:
                 first = 1
                 # Variable names, beginning of for
-                f = "for %s, %s" % (s.get_ref().get_name(), sn)
+                f = "for %s, %s" % (s.ref.name, sn)
                 # Zip part
-                z = "in zip(sigs[\"%s\"].get_ref().get_data()" % sn
-                z += ", sigs[\"%s\"].get_data()" % sn
+                z = "in zip(sigs[\"%s\"].ref.data" % sn
+                z += ", sigs[\"%s\"].data" % sn
                 # Header
                 h = "_f.write(\"#\" + \"%s\" + _sep + \"%s\"" % \
-                    (self.format_sig_name(s.get_ref().get_name()), \
-                    self.format_sig_name(s.get_name()))
+                    (self.format_sig_name(s.ref.name), \
+                    self.format_sig_name(s.name))
                 # Data line, float conversion to get 1.234 instead of 1,234
                 d = "\t_f.write(str(float(%s)) + _sep + str(float(%s))" % \
-                    (s.get_ref().get_name(), sn)
+                    (s.ref.name, sn)
             else:
                 f += ", %s" % sn 
-                z += ", sigs[\"%s\"].get_data()" % sn
-                h += " + _sep + \"%s\"" % self.format_sig_name(s.get_name())
+                z += ", sigs[\"%s\"].data" % sn
+                h += " + _sep + \"%s\"" % self.format_sig_name(s.name)
                 # Float conversion to get_ 1.234 instead of 1,234
                 d += " + _sep + str(float(%s))" % sn
         h += " + \"\\n\")\n"

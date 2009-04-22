@@ -105,26 +105,26 @@ class Reader(object):
                     continue
                 os = oldsigs[sn]
                 ns = sigs[sn]
-                if os.get_unit() == ns.get_unit() and \
-                        os.get_ref().get_unit() == ns.get_ref().get_unit() and \
-                        os.get_ref().get_name() == ns.get_ref().get_name():
+                if os.unit == ns.unit and \
+                        os.ref.unit == ns.ref.unit and \
+                        os.ref.name == ns.ref.name:
                     # Unit, reference unit and reference name are the same so
                     # Update !
-                    os.get_ref().set_data(ns.get_ref().get_data())
-                    os.set_data(ns.get_data())
- #                   print os.get_name(), "updated !"
+                    os.ref.data = ns.ref.data
+                    os.data = ns.data
+ #                   print os.name, "updated !"
                 else:
                     # Something changed, do not update
                     if not keep:
-                        os.set_data(None)
- #                   print os.get_name(), "not updated: something changed"
+                        os.data = None
+ #                   print os.name, "not updated: something changed"
 
         # Find deleted signals, i.e. present in old dict but not in new one
         for sn, s in oldsigs.iteritems():
             if sn not in sigs:
                 if not keep:
-                    s.set_data(None)
- #                   print s.get_name(), "DELETED !"
+                    s.data = None
+ #                   print s.name, "DELETED !"
         self.upn = upn
         self.sigs = oldsigs
         return n

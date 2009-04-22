@@ -34,23 +34,23 @@ class FFTGraph(Graph):
         self.sigs = {}
         # Compute FFT for all signals
         for sn, s in origsigs.iteritems():
-            s2 = Signal(sn, s.get_unit())
+            s2 = Signal(sn, s.unit)
             # Check whether ref sig is Time
-            if s.get_ref().get_name() != "Time":
-                print "Warning : ref sig of", s.get_name() ,"is not 'Time'.\
+            if s.ref.name != "Time":
+                print "Warning : ref sig of", s.name ,"is not 'Time'.\
  I hope you know what you do !"
             # Do a fft
-            y = numpy.fft.fft(s.get_data())
+            y = numpy.fft.fft(s.data)
             y = y[0:int(len(y)/2)-1]
-            s2.set_data(y)
+            s2.data = y
             # Change the ref sig from Time to Freq
             x = []
             for i in range(0, len(y)):
-                x.append(i / (abs(s.get_ref().get_data()[1]\
-                                      - s.get_ref().get_data()[0])\
-                                  * len(s.get_ref().get_data())))
-            s2.set_ref(Signal("Freq", "Hz"))
-            s2.get_ref().set_data(x)
+                x.append(i / (abs(s.ref.data[1]\
+                                      - s.ref.data[0])\
+                                  * len(s.ref.data)))
+            s2.ref = Signal("Freq", "Hz")
+            s2.ref.data = x
             self.sigs[sn] = s2
 
         self.xunit = "Hz"
@@ -84,21 +84,21 @@ class IFFTGraph(Graph):
         for sn, s in origsigs.iteritems():
             # Check whether ref sig is Freq
             s2 = Signal(s)
-            if s.get_ref().get_name() != "Freq":
-                print "Warning : ref sig of", s.get_name() ,"is not 'Freq'.\
+            if s.ref.name != "Freq":
+                print "Warning : ref sig of", s.name ,"is not 'Freq'.\
  I hope you know what you do !"
             # Do a inverse fft
-            y = numpy.fft.ifft(s.get_data())
+            y = numpy.fft.ifft(s.data)
             y = y[0:int(len(y)/2)-1]
-            s2.set_data(y)
+            s2.data = y
             # Change the ref sig from Time to Freq
             x = []
             for i in range(0, len(y)):
-                x.append(i / (abs(s.get_ref().get_data()[1]\
-                                      - s.get_ref().get_data()[0]) \
-                                  * len(s.get_ref().get_data())))
-            s2.set_ref(Signal("Time", "s"))
-            s2.get_ref().set_data(x)
+                x.append(i / (abs(s.ref.data[1]\
+                                      - s.ref.data[0]) \
+                                  * len(s.ref.data)))
+            s2.ref = Signal("Time", "s")
+            s2.ref.data = x
             self.sigs[sn] = s2
 
         self.xunit = "s"

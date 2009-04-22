@@ -109,13 +109,13 @@ may lead to uncertain results"
         for sn, s in sigs.iteritems():
             if not self.sigs:
                 # First signal, set_ the abscisse name and add signal
-                self.xaxis = s.get_ref().get_name()
-                self.xunit = s.get_ref().get_unit()
+                self.xaxis = s.ref.name
+                self.xunit = s.ref.unit
                 self.yaxis = "Signals"  # To change
-                self.yunit = s.get_unit()
+                self.yunit = s.unit
                 self.sigs[sn] = s
             else:
-                if s.get_ref().get_name() == self.xaxis:
+                if s.ref.name == self.xaxis:
                     # Add signal
                     self.sigs[sn] = s
                 else:
@@ -159,8 +159,8 @@ may lead to uncertain results"
         ax.hold(True)
         for sn, s in self.sigs.iteritems():
             # Scaling factor
-            x = s.get_ref().get_data() * pow(10, fx)
-            y = s.get_data() * pow(10, fy)
+            x = s.ref.data * pow(10, fx)
+            y = s.data * pow(10, fy)
             try:
                 self.plotf(x, y, label=sn)
             except OverflowError, e:
@@ -207,11 +207,11 @@ may lead to uncertain results"
 
         for s in self.sigs.itervalues():
             if a == "X":
-                mxs.append(max(s.get_ref().get_data()))
-                mns.append(min(s.get_ref().get_data()))
+                mxs.append(max(s.ref.data))
+                mns.append(min(s.ref.data))
             else:
-                mxs.append(max(s.get_data()))
-                mns.append(min(s.get_data()))
+                mxs.append(max(s.data))
+                mns.append(min(s.data))
         mx = abs(max(mxs))
         mn = abs(min(mns))
         mx = max(mx, mn)

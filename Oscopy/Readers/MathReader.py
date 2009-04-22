@@ -79,9 +79,9 @@ class MathReader(Reader, object):
         inval = []
         for k, s in _sigs.iteritems():
             if first:
-                _refname = s.get_ref().get_name()
-                _refdata = s.get_ref().get_data()
-                _refsig = s.get_ref()
+                _refname = s.ref.name
+                _refdata = s.ref.data
+                _refsig = s.ref
                 first = 0
             else:
                 # Check name
@@ -89,10 +89,10 @@ class MathReader(Reader, object):
                     inval.append(k)
                     continue
                 # Check values
-                if len(_refdata) != len(s.get_ref().get_data()):
+                if len(_refdata) != len(s.ref.data):
                     inval.append(k)
                     continue
-                for vref, v in zip(_refdata, s.get_ref().get_data()):
+                for vref, v in zip(_refdata, s.ref.data):
                     if vref != v:
                         inval.append(k)
                         break
@@ -129,9 +129,9 @@ class MathReader(Reader, object):
         _expr += "_tmp = Signal(\"" + _sn + "\")" + _endl
         for k, s in _sigs.iteritems():
             _expr += s.name + "=" + \
-                "_sigs[\"" + s.name + "\"].get_data()" + _endl
+                "_sigs[\"" + s.name + "\"].data" + _endl
         _expr += fn + _endl
-        _expr += "_tmp.set_data("+ _sn +")" + _endl
+        _expr += "_tmp.data = " + _sn + _endl
         # If there is an fft or ifft, compute new axis
         if re.search("\\bfft\\b", fn) is not None\
                 or re.search("\\bifft\\b", fn) is not None:
@@ -144,22 +144,22 @@ class MathReader(Reader, object):
                 _u = "s"
                 _n = "Time"
             # Result is symetric, only take one half
-            _expr += "_len = int(len(_tmp.get_data()) / 2 - 1)\n\
-_tmp.set_data(_tmp.get_data()[0:_len])\n\
+            _expr += "_len = int(len(_tmp.data) / 2 - 1)\n\
+_tmp.data = _tmp.data[0:_len]\n\
 # Compute reference signal\n\
-_delta = abs(_refsig.get_data()[1] \
-- _refsig.get_data()[0]) * len(_refsig.get_data())\n\
+_delta = abs(_refsig.data[1] \
+- _refsig.data[0]) * len(_refsig.data)\n\
 _x = numpy.linspace(0, _len, _len) / _delta\n"
             _expr += "_refsig = Signal(\"%s\", \"%s\")\n" % (_n, _u)
-            _expr += "_refsig.set_data(_x)\n"
+            _expr += "_refsig.data = _x\n"
         # If there is a diff, compute also new axis
         if re.search("\\bdiff\\b", fn) is not None:
-            _expr += "_x = numpy.resize(_refsig.get_data(), len(_refsig.get_data()) - 1)\n\
-_refsig = Signal(_refsig.get_name(), _refsig.get_unit())\n\
-_refsig.set_data(_x)\n\
-#print len(_refsig.get_data())\n\
-#print len(_tmp.get_data())"
-        _expr += "_tmp.set_ref(_refsig)\n\
+            _expr += "_x = numpy.resize(_refsig.data, len(_refsig.data) - 1)\n\
+_refsig = Signal(_refsig.name, _refsig.unit)\n\
+_refsig.data = _x\n\
+#print len(_refsig.data)\n\
+#print len(_tmp.data)"
+        _expr += "_tmp.ref = _refsig\n\
 _ret[\"%s\"] = _tmp\n\
 self.sigs[\"%s\"] = _tmp\n" % (_sn, _sn)
 
@@ -250,6 +250,6 @@ self.sigs[\"%s\"] = _tmp\n" % (_sn, _sn)
         """ Return True if all the signals are valid, i.e. data is not None
         """
         for sn, s in self.origsigs.iteritems():
-            if s.get_data() is None or s.get_ref().get_data() is None:
+            if s.data is None or s.ref.data is None:
                 return False
         return True

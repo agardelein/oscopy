@@ -40,60 +40,62 @@ import numpy
 class Signal(object):
     def __init__(self, name="", unit=""):
         if isinstance(name, Signal):
-            self.data = name.data
-            self.name = name.name
+            self._data = name._data
+            self._name = name._name
             if name.ref is None:
-                self.ref = name.ref
+                self._ref = name._ref
             else:
-                self.ref = Signal(name.ref)
-            self.unit = name.unit
+                self._ref = Signal(name._ref)
+            self._unit = name._unit
             self.frozen = name.frozen
         else:
-            self.data = []            # Data points
-            self.name = name         # Identifier
-            self.ref = None          # Reference signal
-            self.unit = unit         # Unit of the signal
+            self._data = []            # Data points
+            self._name = name         # Identifier
+            self._ref = None          # Reference signal
+            self._unit = unit         # Unit of the signal
             self.frozen = False      # Flag for update
 
     def set_data(self, data=[]):
         """ Set the data points of the signal
         """
         if data is None:
-            self.data = data
+            self._data = data
         elif len(data) > 0 :
             if isinstance(data, list):
-                self.data = numpy.array(data)
+                self._data = numpy.array(data)
             elif isinstance(data, numpy.ndarray):
-                self.data = data
+                self._data = data
 
     def get_data(self):
         """ Return the list of point of the signal
         """
-        return self.data
+        return self._data
 
     def set_ref(self, ref=None):
         """ Set the reference signal
         If set_ to None, then signal is a reference signal (Time, Freq)
         """
         if ref is None or isinstance(ref, Signal):
-            self.ref = ref
+            self._ref = ref
         else:
             return
 
     def get_ref(self):
         """ Return the reference signal
         """
-        return self.ref
+        return self._ref
 
-    def get_name(self):
+    @property
+    def name(self):
         """ Return the signal name
         """
-        return self.name
+        return self._name
 
-    def get_unit(self):
+    @property
+    def unit(self):
         """ Return the unit of the signal
         """
-        return self.unit
+        return self._unit
 
     def freeze(self, frz=None):
         """ Tell to update or not the signal
@@ -103,10 +105,13 @@ class Signal(object):
         return self.frozen
 
     def __str__(self):
-        a = self.name + " / " + (self.ref.name) \
-            + " " + self.unit
+        a = self._name + " / " + (self._ref.name) \
+            + " " + self._unit
         b = ""
-        if len(self.data) > 10:
+        if len(self._data) > 10:
             for i in range(0, 9):
-                b = b + str(self.data[i]) + "|"
+                b = b + str(self._data[i]) + "|"
         return a
+
+    ref = property(get_ref, set_ref)
+    data = property(get_data, set_data)

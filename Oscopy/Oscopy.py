@@ -271,7 +271,7 @@ class Oscopy(object):
         d = []
         for sn, s in self.sigs.iteritems():
             #n.update(s.update(self.upn, False))
-            if s.get_data() is None:
+            if s.data is None:
                 d.append(sn)
         # Insert new signals
         self.sigs.update(n)

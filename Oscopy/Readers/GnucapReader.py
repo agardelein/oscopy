@@ -71,11 +71,11 @@ class GnucapReader(Reader, object):
 
         # Assign abscisse to signals
         ref = self.sigs.pop(nlist[0])
-        ref.set_data(plist.pop(nlist[0]))
+        ref.data = plist.pop(nlist[0])
         for sn, s in self.sigs.iteritems():
-            s.set_ref(ref)
-            s.set_data(plist[sn])
-#            sigs[s.get_name()] = s
+            s.ref = ref
+            s.data = plist[sn]
+#            sigs[s.name] = s
         return self.sigs
 
     def unit_from_probe(self, pn=""):
