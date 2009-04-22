@@ -33,26 +33,9 @@ class GnucapWriter(Writer, object):
         """
         if not sigs:
             return False
-        elif len(sigs) > 1:
-            # More than one signal, compare reference signals
-            prevs = None
-            for s in sigs.itervalues():
-                if prevs is None:
-                    # First iteration
-                    prevs = s
-                else:
-                    # Ugly but == on array returns an array of bool
-                    # how to find a False into this ?
-                    for a, b in zip(s.ref.data, \
-                                        prevs.ref.data):
-                        if a == b:
-                            continue
-                        else:
-                            return False
-            return True
-        else:
-            # Only one signal, do not need to compare the reference
-            return True
+
+        ref = sigs.values()[0].ref
+        return all(s.ref is ref for s in sigs.itervalues())
 
     def write_sigs(self, sigs):
         """ Write signals to file
