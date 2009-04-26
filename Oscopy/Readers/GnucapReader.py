@@ -28,6 +28,12 @@ from Oscopy.Signal import Signal
 from Reader import Reader
 
 class GnucapReader(Reader, object):
+    # A dictionary mapping gnucap probe names to units.
+    # For now only element probes.
+    PROBE_UNITS = {"v":"V", "vout":"V", "vin":"V", "i":"A", "p":"W",
+                   "nv":"", "ev":"", "r":"Ohms", "y":"S",
+                   "Time":"s", "Freq":"Hz"}
+
     def read_sigs(self):
         """ Read the signals from the file
 
@@ -70,25 +76,15 @@ class GnucapReader(Reader, object):
         self.sigs = dict(zip(names[1:], signals[1:]))
         return self.sigs
 
-    def unit_from_probe(self, pn=""):
-        """ Return the unit name (un) from the probe name (pn)
+    def unit_from_probe(self, probe_name):
+        """ Return the unit name from the probe name
         In Gnucap format, the header has the format:
         Time|Freq probe(node) probe(node) probe(node)
         The unit is deduced from the probe name as described in the
         gnucap documentation:
         http://www.gnu.org/software/gnucap/gnucap-man-html/gnucap-man046.html
         """
-        if not pn:
-            return pn
-
-        # For now only element probe
-        uns = {"v":"V", "vout":"V", "vin":"V", "i":"A", "p":"W",\
-                   "nv":"", "ev":"", "r":"Ohms", "y":"S",\
-                   "Time":"s", "Freq":"Hz"}
-        if uns.has_key(pn):
-            return uns[pn]
-        else:
-            return ""
+        return GnucapReader.PROBE_UNITS.get(probe_name, '')
 
     def detect(self, fn):
         """ Look at the header, if it if something like
