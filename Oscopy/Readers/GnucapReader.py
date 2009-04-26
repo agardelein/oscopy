@@ -1,3 +1,4 @@
+from __future__ import with_statement
 """ Read gnucap output files
 
 Gnucap files are ordered by columns, one signal by column.
@@ -30,52 +31,43 @@ class GnucapReader(Reader, object):
     def read_sigs(self):
         """ Read the signals from the file
 
-        First get_ the signal names from the first line, the abscisse
-        is the first column
-        Then read the values and assign them to the signals.
-        Finally, assign the abscisse to each signal.
-
-        The whole file is read at once, instead of reading col by col.
+        First get the signal names from the first line, the abscisse
+        is the first column.
+        Then read the data values, and finally, assign the abscisse and
+        data to each signal.
         """
-        self.sigs = {}
-#       sigs = {}
-        try:
-            fil = open(self.fn)
-        except IOError:
-            return {}
+        units = []
+        names = []
+        signals = []
 
-        # Get signal names from first line, remove leading "#"
-        def f(c): return c != "(" and c != ")" # remove ()
-        for names in fil:
-            nlist = names.lstrip('#').split()
-            break  # Read only the first line
+        with open(self.fn) as f:
+            lines = iter(f)
 
-        plist = {}
-        i_to_name = []
-        for name in nlist: # Extract signal names
-            u = self.unit_from_probe(name.split('(', 1)[0])
-            name = filter(f, name.strip())
-            s = Signal(name, u)
-            self.sigs[name] = s
-            plist[name] = []
-            i_to_name.append(name)
-            
+            # read signal names
+            first_line = lines.next()
+            for x in first_line.lstrip('#').split():
+                unit = self.unit_from_probe(x.split('(', 1)[0])
+                units.append(unit)
+                name = x.replace('(', '').replace(')', '')
+                names.append(name)
+                signals.append(Signal(name, unit))
 
-        # Read values and assign to signals
-        # First put the points into a table of list
-        for vals in fil:
-            vallist = vals.split()
-            for i, v in enumerate(vallist):
-                plist[i_to_name[i]].append(float(v))
-        fil.close()
+            # read values
+            data = [[] for x in xrange(len(names))]
+            # optimization: cache the append methods,
+            # avoiding one dictionary lookup per line
+            append = [x.append for x in data]
+            for values in lines:
+                for i, val in enumerate(values.split()):
+                    append[i](float(val))
 
-        # Assign abscisse to signals
-        ref = self.sigs.pop(nlist[0])
-        ref.data = plist.pop(nlist[0])
-        for sn, s in self.sigs.iteritems():
+        ref = signals[0]
+        ref.data = data[0]
+        for i, s in enumerate(signals[1:]):
             s.ref = ref
-            s.data = plist[sn]
-#            sigs[s.name] = s
+            s.data = data[i]
+
+        self.sigs = dict(zip(names[1:], signals[1:]))
         return self.sigs
 
     def unit_from_probe(self, pn=""):
