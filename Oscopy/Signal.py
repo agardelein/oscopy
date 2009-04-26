@@ -105,13 +105,8 @@ class Signal(object):
         return self.frozen
 
     def __str__(self):
-        a = self._name + " / " + (self._ref.name) \
-            + " " + self._unit
-        b = ""
-        if len(self._data) > 10:
-            for i in range(0, 9):
-                b = b + str(self._data[i]) + "|"
-        return a
+        ref_name = self.ref.name if self.ref else '(no reference)'
+        return '%s / %s %s' % (self.name, ref_name, self.unit)
 
     ref = property(get_ref, set_ref)
     data = property(get_data, set_data)
