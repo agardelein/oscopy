@@ -19,7 +19,7 @@ class GnucapWriter -- Handle gnucap format
 import itertools
 from Writer import Writer
 
-class GnucapWriter(Writer, object):
+class GnucapWriter(Writer):
     """ Write signals to columns tab separated format used by Gnucap
     Signals should have the same reference
     """

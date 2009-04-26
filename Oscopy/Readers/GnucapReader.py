@@ -27,7 +27,7 @@ import re
 from Oscopy.Signal import Signal
 from Reader import Reader
 
-class GnucapReader(Reader, object):
+class GnucapReader(Reader):
     # A dictionary mapping gnucap probe names to units.
     # For now only element probes.
     PROBE_UNITS = {"v":"V", "vout":"V", "vin":"V", "i":"A", "p":"W",

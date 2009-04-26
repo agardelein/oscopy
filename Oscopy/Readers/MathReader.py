@@ -40,7 +40,7 @@ import sys
 from Reader import Reader
 from Oscopy.Signal import Signal
 
-class MathReader(Reader, object):
+class MathReader(Reader):
     def __init__(self, sigs={}):
         """ Create the object
         """
