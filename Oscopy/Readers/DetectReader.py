@@ -8,25 +8,17 @@ from Reader import ReadError
 from GnucapReader import GnucapReader
 from MathReader import MathReader
 
-rds = ["GnucapReader", "MathReader"]
+READERS = [GnucapReader, MathReader]
 
-def DetectReader(fn):
-    """ Return a reader object on the file
+def DetectReader(filename):
+    """ Return a reader object
     """
-    if not isinstance(fn, str):
-        return None
-    endl = "\n"
-    excpt = None
-    for rd in rds:
-        s = "tmp = " + rd + "()" + endl \
-            + "res = tmp.detect(fn)"
+    for reader in READERS:
+        r = reader()
         try:
-            exec(s)
-        except ReadError, e:
-            excpt = e
-            continue
-        if res == True:
-            return tmp
-    if excpt is not None:
-        raise excpt
+            if r.detect(filename):
+                return r
+        except ReadError:
+            pass
     return None
+

@@ -205,12 +205,8 @@ class Oscopy(object):
         if fn in self.readers.keys():
             print "File already loaded"
             return
-        try:
-            r = DetectReader(fn)
-        except ReadError, e:
-            print "Read error:", e
-            return
 
+        r = DetectReader(fn)
         if r is None:
             print "File format unknown"
             return
