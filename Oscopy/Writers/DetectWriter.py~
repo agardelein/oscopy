@@ -1,6 +1,0 @@
-""" Automagical detection of Writer to use
-
-DetectWriter(fmt)
-Automagically return a Writer to use for file writing
-
-"""
