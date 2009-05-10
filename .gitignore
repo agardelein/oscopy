@@ -1,3 +1,7 @@
 *~
 *.pyc
-
+doc/manual/tex/auto/*
+*.dat
+*.log
+*#
+*.pdf
