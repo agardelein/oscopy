@@ -11,13 +11,18 @@
      "sec:viewinter"
      "fig:viewinter"
      "sec:sigs"
+     "tab:sigs:props"
      "sec:readers"
      "sec:writers"
      "sec:graphs"
      "sec:figs"
      "sec:curs"
      "sec:ext")
+    (TeX-add-symbols
+     '("att" 1)
+     "sig")
     (TeX-run-style-hooks
+     "wasysym"
      "graphicx"
      "a4wide"
      "babel"

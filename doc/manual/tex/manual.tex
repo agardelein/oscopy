@@ -3,6 +3,10 @@
 \usepackage[english]{babel}
 \usepackage{a4wide}
 \usepackage{graphicx}
+\usepackage{wasysym}
+
+\newcommand{\att}[1]{\texttt{#1}}
+\newcommand{\sig}{\textsf{Signal}}
 
 \title{{\sc Oscopy}\\An interactive program for viewing electrical simulation results\\Manual}
 \author{Arnaud Gardelein}
@@ -59,7 +63,7 @@ Thus the program interacts with two entities:
 \item the data
 \end{enumerate}
 The results are considered to be a list of point representing an electrical signal property (amplitude, intensity, power...).
-In the following, results, data and signals appellation are used indifferently.
+In the following, results, data and signals appellations are used indifferently.
 
 \begin{figure}[htbp]
   \centering
@@ -101,16 +105,16 @@ Results examination mode contains operations:
 \label{sec:fileinter}
 Oscopy can import and export signals to files.
 This is done through the use of Reader-derived objects for import and Writer-derived objects for export.
-Reader parse the file and create as many Signal as needed, and transmit a dict of Signals to Oscopy.
+Reader parse the file and create as many \sig\ as needed, and transmit a dict of \sig s to Oscopy.
 
-For export, Oscopy transmit a dict of Signals to the Writer object, which write the data to the file in the desired format.
+For export, Oscopy transmit a dict of \sig s to the Writer object, which write the data to the file in the desired format.
 
 For more details, see Reader and Writer sections.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics{../pdf/fileinter}
-  \caption{Oscopy get the data (or Signals) from files through Reader objects, and put data into files through Writer objects. Each Reader/Writer support a specific file format.}
+  \caption{Oscopy get the data (or \sig s) from files through Reader objects, and put data into files through Writer objects. Each Reader/Writer support a specific file format.}
   \label{fig:fileinter}
 \end{figure}
 
@@ -122,11 +126,41 @@ The interaction between Oscopy and the viewer is handled by Figure and Graph obj
 \begin{figure}[htbp]
   \centering
   \includegraphics{../pdf/viewinter}
-  \caption{Interaction  of Oscopy with the viewer. Oscopy communicate with Figures, which contains up to 4 Graphs. The Graphs contains the Signals.}
+  \caption{Interaction  of Oscopy with the viewer. Oscopy communicate with Figures, which contains up to 4 Graphs. The Graphs contains the \sig s.}
   \label{fig:viewinter}
 \end{figure}
+
 \section{Signals}
 \label{sec:sigs}
+
+A \sig\ is an object that basically contain the data points.
+For example this could be the Y axis data of a temporal measurement.
+
+Since generally in a simulation or experimental results many signal share the same scale, e.g. time scale or frequency scale, the \sig\ is associated to a reference signal.
+To make the difference between a ``\sig'' and a ``reference \sig'', the latter has its \att{ref}\ attribute set to \att{None}.
+
+We humans give to each signal a name, e.g. V1, Iout... and associate a unit (Volts, Watts...).
+The \sig\ thus possess those two attributes.
+
+And finally, when rereading the data from file, one want not always update each Signal, for instance to compare two simulations with different component values.
+When the attribute \texttt{frozen} is set, the \sig\ is not updated.
+For now this attribute is not accessed as a property but through the method freeze().
+\begin{table}[htbp]
+  \centering\small\sf
+  \begin{tabular}{lcccl}
+    \hline
+    Attribute & Type & Read & Write & Comment \\
+    \hline
+    data     & numpy.array & \checked & \checked & Data points\\
+    name     & string & \checked &          & Name of the signal \\
+    ref      & \sig\ & \checked & \checked & Reference signal \\
+    unit     & string & \checked &          & Unit of the data \\
+    frozen   & bool   & \checked & \checked & Update signal or not\\
+    \hline
+  \end{tabular}
+  \caption{Properties of \sig s.}
+  \label{tab:sigs:props}
+\end{table}
 
 \section{Readers}
 \label{sec:readers}
