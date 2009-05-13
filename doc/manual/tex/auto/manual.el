@@ -13,14 +13,24 @@
      "sec:sigs"
      "tab:sigs:props"
      "sec:readers"
+     "fig:rds:callgraph"
+     "sec:readers:reader"
+     "tab:rds:meth"
+     "sec:readers:detect"
+     "sec:readers:readerror"
+     "sec:readers:add"
      "sec:writers"
      "sec:graphs"
      "sec:figs"
      "sec:curs"
      "sec:ext")
     (TeX-add-symbols
+     '("module" 1)
+     '("meth" 1)
      '("att" 1)
-     "sig")
+     "sig"
+     "rds"
+     "rdserr")
     (TeX-run-style-hooks
      "wasysym"
      "graphicx"

@@ -6,7 +6,12 @@
 \usepackage{wasysym}
 
 \newcommand{\att}[1]{\texttt{#1}}
+\newcommand{\meth}[1]{\texttt{#1()}}
+
 \newcommand{\sig}{\textsf{Signal}}
+\newcommand{\rds}{\textsf{Reader}}
+\newcommand{\rdserr}{\textsf{ReadError}}
+\newcommand{\module}[1]{\textsc{#1}}
 
 \title{{\sc Oscopy}\\An interactive program for viewing electrical simulation results\\Manual}
 \author{Arnaud Gardelein}
@@ -143,7 +148,7 @@ We humans give to each signal a name, e.g. V1, Iout... and associate a unit (Vol
 The \sig\ thus possess those two attributes.
 
 And finally, when rereading the data from file, one want not always update each Signal, for instance to compare two simulations with different component values.
-When the attribute \texttt{frozen} is set, the \sig\ is not updated.
+When the attribute \att{frozen} is set, the \sig\ is not updated.
 For now this attribute is not accessed as a property but through the method freeze().
 \begin{table}[htbp]
   \centering\small\sf
@@ -164,7 +169,73 @@ For now this attribute is not accessed as a property but through the method free
 
 \section{Readers}
 \label{sec:readers}
-% + DetectReader
+The module \module{Readers}\ is used to load signals, mainly from files.
+It composed of a main class \rds, an exception class \rdserr.
+Each file format is supported through a specific back-end.
+The back-end class is created by deriving the base class \rds\ and redefining only the way to 1) check if the file is supported and 2) load the signals from the file.
+The function \meth{DectectReader}\ should be used to automagically find the right back-end from the file name.
+The interaction between objects is summarised in Figure~\ref{fig:rds:callgraph}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{../pdf/readers}
+  \caption{Call graph of Readers module. \meth{DetectReader} create the object for the user. The only visible functions to the user are \meth{read} and \meth{update}. The dashed method should be redefined when deriving \rds\ to support new file formats.}
+  \label{fig:rds:callgraph}
+\end{figure}
+
+\subsection{Reader}
+\label{sec:readers:reader}
+ 
+A \rds\ is used to load the data from a file.
+The \rds\ class provide the tools to ensure the file is readable and the update mechanism to make the new back-end definition easier.
+The table~\ref{tab:rds:meth} show the methods of this class.
+
+The main method of this object is then \meth{read}, which is user-visible.
+However, this is \meth{read\_sigs}\ that does the real work, i.e. parse the file and create the signals.
+The file format support is verified by \meth{detect}.
+Those two methods should be redefined when deriving \rds.
+
+The file access is verified by \meth{check}, and the update mechanism is handled through \meth{update}.
+
+\begin{table}[htbp]
+  \centering\sf\small
+  \begin{tabular}{lll}
+    \hline
+    Method & Type & Action \\
+    \hline
+    \_\_init\_\_ & Public & Initialise the object \\
+    \_\_str\_\_  & Public & Return a string with the filename\\
+    read         & Public & Read the data\\
+    update       & Public & Reread the data\\
+    detect       & Public & Return True if file is handled\\
+    check        & Private& Raise an exception if the file is not readable\\
+    read\_sigs    & Private& Read the data \\
+    \hline
+  \end{tabular}
+  \caption{Methods of \rds}
+  \label{tab:rds:meth}
+\end{table}
+
+\subsection{DetectReader}
+\label{sec:readers:detect}
+This function find the right back-end to read the file and return a valid \rds.
+It call the method \meth{detect} of each known \rds-based object until a True is returned, meaning the object can handle the file.
+
+\subsection{ReadError}
+\label{sec:readers:readerror}
+This exception class is raised whenever an error is encountered during the file access, e.g. no file, bad file type...
+It contains only the constructor and a str method that returns the error message \att{value}.
+
+\subsection{Adding new Readers}
+\label{sec:readers:add}
+New back-end can be created to support new file formats, this is done by deriving the \rds\ object.
+This object provide the necessary framework so that the derived class should only redefine two methods:
+\begin{itemize}
+\item \meth{detect} that returns True if the file format is supported
+\item \meth{read\_sigs} that effectively parse the file and return a dict of signals
+\end{itemize}
+Boring tasks like file access check or update management are handled by \rds.
+Note that the constructor should also call the base class one.
 
 \section{Writers}
 \label{sec:writers}

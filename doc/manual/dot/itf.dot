@@ -1,0 +1,8 @@
+digraph itf {
+	node [fontname="Helvetica",fontsize=8] ;
+	rankdir=LR;
+	"Data\n(Signals)"-> Oscopy ;
+	Oscopy -> "Data\n(Signals)" ;
+	User -> Oscopy ;
+	Oscopy -> User ;	
+}

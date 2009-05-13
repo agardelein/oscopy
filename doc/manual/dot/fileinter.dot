@@ -1,0 +1,62 @@
+digraph fileinter {
+	node [fontname="Helvetica",fontsize=8] ;
+	rankdir=LR
+	subgraph cluster0 {
+		node [fontname="Helvetica",fontsize=8];
+		label="File 1/Format X";		
+		fontname="Helvetica";
+		fontsize=8;
+		
+		"Signal 1";
+		"Signal 2";		
+	}
+	subgraph cluster1 {
+		node [fontname="Helvetica",fontsize=8] ;
+		label="File 2/Format Y";
+		fontname="Helvetica";
+		fontsize=8;
+		
+		"Signal 3";
+		"Signal 4";
+	}
+	subgraph cluster2 {
+		node [fontname="Helvetica",fontsize=8];
+		label="File 3/Format Z";
+		fontname="Helvetica";
+		fontsize=8;
+		
+		"Signal 5";
+	}
+	subgraph cluster3 {
+		node [fontname="Helvetica",fontsize=8]
+		label="File 4/Format W"
+		fontname="Helvetica";
+		fontsize=8 ;
+		
+		"Signal 2'" [label="Signal 2"];
+		"Signal 5'" [label="Signal 5"];
+	       
+	}
+	subgraph cluster4 {
+		node [fontname="Helvetica",fontsize=8]
+		label="File 5/Format Z"
+		fontname="Helvetica";
+		fontsize=8 ;
+		
+		"Signal 1'" [label="Signal 1"];
+		"Signal 4'" [label="Signal 4"];
+	       
+	}
+
+	"Signal 1" -> "Reader 1"
+	"Signal 2" -> "Reader 1" -> Oscopy
+	"Signal 3" -> "Reader 2"
+	"Signal 4" -> "Reader 2" -> Oscopy
+	"Signal 5" -> "Reader 3" -> Oscopy
+	"Writer 1" -> "Signal 2'"
+	"Writer 1" -> "Signal 5'"
+	"Writer 2" -> "Signal 1'"
+	"Writer 2" -> "Signal 4'"
+	Oscopy -> "Writer 1"
+	Oscopy -> "Writer 2"
+}

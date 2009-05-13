@@ -1,0 +1,36 @@
+digraph viewinter {
+	node [fontname="Helvetica",fontsize=8] ;
+	rankdir=LR ;
+	Oscopy -> "Figure 1" ;
+       	Oscopy -> "Figure 2" ;
+	Oscopy -> "Figure 3" ;
+	subgraph cluster0 {
+		rankdir=TB
+		"Graph 11" [label="Graph 1"] ;
+		"Graph 12" [label="Graph 2"] ;
+	}
+	subgraph cluster1 {
+		rankdir=TB
+		"Graph 21" [label="Graph 1"] ;
+		"Graph 22" [label="Graph 2"] ;
+		"Graph 23" [label="Graph 3"] ;
+	}
+	subgraph cluster2 {
+		rankdir=TB
+		"Graph 31" [label="Graph 1"] ;
+	}
+	
+	"Figure 1" -> "Graph 11" ;
+	"Figure 1" -> "Graph 12" ;
+ 	"Figure 2" -> "Graph 21" ;
+ 	"Figure 2" -> "Graph 22" ;
+	"Figure 2" -> "Graph 23" ;
+	"Figure 3" -> "Graph 31" ;
+	"Graph 11" -> "Signal 1" ;
+	"Graph 11" -> "Signal 2" ;
+	"Graph 21" -> "Signal 3" ;
+	"Graph 21" -> "Signal 4" ;
+	"Graph 21" -> "Signal 1" ;
+	"Graph 31" -> "Signal 2" ;
+	"Graph 31" -> "Signal 5" ;
+}

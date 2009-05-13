@@ -1,0 +1,21 @@
+digraph readers {
+	node [fontname="Helvetica",fontsize=8] ;
+	rankdir=TB;
+	User [label="Oscopy / User"]
+	subgraph cluster0 {
+		fontname="Helvetica";
+		fontsize=8 ;
+		label="Reader"
+		read_sigs [label="read_sigs()",style=dotted]
+		read [label="read()"]
+		update [label="update()"]
+		init [label="__init__()"]
+		detect [label="detect()",style=dotted]
+		check [label="check()"]
+		}
+	User -> read -> read_sigs
+	User -> update -> read_sigs
+	User -> DetectReader -> init
+	DetectReader -> detect
+	read -> check
+}

@@ -4,14 +4,17 @@ OUTDIR=../out
 LATEX=pdflatex
 LATEXOPTS=-output-directory $(OUTDIR)
 
-FIGS=../pdf/itf.pdf ../pdf/fileinter.pdf ../pdf/viewinter.pdf
+FIGS=../pdf/itf.pdf\
+	 ../pdf/fileinter.pdf \
+	../pdf/viewinter.pdf \
+	../pdf/readers.pdf
 
 pdf: $(FIGS)
 	$(LATEX) $(LATEXOPTS) $(MASTER)
 	$(LATEX) $(LATEXOPTS) $(MASTER)
 	mv $(OUTDIR)/$(MASTER).pdf $(DESTDIR)
 
-clean:r
+clean:
 	rm $(OUTDIR)/* $(DESTDIR)/$(MASTER).pdf $(FIGS)
 
 ../pdf/%.pdf : ../dot/%.dot
