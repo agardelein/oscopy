@@ -11,6 +11,8 @@
 \newcommand{\sig}{\textsf{Signal}}
 \newcommand{\rds}{\textsf{Reader}}
 \newcommand{\rdserr}{\textsf{ReadError}}
+\newcommand{\wrts}{\textsf{Writer}}
+\newcommand{\wrtserr}{\textsf{WriteError}}
 \newcommand{\module}[1]{\textsc{#1}}
 
 \title{{\sc Oscopy}\\An interactive program for viewing electrical simulation results\\Manual}
@@ -149,7 +151,7 @@ The \sig\ thus possess those two attributes.
 
 And finally, when rereading the data from file, one want not always update each Signal, for instance to compare two simulations with different component values.
 When the attribute \att{frozen} is set, the \sig\ is not updated.
-For now this attribute is not accessed as a property but through the method freeze().
+For now this attribute is not accessed as a property but through the method \meth{freeze}.
 \begin{table}[htbp]
   \centering\small\sf
   \begin{tabular}{lcccl}
@@ -170,7 +172,7 @@ For now this attribute is not accessed as a property but through the method free
 \section{Readers}
 \label{sec:readers}
 The module \module{Readers}\ is used to load signals, mainly from files.
-It composed of a main class \rds, an exception class \rdserr.
+It composed of a main class \rds, an exception class \rdserr, the back-end classes and a function \meth{DetectReader}.
 Each file format is supported through a specific back-end.
 The back-end class is created by deriving the base class \rds\ and redefining only the way to 1) check if the file is supported and 2) load the signals from the file.
 The function \meth{DectectReader}\ should be used to automagically find the right back-end from the file name.
@@ -188,7 +190,7 @@ The interaction between objects is summarised in Figure~\ref{fig:rds:callgraph}.
  
 A \rds\ is used to load the data from a file.
 The \rds\ class provide the tools to ensure the file is readable and the update mechanism to make the new back-end definition easier.
-The table~\ref{tab:rds:meth} show the methods of this class.
+The Table~\ref{tab:rds:meth} show the methods of this class.
 
 The main method of this object is then \meth{read}, which is user-visible.
 However, this is \meth{read\_sigs}\ that does the real work, i.e. parse the file and create the signals.
@@ -239,7 +241,75 @@ Note that the constructor should also call the base class one.
 
 \section{Writers}
 \label{sec:writers}
-% + DetectWriter
+This module is used to save data into a file.
+It is composed of a main class \wrts, an exception class \wrtserr, the back-end classes and a function \meth{DetectWriter}.
+Each format is supported through a specific back-end.
+The back-end class is defined by deriving the base class \wrts\ and redefining 1) the format name, 2) the way to check the format is supported and 3) how to save the data to file.
+The function \meth{DetectWriter} should be used to automagically find the right back-end from the format name.
+The interaction between the objects is summarised in Figure~\ref{fig:wrts:callgraph}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{../pdf/writers}
+  \caption{Call graph of Writers module. \meth{DetectWriter} create the object for the user. Only \meth{write} is visible to the user. The dashed method should be redefined when deriving \wrts\ to support new file formats.}
+  \label{fig:wrts:callgraph}
+\end{figure}
+\subsection{Writer}
+% back-end
+The purpose of the \wrts\ is to save the data to a file.
+The \wrts\ class provide the tools to make the definition of new export format easier.
+The Table~\ref{tab:wrts:meth} shows the methods of this class.
+
+Only the methods \meth{detect} and \meth{write} are user visible.
+The real work is done by \meth{write\_sigs} that format the data and put them into the file.
+\meth{detect} is used to check whether the back-end class support the format.
+For now this is only a comparison between the name provided by the user and the result of the call to \meth{get\_fmt\_name}.
+
+Before calling \meth{write\_sigs}, \meth{write} check the file access (with \meth{check}) and do a format specific verification by calling \meth{fmt\_check}.
+For example, for text columns-based formats like CSV, this could be checking that all signals share the same reference.
+This function should be redefined by the derived class.
+
+\begin{table}[htbp]
+  \centering\sf\small
+  \begin{tabular}{lll}
+    \hline
+    Method & Type & Action \\
+    \hline
+    \_\_init\_\_ & Public & Initialise the object \\
+    write        & Public & Write the data, user visible function\\
+    detect       & Public & Return True if format is handled\\
+    check        & Private& Raise an exception if the file is not writable\\
+    write\_sigs  & Private& Write the data, to be defined by the back-end\\
+    get\_fmt\_name&Private& Return the name of the format\\
+    fmt\_check   & Private& Format-specific checks\\
+    \hline
+  \end{tabular}
+  \caption{Methods of \wrts}
+  \label{tab:wrts:meth}
+\end{table}
+
+\subsection{DetectWriter}
+This function find the right back-end to write the file and then return a valid \wrts.
+It call the method \meth{detect} of each known \wrts\ until a True is returned, meaning the object can handle the file format.
+
+\subsection{WriteError}
+This exception class is raised when an error occurs during the file access, for example bad file permissions.
+There is only a constructor and a str method which return the error message \att{value}.
+
+\subsection{Adding new Writers}
+New formats are supported by adding a back-end to the module, by deriving the \wrts\ class.
+This class provide the requested framework (file access checking, detection mechanism) to make the new format adding simpler.
+Thus the new class should redefine the methods:
+\begin{itemize}
+\item \meth{get\_fmt\_name} that return a string identifying the format
+\item \meth{fmt\_check} that verifies if signals are compliant with the format
+\item \meth{write\_sigs} that effectively write the data to the file
+\end{itemize}
+Note that the constructor of the new class should call the base class one.
+
+The user can pass options to the back-end through the use of a dict, which is then available as \att{self.opts}.
+For example, the option "ow" is supported by the base class.
+When set to "1", the destination file can be overwritten.
 
 \section{Graphs}
 \label{sec:graphs}

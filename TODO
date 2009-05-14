@@ -2,6 +2,7 @@ To be checked :
 FFT: is X axis right ?
 
 To be fixed :
+All: add _ to the private methods and attributes
 
 To be added :
 Support for HDF5

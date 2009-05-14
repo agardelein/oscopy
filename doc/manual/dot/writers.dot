@@ -1,0 +1,24 @@
+digraph writers {
+	node [fontname="Helvetica",fontsize=8] ;
+	rankdir=TB;
+	User [label="Oscopy / User"];
+	DetectWriter [label="DetectWriter()"]
+	subgraph cluster0 {
+		fontname="Helvetica";
+		fontsize=8 ;
+		label="Writer";
+		check [label="check()"];
+		fmtcheck [label="format_check()",style=dotted]
+		write_sigs [label="write_sigs()",style=dotted];
+		write [label="write()"];
+		init [label="__init__()"];
+		detect [label="detect()"];
+		getfmtname [label="get_format_name()",style=dotted]
+		};
+      		User -> write -> write_sigs ;		
+	User -> DetectWriter -> init
+	DetectWriter -> detect
+	write -> check
+	write -> fmtcheck
+	detect -> getfmtname
+}

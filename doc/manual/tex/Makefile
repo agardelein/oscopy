@@ -7,7 +7,8 @@ LATEXOPTS=-output-directory $(OUTDIR)
 FIGS=../pdf/itf.pdf\
 	 ../pdf/fileinter.pdf \
 	../pdf/viewinter.pdf \
-	../pdf/readers.pdf
+	../pdf/readers.pdf \
+	../pdf/writers.pdf
 
 pdf: $(FIGS)
 	$(LATEX) $(LATEXOPTS) $(MASTER)

@@ -20,6 +20,8 @@
      "sec:readers:readerror"
      "sec:readers:add"
      "sec:writers"
+     "fig:wrts:callgraph"
+     "tab:wrts:meth"
      "sec:graphs"
      "sec:figs"
      "sec:curs"
@@ -30,7 +32,9 @@
      '("att" 1)
      "sig"
      "rds"
-     "rdserr")
+     "rdserr"
+     "wrts"
+     "wrtserr")
     (TeX-run-style-hooks
      "wasysym"
      "graphicx"
