@@ -25,20 +25,22 @@
      "sec:graphs"
      "sec:graphs:graph"
      "tab:graphs:meth"
-     "sec:figs"
      "sec:curs"
+     "sec:figs"
      "sec:ext")
     (TeX-add-symbols
      '("module" 1)
+     '("cls" 1)
      '("meth" 1)
      '("att" 1)
      "sig"
-     "rds"
-     "rdserr"
-     "wrts"
-     "wrtserr"
-     "graphs"
-     "figures")
+     "rd"
+     "rderr"
+     "wrt"
+     "wrterr"
+     "graph"
+     "fig"
+     "cursor")
     (TeX-run-style-hooks
      "wasysym"
      "graphicx"
