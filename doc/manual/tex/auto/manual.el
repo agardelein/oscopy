@@ -23,6 +23,8 @@
      "fig:wrts:callgraph"
      "tab:wrts:meth"
      "sec:graphs"
+     "sec:graphs:graph"
+     "tab:graphs:meth"
      "sec:figs"
      "sec:curs"
      "sec:ext")
@@ -34,7 +36,9 @@
      "rds"
      "rdserr"
      "wrts"
-     "wrtserr")
+     "wrtserr"
+     "graphs"
+     "figures")
     (TeX-run-style-hooks
      "wasysym"
      "graphicx"

@@ -14,7 +14,8 @@
 \newcommand{\wrts}{\textsf{Writer}}
 \newcommand{\wrtserr}{\textsf{WriteError}}
 \newcommand{\module}[1]{\textsc{#1}}
-
+\newcommand{\graphs}{\textsf{Graph}}
+\newcommand{\figures}{\textsf{Figure}}
 \title{{\sc Oscopy}\\An interactive program for viewing electrical simulation results\\Manual}
 \author{Arnaud Gardelein}
 
@@ -127,8 +128,11 @@ For more details, see Reader and Writer sections.
 
 \subsubsection{Viewer interaction}
 \label{sec:viewinter}
-The signals are presented to the user through a viewer program, currently matplotlib.
-The interaction between Oscopy and the viewer is handled by Figure and Graph objects.
+The results are presented to the user in a graphical manner, as a set of figures where the data is plotted.
+On each figures, there can be several graphs containing each one containing a plot.
+Each plot can hold as signals as requested.
+The ineraction between Oscopy and the graphical representation is handled by \figures\ and \graphs\ objects.
+They both use Matplotlib.
 
 \begin{figure}[htbp]
   \centering
@@ -313,6 +317,34 @@ When set to "1", the destination file can be overwritten.
 
 \section{Graphs}
 \label{sec:graphs}
+
+\subsection{Graph}
+\label{sec:graphs:graph}
+%The \module{Graphs}
+
+
+\begin{table}[htbp]
+  \centering\sf\small
+  \begin{tabular}{lll}
+    \hline
+    Method & Type & Action \\
+    \hline
+    \_\_init\_\_ & Public & Initialise the object \\
+    insert & Public & Insert signals into the graph\\
+    remove & Public & Take away signals from the graph\\
+    plot & Public & Display the graph\\
+    get\_sigs & Public & Iterator that return the internal signal list\\
+    get\_type & Public & Return a string identifying the graph type\\
+    set\_unit & Public & Define the unit to be displayed\\
+    set\_scale & Public & Define the scale of the axis\\
+    set\_range & Public & Define the limits of the graph\\
+    \hline
+  \end{tabular}
+  \caption{Methods of \graphs}
+  \label{tab:graphs:meth}
+\end{table}
+
+\subsection{Adding new Graphs}
 
 \section{Figures}
 \label{sec:figs}

@@ -7,6 +7,6 @@ All: add _ to the private methods and attributes
 To be added :
 Support for HDF5
 Make Signal derive from numpy.array
-Use property()
+Use property() for Graph (scale, unit, type, get_sigs)
 Signal.frozen to use property()
 MathReader: just replace in expr v1 by sigs["v1"] and only eval the expression. This avoid exec a page-long string.
