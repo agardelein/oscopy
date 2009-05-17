@@ -71,7 +71,7 @@ class GnucapReader(Reader):
         ref.data = data[0]
         for i, s in enumerate(signals[1:]):
             s.ref = ref
-            s.data = data[i]
+            s.data = data[i + 1]
 
         self.sigs = dict(zip(names[1:], signals[1:]))
         return self.sigs
