@@ -1,0 +1,15 @@
+digraph cursorinter {
+	node [fontname="Helvetica",fontsize=8] ;
+	rankdir=TB;
+	User [label="Oscopy / User\n(through Figure)"];
+	togglecurs [label="toggle_cursor()"];
+	plot [label="plot()"];
+	setcurs [label="set_cursor()"] ;
+	drawcurs [label="draw_cursor()"] ;
+	printcurs [label="print_cursor()"] ;
+	User -> togglecurs ;
+	User -> plot ;
+	togglecurs -> setcurs ;
+	plot -> drawcurs ;
+	plot -> printcurs ;
+}

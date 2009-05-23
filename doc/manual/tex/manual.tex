@@ -378,14 +378,67 @@ The range is the zoom area, the scale type is either linear or logarithmic, and 
 From the external user perspective, cursors can only be toggled with \meth{toggle\_cursors}.
 By default there are up to two cursors per axis to keep graph readable by a human.
 Internally, \meth{toggle\_cursors} call \meth{set\_cursor} to define cursors properties, and \meth{plot} call \meth{draw\_cursors} and \meth{print\_cursors} to display respectively the cursors shape and value onto the graph.
+The figure~\ref{fig:cursorinter} summarise this paragraph.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{../pdf/cursorinter}
+  \caption{Interaction between the user, \graph\ and \cursor.}
+  \label{fig:cursorinter}
+\end{figure}
 
 \subsection{Cursors}
 \label{sec:curs}
+When annotating the graphs with Matplotlib, changes are lost when the figure window is closed.
+Oscopy support cursors, i.e. a way to print references on a graph, through the use of annotation.
+The goal of the \cursor\ object is to make the references persistent between figure close.
+
+The tables~\ref{tab:cursors:meth} and \ref{tab:cursors:props} summarise the methods and attributes of this object.
+Apart from the constructor and the string representation, it contains one method \meth{draw}, that handle the representation of the reference on the graph.
+
+The main attribute is \att{value}, or the location on the graph of the reference.
+The cursor can be \att{visible}, i.e. printed on the graph or not, and can be either horizontal or vertical, as defined by \att{type}.
+The \att{line} object is a reference to the Matplotlib.Line2D where the cursor is drawn.
+
+\begin{table}[htbp]
+  \centering\sf\small
+  \begin{tabular}{lll}
+    \hline
+    Method & Type & Action \\
+    \hline
+    \_\_init\_\_ & Public & Initialise the object \\
+    draw & Public & Draw the cursor on the graph \\
+    \_\_str\_\_ & Public & Print value, type and visible \\
+    \hline
+  \end{tabular}
+  \caption{Methods of \cursor}
+  \label{tab:cursors:meth}
+\end{table}
+
+\begin{table}[htbp]
+  \centering\small\sf
+  \begin{tabular}{lcccl}
+    \hline
+    Attribute & Type & Read & Write & Comment \\
+    \hline
+    value     & float & \checked & \checked & Position\\
+    visible   & bool & \checked & \checked & State \\
+    line      & matplotlib.Line2D & & & Where it is dawn \\
+    type      & str & \checked & \checked & "horiz" or "vert"\\
+    \hline
+  \end{tabular}
+  \caption{Properties of \cursor.}
+  \label{tab:cursors:props}
+\end{table}
 
 \subsection{Adding new Graphs}
 Adding new ways of plotting data is done by deriving \graph.
 At least the method \meth{get\_type} should be redefined, and the constructor of the new class should call the base class one.
 However, surely the method \meth{plot} has to be redefined to handle the new way of plotting data.
+
+\subsection{Adding new Cursors}
+By deriving \cursor, new way of putting references on the graph can be defined.
+The method \meth{draw} then needs to be redefined.
 
 \section{Figures}
 \label{sec:figs}

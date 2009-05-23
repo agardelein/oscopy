@@ -25,7 +25,10 @@
      "sec:graphs"
      "sec:graphs:graph"
      "tab:graphs:meth"
+     "fig:cursorinter"
      "sec:curs"
+     "tab:cursors:meth"
+     "tab:cursors:props"
      "sec:figs"
      "sec:ext")
     (TeX-add-symbols

@@ -8,7 +8,8 @@ FIGS=../pdf/itf.pdf\
 	 ../pdf/fileinter.pdf \
 	../pdf/viewinter.pdf \
 	../pdf/readers.pdf \
-	../pdf/writers.pdf
+	../pdf/writers.pdf \
+	../pdf/cursorinter.pdf
 
 pdf: $(FIGS)
 	$(LATEX) $(LATEXOPTS) $(MASTER)
