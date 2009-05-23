@@ -132,7 +132,7 @@ For more details, see Reader and Writer sections.
 \label{sec:viewinter}
 The results are presented to the user in a graphical manner, as a set of figures where the data is plotted.
 On each figures, there can be several graphs containing each one containing a plot.
-Each plot can hold as signals as requested.
+Each plot can hold as many signals as requested.
 The interaction between Oscopy and the graphical representation is handled by \fig\ and \graph\ objects.
 They both use \module{Matplotlib} to plot the data.
 
@@ -317,10 +317,70 @@ The user can pass options to the back-end through the use of a dict, which is th
 For example, the option "ow" is supported by the base class.
 When set to "1", the destination file can be overwritten.
 
+\section{Figures}
+\label{sec:figs}
+A \fig\ is a container that manage \graph s, i.e. handle adding, deleting, formating and updating, as shown in Table~\ref{tab:figs:meth}.
+It handle the layout and the mode of the graphs, and pass all data-plotting specific commands to the \graph s, through the use of an alias to the current graph \att{curgraph}.
+
+When updating, for each graph it prepare a list of signals to be updated and deleted and then pass it to the graph.
+
+When \meth{plot}\ is called, it set up the figure, the layout, and then call the method \meth{plot}\ of each graph.
+Finally it set the method \meth{key}\ as a call-back for key-press related event in Matplotlib.
+Currently this method handle the keys '1', '2', '3' and '4' to toggle cursors, as summarised in Table~\ref{tab:figs:key}.
+It then call \meth{toggle\_cursors}\ from \graph.
+
+\begin{table}[htbp]
+  \centering\sf\small
+  \begin{tabular}{lll}
+    \hline
+    Method & Type & Action \\
+    \hline
+    \_\_init\_\_ & Public & Initialise the object \\
+    plot & Public & Draw the graphs\\
+    \multicolumn{3}{l}{\textit{Graph management}} \\
+    add & Public & Add a graph into the figure \\
+    delete & Public & Delete a graph from the figure \\
+    list & Public & Print a list of the graphs\\
+    select & Public & Select the current graph \\
+    set\_layout & Public & Define the placement of graph in the figure\\
+    set\_mode & Public & Define the mode of the current graph\\
+    \multicolumn{3}{l}{\textit{Pass-through to current Graph}} \\
+    insert & Public & Insert signals into the graph\\
+    remove & Public & Take away signals from the graph\\
+    set\_range & Public & Define the limits of the graph\\
+    set\_scale & Public & Define the scale of the axis\\
+    set\_unit & Public & Define the unit to be displayed\\
+    \multicolumn{3}{l}{\textit{Viewing management}} \\
+    key & Private & Handle keystrokes when displaying plots \\
+    \multicolumn{3}{l}{\textit{Data management}} \\
+    update & Public & Update signal list of all graphs\\
+    get\_sigs & Public & Iterator that return the signal list of all graphs\\
+    \hline
+  \end{tabular}
+  \caption{Methods of \fig}
+  \label{tab:figs:meth}
+\end{table}
+
+\begin{table}[htbp]
+  \centering\small\sf
+  \begin{tabular}{ll}
+    \hline
+    Key & Action \\
+    \hline
+    1  & Toggle first vertical cursor \\
+    2  & Toggle second vertical cursor \\
+    3  & Toggle first horizontal cursor \\
+    4  & Toggle second horizontal cursor \\
+    \hline
+  \end{tabular}
+  \caption{Keystrokes handled by \meth{key} in \fig.}
+  \label{tab:figs:key}
+\end{table}
+
 \section{Graphs}
 \label{sec:graphs}
 The \module{Graphs} module is in charge to plot the data on one figure.
-Since there are many ways of plotting data like linear graphs or smith charts, the module is composed of one base class \graph that handle the signal dict and the basic plotting.
+Since there are many ways of plotting data like linear graphs or smith charts, the module is composed of one base class \graph\ that handle the signal dict and the basic plotting.
 This class is then derived, and the new ones generally redefine the way of plotting the data.
 
 Additionally the user want a way to put references on the displayed data, thus the module contains a \cursor\ class to handle this.
@@ -440,8 +500,7 @@ However, surely the method \meth{plot} has to be redefined to handle the new way
 By deriving \cursor, new way of putting references on the graph can be defined.
 The method \meth{draw} then needs to be redefined.
 
-\section{Figures}
-\label{sec:figs}
+
 
 \section{Extending Oscopy}
 \label{sec:ext}

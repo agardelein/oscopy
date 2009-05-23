@@ -22,6 +22,9 @@
      "sec:writers"
      "fig:wrts:callgraph"
      "tab:wrts:meth"
+     "sec:figs"
+     "tab:figs:meth"
+     "tab:figs:key"
      "sec:graphs"
      "sec:graphs:graph"
      "tab:graphs:meth"
@@ -29,7 +32,6 @@
      "sec:curs"
      "tab:cursors:meth"
      "tab:cursors:props"
-     "sec:figs"
      "sec:ext")
     (TeX-add-symbols
      '("module" 1)
