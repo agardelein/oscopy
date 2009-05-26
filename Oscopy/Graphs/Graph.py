@@ -297,7 +297,7 @@ may lead to uncertain results"
         if self.cursors[ctype][num] is None:
             self.set_cursor(ctype, num, val)
         else:
-            self.cursors[ctype][num].set_value(val)
+            self.cursors[ctype][num].value = val
             self.cursors[ctype][num].set_visible()
             self.cursors[ctype][num].draw(self.ax)
         self.print_cursors()
@@ -338,14 +338,14 @@ may lead to uncertain results"
         # Preapre string for each cursor type (i.e. "horiz" and "vert")
         for t, cl in self.cursors.iteritems():
             for c in cl:
-                if c is not None and c.get_visible():
+                if c is not None and c.visible:
                     # Add cursors value to text
                     txt[t] += " %d: %8.3f %2s%-3s" \
-                        % (cl.index(c) + 1, float(c.get_value()), l[t], u[t])
-            if not None in cl and cl[0].get_visible() and cl[1].get_visible():
+                        % (cl.index(c) + 1, float(c.value), l[t], u[t])
+            if not None in cl and cl[0].visible and cl[1].visible:
                 # Add cursors difference (delta)
                 txt[t] += " d%s: %8.3f %2s%-3s"\
-                    % (u[t], float(cl[1].get_value() - cl[0].get_value()),\
+                    % (u[t], float(cl[1].value - cl[0].value),\
                            l[t], u[t])
 
         if self.txt is None or not self.txt.axes == self.ax:

@@ -30,7 +30,7 @@ class Cursor(object):
         """
         self.set_value(val)
         self.set_visible(True)
-        self.line = None # Line2D
+        self._line = None # Line2D
         self.set_type(type)
 
     def draw(self, ax=None, num=0):
@@ -38,26 +38,26 @@ class Cursor(object):
         non-zero for dashed
         """
         # Check whether cursor is within the axis limits
-        if self.type == "horiz":
+        if self._type == "horiz":
             lim = ax.get_ylim()
-        elif self.type == "vert":
+        elif self._type == "vert":
             lim = ax.get_xlim()
         else:
             return
-        if self.val < lim[0] or self.val > lim[1]:
+        if self._value < lim[0] or self._value > lim[1]:
             # Outside axe limits, delete line and that's it
-            self.line = None
+            self._line = None
             return
 
         # Cursor is within the limit
-        if self.line is None or not self.line.get_axes() == ax:
+        if self._line is None or not self._line.get_axes() == ax:
             # Cursor do not exist on the graph, plot it
             ax.hold(True)
-            if self.type == "horiz":
+            if self._type == "horiz":
                 x = ax.get_xlim()
-                y = [self.val, self.val]
-            elif self.type == "vert":
-                x = [self.val, self.val]
+                y = [self._value, self._value]
+            elif self._type == "vert":
+                x = [self._value, self._value]
                 y = ax.get_ylim()
             else:
                 return
@@ -65,40 +65,40 @@ class Cursor(object):
                 lt = ""
             else:
                 lt = "--"
-            self.line, = ax.plot(x, y, lt + "k")
-            self.line.set_visible(self.vis)
+            self._line, = ax.plot(x, y, lt + "k")
+            self._line.set_visible(self._visible)
             ax.hold(False)
-        elif ax == self.line.get_axes():
+        elif ax == self._line.get_axes():
             # Cursor already exist, just update visibility
-            if self.type == "horiz":
+            if self._type == "horiz":
                 x = ax.get_xlim()
-                y = [self.val, self.val]
-            elif self.type == "vert":
-                x = [self.val, self.val]
+                y = [self._value, self._value]
+            elif self._type == "vert":
+                x = [self._value, self._value]
                 y = ax.get_ylim()
-            self.line.set_data(x, y)
-            self.line.set_visible(self.vis)
+            self._line.set_data(x, y)
+            self._line.set_visible(self._visible)
         else:
             # Cursor exist already in this graph, nothing to do
             pass
 
     def get_type(self):
-        return self.type
+        return self._type
 
     def get_value(self):
-        return self.val
+        return self._value
 
     def get_visible(self):
-        return self.vis
+        return self._visible
 
     def set_type(self, type=""):
         if isinstance(type, str):
             if type == "horiz" or type == "vert":
-                self.type = type
+                self._type = type
 
     def set_value(self, val=None):
         if val is not None:
-            self.val = val
+            self._value = val
 
     def set_visible(self, vis=None):
         """ Toggle status if called without argument
@@ -106,14 +106,18 @@ class Cursor(object):
         """ 
         if isinstance(vis, bool):
             # Set
-            self.vis = vis
+            self._visible = vis
         else:
             # Toggle
-            if self.vis:
-                self.vis = False
+            if self._visible:
+                self._visible = False
             else:
-                self.vis = True
+                self._visible = True
+
+    value = property(get_value, set_value)
+    type = property(get_type, set_type)
+    visible = property(get_visible, set_visible)
 
     def __str__(self):
-        return "val:" + str(self.val) + " type:" + self.type \
-            + " vis:" + str(self.vis)
+        return "val:" + str(self._value) + " type:" + self._type \
+            + " vis:" + str(self._visible)
