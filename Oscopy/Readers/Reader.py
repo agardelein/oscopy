@@ -99,7 +99,7 @@ class Reader(object):
                 oldsigs[sn] = s
  #               print "New signal:", sn
             else:
-                if oldsigs[sn].freeze():
+                if oldsigs[sn].freeze:
                     # Signal is frozen, no update
  #                   print sn, "is frozen"
                     continue

@@ -345,14 +345,14 @@ class Oscopy(object):
         """
         sigs = self.signames_to_sigs(sns)
         for s in sigs.itervalues():
-            s.freeze(True)
+            s.freeze = True
 
     def unfreeze(self, sns):
         """ Unset the freeze flag of signals
         """
         sigs = self.signames_to_sigs(sns)
         for s in sigs.itervalues():
-            s.freeze(False)
+            s.freeze = False
 
     def siglist(self):
         """ List loaded signals
