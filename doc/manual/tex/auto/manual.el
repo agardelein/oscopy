@@ -10,6 +10,7 @@
      "fig:fileinter"
      "sec:viewinter"
      "fig:viewinter"
+     "tab:ctxt:meth"
      "sec:sigs"
      "tab:sigs:props"
      "sec:readers"
@@ -38,6 +39,7 @@
      '("cls" 1)
      '("meth" 1)
      '("att" 1)
+     "ctx"
      "sig"
      "rd"
      "rderr"
@@ -47,6 +49,7 @@
      "fig"
      "cursor")
     (TeX-run-style-hooks
+     "caption"
      "wasysym"
      "graphicx"
      "a4wide"

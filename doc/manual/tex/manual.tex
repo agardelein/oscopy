@@ -4,11 +4,13 @@
 \usepackage{a4wide}
 \usepackage{graphicx}
 \usepackage{wasysym}
+\usepackage[font=small,labelfont=sf,textfont=sf]{caption}
 
 \newcommand{\att}[1]{\texttt{#1}}
 \newcommand{\meth}[1]{\texttt{#1()}}
 \newcommand{\cls}[1]{\textsf{#1}}
 
+\newcommand{\ctx}{\cls{Context}}
 \newcommand{\sig}{\cls{Signal}}
 \newcommand{\rd}{\cls{Reader}}
 \newcommand{\rderr}{\cls{ReadError}}
@@ -142,6 +144,57 @@ They both use \module{Matplotlib} to plot the data.
   \caption{Interaction  of Oscopy with the viewer. Oscopy communicate with Figures, which contains up to 4 Graphs. The Graphs contains the \sig s.}
   \label{fig:viewinter}
 \end{figure}
+
+\subsection{Context}
+The user and data interaction are gathered into the object \ctx, which handle the creation of readers, writers and figures objects.
+It present an interface that can be split into a few parts:
+\begin{itemize}
+\item Data management
+\item Figure management
+\item Graph of current figure management
+\item Pass-through to current graph of current figure
+\end{itemize}
+The methods of this interface are summarised in Table~\ref{tab:ctxt:meth}.
+
+\begin{table}[htbp]
+  \centering\sf\small
+  \begin{tabular}{lll}
+    \hline
+    Method & Type & Action \\
+    \hline
+    \_\_init\_\_ & Public & Initialise the object \\
+    \multicolumn{3}{l}{\textit{Data management}} \\
+    read & Public & Load data from file\\
+    write &Public & Save data to file \\
+    update & Public & Reload data from files\\
+    siglist & Public & Print the list of loaded signals\\
+    freeze & Public & Disable update of some signals\\
+    unfreeze & Public & Enable update of some signals\\
+    math & Public & Create a signal from a math expression\\
+    signames\_to\_sigs & Private\\
+    \multicolumn{3}{l}{\textit{Figure management}} \\
+    create & Public & Create a new figure\\
+    destroy & Public & Destroy a figure \\
+    figlist & Public & Print list of figures \\
+    plot & Public & Draw the figures\\    
+    select & Public & Select the current figure and graph \\
+    \multicolumn{3}{l}{\textit{Graph management of current figure}} \\
+    add & Public & Add a graph into the figure \\
+    delete & Public & Delete a graph from the figure \\
+    list & Public & Print a list of the graphs\\
+    layout & Public & Define the placement of graph in the figure\\
+    mode & Public & Define the mode of the current graph\\
+    \multicolumn{3}{l}{\textit{Pass-through to current Graph of current figure}} \\
+    insert & Public & Insert signals into the graph\\
+    remove & Public & Take away signals from the graph\\
+    range & Public & Define the limits of the graph\\
+    scale & Public & Define the scale of the axis\\
+    unit & Public & Define the unit to be displayed\\
+    \hline
+  \end{tabular}
+  \caption{Methods of Context}
+  \label{tab:ctxt:meth}
+\end{table}
 
 \section{Signals}
 \label{sec:sigs}
