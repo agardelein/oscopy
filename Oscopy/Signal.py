@@ -47,13 +47,13 @@ class Signal(object):
             else:
                 self._ref = Signal(name._ref)
             self._unit = name._unit
-            self.frozen = name.frozen
+            self._freeze = name.frozen
         else:
             self._data = []            # Data points
             self._name = name         # Identifier
             self._ref = None          # Reference signal
             self._unit = unit         # Unit of the signal
-            self.frozen = False      # Flag for update
+            self._freeze = False      # Flag for update
 
     def set_data(self, data=[]):
         """ Set the data points of the signal
@@ -97,12 +97,16 @@ class Signal(object):
         """
         return self._unit
 
-    def freeze(self, frz=None):
+    def get_freeze(self):
+        """ Tell to update or not the signal
+        """
+        return self._freeze
+
+    def set_freeze(self, frz=None):
         """ Tell to update or not the signal
         """
         if isinstance(frz, bool):
-            self.frozen = frz
-        return self.frozen
+            self._freeze = frz
 
     def __str__(self):
         ref_name = self.ref.name if self.ref else '(no reference)'
@@ -110,3 +114,4 @@ class Signal(object):
 
     ref = property(get_ref, set_ref)
     data = property(get_data, set_data)
+    freeze = property(get_freeze, set_freeze)
