@@ -104,38 +104,48 @@ class MathReader(Reader):
         del first, inval
 
         # Prepare the expression to be executed
-        fn = self.fn
+        _expr = self.fn
         # Replace sin with numpy.sin but only for supported math functions
         # an also fft with numpy.fft.fft
         # on: operand name
         for on in dir(math):
-            fn = re.sub('\\b'+on+'\\b', 'numpy.'+on, fn)
+            _expr = re.sub('\\b'+on+'\\b', 'numpy.'+on, _expr)
         for on in ["fft", "ifft"]:
-            fn = re.sub('\\b'+on+'\\b', 'numpy.fft.'+on, fn)
+            _expr = re.sub('\\b'+on+'\\b', 'numpy.fft.'+on, _expr)
         for on in ["diff"]:
-            fn = re.sub('\\b'+on+'\\b', 'numpy.'+on, fn)
+            _expr = re.sub('\\b'+on+'\\b', 'numpy.'+on, _expr)
         # Support for Time and Freq
-        if fn.find("Time") > 0:
+        if _expr.find("Time") > 0:
             Time = _refdata
-            fn = re.sub('Time\(\w+\)', 'Time', fn)
-        if fn.find("Freq") > 0:
+            _expr = re.sub('Time\(\w+\)', 'Time', _expr)
+        if _expr.find("Freq") > 0:
             Freq = _refdata
-            fn = re.sub('Freq\(\w+\)', 'Freq', fn)
+            _expr = re.sub('Freq\(\w+\)', 'Freq', _expr)
 
-        _expr = ""          # String for snippet code
-        _endl = "\n"        # Newline code
-        _ret = {}           # Value to be returned
-        _sn = fn.split("=", 1)[0].strip()  # Result signal name
-        _expr += "_tmp = Signal(\"" + _sn + "\")" + _endl
-        for k, s in _sigs.iteritems():
-            _expr += s.name + "=" + \
-                "_sigs[\"" + s.name + "\"].data" + _endl
-        _expr += fn + _endl
-        _expr += "_tmp.data = " + _sn + _endl
+        _sn = _expr.split("=", 1)[0].strip()  # Result signal name
+        _expr = _expr.split("=", 1)[1].strip()
+        _tmp = Signal(_sn)
+        # Replace sn by sigs["sn"]
+        for sn in _sigs.iterkeys():
+            _expr = re.sub("\\b" + sn + "\\b", '_sigs[\"%s\"].data'%sn, _expr)
+        # Execute the expression
+#         print "Evaluating:\n---"
+#         print _expr
+#         print "---"
+        try:
+            _tmp.data = eval(_expr)
+        except NameError, e:
+            print "NameError:", e.message
+            return {}
+        except TypeError, e:
+            print "TypeError:", e.message
+            return {}
+        _tmp.ref = _refsig
+
         # If there is an fft or ifft, compute new axis
-        if re.search("\\bfft\\b", fn) is not None\
-                or re.search("\\bifft\\b", fn) is not None:
-            if re.search("\\bifft\\b", fn) is None:
+        if re.search("\\bfft\\b", _expr) is not None\
+                or re.search("\\bifft\\b", _expr) is not None:
+            if re.search("\\bifft\\b", _expr) is None:
                 # FFT
                 _u = "Hz"
                 _n = "Freq"
@@ -143,39 +153,21 @@ class MathReader(Reader):
                 # IFFT
                 _u = "s"
                 _n = "Time"
-            # Result is symetric, only take one half
-            _expr += "_len = int(len(_tmp.data) / 2 - 1)\n\
-_tmp.data = _tmp.data[0:_len]\n\
-# Compute reference signal\n\
-_delta = abs(_refsig.data[1] \
-- _refsig.data[0]) * len(_refsig.data)\n\
-_x = numpy.linspace(0, _len, _len) / _delta\n"
-            _expr += "_refsig = Signal(\"%s\", \"%s\")\n" % (_n, _u)
-            _expr += "_refsig.data = _x\n"
-        # If there is a diff, compute also new axis
-        if re.search("\\bdiff\\b", fn) is not None:
-            _expr += "_x = numpy.resize(_refsig.data, len(_refsig.data) - 1)\n\
-_refsig = Signal(_refsig.name, _refsig.unit)\n\
-_refsig.data = _x\n\
-#print len(_refsig.data)\n\
-#print len(_tmp.data)"
-        _expr += "_tmp.ref = _refsig\n\
-_ret[\"%s\"] = _tmp\n\
-self.sigs[\"%s\"] = _tmp\n" % (_sn, _sn)
+            _tmp.ref = Signal(_n, _u)
+            delta = _refsig.data[1] - _refsig.data[0]
+            # Do the FFT and shift the results
+            _tmp.ref.data = numpy.fft.fftfreq(len(_refsig.data), d=delta)
+            _tmp.data = numpy.fft.fftshift(_tmp.data)
+            _tmp.ref.data = numpy.fft.fftshift(_tmp.ref.data)
 
-        # Execute the expression
-#        print "Executing:\n---"
-#        print _expr
-#        print "---"
-        try:
-            exec(_expr)
-        except NameError, e:
-            print "NameError:", e.message
-            return {}
-        except TypeError, e:
-            print "TypeError:", e.message
-            return {}
-        return _ret
+        # If there is a diff, compute also new axis
+        if re.search("\\bdiff\\b", _expr) is not None:
+            x = numpy.resize(_refsig.data, len(_refsig.data) - 1)
+            _tmp.ref = Signal(_refsig.name, _refsig.unit)
+            _tmp.ref.data = x
+
+        self.sigs[_sn] = _tmp
+        return self.sigs
 
     def missing(self):
         """ Return the unknown names found when read() was last called

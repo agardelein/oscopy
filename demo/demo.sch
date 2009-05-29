@@ -20,7 +20,7 @@ device=vpulse
 T 41400 48050 5 10 0 0 0 0 1
 footprint=none
 T 41400 47450 5 10 1 1 0 0 1
-value=pulse 0 1 10n 10n 100n 5u 10u
+value=pulse -1 1 10n 10n 100n 5u 10u
 }
 C 40900 48700 1 0 0 gnd-1.sym
 C 40900 46700 1 0 0 gnd-1.sym
