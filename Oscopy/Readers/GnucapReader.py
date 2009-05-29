@@ -13,10 +13,10 @@ parenthesis stripped, e.g. v(gs) -> vgs or i(Rd) -> iRd.
 
 Class GnucapReader:
    method:
-   read_sigs():
+   _read_signals():
    Read the signals from a file to gnucap output format.
 
-   unit_from_probe():
+   _unit_from_probe():
    Return the unit of the signal deduced from the probe name
 
    detect():
@@ -34,7 +34,7 @@ class GnucapReader(Reader):
                    "nv":"", "ev":"", "r":"Ohms", "y":"S",
                    "Time":"s", "Freq":"Hz"}
 
-    def read_sigs(self):
+    def _read_signals(self):
         """ Read the signals from the file
 
         First get the signal names from the first line, the abscisse
@@ -46,13 +46,13 @@ class GnucapReader(Reader):
         names = []
         signals = []
 
-        with open(self.fn) as f:
+        with open(self._fn) as f:
             lines = iter(f)
 
             # read signal names
             first_line = lines.next()
             for x in first_line.lstrip('#').split():
-                unit = self.unit_from_probe(x.split('(', 1)[0])
+                unit = self._unit_from_probe(x.split('(', 1)[0])
                 units.append(unit)
                 name = x.replace('(', '').replace(')', '')
                 names.append(name)
@@ -73,10 +73,10 @@ class GnucapReader(Reader):
             s.ref = ref
             s.data = data[i + 1]
 
-        self.sigs = dict(zip(names[1:], signals[1:]))
-        return self.sigs
+        self._signals = dict(zip(names[1:], signals[1:]))
+        return self._signals
 
-    def unit_from_probe(self, probe_name):
+    def _unit_from_probe(self, probe_name):
         """ Return the unit name from the probe name
         In Gnucap format, the header has the format:
         Time|Freq probe(node) probe(node) probe(node)
@@ -90,7 +90,7 @@ class GnucapReader(Reader):
         """ Look at the header, if it if something like
         #Name probe(name)
         """
-        self.check(fn)
+        self._check(fn)
         try:
             f = open(fn)
         except IOError, e:

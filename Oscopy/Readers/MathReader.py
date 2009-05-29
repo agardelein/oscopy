@@ -1,7 +1,7 @@
 """ Handle mathematical expressions for signals
 
 In parent class, read validate the path, here validate the expression.
-read_sigs() load the signals from file(s) and compute the expression.
+_read_signals() load the signals from file(s) and compute the expression.
 
 Mathematical function are supported through the pylab module. However 
 this module contains a bunch of non-math function, so only the functions
@@ -14,16 +14,16 @@ class MathReader:
    read(f)
    Validate the expression, check if all signals are here.
 
-   read_sigs()
+   _read_signals()
    Load the signals from files, and compute the result
 
    missing()
    Return the unrecognized name in the expression
 
    set_origsigs()
-   Store the signals name and their original file to be used in read_sigs()
+   Store the signals name and their original file to be used in _read_signals()
 
-   check()
+   _check()
    No check to do since no file are used
 
    detect()
@@ -51,7 +51,7 @@ class MathReader(Reader):
         Reader.__init__(self)
 
     def read(self, inp=""):
-        """ Validate the expression : each word should be in self.sigs
+        """ Validate the expression : each word should be in self._signals
         or math module
         If read failed, return {} and unknown word can be retrieved by
         calling missing()
@@ -59,12 +59,12 @@ class MathReader(Reader):
         if not inp:
             return {}
         if self.validate_expr(inp):
-            self.fn = inp
-            return self.read_sigs()
+            self._fn = inp
+            return self._read_signals()
         else:
             return {}
 
-    def read_sigs(self):
+    def _read_signals(self):
         """ Return a dict with only the signal computed
         The signal is computed here since it can change between two updates
         """
@@ -72,7 +72,7 @@ class MathReader(Reader):
             return {}
 
         _sigs = self.origsigs
-        self.sigs = {}
+        self._signals = {}
 
         # Check homogeneity of X: signals should have the same abscisse
         first = 1
@@ -104,7 +104,7 @@ class MathReader(Reader):
         del first, inval
 
         # Prepare the expression to be executed
-        _expr = self.fn
+        _expr = self._fn
         # Replace sin with numpy.sin but only for supported math functions
         # an also fft with numpy.fft.fft
         # on: operand name
@@ -166,8 +166,8 @@ class MathReader(Reader):
             _tmp.ref = Signal(_refsig.name, _refsig.unit)
             _tmp.ref.data = x
 
-        self.sigs[_sn] = _tmp
-        return self.sigs
+        self._signals[_sn] = _tmp
+        return self._signals
 
     def missing(self):
         """ Return the unknown names found when read() was last called
@@ -185,7 +185,7 @@ class MathReader(Reader):
         """ Return the list of signal names dependencies """
         return self.origsigs.keys()
 
-    def check(self, fn):
+    def _check(self, fn):
         """ No file are needed, so no access problems !
         """
         return

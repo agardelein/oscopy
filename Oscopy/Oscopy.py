@@ -249,7 +249,7 @@ class Oscopy(object):
             # Normal call create the new list etc etc
             self.upn += 1
             for reader in self.readers.itervalues():
-                print "Updating signals from", reader.fn
+                print "Updating signals from", reader
                 n.update(self.update(reader, self.upn))
         else:
             # First look at its dependencies
