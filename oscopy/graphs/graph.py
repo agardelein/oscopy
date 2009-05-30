@@ -50,7 +50,7 @@ Class Graph -- Handle the representation of a list of signals
 
 import matplotlib.pyplot as plt
 from matplotlib import rc
-from Cursor import Cursor
+from cursor import Cursor
 
 class Graph(object):
     def __init__(self, sigs={}):

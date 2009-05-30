@@ -58,9 +58,7 @@ Figure -- Handle a list of graphs
 """
 
 import matplotlib.pyplot as plt
-from Graphs import Graph
-from Graphs.LinGraphs import LinGraph
-#from Graphs.FFTGraph import FFTGraph, IFFTGraph
+from graphs import Graph, LinGraph
 
 class Figure(object):
 

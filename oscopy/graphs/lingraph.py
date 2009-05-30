@@ -12,7 +12,7 @@ Class XYGraph -- Draw a xy graph using signals pairs
       Return the mode of the graph "linear"
 """
 
-from Graph import Graph
+from graph import Graph
 
 class LinGraph(Graph):
     @property
