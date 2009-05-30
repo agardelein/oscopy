@@ -1,6 +1,6 @@
 """ Interface between signals and figures
 
-Class Oscopy: Commands callables from oscopy commandline
+Class Context: Commands callables from oscopy commandline
 
    Methods:
    __init__()
@@ -90,8 +90,8 @@ from writers.detect_writer import DetectWriter
 from writers.writer import WriteError
 from figure import Figure
 
-class Oscopy(object):
-    """ Class Oscopy -- Interface between signals and figures
+class Context(object):
+    """ Class Context -- Interface between signals and figures
 
     This object is the interface between the signals and the figures,
     e.g. it handle operations on figures, signals, readers and writers.

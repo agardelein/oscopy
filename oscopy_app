@@ -6,7 +6,7 @@ import re
 import readline
 import os.path
 from optparse import OptionParser
-from oscopy.Oscopy import Oscopy
+import oscopy
 from oscopy.readers.reader import ReadError
 
 class OscopyApp(object):
@@ -14,7 +14,7 @@ class OscopyApp(object):
     See Cmd for more help
     """
     def __init__(self):
-        self.cmds = Oscopy()
+        self.cmds = oscopy.Context()
         # Prompt
         p = "oscopy> "
         # History file
