@@ -252,7 +252,7 @@ The \rd\ class provide the tools to ensure the file is readable and the update m
 The Table~\ref{tab:rds:meth} show the methods of this class.
 
 The main method of this object is then \meth{read}, which is user-visible.
-However, this is \meth{read\_sigs}\ that does the real work, i.e. parse the file and create the signals.
+However, this is \meth{read\_signals}\ that does the real work, i.e. parse the file and create the signals.
 The file format support is verified by \meth{detect}.
 Those two methods should be redefined when deriving \rd.
 
@@ -270,7 +270,7 @@ The file access is verified by \meth{check}, and the update mechanism is handled
     update       & Public & Reread the data\\
     detect       & Public & Return True if file is handled\\
     check        & Private& Raise an exception if the file is not readable\\
-    read\_sigs    & Private& Read the data \\
+    read\_signals    & Private& Read the data \\
     \hline
   \end{tabular}
   \caption{Methods of \rd}
@@ -293,7 +293,7 @@ New back-end can be created to support new file formats, this is done by derivin
 This object provide the necessary framework so that the derived class should only redefine two methods:
 \begin{itemize}
 \item \meth{detect} that returns True if the file format is supported
-\item \meth{read\_sigs} that effectively parse the file and return a dict of signals
+\item \meth{read\_signals} that effectively parse the file and return a dict of signals
 \end{itemize}
 Boring tasks like file access check or update management are handled by \rd.
 Note that the constructor should also call the base class one.
