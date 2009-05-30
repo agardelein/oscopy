@@ -19,7 +19,7 @@ Class IFFTGraph -- Do an inverse fft when plotting signals
    Return "ifft", the type of the graph
 """
 from Graph import Graph
-from Oscopy.Signal import Signal
+from oscopy.Signal import Signal
 import numpy.fft
 
 class FFTGraph(Graph):

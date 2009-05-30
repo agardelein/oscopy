@@ -6,8 +6,8 @@ import re
 import readline
 import os.path
 from optparse import OptionParser
-from Oscopy.Oscopy import Oscopy
-from Oscopy.Readers.Reader import ReadError
+from oscopy.Oscopy import Oscopy
+from oscopy.Readers.Reader import ReadError
 
 class OscopyApp(object):
     """ Analyse command arguments and call function from Cmd

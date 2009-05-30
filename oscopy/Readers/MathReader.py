@@ -37,8 +37,8 @@ import numpy
 import re
 import math
 import sys
-from Reader import Reader, ReadError
-from Oscopy.Signal import Signal
+from Reader import Reader
+from oscopy.Signal import Signal
 
 class MathReader(Reader):
     def __init__(self, sigs={}):
