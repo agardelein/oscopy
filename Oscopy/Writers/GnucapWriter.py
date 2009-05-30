@@ -3,13 +3,13 @@ from __future__ import with_statement
 
 class GnucapWriter -- Handle gnucap format
 
-   _get_fmt_name()
+   _get_format_name()
    Return 'gnucap'
 
-   _fmt_check()
+   _format_check()
    Return True if all signals have the same reference
 
-   write_sigs()
+   write_signals()
    Write the signals to file
 
    format_sig_name()
@@ -32,12 +32,12 @@ class GnucapWriter(Writer):
         self._prefixes.sort()
         self._prefixes.reverse()
 
-    def _get_fmt_name(self):
+    def _get_format_name(self):
         """ Return the format name
         """
         return 'gnucap'
 
-    def _fmt_check(self, sigs):
+    def _format_check(self, sigs):
         """ Check if all signals have the same reference
         """
         if not sigs:
@@ -46,7 +46,7 @@ class GnucapWriter(Writer):
         ref = sigs.values()[0].ref
         return all(s.ref is ref for s in sigs.itervalues())
 
-    def write_sigs(self, sigs):
+    def write_signals(self, sigs):
         """ Write signals to file
         Loop through all the data of each signal to write
         columns line by line.

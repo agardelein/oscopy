@@ -8,17 +8,17 @@ digraph writers {
 		fontsize=8 ;
 		label="Writer";
 		check [label="check()"];
-		fmtcheck [label="format_check()",style=dotted]
-		write_sigs [label="write_sigs()",style=dotted];
+		formatcheck [label="format_check()",style=dotted]
+		write_sigs [label="write_signals()",style=dotted];
 		write [label="write()"];
 		init [label="__init__()"];
 		detect [label="detect()"];
-		getfmtname [label="get_format_name()",style=dotted]
+		getformatname [label="get_format_name()",style=dotted]
 		};
       		User -> write -> write_sigs ;		
 	User -> DetectWriter -> init
 	DetectWriter -> detect
 	write -> check
-	write -> fmtcheck
-	detect -> getfmtname
+	write -> formatcheck
+	detect -> getformatname
 }

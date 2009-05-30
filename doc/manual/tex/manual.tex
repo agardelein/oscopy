@@ -320,11 +320,11 @@ The \wrt\ class provide the tools to make the definition of new export format ea
 The Table~\ref{tab:wrts:meth} shows the methods of this class.
 
 Only the methods \meth{detect} and \meth{write} are user visible.
-The real work is done by \meth{write\_sigs} that format the data and put them into the file.
+The real work is done by \meth{write\_signals} that format the data and put them into the file.
 \meth{detect} is used to check whether the back-end class support the format.
-For now this is only a comparison between the name provided by the user and the result of the call to \meth{get\_fmt\_name}.
+For now this is only a comparison between the name provided by the user and the result of the call to \meth{get\_format\_name}.
 
-Before calling \meth{write\_sigs}, \meth{write} check the file access (with \meth{check}) and do a format specific verification by calling \meth{fmt\_check}.
+Before calling \meth{write\_signals}, \meth{write} check the file access (with \meth{check}) and do a format specific verification by calling \meth{format\_check}.
 For example, for text columns-based formats like CSV, this could be checking that all signals share the same reference.
 This function should be redefined by the derived class.
 
@@ -338,9 +338,9 @@ This function should be redefined by the derived class.
     write        & Public & Write the data, user visible function\\
     detect       & Public & Return True if format is handled\\
     check        & Private& Raise an exception if the file is not writable\\
-    write\_sigs  & Private& Write the data, to be defined by the back-end\\
-    get\_fmt\_name&Private& Return the name of the format\\
-    fmt\_check   & Private& Format-specific checks\\
+    write\_signals  & Private& Write the data, to be defined by the back-end\\
+    get\_format\_name&Private& Return the name of the format\\
+    format\_check   & Private& Format-specific checks\\
     \hline
   \end{tabular}
   \caption{Methods of \wrt}
@@ -360,9 +360,9 @@ New formats are supported by adding a back-end to the module, by deriving the \w
 This class provide the requested framework (file access checking, detection mechanism) to make the new format adding simpler.
 Thus the new class should redefine the methods:
 \begin{itemize}
-\item \meth{get\_fmt\_name} that return a string identifying the format
-\item \meth{fmt\_check} that verifies if signals are compliant with the format
-\item \meth{write\_sigs} that effectively write the data to the file
+\item \meth{get\_format\_name} that return a string identifying the format
+\item \meth{format\_check} that verifies if signals are compliant with the format
+\item \meth{write\_signals} that effectively write the data to the file
 \end{itemize}
 Note that the constructor of the new class should call the base class one.
 
