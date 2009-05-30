@@ -88,7 +88,7 @@ from Readers.DetectReader import DetectReader
 from Writers.DetectWriter import DetectWriter
 from Readers.Reader import ReadError
 from Writers.Writer import WriteError
-from Figure import Figure
+from figure import Figure
 
 class Oscopy(object):
     """ Class Oscopy -- Interface between signals and figures
