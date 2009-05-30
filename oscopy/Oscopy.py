@@ -86,8 +86,8 @@ import re
 import matplotlib.pyplot as plt
 from readers.detect_reader import DetectReader
 from readers.reader import ReadError
-from Writers.DetectWriter import DetectWriter
-from Writers.Writer import WriteError
+from writers.detect_writer import DetectWriter
+from writers.writer import WriteError
 from figure import Figure
 
 class Oscopy(object):

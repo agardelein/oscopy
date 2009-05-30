@@ -6,8 +6,8 @@ Automagically return a Writer to use for file writing
 """
 import os.path
 from os import access
-from Writer import WriteError
-from GnucapWriter import GnucapWriter
+from writer import WriteError
+from gnucap_writer import GnucapWriter
 
 WRITERS = [GnucapWriter]
 

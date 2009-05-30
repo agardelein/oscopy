@@ -17,7 +17,7 @@ class GnucapWriter -- Handle gnucap format
 """
 
 import itertools
-from Writer import Writer
+from writer import Writer
 
 class GnucapWriter(Writer):
     """ Write signals to columns tab separated format used by Gnucap
