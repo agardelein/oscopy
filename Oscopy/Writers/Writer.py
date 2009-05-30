@@ -23,7 +23,6 @@ class Writer -- Define the common functions for writing files
 """
 
 import os.path
-import numpy
 
 class WriteError(Exception):
     def __init__(self, msg):
