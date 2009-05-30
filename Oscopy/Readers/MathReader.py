@@ -37,7 +37,7 @@ import numpy
 import re
 import math
 import sys
-from Reader import Reader
+from Reader import Reader, ReadError
 from Oscopy.Signal import Signal
 
 class MathReader(Reader):
@@ -97,10 +97,7 @@ class MathReader(Reader):
                         inval.append(k)
                         break
         if inval:
-            print "Abscisse is different:",
-            for s in inval:
-                print s
-            return {}
+            raise ReadError("Abscisse is different: " + ", ".join(inval))
         del first, inval
 
         # Prepare the expression to be executed
@@ -135,11 +132,10 @@ class MathReader(Reader):
         try:
             _tmp.data = eval(_expr)
         except NameError, e:
-            print "NameError:", e.message
-            return {}
+            raise ReadError("NameError: " + e.message)
         except TypeError, e:
-            print "TypeError:", e.message
-            return {}
+            raise ReadError("TypeError: " + e.message)
+
         _tmp.ref = _refsig
 
         # If there is an fft or ifft, compute new axis

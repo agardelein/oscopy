@@ -393,7 +393,7 @@ Help for individual command can be obtained with 'help COMMAND'\
                 continue
             
             except ReadError, e:
-                print "Error in read :", e.value
+                print "Error in read :", e
 
         readline.write_history_file(self.hist_file)
 
