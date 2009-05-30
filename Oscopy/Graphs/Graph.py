@@ -59,7 +59,7 @@ class Graph(object):
         Signals are assumed to exist and to be valid
         If first argument is a Graph, then copy things
         """
-        self.sigs = {}
+        self._sigs = {}
         if isinstance(sigs, Graph):
             # Warn on some conversion that may lead to nasty things
             if (sigs.get_type().find('fft') == 0 \
@@ -72,31 +72,31 @@ may lead to uncertain results"
             mysigs = {}
             mysigs = sigs.sigs.copy()
             self.insert(mysigs)
-            self.plotf = sigs.plotf
-            self.xrange = sigs.xrange
-            self.yrange = sigs.yrange
-            self.ax = sigs.ax
-            self.cursors = {"horiz": [None, None], "vert": [None, None]}
-            self.txt = None
+            self._plotf = sigs.plotf
+            self._xrange = sigs.xrange
+            self._yrange = sigs.yrange
+            self._ax = sigs.ax
+            self._cursors = {"horiz": [None, None], "vert": [None, None]}
+            self._txt = None
         else:
-            self.xaxis = ""
-            self.yaxis = ""
-            self.xunit = ""
-            self.yunit = ""
-            self.xrange = []
-            self.yrange = []
+            self._xaxis = ""
+            self._yaxis = ""
+            self._xunit = ""
+            self._yunit = ""
+            self._xrange = []
+            self._yrange = []
             self.insert(sigs)
-            self.plotf = plt.plot
-            self.ax = None
+            self._plotf = plt.plot
+            self._ax = None
             # Cursors values, only two horiz and two vert but can be changed
-            self.cursors = {"horiz":[None, None], "vert":[None, None]}
-            self.txt = None
+            self._cursors = {"horiz":[None, None], "vert":[None, None]}
+            self._txt = None
 
     def __str__(self):
         """ Return a string with the type and the signal list of the graph
         """
         a = "(" + self.get_type() + ") "
-        for sn in self.sigs.keys():
+        for sn in self._sigs.keys():
             a = a + sn + " "
         return a
 
@@ -107,29 +107,29 @@ may lead to uncertain results"
         otherwise they are ignored
         """
         for sn, s in sigs.iteritems():
-            if not self.sigs:
+            if not self._sigs:
                 # First signal, set_ the abscisse name and add signal
-                self.xaxis = s.ref.name
-                self.xunit = s.ref.unit
-                self.yaxis = "Signals"  # To change
-                self.yunit = s.unit
-                self.sigs[sn] = s
+                self._xaxis = s.ref.name
+                self._xunit = s.ref.unit
+                self._yaxis = "Signals"  # To change
+                self._yunit = s.unit
+                self._sigs[sn] = s
             else:
-                if s.ref.name == self.xaxis:
+                if s.ref.name == self._xaxis:
                     # Add signal
-                    self.sigs[sn] = s
+                    self._sigs[sn] = s
                 else:
                     # Ignore signal
-                    print "Not the same ref:", sn, "-", self.xaxis,"-"
-        return len(self.sigs)
+                    print "Not the same ref:", sn, "-", self._xaxis,"-"
+        return len(self._sigs)
 
     def remove(self, sigs={}):
         """ Delete signals from the graph
         """
         for sn in sigs.iterkeys():
-            if sn in self.sigs.keys():
-                del self.sigs[sn]
-        return len(self.sigs)
+            if sn in self._sigs.keys():
+                del self._sigs[sn]
+        return len(self._sigs)
 
     def plot(self, ax=None):
         """ Plot the graph in Matplotlib Axes instance ax
@@ -137,32 +137,32 @@ may lead to uncertain results"
         In this way, signals with a different sampling can be plotted toget_her.
         The x axis is labelled with the abscisse name of the graph.
         """
-        if not self.sigs:
+        if not self._sigs:
             return
         # Prepare labels
-        xl = self.xaxis
-        if not self.xunit:
+        xl = self._xaxis
+        if not self._xunit:
             xu = "a.u."
         else:
-            xu = self.xunit
-        fx, l = self.find_scale_factor("X")
+            xu = self._xunit
+        fx, l = self._find_scale_factor("X")
         xl = xl + " (" + l + xu + ")"
-        yl = self.yaxis
-        if not self.yunit:
+        yl = self._yaxis
+        if not self._yunit:
             yu = "a.u."
         else:
-            yu = self.yunit
-        fy, l = self.find_scale_factor("Y")
+            yu = self._yunit
+        fy, l = self._find_scale_factor("Y")
         yl = yl + " (" + l + yu + ")"
         
         # Plot the signals
         ax.hold(True)
-        for sn, s in self.sigs.iteritems():
+        for sn, s in self._sigs.iteritems():
             # Scaling factor
             x = s.ref.data * pow(10, fx)
             y = s.data * pow(10, fy)
             try:
-                self.plotf(x, y, label=sn)
+                self._plotf(x, y, label=sn)
             except OverflowError, e:
                 print "OverflowError in plot:", e.message, ", log(0) somewhere ?"
                 ax.hold(False)
@@ -172,20 +172,20 @@ may lead to uncertain results"
         ax.hold(False)
         ax.set_xlabel(xl)
         ax.set_ylabel(yl)
-        if len(self.xrange) == 2:
-            ax.set_xlim(self.xrange[0], self.xrange[1])
-        if len(self.yrange) == 2:
-            ax.set_ylim(self.yrange[0], self.yrange[1])
+        if len(self._xrange) == 2:
+            ax.set_xlim(self._xrange[0], self._xrange[1])
+        if len(self._yrange) == 2:
+            ax.set_ylim(self._yrange[0], self._yrange[1])
         ax.legend()
 
-        self.ax = ax
-        self.draw_cursors()
-        self.print_cursors()
+        self._ax = ax
+        self._draw_cursors()
+        self._print_cursors()
 
     def get_sigs(self):
         """ Return a list of the signal names
         """
-        for sn in self.sigs:
+        for sn in self._sigs:
             yield sn
 
     def get_type(self):
@@ -194,7 +194,7 @@ may lead to uncertain results"
         """
         return
     
-    def find_scale_factor(self, a):
+    def _find_scale_factor(self, a):
         """ Choose the right scale for data on axis a
         Return the scale factor (f) and a string with the abbrev. (l)
         """
@@ -205,7 +205,7 @@ may lead to uncertain results"
         mxs = []
         mns = []
 
-        for s in self.sigs.itervalues():
+        for s in self._sigs.itervalues():
             if a == "X":
                 mxs.append(max(s.ref.data))
                 mns.append(min(s.ref.data))
@@ -225,8 +225,8 @@ may lead to uncertain results"
         while not (abs(mx * pow(10.0, f)) < 1000.0 \
                        and abs(mx * pow(10.0, f)) >= 1.0):
             f = f + fct
-        if scnames.has_key(-f) and ((self.xunit != "" and a == "X") \
-                or (self.yunit != "" and a != "X")):
+        if scnames.has_key(-f) and ((self._xunit != "" and a == "X") \
+                or (self._yunit != "" and a != "X")):
             l = scnames[-f]
         else:
             if f == 0:
@@ -240,23 +240,23 @@ may lead to uncertain results"
         set_ y axis, if both are provided, set_ both.
         """
         if not yu:
-            self.yunit = xu
+            self._yunit = xu
         else:
-            self.xunit = xu
-            self.yunit = yu
+            self._xunit = xu
+            self._yunit = yu
 
     def set_scale(self, a):
         """ Set axes scale, either lin, logx, logy or loglog
         """
         if isinstance(a, str):
             if a == "lin":
-                self.plotf = plt.plot
+                self._plotf = plt.plot
             elif a == "logx":
-                self.plotf = plt.semilogx
+                self._plotf = plt.semilogx
             elif a == "logy":
-                self.plotf = plt.semilogy
+                self._plotf = plt.semilogy
             elif a == "loglog":
-                self.plotf = plt.loglog
+                self._plotf = plt.loglog
 
     def set_range(self, a1="reset", a2=None, a3=None, a4=None):
         """ Set axis range
@@ -267,18 +267,18 @@ may lead to uncertain results"
         """
         if isinstance(a1, str) and a1 == "reset":
             # Delete range specs
-            self.xrange = []
-            self.yrange = []
+            self._xrange = []
+            self._yrange = []
         if a4 is None:
             # Set either x or y range
             if a1 == 'x':
-                self.xrange = [a2, a3]
+                self._xrange = [a2, a3]
             elif a1 == 'y':
-                self.yrange = [a2, a3]
+                self._yrange = [a2, a3]
         else:
             # Set range for both axis
-            self.xrange = [a1, a2]
-            self.yrange = [a3, a4]
+            self._xrange = [a1, a2]
+            self._yrange = [a3, a4]
         
     def toggle_cursors(self, ctype="", num=None, val=None):
         """ Toggle the cursors in the graph
@@ -290,53 +290,53 @@ may lead to uncertain results"
 
         if not ctype in ["horiz", "vert"]:
             return
-        if num >= len(self.cursors[ctype]):
+        if num >= len(self._cursors[ctype]):
             return
         if val is None:
             return
-        if self.cursors[ctype][num] is None:
-            self.set_cursor(ctype, num, val)
+        if self._cursors[ctype][num] is None:
+            self._set_cursor(ctype, num, val)
         else:
-            self.cursors[ctype][num].value = val
-            self.cursors[ctype][num].set_visible()
-            self.cursors[ctype][num].draw(self.ax)
-        self.print_cursors()
-        fx, lx = self.find_scale_factor("X")
-        fy, ly = self.find_scale_factor("Y")
+            self._cursors[ctype][num].value = val
+            self._cursors[ctype][num].set_visible()
+            self._cursors[ctype][num].draw(self._ax)
+        self._print_cursors()
+        fx, lx = self._find_scale_factor("X")
+        fy, ly = self._find_scale_factor("Y")
 
-    def draw_cursors(self):
+    def _draw_cursors(self):
         """ Draw the cursor lines on the graph
         Called at the end of plot()
         """
-        fx, lx = self.find_scale_factor("X")
-        fy, ly = self.find_scale_factor("Y")
+        fx, lx = self._find_scale_factor("X")
+        fy, ly = self._find_scale_factor("Y")
         l = {"horiz": ly, "vert": lx}
         txt = {"horiz": "", "vert": ""}
-        for t, ct in self.cursors.iteritems():
+        for t, ct in self._cursors.iteritems():
             for c in ct:
                 if c is not None:
-                    c.draw(self.ax, ct.index(c))
+                    c.draw(self._ax, ct.index(c))
 
-    def set_cursor(self, ctype, num, val):
+    def _set_cursor(self, ctype, num, val):
         """ Add a cursor to the graph
         """
         if ctype in ["horiz", "vert"]:
             if num >= 0 and num < 2:
                 # Just handle two cursor
-                self.cursors[ctype][num] = Cursor(val, ctype)
-                self.cursors[ctype][num].draw(self.ax, num)
+                self._cursors[ctype][num] = Cursor(val, ctype)
+                self._cursors[ctype][num].draw(self._ax, num)
 
-    def print_cursors(self):
+    def _print_cursors(self):
         """ Print cursors values on the graph
         If both cursors are set_, print difference (delta)
         """
-        fx, lx = self.find_scale_factor("X")
-        fy, ly = self.find_scale_factor("Y")
+        fx, lx = self._find_scale_factor("X")
+        fy, ly = self._find_scale_factor("Y")
         l = {"horiz": ly, "vert": lx}
-        u = {"horiz": self.yunit, "vert": self.xunit}
+        u = {"horiz": self._yunit, "vert": self._xunit}
         txt = {"horiz": "", "vert": ""}
         # Preapre string for each cursor type (i.e. "horiz" and "vert")
-        for t, cl in self.cursors.iteritems():
+        for t, cl in self._cursors.iteritems():
             for c in cl:
                 if c is not None and c.visible:
                     # Add cursors value to text
@@ -348,12 +348,18 @@ may lead to uncertain results"
                     % (u[t], float(cl[1].value - cl[0].value),\
                            l[t], u[t])
 
-        if self.txt is None or not self.txt.axes == self.ax:
+        if self._txt is None or not self._txt.axes == self._ax:
             # Add text to graph
             rc('font', family='monospace')
-            self.txt = self.ax.text(0.02, 0.1, "",\
-                                        transform=self.ax.transAxes,\
-                                        axes=self.ax)
-            self.txt.set_size(0.75 * self.txt.get_size())
+            self._txt = self._ax.text(0.02, 0.1, "",\
+                                        transform=self._ax.transAxes,\
+                                        axes=self._ax)
+            self._txt.set_size(0.75 * self._txt.get_size())
         # Update text
-        self.txt.set_text("%s\n%s" % (txt["horiz"], txt["vert"]))
+        self._txt.set_text("%s\n%s" % (txt["horiz"], txt["vert"]))
+
+    @property
+    def ax(self):
+        """ Return the Matplotlib axe
+        """
+        return self._ax
