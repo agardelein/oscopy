@@ -24,7 +24,7 @@ Class GnucapReader:
 """
 
 import re
-from oscopy.Signal import Signal
+from oscopy import Signal
 from Reader import Reader
 
 class GnucapReader(Reader):

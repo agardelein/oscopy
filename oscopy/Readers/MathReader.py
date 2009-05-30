@@ -38,7 +38,7 @@ import re
 import math
 import sys
 from Reader import Reader
-from oscopy.Signal import Signal
+from oscopy import Signal
 
 class MathReader(Reader):
     def __init__(self, sigs={}):
