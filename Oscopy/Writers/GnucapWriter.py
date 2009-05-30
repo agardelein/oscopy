@@ -3,10 +3,10 @@ from __future__ import with_statement
 
 class GnucapWriter -- Handle gnucap format
 
-   get_fmt_name()
+   _get_fmt_name()
    Return 'gnucap'
 
-   fmt_check()
+   _fmt_check()
    Return True if all signals have the same reference
 
    write_sigs()
@@ -32,12 +32,12 @@ class GnucapWriter(Writer):
         self._prefixes.sort()
         self._prefixes.reverse()
 
-    def get_fmt_name(self):
+    def _get_fmt_name(self):
         """ Return the format name
         """
         return 'gnucap'
 
-    def fmt_check(self, sigs):
+    def _fmt_check(self, sigs):
         """ Check if all signals have the same reference
         """
         if not sigs:
@@ -61,8 +61,8 @@ class GnucapWriter(Writer):
         """
         SEPARATOR = '\t'
         # Overwrite file or not
-        self.ow = True
-        if self.ow:
+        self._ow = True
+        if self._ow:
             mode = "w"
         else:
             mode = "a"
@@ -71,7 +71,7 @@ class GnucapWriter(Writer):
         s = sigs.values()
         s.insert(0, s[0].ref)
 
-        with open(self.fn, mode) as f:
+        with open(self._fn, mode) as f:
             # write the header
             names = map(self.format_sig_name, map(lambda x: x.name, s))
             f.write('#%s\n' % SEPARATOR.join(names))
