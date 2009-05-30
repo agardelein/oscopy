@@ -37,7 +37,7 @@ import numpy
 import re
 import math
 import sys
-from Reader import Reader
+from reader import Reader, ReadError
 from oscopy import Signal
 
 class MathReader(Reader):

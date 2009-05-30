@@ -4,9 +4,9 @@ Detect(file)
    Automagically select the Reader to use for reading file
 """
 import os.path
-from Reader import ReadError
-from GnucapReader import GnucapReader
-from MathReader import MathReader
+from reader import ReadError
+from gnucap_reader import GnucapReader
+from math_reader import MathReader
 
 READERS = [GnucapReader, MathReader]
 

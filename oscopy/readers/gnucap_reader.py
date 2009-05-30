@@ -25,7 +25,7 @@ Class GnucapReader:
 
 import re
 from oscopy import Signal
-from Reader import Reader
+from reader import Reader
 
 class GnucapReader(Reader):
     # A dictionary mapping gnucap probe names to units.

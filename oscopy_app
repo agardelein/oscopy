@@ -7,7 +7,7 @@ import readline
 import os.path
 from optparse import OptionParser
 from oscopy.Oscopy import Oscopy
-from oscopy.Readers.Reader import ReadError
+from oscopy.readers.reader import ReadError
 
 class OscopyApp(object):
     """ Analyse command arguments and call function from Cmd

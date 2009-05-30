@@ -84,9 +84,9 @@ gn  : graph number
 import sys
 import re
 import matplotlib.pyplot as plt
-from Readers.DetectReader import DetectReader
+from readers.detect_reader import DetectReader
+from readers.reader import ReadError
 from Writers.DetectWriter import DetectWriter
-from Readers.Reader import ReadError
 from Writers.Writer import WriteError
 from figure import Figure
 
