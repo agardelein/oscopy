@@ -35,7 +35,7 @@ Class Graph -- Handle the representation of a list of signals
    get_sigs()
       Return a list of the signal names
 
-   get_type()
+   type()
       Return a string with the type of graph, to be overloaded.
 
    set_units()
@@ -62,10 +62,10 @@ class Graph(object):
         self._sigs = {}
         if isinstance(sigs, Graph):
             # Warn on some conversion that may lead to nasty things
-            if (sigs.get_type().find('fft') == 0 \
-                    and self.get_type().find('ifft') == 0) \
-                    or (sigs.get_type().find('ifft') == 0 \
-                            and self.get_type().find('fft') == 0):
+            if (sigs.type.find('fft') == 0 \
+                    and self.type.find('ifft') == 0) \
+                    or (sigs.type.find('ifft') == 0 \
+                            and self.type.find('fft') == 0):
                 print "Warning: fft <=> ifft conversions and vice versa \
 may lead to uncertain results"
 
@@ -95,7 +95,7 @@ may lead to uncertain results"
     def __str__(self):
         """ Return a string with the type and the signal list of the graph
         """
-        a = "(" + self.get_type() + ") "
+        a = "(" + self.type + ") "
         for sn in self._sigs.keys():
             a = a + sn + " "
         return a
@@ -188,7 +188,8 @@ may lead to uncertain results"
         for sn in self._sigs:
             yield sn
 
-    def get_type(self):
+    @property
+    def type(self):
         """ Return a string with the type of the graph
         To be overloaded by derived classes.
         """

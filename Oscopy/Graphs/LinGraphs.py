@@ -3,19 +3,20 @@
 Class LinGraph -- Draw graph with linear scale on X and Y axis
 
    methods:
-   get_type()
+   type()
       Return the mode of the graph "linear"
 
 Class XYGraph -- Draw a xy graph using signals pairs
    methods:
-   get_type()
+   type()
       Return the mode of the graph "linear"
 """
 
 from Graph import Graph
 
 class LinGraph(Graph):
-    def get_type(self):
+    @property
+    def type(self):
         """ Return 'linear', the type of the graph
         """
         return "linear"
