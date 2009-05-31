@@ -60,6 +60,10 @@ class Graph(object):
         If first argument is a Graph, then copy things
         """
         self._sigs = {}
+        self._factor_names = {-18: "a", -15:"f", -12:"p", -9:"n", -6:"u",\
+                                   -3:"m", 0:"", 3:"k", 6:"M", 9:"G", 12:"T",\
+                                   15:"P", 18:"E"}
+
         if isinstance(sigs, Graph):
             # Warn on some conversion that may lead to nasty things
             if (sigs.type.find('fft') == 0 \
@@ -199,9 +203,6 @@ may lead to uncertain results"
         """ Choose the right scale for data on axis a
         Return the scale factor (f) and a string with the abbrev. (l)
         """
-        scnames = {-18: "a", -15:"f", -12:"p", -9:"n", -6:"u", -3:"m", \
-            0:"", 3:"k", 6:"M", 9:"G", 12:"T", 15:"P", 18:"E"}
-
         # Find the absolute maximum of the data
         mxs = []
         mns = []
@@ -226,9 +227,10 @@ may lead to uncertain results"
         while not (abs(mx * pow(10.0, f)) < 1000.0 \
                        and abs(mx * pow(10.0, f)) >= 1.0):
             f = f + fct
-        if scnames.has_key(-f) and ((self._xunit != "" and a == "X") \
-                or (self._yunit != "" and a != "X")):
-            l = scnames[-f]
+        if self._factor_names.has_key(-f) and \
+                ((self._xunit != "" and a == "X") or \
+                     (self._yunit != "" and a != "X")):
+            l = self._factor_names[-f]
         else:
             if f == 0:
                 l = ""
