@@ -253,17 +253,29 @@ may lead to uncertain results"
                 self._xunit = unit[0]
                 self._yunit = unit[1]
 
-    def set_scale(self, a):
+    def get_scale(self):
+        """ Return the axes scale
+        """
+        if self._plotf == plt.plot:
+            return "lin"
+        elif self._plotf == plt.semilogx:
+            return "logx"
+        elif self._plotf == plt.semilogy:
+            return "logy"
+        elif self._plotf == plt.loglog:
+            return "loglog"
+
+    def set_scale(self, scale):
         """ Set axes scale, either lin, logx, logy or loglog
         """
-        if isinstance(a, str):
-            if a == "lin":
+        if isinstance(scale, str):
+            if scale == "lin":
                 self._plotf = plt.plot
-            elif a == "logx":
+            elif scale == "logx":
                 self._plotf = plt.semilogx
-            elif a == "logy":
+            elif scale == "logy":
                 self._plotf = plt.semilogy
-            elif a == "loglog":
+            elif scale == "loglog":
                 self._plotf = plt.loglog
 
     def set_range(self, a1="reset", a2=None, a3=None, a4=None):
@@ -372,3 +384,4 @@ may lead to uncertain results"
         """
         return self._ax
     unit = property(get_unit, set_unit)
+    scale = property(get_scale, set_scale)

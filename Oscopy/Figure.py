@@ -242,11 +242,11 @@ class Figure(object):
         if self.curgraph is not None:
             self.curgraph.unit = xu, yu
 
-    def set_scale(self, a):
+    def set_scale(self, scale):
         """ Set the current graph axis scale
         """
         if self.curgraph is not None:
-            self.curgraph.set_scale(a)
+            self.curgraph.scale = scale
 
     def set_range(self, a1="reset", a2=None, a3=None, a4=None):
         """ Set the axis range of the current graph
