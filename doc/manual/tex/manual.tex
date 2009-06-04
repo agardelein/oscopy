@@ -464,7 +464,6 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object, and
     get\_sigs & Public & Iterator that return the internal signal list\\
     \multicolumn{3}{l}{\textit{Viewing management}} \\
     plot & Public & Display the graph\\
-    set\_range & Public & Define the limits of the graph\\
     \multicolumn{3}{l}{\textit{Cursors management}} \\
     toggle\_cursor & Public & Change cursor status \\
     draw\_cursors & Private & Display the cursors on the graph\\
@@ -483,6 +482,7 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object, and
     \hline
     unit & Public & Tuple of str & The unit to be displayed in x/y labels\\
     scale & Public & str & Scale of the axis (one of lin,logx,logy,loglog) \\
+    range & Public & list[4] & Axis limits \\
     \hline
   \end{tabular}
   \caption{Properties of \graph.}
