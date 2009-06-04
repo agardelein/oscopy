@@ -191,9 +191,9 @@ FITNESS FOR A PARTICULAR PURPOSE."
                 self.cmds.range(tmp[0])
         elif len(tmp) == 3:
             if tmp[0] == 'x' or tmp[0] == 'y':
-                self.cmds.range(tmp[0], float(tmp[1]), float(tmp[2]))
+                self.cmds.range((tmp[0], [float(tmp[1]), float(tmp[2])]))
         elif len(tmp) == 4:
-            self.cmds.range(float(tmp[0]), float(tmp[1]), float(tmp[2]), float(tmp[3]))
+            self.cmds.range([float(tmp[0]), float(tmp[1]), float(tmp[2]), float(tmp[3])])
 
     def unit(self, args):
         if args == "help":

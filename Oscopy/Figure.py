@@ -248,11 +248,11 @@ class Figure(object):
         if self.curgraph is not None:
             self.curgraph.scale = scale
 
-    def set_range(self, a1="reset", a2=None, a3=None, a4=None):
+    def set_range(self, arg):
         """ Set the axis range of the current graph
         """
         if self.curgraph is not None:
-            self.curgraph.set_range(a1, a2, a3, a4)
+            self.curgraph.range = arg
 
     def key(self, event):
         """ Handle key press event

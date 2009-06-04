@@ -306,11 +306,11 @@ class Oscopy(object):
         if self.curfig is not None:
             self.curfig.set_scale(sc)
 
-    def range(self, a1 = "reset", a2 = None, a3 = None, a4 = None):
+    def range(self, arg):
         """ Set the axis range of the current graph of the current figure
         """
         if self.curfig is not None:
-            self.curfig.set_range(a1, a2, a3, a4)
+            self.curfig.set_range(arg)
 
     def unit(self, xu, yu = ""):
         """ Set the units of current graph of current figure

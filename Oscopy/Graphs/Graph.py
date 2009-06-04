@@ -278,27 +278,33 @@ may lead to uncertain results"
             elif scale == "loglog":
                 self._plotf = plt.loglog
 
-    def set_range(self, a1="reset", a2=None, a3=None, a4=None):
-        """ Set axis range
-        Form 1: set_range("reset")                delete range specs
-        Form 2: set_range("x", xmin, xmax)        set_ range for x axis
-                set_range("y", ymin, ymax)        set_ range for y axis
-        Form 3: set_range(xmin, xmax, ymin, ymax) set_ range for both axis
+    def get_range(self):
+        """ Return the axes limits
         """
-        if isinstance(a1, str) and a1 == "reset":
+        return self._xrange, self._yrange
+
+    def set_range(self, arg="reset"):
+        """ Set axis range
+        Form 1: set_range("reset")                  delete range specs
+        Form 2: set_range(("x", [xmin, xmax]))      set range for x axis
+                set_range(("y", [ymin, ymax]))      set range for y axis
+        Form 3: set_range([xmin, xmax, ymin, ymax]) set range for both axis
+        """
+        if isinstance(arg, str) and arg == "reset":
             # Delete range specs
             self._xrange = []
             self._yrange = []
-        if a4 is None:
-            # Set either x or y range
-            if a1 == 'x':
-                self._xrange = [a2, a3]
-            elif a1 == 'y':
-                self._yrange = [a2, a3]
-        else:
-            # Set range for both axis
-            self._xrange = [a1, a2]
-            self._yrange = [a3, a4]
+        elif isinstance(arg, list) and len(arg) == 4:
+            self._xrange = [arg[0], arg[1]]
+            self._yrange = [arg[2], arg[3]]            
+        elif isinstance(arg, tuple):
+            if len(arg) == 2 and isinstance(arg[0], str):
+                if arg[0] == "x" and isinstance(arg[1], list) and\
+                        len(arg[1]) == 2:
+                    self._xrange = arg[1]
+                elif arg[0] == "y" and isinstance(arg[1], list) and\
+                        len(arg[1]) == 2:
+                    self._yrange = arg[1]
         
     def toggle_cursors(self, ctype="", num=None, val=None):
         """ Toggle the cursors in the graph
@@ -383,5 +389,7 @@ may lead to uncertain results"
         """ Return the Matplotlib axe
         """
         return self._ax
+
     unit = property(get_unit, set_unit)
     scale = property(get_scale, set_scale)
+    range = property(get_range, set_range)
