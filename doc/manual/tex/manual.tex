@@ -160,7 +160,7 @@ The methods of this interface are summarised in Table~\ref{tab:ctxt:meth}.
   \centering\sf\small
   \begin{tabular}{lll}
     \hline
-    Method & Type & Action \\
+    Method & Access & Action \\
     \hline
     \_\_init\_\_ & Public & Initialise the object \\
     \multicolumn{3}{l}{\textit{Data management}} \\
@@ -262,7 +262,7 @@ The file access is verified by \meth{check}, and the update mechanism is handled
   \centering\sf\small
   \begin{tabular}{lll}
     \hline
-    Method & Type & Action \\
+    Method & Access & Action \\
     \hline
     \_\_init\_\_ & Public & Initialise the object \\
     \_\_str\_\_  & Public & Return a string with the filename\\
@@ -332,7 +332,7 @@ This function should be redefined by the derived class.
   \centering\sf\small
   \begin{tabular}{lll}
     \hline
-    Method & Type & Action \\
+    Method & Access & Action \\
     \hline
     \_\_init\_\_ & Public & Initialise the object \\
     write        & Public & Write the data, user visible function\\
@@ -386,7 +386,7 @@ It then call \meth{toggle\_cursors}\ from \graph.
   \centering\sf\small
   \begin{tabular}{lll}
     \hline
-    Method & Type & Action \\
+    Method & Access & Action \\
     \hline
     \_\_init\_\_ & Public & Initialise the object \\
     plot & Public & Draw the graphs\\
@@ -448,12 +448,12 @@ It has mainly three types of methods:
 \item[cursors management] that handle cursors related work e.g. toggling, displaying
 \end{description}
 The method \meth{get\_type} that identify the type of the graph, \meth{get\_type} do not fit in the previous categories.
-The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object.
+The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object, and Table~\ref{tab:graphs:props} the properties.
 \begin{table}[htbp]
   \centering\sf\small
   \begin{tabular}{lll}
     \hline
-    Method & Type & Action \\
+    Method & Access & Action \\
     \hline
     \_\_init\_\_ & Public & Initialise the object \\
     type & Public & Return a string identifying the graph type\\
@@ -466,7 +466,6 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object.
     plot & Public & Display the graph\\
     set\_range & Public & Define the limits of the graph\\
     set\_scale & Public & Define the scale of the axis\\
-    set\_unit & Public & Define the unit to be displayed\\
     \multicolumn{3}{l}{\textit{Cursors management}} \\
     toggle\_cursor & Public & Change cursor status \\
     draw\_cursors & Private & Display the cursors on the graph\\
@@ -477,7 +476,18 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object.
   \caption{Methods of \graph}
   \label{tab:graphs:meth}
 \end{table}
-
+\begin{table}[htbp]
+  \centering\small\sf
+  \begin{tabular}{llll}
+    \hline
+    Property & Access & Type & Summary \\
+    \hline
+    unit & Public & Tuple of str & The unit to be displayed\\
+    \hline
+  \end{tabular}
+  \caption{Properties of \graph.}
+  \label{tab:graphs:props}
+\end{table}
 \subsubsection{Data management methods}
 The data is inserted into the graph with \meth{insert}, and removed with \meth{remove}.
 It can be parsed by calling the generator \meth{get\_sigs}.
@@ -517,7 +527,7 @@ The \att{line} object is a reference to the Matplotlib.Line2D where the cursor i
   \centering\sf\small
   \begin{tabular}{lll}
     \hline
-    Method & Type & Action \\
+    Method & Access & Action \\
     \hline
     \_\_init\_\_ & Public & Initialise the object \\
     draw & Public & Draw the cursor on the graph \\

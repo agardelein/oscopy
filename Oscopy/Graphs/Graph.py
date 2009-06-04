@@ -238,15 +238,20 @@ may lead to uncertain results"
                 l = "10e" + str(-f) + " "
         return f, l
 
-    def set_unit(self, xu, yu=""):
+    def get_unit(self):
+        """ Return the graph units """
+        return self._xunit, self._yunit
+
+    def set_unit(self, unit):
         """ Define the graph units. If only one argument is provided,
-        set_ y axis, if both are provided, set_ both.
+        set y axis, if both are provided, set both.
         """
-        if not yu:
-            self._yunit = xu
-        else:
-            self._xunit = xu
-            self._yunit = yu
+        if isinstance(unit, tuple):
+            if len(unit) == 1 or (len(unit) == 2 and not unit[1]):
+                self._yunit = unit[0]
+            elif len(unit) == 2 and unit[1]:
+                self._xunit = unit[0]
+                self._yunit = unit[1]
 
     def set_scale(self, a):
         """ Set axes scale, either lin, logx, logy or loglog
@@ -366,3 +371,4 @@ may lead to uncertain results"
         """ Return the Matplotlib axe
         """
         return self._ax
+    unit = property(get_unit, set_unit)

@@ -240,7 +240,7 @@ class Figure(object):
         """ Set the current graph units
         """
         if self.curgraph is not None:
-            self.curgraph.set_unit(xu, yu)
+            self.curgraph.unit = xu, yu
 
     def set_scale(self, a):
         """ Set the current graph axis scale

@@ -29,6 +29,7 @@
      "sec:graphs"
      "sec:graphs:graph"
      "tab:graphs:meth"
+     "tab:graphs:props"
      "fig:cursorinter"
      "sec:curs"
      "tab:cursors:meth"
