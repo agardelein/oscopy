@@ -92,9 +92,10 @@ class Cursor(object):
         return self._visible
 
     def set_type(self, type=""):
-        if isinstance(type, str):
-            if type == "horiz" or type == "vert":
-                self._type = type
+        if type == "horiz" or type == "vert":
+            self._type = type
+        else:
+            assert 0, "Bad type"
 
     def set_value(self, val=None):
         if val is not None:
