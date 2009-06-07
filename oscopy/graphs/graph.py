@@ -260,6 +260,10 @@ may lead to uncertain results"
             elif len(unit) == 2 and unit[1]:
                 self._xunit = unit[0]
                 self._yunit = unit[1]
+            else:
+                assert 0, "Invalid argument"
+        else:
+            assert 0, "Invalid argument"
 
     def get_scale(self):
         """ Return the axes scale
@@ -283,7 +287,7 @@ may lead to uncertain results"
                 set_range(("y", [ymin, ymax]))      set range for y axis
         Form 3: set_range([xmin, xmax, ymin, ymax]) set range for both axis
         """
-        if isinstance(arg, str) and arg == "reset":
+        if arg == "reset":
             # Delete range specs
             self._xrange = []
             self._yrange = []
@@ -298,6 +302,8 @@ may lead to uncertain results"
                 elif arg[0] == "y" and isinstance(arg[1], list) and\
                         len(arg[1]) == 2:
                     self._yrange = arg[1]
+        else:
+            assert 0, "Unrecognized argument"
         
     def toggle_cursors(self, ctype="", num=None, val=None):
         """ Toggle the cursors in the graph
@@ -344,6 +350,10 @@ may lead to uncertain results"
                 # Just handle two cursor
                 self._cursors[ctype][num] = Cursor(val, ctype)
                 self._cursors[ctype][num].draw(self._ax, num)
+            else:
+                assert 0, "Invalid cursor number"
+        else:
+            assert 0, "Invalid cursor type"
 
     def _print_cursors(self):
         """ Print cursors values on the graph
