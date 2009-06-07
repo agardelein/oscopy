@@ -63,6 +63,14 @@ class Graph(object):
         self._factor_names = {-18: "a", -15:"f", -12:"p", -9:"n", -6:"u",\
                                    -3:"m", 0:"", 3:"k", 6:"M", 9:"G", 12:"T",\
                                    15:"P", 18:"E"}
+        self._SCALES_TO_FUNC = {"lin": plt.plot,\
+                           "logx": plt.semilogx,\
+                           "logy": plt.semilogy,\
+                           "loglog": plt.loglog}
+        # Slow way... Surely there exist something faster
+        self._FUNC_TO_SCALES = {}
+        for k, v in self._SCALES_TO_FUNC.iteritems():
+            self._FUNC_TO_SCALES[v] = k
 
         if isinstance(sigs, Graph):
             # Warn on some conversion that may lead to nasty things
@@ -256,27 +264,12 @@ may lead to uncertain results"
     def get_scale(self):
         """ Return the axes scale
         """
-        if self._plotf == plt.plot:
-            return "lin"
-        elif self._plotf == plt.semilogx:
-            return "logx"
-        elif self._plotf == plt.semilogy:
-            return "logy"
-        elif self._plotf == plt.loglog:
-            return "loglog"
+        return self._FUNC_TO_SCALES[self._plotf]
 
     def set_scale(self, scale):
         """ Set axes scale, either lin, logx, logy or loglog
         """
-        if isinstance(scale, str):
-            if scale == "lin":
-                self._plotf = plt.plot
-            elif scale == "logx":
-                self._plotf = plt.semilogx
-            elif scale == "logy":
-                self._plotf = plt.semilogy
-            elif scale == "loglog":
-                self._plotf = plt.loglog
+        self._plotf = self._SCALES_TO_FUNC[scale]
 
     def get_range(self):
         """ Return the axes limits
