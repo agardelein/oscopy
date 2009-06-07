@@ -53,7 +53,7 @@ Figure -- Handle a list of graphs
    set_range()
       Set the current graph axis range
 
-   key()
+   _key()
       Handle keystrokes during plot
 """
 
@@ -67,9 +67,9 @@ class Figure(object):
         If a signal list is provided, add a graph with the signal list
         By default, create an empty list of graph and set_ the layout to horiz
         """
-        self.graphs = []
-        self.layout = "horiz"
-        self.curgraph = None
+        self._graphs = []
+        self._layout = "horiz"
+        self._current = None
         if not sigs:
             return
         elif isinstance(sigs, dict):
@@ -83,11 +83,11 @@ class Figure(object):
         Additionnal attemps are ignored.
         By default, do nothing.
         """
-        if len(self.graphs) > 3:
+        if len(self._graphs) > 3:
             return
         gr = LinGraph(sigs)
-        self.graphs.append(gr)
-        self.select(self.graphs.index(gr) + 1)
+        self._graphs.append(gr)
+        self.select(self._graphs.index(gr) + 1)
 
     def delete(self, num=1):
         """ Delete a graph from the figure
@@ -97,18 +97,18 @@ class Figure(object):
         if not isinstance(num, int):
             return
         gn = eval(num)   # Graph number
-        if len(self.graphs) < 1 or gn < 1 or gn > len(self.graphs):
+        if len(self._graphs) < 1 or gn < 1 or gn > len(self._graphs):
             return
-        if self.curgraph == self.graphs[gn - 1]:
-            if len(self.graphs) == 1:
+        if self._current == self._graphs[gn - 1]:
+            if len(self._graphs) == 1:
                 # Only one element in the list
-                self.curgraph = None
-            elif gn == len(self.graphs):
+                self._current = None
+            elif gn == len(self._graphs):
                 # Last element, go to the previous
-                self.curgraph = self.graphs[gn - 2]
+                self._current = self._graphs[gn - 2]
             else:
-                self.curgraph = self.graphs[gn]
-        del self.graphs[gn - 1]
+                self._current = self._graphs[gn]
+        del self._graphs[gn - 1]
         
     def update(self, u, d):
         """ Update the graphs
@@ -118,7 +118,7 @@ class Figure(object):
         if not isinstance(d, dict):
             return
 
-        for g in self.graphs:
+        for g in self._graphs:
             ug = {}
             dg = {}
             for sn in g.get_sigs():
@@ -132,15 +132,15 @@ class Figure(object):
     def select(self, gn=0):
         """ Select the current graph
         """
-        if gn < 1 or gn > len(self.graphs):
+        if gn < 1 or gn > len(self._graphs):
             return
-        self.curgraph = self.graphs[gn - 1]
+        self._current = self._graphs[gn - 1]
 
     def list(self):
         """ List the graphs from the figure
         """
-        for gn, g in enumerate(self.graphs):
-            if g == self.curgraph:
+        for gn, g in enumerate(self._graphs):
+            if g == self._current:
                 print "   *",
             else:
                 print "    ",
@@ -149,19 +149,23 @@ class Figure(object):
     def set_mode(self, gmode):
         """ Set the mode of the current graph
         """
-        if self.curgraph is None:
+        if self._current is None:
             return
         if isinstance(gmode, str):
             if gmode == "lin":
-                g = LinGraph(self.curgraph)
+                g = LinGraph(self._current)
 #            elif gmode == "fft":
-#                g = FFTGraph(self.curgraph)
+#                g = FFTGraph(self._current)
 #            elif gmode == "ifft":
-#                g = IFFTGraph(self.curgraph)
+#                g = IFFTGraph(self._current)
             else:
                 return
-            self.graphs[self.graphs.index(self.curgraph)] = g
-            self.curgraph = g
+            self._graphs[self._graphs.index(self._current)] = g
+            self._current = g
+
+    def get_layout(self):
+        """ Return the figure layout"""
+        return self._layout
 
     def set_layout(self, layout="quad"):
         """ Set the layout of the figure, default is quad
@@ -171,7 +175,7 @@ class Figure(object):
         Other values are ignored
         """
         if layout == "horiz" or layout == "vert" or layout == "quad":
-            self.layout = layout
+            self._layout = layout
             return
         else:
             return
@@ -182,19 +186,19 @@ class Figure(object):
         And then really call the plot function of each graph
         """
         # Set the number of lines and rows
-        if not self.graphs:
+        if not self._graphs:
             return
-        if self.layout == "horiz":
-            nx = len(self.graphs)
+        if self._layout == "horiz":
+            nx = len(self._graphs)
             ny = 1
-        elif self.layout == "vert":
+        elif self._layout == "vert":
             nx = 1
-            ny = len(self.graphs)
-        elif self.layout == "quad":
-            if len(self.graphs) == 1:
+            ny = len(self._graphs)
+        elif self._layout == "quad":
+            if len(self._graphs) == 1:
                 nx = 1
                 ny = 1
-            elif len(self.graphs) == 2:
+            elif len(self._graphs) == 2:
                 # For two graphs in quad config, go to horiz
                 nx = 2
                 ny = 1
@@ -206,53 +210,53 @@ class Figure(object):
             ny = 2
 
         # Plot the whole figure
-        for gn, g in enumerate(self.graphs):
+        for gn, g in enumerate(self._graphs):
             ax = fig.add_subplot(nx, ny, gn+1)
             g.plot(ax)
-        self.kid = fig.canvas.mpl_connect('key_press_event', self.key)
+        self.kid = fig.canvas.mpl_connect('key_press_event', self._key)
 
     def insert(self, sigs):
         """ Add a signal into the current graph
         """
-        if self.curgraph is not None:
-            self.curgraph.insert(sigs)
+        if self._current is not None:
+            self._current.insert(sigs)
 
     def remove(self, sigs, where="current"):
         """ Delete a signal from the current graph
         """
         if where == "current":
-            if self.curgraph is not None:
-                self.curgraph.remove(sigs)
+            if self._current is not None:
+                self._current.remove(sigs)
         elif where == "all":
-            for g in self.graphs:
+            for g in self._graphs:
                 g.remove(sigs)
 
     def get_sigs(self):
         """ Return the list of signals in all graphs
         """
-        for g in self.graphs:
+        for g in self._graphs:
             for sn in g.get_sigs():
                 yield sn
 
     def set_unit(self, xu, yu=""):
         """ Set the current graph units
         """
-        if self.curgraph is not None:
-            self.curgraph.unit = xu, yu
+        if self._current is not None:
+            self._current.unit = xu, yu
 
     def set_scale(self, scale):
         """ Set the current graph axis scale
         """
-        if self.curgraph is not None:
-            self.curgraph.scale = scale
+        if self._current is not None:
+            self._current.scale = scale
 
     def set_range(self, arg):
         """ Set the axis range of the current graph
         """
-        if self.curgraph is not None:
-            self.curgraph.range = arg
+        if self._current is not None:
+            self._current.range = arg
 
-    def key(self, event):
+    def _key(self, event):
         """ Handle key press event
         1, 2: toggle vertical cursors #0 and #1
         3, 4: toggle horizontal cursors #0 and #1
@@ -261,7 +265,7 @@ class Figure(object):
             return
         # Find graph
         g = None
-        for g in self.graphs:
+        for g in self._graphs:
             if g.ax == event.inaxes:
                 break
             else:
@@ -280,3 +284,6 @@ class Figure(object):
         else:
             return
         event.canvas.draw()
+
+    layout = property(get_layout, set_layout)
+
