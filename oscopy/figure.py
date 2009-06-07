@@ -75,7 +75,7 @@ class Figure(object):
         elif isinstance(sigs, dict):
             self.add(sigs)
         else:
-            return
+            assert 0, "Bad type"
 
     def add(self, sigs={}):
         """ Add a graph into the figure and set_ it as current graph.
@@ -84,7 +84,7 @@ class Figure(object):
         By default, do nothing.
         """
         if len(self._graphs) > 3:
-            return
+            assert 0, "Bad graph number"
         gr = LinGraph(sigs)
         self._graphs.append(gr)
         self.select(self._graphs.index(gr) + 1)
@@ -95,10 +95,10 @@ class Figure(object):
         Act as a "pop" with curgraph variable.
         """
         if not isinstance(num, int):
-            return
+            assert 0, "Bad graph number"
         gn = eval(num)   # Graph number
         if len(self._graphs) < 1 or gn < 1 or gn > len(self._graphs):
-            return
+            assert 0, "Bad graph number"
         if self._current == self._graphs[gn - 1]:
             if len(self._graphs) == 1:
                 # Only one element in the list
@@ -114,9 +114,9 @@ class Figure(object):
         """ Update the graphs
         """
         if not isinstance(u, dict):
-            return
+            assert 0, "Bad type"
         if not isinstance(d, dict):
-            return
+            assert 0, "Bad type"
 
         for g in self._graphs:
             ug = {}
@@ -133,7 +133,7 @@ class Figure(object):
         """ Select the current graph
         """
         if gn < 1 or gn > len(self._graphs):
-            return
+            assert 0, "Bad graph number"
         self._current = self._graphs[gn - 1]
 
     def list(self):
@@ -150,7 +150,7 @@ class Figure(object):
         """ Set the mode of the current graph
         """
         if self._current is None:
-            return
+            assert 0, "No graph defined"
         if isinstance(gmode, str):
             if gmode == "lin":
                 g = LinGraph(self._current)
@@ -159,7 +159,7 @@ class Figure(object):
 #            elif gmode == "ifft":
 #                g = IFFTGraph(self._current)
             else:
-                return
+                assert 0, "Bad mode: %s" % gmode
             self._graphs[self._graphs.index(self._current)] = g
             self._current = g
 
@@ -178,7 +178,7 @@ class Figure(object):
             self._layout = layout
             return
         else:
-            return
+            assert 0, "Bad layout"
 
     def plot(self, fig):
         """ Plot the figure in Matplotlib Figure instance fig
@@ -187,7 +187,7 @@ class Figure(object):
         """
         # Set the number of lines and rows
         if not self._graphs:
-            return
+            assert 0, "No graphs defined"
         if self._layout == "horiz":
             nx = len(self._graphs)
             ny = 1
@@ -230,6 +230,8 @@ class Figure(object):
         elif where == "all":
             for g in self._graphs:
                 g.remove(sigs)
+        else:
+            assert 0, "Bad location"
 
     def get_sigs(self):
         """ Return the list of signals in all graphs
@@ -243,18 +245,24 @@ class Figure(object):
         """
         if self._current is not None:
             self._current.unit = xu, yu
+        else:
+            assert 0, "No graph defined"
 
     def set_scale(self, scale):
         """ Set the current graph axis scale
         """
         if self._current is not None:
             self._current.scale = scale
+        else:
+            assert 0, "No graph defined"
 
     def set_range(self, arg):
         """ Set the axis range of the current graph
         """
         if self._current is not None:
             self._current.range = arg
+        else:
+            assert 0, "No graph defined"
 
     def _key(self, event):
         """ Handle key press event
