@@ -300,23 +300,23 @@ class Context(object):
         if self.curfig is not None:
             self.curfig.set_mode(mode)
 
-    def scale(self, sc):
+    def scale(self, scale):
         """ Set the axis scale of the current graph of the current figure
         """
         if self.curfig is not None:
-            self.curfig.set_scale(sc)
+            self.curfig.scale = scale
 
     def range(self, arg):
         """ Set the axis range of the current graph of the current figure
         """
         if self.curfig is not None:
-            self.curfig.set_range(arg)
+            self.curfig.range = arg
 
     def unit(self, xu, yu = ""):
         """ Set the units of current graph of current figure
         """
         if self.curfig is not None:
-            self.curfig.set_unit(xu, yu)        
+            self.curfig.unit = xu, yu
             
     def insert(self, sns):
         """ Insert a list of signals into the current graph 

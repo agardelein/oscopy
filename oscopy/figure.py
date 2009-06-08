@@ -240,19 +240,42 @@ class Figure(object):
             for sn in g.get_sigs():
                 yield sn
 
-    def set_unit(self, xu, yu=""):
+    def get_unit(self):
+        """ Return the current graph unit"""
+        if self._current is not None:
+            return self._current.unit
+        else:
+            assert 0, "No graph defined"
+        
+
+    def set_unit(self, unit):
         """ Set the current graph units
         """
         if self._current is not None:
-            self._current.unit = xu, yu
+            self._current.unit = unit
         else:
             assert 0, "No graph defined"
+
+    def get_scale(self):
+        """Return the current graph axis scale """
+        if self._current is not None:
+            return self._current.scale
+        else:
+            assert 0, "No graph defined"
+        
 
     def set_scale(self, scale):
         """ Set the current graph axis scale
         """
         if self._current is not None:
             self._current.scale = scale
+        else:
+            assert 0, "No graph defined"
+
+    def get_range(self):
+        """ Return the axis range of the current graph"""
+        if self._current is not None:
+            return self._current.range
         else:
             assert 0, "No graph defined"
 
@@ -294,4 +317,6 @@ class Figure(object):
         event.canvas.draw()
 
     layout = property(get_layout, set_layout)
-
+    range = property(get_range, set_range)
+    scale = property(get_scale, set_scale)
+    unit = property(get_unit, set_unit)
