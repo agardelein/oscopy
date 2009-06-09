@@ -410,18 +410,18 @@ It then call \meth{toggle\_cursors}\ from \graph.
 \end{table}
 \begin{table}[htbp]
   \centering\small\sf
-  \begin{tabular}{llll}
+  \begin{tabular}{*5l}
     \hline
-    Property & Access & Type & Summary \\
+    Property & Read & Write & Type & Summary \\
     \hline
     \multicolumn{4}{l}{\textit{Graph management}}\\
-    layout & Public & str & Disposition of graphs in the figure\\
+    layout & \checked & \checked & str & Disposition of graphs in the figure\\
     \multicolumn{4}{l}{\textit{Data management}}\\
-    signals & Public & iter & Signals contained in the figure \\
+    signals & \checked & & iter & Signals contained in the figure \\
     \multicolumn{4}{l}{\textit{Pass-through to current graph}}\\
-    unit & Public & Tuple of str & The unit to be displayed in x/y labels\\
-    scale & Public & str & Scale of the axis (one of lin,logx,logy,loglog) \\
-    range & Public & list[4] & Axis limits \\
+    unit  & \checked & \checked& Tuple of str & The unit to be displayed in x/y labels\\
+    scale & \checked & \checked & str & Scale of the axis (one of lin,logx,logy,loglog) \\
+    range & \checked & \checked & list[4] & Axis limits \\
     \hline
   \end{tabular}
   \caption{Properties of \fig.}
@@ -489,15 +489,15 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object, and
 \end{table}
 \begin{table}[htbp]
   \centering\small\sf
-  \begin{tabular}{llll}
+  \begin{tabular}{*5l}
     \hline
-    Property & Access & Type & Summary \\
+    Property & Read & Write & Type & Summary \\
     \hline
-    type & Public & str & Graph identification\\
-    unit & Public & Tuple of str & The unit to be displayed in x/y labels\\
-    scale & Public & str & Scale of the axis (one of lin,logx,logy,loglog) \\
-    range & Public & list[4] & Axis limits \\
-    signals & Public & iter & Signals contained in the graph\\
+    type & \checked & & str & Graph identification\\
+    unit & \checked & \checked & Tuple of str & The unit to be displayed in x/y labels\\
+    scale & \checked & \checked & str & Scale of the axis (one of lin,logx,logy,loglog) \\
+    range & \checked & \checked & list[4] & Axis limits \\
+    signals & \checked &  & iter & Signals contained in the graph\\
     \hline
   \end{tabular}
   \caption{Properties of \graph.}
