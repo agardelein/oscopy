@@ -25,6 +25,7 @@
      "tab:wrts:meth"
      "sec:figs"
      "tab:figs:meth"
+     "tab:figs:props"
      "tab:figs:key"
      "sec:graphs"
      "sec:graphs:graph"

@@ -41,7 +41,7 @@ Figure -- Handle a list of graphs
    plot()
       Plot the figure
 
-   get_sigs()
+   get_signals()
       Return a list of the signals in all graphs
 
    set_unit()
@@ -121,7 +121,7 @@ class Figure(object):
         for g in self._graphs:
             ug = {}
             dg = {}
-            for sn in g.get_sigs():
+            for sn in g.get_signals():
                 if sn in u:
                     ug[sn] = u[sn]
                 elif sn in d:
@@ -233,11 +233,11 @@ class Figure(object):
         else:
             assert 0, "Bad location"
 
-    def get_sigs(self):
+    def get_signals(self):
         """ Return the list of signals in all graphs
         """
         for g in self._graphs:
-            for sn in g.get_sigs():
+            for sn in g.get_signals():
                 yield sn
 
     def get_unit(self):
@@ -320,3 +320,4 @@ class Figure(object):
     range = property(get_range, set_range)
     scale = property(get_scale, set_scale)
     unit = property(get_unit, set_unit)
+    signals = property(get_signals)

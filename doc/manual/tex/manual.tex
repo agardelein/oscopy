@@ -395,23 +395,37 @@ It then call \meth{toggle\_cursors}\ from \graph.
     delete & Public & Delete a graph from the figure \\
     list & Public & Print a list of the graphs\\
     select & Public & Select the current graph \\
-    set\_layout & Public & Define the placement of graph in the figure\\
     set\_mode & Public & Define the mode of the current graph\\
     \multicolumn{3}{l}{\textit{Pass-through to current Graph}} \\
     insert & Public & Insert signals into the graph\\
     remove & Public & Take away signals from the graph\\
-    set\_range & Public & Define the limits of the graph\\
-    set\_scale & Public & Define the scale of the axis\\
-    set\_unit & Public & Define the unit to be displayed\\
     \multicolumn{3}{l}{\textit{Viewing management}} \\
     key & Private & Handle keystrokes when displaying plots \\
     \multicolumn{3}{l}{\textit{Data management}} \\
     update & Public & Update signal list of all graphs\\
-    get\_sigs & Public & Iterator that return the signal list of all graphs\\
     \hline
   \end{tabular}
   \caption{Methods of \fig}
   \label{tab:figs:meth}
+\end{table}
+\begin{table}[htbp]
+  \centering\small\sf
+  \begin{tabular}{llll}
+    \hline
+    Property & Access & Type & Summary \\
+    \hline
+    \multicolumn{4}{l}{\textit{Graph management}}\\
+    layout & Public & str & Disposition of graphs in the figure\\
+    \multicolumn{4}{l}{\textit{Data management}}\\
+    signals & Public & iter & Signals contained in the figure \\
+    \multicolumn{4}{l}{\textit{Pass-through to current graph}}\\
+    unit & Public & Tuple of str & The unit to be displayed in x/y labels\\
+    scale & Public & str & Scale of the axis (one of lin,logx,logy,loglog) \\
+    range & Public & list[4] & Axis limits \\
+    \hline
+  \end{tabular}
+  \caption{Properties of \fig.}
+  \label{tab:figs:props}
 \end{table}
 
 \begin{table}[htbp]
@@ -461,7 +475,7 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object, and
     \multicolumn{3}{l}{\textit{Data management}} \\
     insert & Public & Insert signals into the graph\\
     remove & Public & Take away signals from the graph\\
-    get\_sigs & Public & Iterator that return the internal signal list\\
+    get\_signals & Public & Iterator that return the internal signal list\\
     \multicolumn{3}{l}{\textit{Viewing management}} \\
     plot & Public & Display the graph\\
     \multicolumn{3}{l}{\textit{Cursors management}} \\
@@ -483,6 +497,7 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object, and
     unit & Public & Tuple of str & The unit to be displayed in x/y labels\\
     scale & Public & str & Scale of the axis (one of lin,logx,logy,loglog) \\
     range & Public & list[4] & Axis limits \\
+    signals & Public & iter & Signals contained in the graph\\
     \hline
   \end{tabular}
   \caption{Properties of \graph.}
@@ -490,7 +505,7 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object, and
 \end{table}
 \subsubsection{Data management methods}
 The data is inserted into the graph with \meth{insert}, and removed with \meth{remove}.
-It can be parsed by calling the generator \meth{get\_sigs}.
+It can be parsed by calling the generator \meth{get\_signals}.
 
 \subsubsection{Viewing management}
 The central function of this object is \meth{plot}, that does the work to present the data to the user.

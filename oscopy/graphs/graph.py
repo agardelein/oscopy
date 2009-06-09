@@ -32,7 +32,7 @@ Class Graph -- Handle the representation of a list of signals
    plot()
       Plot the graph
 
-   get_sigs()
+   get_signals()
       Return a list of the signal names
 
    type()
@@ -194,7 +194,7 @@ may lead to uncertain results"
         self._draw_cursors()
         self._print_cursors()
 
-    def get_sigs(self):
+    def get_signals(self):
         """ Return a list of the signal names
         """
         for sn in self._sigs:
@@ -396,3 +396,4 @@ may lead to uncertain results"
     unit = property(get_unit, set_unit)
     scale = property(get_scale, set_scale)
     range = property(get_range, set_range)
+    signals = property(get_signals)
