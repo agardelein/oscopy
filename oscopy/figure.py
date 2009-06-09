@@ -233,13 +233,6 @@ class Figure(object):
         else:
             assert 0, "Bad location"
 
-    def get_signals(self):
-        """ Return the list of signals in all graphs
-        """
-        for g in self._graphs:
-            for sn in g.get_signals():
-                yield sn
-
     def get_unit(self):
         """ Return the current graph unit"""
         if self._current is not None:
@@ -316,8 +309,15 @@ class Figure(object):
             return
         event.canvas.draw()
 
+    @property
+    def signals(self):
+        """ Return the list of signals in all graphs
+        """
+        for g in self._graphs:
+            for sn in g.get_signals():
+                yield sn
+
     layout = property(get_layout, set_layout)
     range = property(get_range, set_range)
     scale = property(get_scale, set_scale)
     unit = property(get_unit, set_unit)
-    signals = property(get_signals)

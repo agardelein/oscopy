@@ -470,7 +470,6 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object, and
     Method & Access & Action \\
     \hline
     \_\_init\_\_ & Public & Initialise the object \\
-    type & Public & Return a string identifying the graph type\\
     find\_scale\_factor & Private & Find a human-readable multiplier to the data \\
     \multicolumn{3}{l}{\textit{Data management}} \\
     insert & Public & Insert signals into the graph\\
@@ -494,6 +493,7 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object, and
     \hline
     Property & Access & Type & Summary \\
     \hline
+    type & Public & str & Graph identification\\
     unit & Public & Tuple of str & The unit to be displayed in x/y labels\\
     scale & Public & str & Scale of the axis (one of lin,logx,logy,loglog) \\
     range & Public & list[4] & Axis limits \\

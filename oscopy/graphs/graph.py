@@ -193,19 +193,6 @@ may lead to uncertain results"
         self._ax = ax
         self._draw_cursors()
         self._print_cursors()
-
-    def get_signals(self):
-        """ Return a list of the signal names
-        """
-        for sn in self._sigs:
-            yield sn
-
-    @property
-    def type(self):
-        """ Return a string with the type of the graph
-        To be overloaded by derived classes.
-        """
-        return
     
     def _find_scale_factor(self, a):
         """ Choose the right scale for data on axis a
@@ -393,7 +380,20 @@ may lead to uncertain results"
         """
         return self._ax
 
+    @property
+    def signals(self):
+        """ Return a list of the signal names
+        """
+        for sn in self._sigs:
+            yield sn
+
+    @property
+    def type(self):
+        """ Return a string with the type of the graph
+        To be overloaded by derived classes.
+        """
+        return
+
     unit = property(get_unit, set_unit)
     scale = property(get_scale, set_scale)
     range = property(get_range, set_range)
-    signals = property(get_signals)
