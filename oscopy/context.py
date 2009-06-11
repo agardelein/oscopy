@@ -142,7 +142,7 @@ class Context(object):
         Act as a "pop" with self._curfig
         """
         if num > len(self._figs) or num < 1:
-            return
+            assert 0, "Out of range figure number"
         if self._curfig == self._figs[num - 1]:
             if len(self._figs) == 1:
                 # Only one element remaining in the list
@@ -163,7 +163,7 @@ class Context(object):
         """ Select the current figure
         """
         if num > len(self._figs) or num < 1:
-            return
+            assert 0, "Out of range figure number"
         self._curfig = self._figs[num - 1]
         if gn > 0:
             self._curfig.select(gn)
@@ -189,7 +189,7 @@ class Context(object):
         """ Plot the figures, and enter in the matplotlib main loop
         """
         if not self._figs:
-            return
+            assert 0, "No figure to plot"
         for i, f in enumerate(self._figs):
             fig = plt.figure(i + 1)
             f.plot(fig)
@@ -293,52 +293,66 @@ class Context(object):
         """
         if self._curfig is not None:
             self._curfig.delete(gn)
+        else:
+            assert 0, "No figure selected"
 
     def mode(self, mode):
         """ Set the mode of the current graph of the current figure
         """
         if self._curfig is not None:
             self._curfig.mode = mode
+        else:
+            assert 0, "No figure selected"
 
     def scale(self, scale):
         """ Set the axis scale of the current graph of the current figure
         """
         if self._curfig is not None:
             self._curfig.scale = scale
+        else:
+            assert 0, "No figure selected"
 
     def range(self, arg):
         """ Set the axis range of the current graph of the current figure
         """
         if self._curfig is not None:
             self._curfig.range = arg
+        else:
+            assert 0, "No figure selected"
 
     def unit(self, xu, yu = ""):
         """ Set the units of current graph of current figure
         """
         if self._curfig is not None:
             self._curfig.unit = xu, yu
+        else:
+            assert 0, "No figure selected"
             
     def insert(self, sns):
         """ Insert a list of signals into the current graph 
         of the current figure
         """
         if not self._figs:
-            return
+            assert 0, "No figure present"
 
         if self._curfig is not None:
             sigs = self._signames_to_sigs(sns)
             self._curfig.insert(sigs)
+        else:
+            assert 0, "No figure selected"
 
     def remove(self, sns):
         """ Remove a list of signals from the current graph
         of the current figure
         """
         if not self._figs:
-            return
+            assert 0, "No figure present"
 
         if self._curfig is not None:
             sigs = self._signames_to_sigs(sns)
             self._curfig.remove(sigs)
+        else:
+            assert 0, "No figure selected"
 
     def freeze(self, sns):
         """ Set the freeze flag of signals
