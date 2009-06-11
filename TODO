@@ -2,8 +2,8 @@ To be checked :
 
 To be fixed :
 All: add _ to the private methods and attributes
+All: move out all print statements, only the app should have these.
 
 To be added :
 Support for HDF5
 Make Signal derive from numpy.array
-Use property() for Graph (scale, unit, type, get_sigs)

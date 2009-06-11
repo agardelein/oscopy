@@ -69,7 +69,7 @@ Class Context: Commands callables from oscopy commandline
    math(expr)
    Create a signal from a mathematical expression
 
-   _signames_to_sigs(sns)
+   _names_to_signals(sns)
    Return a list of the signal names from the arguments provided by the user
    Should not be called from the command line
 
@@ -104,17 +104,17 @@ class Context(object):
     def __init__(self):
         """ Create the instance variables
         """
-        self._curfig = None
+        self._current = None
         self._readers = {}
-        self._figs = []
-        self._sigs = {}
-        self._upn = -1
-        self._sn_to_r = {}
+        self._figures = []
+        self._signals = {}
+        self._update_num = -1
+        self._signal_name_to_reader = {}
         
     def create(self, sigs):
         """ Create a new figure and set_ it as current
         Can be either called from commandline or a function.
-        When called from commandline, call _signames_to_sigs to retrieve
+        When called from commandline, call _names_to_signals to retrieve
         the signal list
         When called from a function, if the argument is not a list
         then return.
@@ -124,7 +124,7 @@ class Context(object):
             # Called from commandline,
             # Get the signal list from args
             if not sigs == "":
-                sigs = self._signames_to_sigs(sigs)
+                sigs = self._names_to_signals(sigs)
             else:
                 # No signal list provided
                 sigs = {}
@@ -132,53 +132,53 @@ class Context(object):
             return
         # toplot is now a list
         f = Figure(sigs)
-        self._figs.append(f)
-        self._curfig = f
+        self._figures.append(f)
+        self._current = f
 
     def destroy(self, num):
         """ Delete a figure
         User must provide the figure number.
         If the number is out of range, then return
-        Act as a "pop" with self._curfig
+        Act as a "pop" with self._current
         """
-        if num > len(self._figs) or num < 1:
+        if num > len(self._figures) or num < 1:
             assert 0, "Out of range figure number"
-        if self._curfig == self._figs[num - 1]:
-            if len(self._figs) == 1:
+        if self._current == self._figures[num - 1]:
+            if len(self._figures) == 1:
                 # Only one element remaining in the list
-                self._curfig = None
-            elif num == len(self._figs):
+                self._current = None
+            elif num == len(self._figures):
                 # Last element, go to the previous
-                self._curfig = self._figs[num - 2]
+                self._current = self._figures[num - 2]
             else:
                 # Go to next element
-                self._curfig = self._figs[num]
-        del self._figs[num - 1]
-        if self._curfig is not None:
-            print "Curfig : ", self._figs.index(self._curfig) + 1
+                self._current = self._figures[num]
+        del self._figures[num - 1]
+        if self._current is not None:
+            print "Curfig : ", self._figures.index(self._current) + 1
         else:
             print "No figures"
 
     def select(self, num, gn = 0):
         """ Select the current figure
         """
-        if num > len(self._figs) or num < 1:
+        if num > len(self._figures) or num < 1:
             assert 0, "Out of range figure number"
-        self._curfig = self._figs[num - 1]
+        self._current = self._figures[num - 1]
         if gn > 0:
-            self._curfig.select(gn)
+            self._current.select(gn)
 
     def layout(self, l):
         """ Define the layout of the current figure
         """
-        if self._curfig is not None:
-            self._curfig.set_layout(l)
+        if self._current is not None:
+            self._current.set_layout(l)
 
     def figlist(self):
         """ Print the list of figures
         """
-        for i, f in enumerate(self._figs):
-            if f == self._curfig:
+        for i, f in enumerate(self._figures):
+            if f == self._current:
                 print "*",
             else:
                 print " ",
@@ -188,9 +188,9 @@ class Context(object):
     def plot(self):
         """ Plot the figures, and enter in the matplotlib main loop
         """
-        if not self._figs:
+        if not self._figures:
             assert 0, "No figure to plot"
-        for i, f in enumerate(self._figs):
+        for i, f in enumerate(self._figures):
             fig = plt.figure(i + 1)
             f.plot(fig)
         plt.show()
@@ -214,8 +214,8 @@ class Context(object):
 
         # Insert signals into the dict
         for sn in sigs.keys():
-            self._sigs[sn] = sigs[sn]
-            self._sn_to_r[sn] = r
+            self._signals[sn] = sigs[sn]
+            self._signal_name_to_reader[sn] = r
         print fn, ":"
         for s in sigs.itervalues():
             print s
@@ -225,7 +225,7 @@ class Context(object):
         """ Write signals to file
         """
         # Create the object
-        sigs = self._signames_to_sigs(sns)
+        sigs = self._names_to_signals(sns)
         if len(sigs) < 1:
             return
         try:
@@ -247,84 +247,84 @@ class Context(object):
         n = {}    # New signals
         if r is None:
             # Normal call create the new list etc etc
-            self._upn += 1
+            self._update_num += 1
             for reader in self._readers.itervalues():
                 print "Updating signals from", reader
-                n.update(self.update(reader, self._upn))
+                n.update(self.update(reader, self._update_num))
         else:
             # First look at its dependencies
             if hasattr(r, "get_depends") and callable(r.get_depends):
                 for sn in r.get_depends():
-                    print " Updating signals from", self._sn_to_r[sn]
-                    n.update(self.update(self._sn_to_r[sn], self._upn))
+                    print " Updating signals from", self._signal_name_to_reader[sn]
+                    n.update(self.update(self._signal_name_to_reader[sn], self._update_num))
                     # TODO: Update depencies: what happens to vo when
                     # vout is deleted ? It seems it is not deleted: it should!
             # Update the reader
-            n.update(r.update(self._upn, keep=False))
+            n.update(r.update(self._update_num, keep=False))
             return n
 
         # Find deleted signals
         d = []
-        for sn, s in self._sigs.iteritems():
-            #n.update(s.update(self._upn, False))
+        for sn, s in self._signals.iteritems():
+            #n.update(s.update(self._update_num, False))
             if s.data is None:
                 d.append(sn)
         # Insert new signals
-        self._sigs.update(n)
+        self._signals.update(n)
         # Delete signals: first from figure and after from dict
         for sn in d:
-            for f in self._figs:
-                f.remove({sn:self._sigs[sn]}, "all")
-            del self._sigs[sn]
+            for f in self._figures:
+                f.remove({sn:self._signals[sn]}, "all")
+            del self._signals[sn]
 
     def add(self, sns):
         """ Add a graph to the current figure
         The signal list is a coma separated list of signal names
         If no figure exist, create a new one.
         """
-        if not self._figs:
+        if not self._figures:
             self.create(sns)
         else:
-            sigs = self._signames_to_sigs(sns)
-            self._curfig.add(sigs)
+            sigs = self._names_to_signals(sns)
+            self._current.add(sigs)
 
     def delete(self, gn):
         """ Delete a graph from the current figure
         """
-        if self._curfig is not None:
-            self._curfig.delete(gn)
+        if self._current is not None:
+            self._current.delete(gn)
         else:
             assert 0, "No figure selected"
 
     def mode(self, mode):
         """ Set the mode of the current graph of the current figure
         """
-        if self._curfig is not None:
-            self._curfig.mode = mode
+        if self._current is not None:
+            self._current.mode = mode
         else:
             assert 0, "No figure selected"
 
     def scale(self, scale):
         """ Set the axis scale of the current graph of the current figure
         """
-        if self._curfig is not None:
-            self._curfig.scale = scale
+        if self._current is not None:
+            self._current.scale = scale
         else:
             assert 0, "No figure selected"
 
     def range(self, arg):
         """ Set the axis range of the current graph of the current figure
         """
-        if self._curfig is not None:
-            self._curfig.range = arg
+        if self._current is not None:
+            self._current.range = arg
         else:
             assert 0, "No figure selected"
 
     def unit(self, xu, yu = ""):
         """ Set the units of current graph of current figure
         """
-        if self._curfig is not None:
-            self._curfig.unit = xu, yu
+        if self._current is not None:
+            self._current.unit = xu, yu
         else:
             assert 0, "No figure selected"
             
@@ -332,12 +332,12 @@ class Context(object):
         """ Insert a list of signals into the current graph 
         of the current figure
         """
-        if not self._figs:
+        if not self._figures:
             assert 0, "No figure present"
 
-        if self._curfig is not None:
-            sigs = self._signames_to_sigs(sns)
-            self._curfig.insert(sigs)
+        if self._current is not None:
+            sigs = self._names_to_signals(sns)
+            self._current.insert(sigs)
         else:
             assert 0, "No figure selected"
 
@@ -345,33 +345,33 @@ class Context(object):
         """ Remove a list of signals from the current graph
         of the current figure
         """
-        if not self._figs:
+        if not self._figures:
             assert 0, "No figure present"
 
-        if self._curfig is not None:
-            sigs = self._signames_to_sigs(sns)
-            self._curfig.remove(sigs)
+        if self._current is not None:
+            sigs = self._names_to_signals(sns)
+            self._current.remove(sigs)
         else:
             assert 0, "No figure selected"
 
     def freeze(self, sns):
         """ Set the freeze flag of signals
         """
-        sigs = self._signames_to_sigs(sns)
+        sigs = self._names_to_signals(sns)
         for s in sigs.itervalues():
             s.freeze = True
 
     def unfreeze(self, sns):
         """ Unset the freeze flag of signals
         """
-        sigs = self._signames_to_sigs(sns)
+        sigs = self._names_to_signals(sns)
         for s in sigs.itervalues():
             s.freeze = False
 
     def siglist(self):
         """ List loaded signals
         """
-        for s in self._sigs.itervalues():
+        for s in self._signals.itervalues():
             print s
 
     def math(self, inp):
@@ -390,8 +390,8 @@ class Context(object):
                 sns = r.missing()
                 if hasattr(r, "set_origsigs") and callable(r.set_origsigs):
                     for sn in sns:
-                        if self._sigs.has_key(sn):
-                            sigs[sn] = self._sigs[sn]
+                        if self._signals.has_key(sn):
+                            sigs[sn] = self._signals[sn]
                         else:
                             print "What is", sn
                     r.set_origsigs(sigs)
@@ -399,11 +399,11 @@ class Context(object):
                     if not ss:
                         print "Signal not generated"
         for sn, s in ss.iteritems():
-            self._sigs[sn] = s
-            self._sn_to_r[sn] = inp
+            self._signals[sn] = s
+            self._signal_name_to_reader[sn] = inp
         self._readers[inp] = r
 
-    def _signames_to_sigs(self, sns):
+    def _names_to_signals(self, sns):
         """ Return a signal dict from the signal names list provided
         If no signals are found, return {}
         """
@@ -411,14 +411,14 @@ class Context(object):
             return {}
         sigs = {}
         # Are there signals ?
-        if not self._sigs:
+        if not self._signals:
             print "No signal loaded"
             return {}
 
         # Prepare the signal list
         for sn in sns:
-            if sn in self._sigs.keys():
-                sigs[sn] = self._sigs[sn]
+            if sn in self._signals.keys():
+                sigs[sn] = self._signals[sn]
             else:
                 print sn + ": Not here"
 
