@@ -298,7 +298,7 @@ class Context(object):
         """ Set the mode of the current graph of the current figure
         """
         if self.curfig is not None:
-            self.curfig.set_mode(mode)
+            self.curfig.mode = mode
 
     def scale(self, scale):
         """ Set the axis scale of the current graph of the current figure

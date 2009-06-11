@@ -70,6 +70,12 @@ class Figure(object):
         self._graphs = []
         self._layout = "horiz"
         self._current = None
+        self._MODES_NAMES_TO_OBJ = {"lin":LinGraph}
+        # Slow way... Surely there exist something faster
+        self._OBJ_TO_MODES_NAMES = {}
+        for k, v in self._MODES_NAMES_TO_OBJ.iteritems():
+            self._OBJ_TO_MODES_NAMES[v] = k
+
         if not sigs:
             return
         elif isinstance(sigs, dict):
@@ -146,22 +152,19 @@ class Figure(object):
                 print "    ",
             print "Graph", gn + 1, ":", g
 
+    def get_mode(self):
+        """ Return the mode of the current graph"""
+        return self._OBJ_TO_MODES_NAMES(self._current)
+
     def set_mode(self, gmode):
         """ Set the mode of the current graph
         """
+        # Currently this cannot be tested (only one mode available)
         if self._current is None:
             assert 0, "No graph defined"
-        if isinstance(gmode, str):
-            if gmode == "lin":
-                g = LinGraph(self._current)
-#            elif gmode == "fft":
-#                g = FFTGraph(self._current)
-#            elif gmode == "ifft":
-#                g = IFFTGraph(self._current)
-            else:
-                assert 0, "Bad mode: %s" % gmode
-            self._graphs[self._graphs.index(self._current)] = g
-            self._current = g
+        g = (self._MODES_NAMES_TO_OBJ(gmode))(self._current)
+        self._graphs[self._graphs.index(self._current)] = g
+        self._current = g
 
     def get_layout(self):
         """ Return the figure layout"""
@@ -321,3 +324,4 @@ class Figure(object):
     range = property(get_range, set_range)
     scale = property(get_scale, set_scale)
     unit = property(get_unit, set_unit)
+    mode = property(get_mode, set_mode)
