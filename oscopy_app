@@ -94,7 +94,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "Usage : layout horiz|vert|quad"
             print "   Define the layout of the current figure"
             return
-        self.cmds.layout(args)
+        self.cmds.layout = args
 
     def figlist(self, args):
         if args == "help":
@@ -171,29 +171,29 @@ FITNESS FOR A PARTICULAR PURPOSE."
 #   fft      Fast Fourier Transform (FFT) of signals\n\
 #   ifft     Inverse FFT of signals"
             return
-        self.cmds.mode(args)
+        self.cmds.mode = args
 
     def scale(self, args):
         if args == "help":
             print "Usage: scale [lin|logx|logy|loglog]"
             print "   Set the axis scale"
             return
-        self.cmds.scale(args)
+        self.cmds.scale = args
 
     def range(self, args):
         if args == "help":
             print "Usage: range [x|y min max]|[xmin xmax ymin ymax]|[reset]"
             print "   Set the axis range of the current graph of the current figure"
             return
-        tmp = args.split()
-        if len(tmp) == 1:
-            if tmp[0] == "reset":
-                self.cmds.range(tmp[0])
-        elif len(tmp) == 3:
-            if tmp[0] == 'x' or tmp[0] == 'y':
-                self.cmds.range((tmp[0], [float(tmp[1]), float(tmp[2])]))
-        elif len(tmp) == 4:
-            self.cmds.range([float(tmp[0]), float(tmp[1]), float(tmp[2]), float(tmp[3])])
+        range = args.split()
+        if len(range) == 1:
+            if range[0] == "reset":
+                self.cmds.range = range[0]
+        elif len(range) == 3:
+            if range[0] == 'x' or range[0] == 'y':
+                self.cmds.range = range[0], [float(range[1]), float(range[2])]
+        elif len(range) == 4:
+            self.cmds.range = [float(range[0]), float(range[1]), float(range[2]), float(range[3])]
 
     def unit(self, args):
         if args == "help":
@@ -201,13 +201,13 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "   Set the unit to be displayed on graph axis"
             return
 
-        us = args.split(",", 1)
-        if len(us) < 1:
+        units = args.split(",", 1)
+        if len(units) < 1:
             return
-        elif len(us) == 1:
-            self.cmds.unit(us[0].strip())
-        elif len(us) == 2:
-            self.cmds.unit(us[0].strip(), us[1].strip())
+        elif len(units) == 1:
+            self.cmds.unit = units[0].strip(),
+        elif len(units) == 2:
+            self.cmds.unit = units[0].strip(), units[1].strip()
         else:
             return
 

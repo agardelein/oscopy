@@ -11,6 +11,7 @@
      "sec:viewinter"
      "fig:viewinter"
      "tab:ctxt:meth"
+     "tab:ctxt:props"
      "sec:sigs"
      "tab:sigs:props"
      "sec:readers"

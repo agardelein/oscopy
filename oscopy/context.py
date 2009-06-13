@@ -168,11 +168,21 @@ class Context(object):
         if gn > 0:
             self._current.select(gn)
 
-    def layout(self, l):
+    def get_layout(self):
         """ Define the layout of the current figure
         """
         if self._current is not None:
-            self._current.set_layout(l)
+            return self._current.layout
+        else:
+            assert 0, "No figure selected"
+
+    def set_layout(self, layout):
+        """ Define the layout of the current figure
+        """
+        if self._current is not None:
+            self._current.layout = layout
+        else:
+            assert 0, "No figure selected"
 
     def figlist(self):
         """ Print the list of figures
@@ -296,7 +306,16 @@ class Context(object):
         else:
             assert 0, "No figure selected"
 
-    def mode(self, mode):
+    def get_mode(self):
+        """ Return the mode of the current graph of the current figure
+        """
+        if self._current is not None:
+            return self._current.mode
+        else:
+            assert 0, "No figure selected"
+        
+
+    def set_mode(self, mode):
         """ Set the mode of the current graph of the current figure
         """
         if self._current is not None:
@@ -304,7 +323,15 @@ class Context(object):
         else:
             assert 0, "No figure selected"
 
-    def scale(self, scale):
+    def get_scale(self):
+        """ Return the axis scale of the current graph of the current figure
+        """
+        if self._current is not None:
+            return self._current.scale
+        else:
+            assert 0, "No figure selected"
+
+    def set_scale(self, scale):
         """ Set the axis scale of the current graph of the current figure
         """
         if self._current is not None:
@@ -312,19 +339,35 @@ class Context(object):
         else:
             assert 0, "No figure selected"
 
-    def range(self, arg):
-        """ Set the axis range of the current graph of the current figure
+    def get_range(self):
+        """ Return the axis range of the current graph of the current figure
         """
         if self._current is not None:
-            self._current.range = arg
+            return self._current.range
         else:
             assert 0, "No figure selected"
 
-    def unit(self, xu, yu = ""):
+    def set_range(self, range):
+        """ Set the axis range of the current graph of the current figure
+        """
+        if self._current is not None:
+            self._current.range = range
+        else:
+            assert 0, "No figure selected"
+
+    def get_unit(self):
+        """ Return the units of current graph of current figure
+        """
+        if self._current is not None:
+            return self._current.unit
+        else:
+            assert 0, "No figure selected"
+            
+    def set_unit(self, unit):
         """ Set the units of current graph of current figure
         """
         if self._current is not None:
-            self._current.unit = xu, yu
+            self._current.unit = unit
         else:
             assert 0, "No figure selected"
             
@@ -428,3 +471,8 @@ class Context(object):
             return {}
         return sigs
 
+    layout = property(get_layout, set_layout)
+    mode = property(get_mode, set_mode)
+    scale = property(get_scale, set_scale)
+    range = property(get_range, set_range)
+    unit = property(get_unit, set_unit)
