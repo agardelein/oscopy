@@ -177,7 +177,6 @@ The methods of this interface are summarised in Table~\ref{tab:ctxt:meth}.
     destroy & Public & Destroy a figure \\
     figlist & Public & Print list of figures \\
     plot & Public & Draw the figures\\    
-    select & Public & Select the current figure and graph \\
     \multicolumn{3}{l}{\textit{Graph management of current figure}} \\
     add & Public & Add a graph into the figure \\
     delete & Public & Delete a graph from the figure \\
@@ -196,6 +195,7 @@ The methods of this interface are summarised in Table~\ref{tab:ctxt:meth}.
     \hline
     Property & Read & Write & Type & Summary \\
     \hline
+    current & \checked & \checked & tuple of int & Selected figure and graph \\
     \multicolumn{4}{l}{\textit{Pass-through to curent figure}}\\
     layout & \checked & \checked & str & Disposition of graphs in the figure\\
     mode & \checked & \checked & str & Mode of the current graph\\
@@ -409,7 +409,6 @@ It then call \meth{toggle\_cursors}\ from \graph.
     add & Public & Add a graph into the figure \\
     delete & Public & Delete a graph from the figure \\
     list & Public & Print a list of the graphs\\
-    select & Public & Select the current graph \\
     \multicolumn{3}{l}{\textit{Pass-through to current Graph}} \\
     insert & Public & Insert signals into the graph\\
     remove & Public & Take away signals from the graph\\
@@ -428,6 +427,7 @@ It then call \meth{toggle\_cursors}\ from \graph.
     \hline
     Property & Read & Write & Type & Summary \\
     \hline
+    current & \checked & \checked & int & Select graph \\
     \multicolumn{4}{l}{\textit{Graph management}}\\
     layout & \checked & \checked & str & Disposition of graphs in the figure\\
     mode & \checked & \checked & str & Mode of the current graph\\

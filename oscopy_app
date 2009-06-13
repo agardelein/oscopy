@@ -87,7 +87,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
             gn = eval(s[1])
         else:
             gn = 0
-        self.cmds.select(num, gn)
+        self.cmds.current = num, gn
 
     def layout(self, args):
         if args == "help":

@@ -8,4 +8,3 @@ To be added :
 Support for HDF5
 Make Signal derive from numpy.array
 context: support for getting available modes, scales...
-figure, context: use property() for current

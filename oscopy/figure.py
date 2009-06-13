@@ -93,7 +93,7 @@ class Figure(object):
             assert 0, "Bad graph number"
         gr = LinGraph(sigs)
         self._graphs.append(gr)
-        self.select(self._graphs.index(gr) + 1)
+        self.set_current(self._graphs.index(gr) + 1)
 
     def delete(self, num=1):
         """ Delete a graph from the figure
@@ -135,7 +135,11 @@ class Figure(object):
             g.insert(ug)
             g.remove(dg)
 
-    def select(self, gn=0):
+    def get_current(self):
+        """ Return the number of the current graph """
+        return self._graphs.index(self._current) + 1
+
+    def set_current(self, gn=0):
         """ Select the current graph
         """
         if gn < 1 or gn > len(self._graphs):
@@ -325,3 +329,4 @@ class Figure(object):
     scale = property(get_scale, set_scale)
     unit = property(get_unit, set_unit)
     mode = property(get_mode, set_mode)
+    current = property(get_current, set_current)

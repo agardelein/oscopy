@@ -159,14 +159,24 @@ class Context(object):
         else:
             print "No figures"
 
-    def select(self, num, gn = 0):
+    def get_current(self):
+        """ Return the selected figure and graph
+        """
+        return self._figures.index(self._current) + 1, self._current.current
+
+    def set_current(self, currents):
         """ Select the current figure
         """
+        if not isinstance(currents, tuple) or len(currents) != 2:
+            assert 0, "Bad type"
+        num = currents[0]
+        gn = currents[1]
+
         if num > len(self._figures) or num < 1:
             assert 0, "Out of range figure number"
         self._current = self._figures[num - 1]
         if gn > 0:
-            self._current.select(gn)
+            self._current.current = gn
 
     def get_layout(self):
         """ Define the layout of the current figure
@@ -476,3 +486,4 @@ class Context(object):
     scale = property(get_scale, set_scale)
     range = property(get_range, set_range)
     unit = property(get_unit, set_unit)
+    current = property(get_current, set_current)
