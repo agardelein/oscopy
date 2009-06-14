@@ -424,8 +424,10 @@ class Context(object):
     def siglist(self):
         """ List loaded signals
         """
-        for s in self._signals.itervalues():
-            print s
+        signals = {}
+        for r_name, reader in self._readers.iteritems():
+            signals[r_name] = reader.signals
+        return signals
 
     def math(self, inp):
         """ Create a signal from mathematical expression

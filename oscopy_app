@@ -242,7 +242,13 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "Usage : siglist"
             print "   List loaded signals"
             return
-        self.cmds.siglist()
+        SEPARATOR = "\t"
+        HEADER=["Name", "Unit", "Ref", "Reader"]
+        print SEPARATOR.join(HEADER)
+        for reader, signals in self.cmds.siglist().iteritems():
+            for signal in signals:
+                print SEPARATOR.join((signal["name"], signal["unit"],\
+                                          signal["reference"], reader))
 
     def math(self, inp):
         if inp == "help":

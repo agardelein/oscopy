@@ -9,6 +9,7 @@
 \newcommand{\att}[1]{\texttt{#1}}
 \newcommand{\meth}[1]{\texttt{#1()}}
 \newcommand{\cls}[1]{\textsf{#1}}
+\newcommand{\prop}[1]{\texttt{#1}}
 
 \newcommand{\ctx}{\cls{Context}}
 \newcommand{\sig}{\cls{Signal}}
@@ -273,6 +274,9 @@ Those two methods should be redefined when deriving \rd.
 
 The file access is verified by \meth{check}, and the update mechanism is handled through \meth{update}.
 
+The property \prop{signals} return the list of signals handled by the reader.
+To avoid any accidental modification of the data, each signal is represented through a dict containing the keys \prop{name}, \prop{unit}\ and \prop{reference}, i.e. the signal name, the unit and the name of the reference signal respectively.
+
 \begin{table}[htbp]
   \centering\sf\small
   \begin{tabular}{lll}
@@ -291,6 +295,19 @@ The file access is verified by \meth{check}, and the update mechanism is handled
   \caption{Methods of \rd}
   \label{tab:rds:meth}
 \end{table}
+\begin{table}[htbp]
+  \centering\small\sf
+  \begin{tabular}{*5l}
+    \hline
+    Property & Read & Write & Type & Summary \\
+    \hline
+    signals & \checked &  & list of dict & Signals contained in the reader, see text\\
+    \hline
+  \end{tabular}
+  \caption{Properties of \rd.}
+  \label{tab:rds:props}
+\end{table}
+
 
 \subsection{DetectReader}
 \label{sec:readers:detect}

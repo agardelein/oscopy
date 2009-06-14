@@ -18,6 +18,7 @@
      "fig:rds:callgraph"
      "sec:readers:reader"
      "tab:rds:meth"
+     "tab:rds:props"
      "sec:readers:detect"
      "sec:readers:readerror"
      "sec:readers:add"
@@ -39,6 +40,7 @@
      "sec:ext")
     (TeX-add-symbols
      '("module" 1)
+     '("prop" 1)
      '("cls" 1)
      '("meth" 1)
      '("att" 1)

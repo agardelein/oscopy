@@ -149,3 +149,11 @@ class Reader(object):
         """ Return the signal name.
         """
         return self._fn
+
+    @property
+    def signals(self):
+        """ Return the list of signals names
+        """
+        return map(lambda x: {"name":x.name, "unit":x.unit,\
+                                  "reference":x.ref.name},\
+                       self._signals.values())
