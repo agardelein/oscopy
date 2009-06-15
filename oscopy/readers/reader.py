@@ -154,6 +154,4 @@ class Reader(object):
     def signals(self):
         """ Return the list of signals names
         """
-        return map(lambda x: {"name":x.name, "unit":x.unit,\
-                                  "reference":x.ref.name},\
-                       self._signals.values())
+        return self._signals

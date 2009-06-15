@@ -424,9 +424,14 @@ class Context(object):
     def siglist(self):
         """ List loaded signals
         """
-        signals = {}
+        signals = []
         for r_name, reader in self._readers.iteritems():
-            signals[r_name] = reader.signals
+            signals = signals +\
+                map(lambda x: {"name":x.name, "unit":x.unit,\
+                                   "reference":x.ref.name,\
+                                   "reader": r_name},\
+                        reader.signals.values())
+
         return signals
 
     def math(self, inp):

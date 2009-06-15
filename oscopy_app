@@ -245,10 +245,11 @@ FITNESS FOR A PARTICULAR PURPOSE."
         SEPARATOR = "\t"
         HEADER=["Name", "Unit", "Ref", "Reader"]
         print SEPARATOR.join(HEADER)
-        for reader, signals in self.cmds.siglist().iteritems():
-            for signal in signals:
-                print SEPARATOR.join((signal["name"], signal["unit"],\
-                                          signal["reference"], reader))
+        for signal in self.cmds.siglist():
+            print SEPARATOR.join((signal["name"], \
+                                      signal["unit"],\
+                                      signal["reference"],\
+                                      signal["reader"]))
 
     def math(self, inp):
         if inp == "help":

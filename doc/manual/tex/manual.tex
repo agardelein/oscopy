@@ -157,6 +157,14 @@ It present an interface that can be split into a few parts:
 \end{itemize}
 The methods of this interface are summarised in Table~\ref{tab:ctxt:meth}.
 
+In the list of signals returned by the method \meth{siglist}, each signal is represented through a dict of string containing the keys:
+\begin{description}
+\item[name] of the signal
+\item[unit] of the signal
+\item[reference] name of the signal
+\item[reader] name handling the signal
+\end{description}
+
 \begin{table}[htbp]
   \centering\sf\small
   \begin{tabular}{lll}
@@ -274,8 +282,7 @@ Those two methods should be redefined when deriving \rd.
 
 The file access is verified by \meth{check}, and the update mechanism is handled through \meth{update}.
 
-The property \prop{signals} return the list of signals handled by the reader.
-To avoid any accidental modification of the data, each signal is represented through a dict containing the keys \prop{name}, \prop{unit}\ and \prop{reference}, i.e. the signal name, the unit and the name of the reference signal respectively.
+The property \prop{signals} return the dict of signals handled by the reader.
 
 \begin{table}[htbp]
   \centering\sf\small
@@ -301,7 +308,7 @@ To avoid any accidental modification of the data, each signal is represented thr
     \hline
     Property & Read & Write & Type & Summary \\
     \hline
-    signals & \checked &  & list of dict & Signals contained in the reader, see text\\
+    signals & \checked &  & dict & Signals contained in the reader\\
     \hline
   \end{tabular}
   \caption{Properties of \rd.}
