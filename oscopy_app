@@ -245,7 +245,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
         SEPARATOR = "\t"
         HEADER=["Name", "Unit", "Ref", "Reader"]
         print SEPARATOR.join(HEADER)
-        for signal in self.cmds.siglist():
+        for signal in self.cmds.signals:
             print SEPARATOR.join((signal["name"], \
                                       signal["unit"],\
                                       signal["reference"],\

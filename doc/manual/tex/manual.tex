@@ -157,7 +157,7 @@ It present an interface that can be split into a few parts:
 \end{itemize}
 The methods of this interface are summarised in Table~\ref{tab:ctxt:meth}.
 
-In the list of signals returned by the method \meth{siglist}, each signal is represented through a dict of string containing the keys:
+The property is a list of signals, each signal is represented through a dict of string containing the keys:
 \begin{description}
 \item[name] of the signal
 \item[unit] of the signal
@@ -176,7 +176,6 @@ In the list of signals returned by the method \meth{siglist}, each signal is rep
     read & Public & Load data from file\\
     write &Public & Save data to file \\
     update & Public & Reload data from files\\
-    siglist & Public & Print the list of loaded signals\\
     freeze & Public & Disable update of some signals\\
     unfreeze & Public & Enable update of some signals\\
     math & Public & Create a signal from a math expression\\
@@ -205,11 +204,11 @@ In the list of signals returned by the method \meth{siglist}, each signal is rep
     Property & Read & Write & Type & Summary \\
     \hline
     current & \checked & \checked & tuple of int & Selected figure and graph \\
-    \multicolumn{4}{l}{\textit{Pass-through to curent figure}}\\
+    \multicolumn{4}{l}{\textit{Pass-through to current figure}}\\
     layout & \checked & \checked & str & Disposition of graphs in the figure\\
     mode & \checked & \checked & str & Mode of the current graph\\
-%    \multicolumn{4}{l}{\textit{Data management}}\\
-%    signals & \checked & & iter & Signals contained in the figure \\
+    \multicolumn{4}{l}{\textit{Data management}}\\
+    signals & \checked & & list & Signals loaded\\
     \multicolumn{4}{l}{\textit{Pass-through to current graph}}\\
     unit  & \checked & \checked& Tuple of str & The unit to be displayed in x/y labels\\
     scale & \checked & \checked & str & Scale of the axis (one of lin,logx,logy,loglog) \\

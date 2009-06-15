@@ -421,7 +421,8 @@ class Context(object):
         for s in sigs.itervalues():
             s.freeze = False
 
-    def siglist(self):
+    @property
+    def signals(self):
         """ List loaded signals
         """
         signals = []
