@@ -5,6 +5,7 @@
 \usepackage{graphicx}
 \usepackage{wasysym}
 \usepackage[font=small,labelfont=sf,textfont=sf]{caption}
+\usepackage{hyperref}
 
 \newcommand{\att}[1]{\texttt{#1}}
 \newcommand{\meth}[1]{\texttt{#1()}}
@@ -23,6 +24,17 @@
 \newcommand{\cursor}{\cls{Cursor}}
 \title{{\sc Oscopy}\\An interactive program for viewing electrical simulation results\\Manual}
 \author{Arnaud Gardelein}
+
+\hypersetup{
+colorlinks=true,
+linkcolor=black,
+anchorcolor=black,
+citecolor=black,
+filecolor=black,
+menucolor=black,
+pagecolor=black,
+urlcolor=black,
+}
 
 \begin{document}
 
@@ -157,12 +169,19 @@ It present an interface that can be split into a few parts:
 \end{itemize}
 The methods of this interface are summarised in Table~\ref{tab:ctxt:meth}.
 
-The property is a list of signals, each signal is represented through a dict of string containing the keys:
+The property \prop{signals} is a list of signals, each signal is represented through a dict of string containing the keys:
 \begin{description}
 \item[name] of the signal
 \item[unit] of the signal
 \item[reference] name of the signal
 \item[reader] name handling the signal
+\end{description}
+The property{figures} is a list of figures, each figure is represented as a dict with the keys:
+\begin{description}
+\item[layout] of the figure
+\item[num] of the figure
+\item[graphs] of the figure
+\item[current] which is True if the figure is currently selected
 \end{description}
 
 \begin{table}[htbp]
@@ -183,7 +202,6 @@ The property is a list of signals, each signal is represented through a dict of 
     \multicolumn{3}{l}{\textit{Figure management}} \\
     create & Public & Create a new figure\\
     destroy & Public & Destroy a figure \\
-    figlist & Public & Print list of figures \\
     plot & Public & Draw the figures\\    
     \multicolumn{3}{l}{\textit{Graph management of current figure}} \\
     add & Public & Add a graph into the figure \\
@@ -204,6 +222,7 @@ The property is a list of signals, each signal is represented through a dict of 
     Property & Read & Write & Type & Summary \\
     \hline
     current & \checked & \checked & tuple of int & Selected figure and graph \\
+    figures & \checked & & dict & List of figures \\
     \multicolumn{4}{l}{\textit{Pass-through to current figure}}\\
     layout & \checked & \checked & str & Disposition of graphs in the figure\\
     mode & \checked & \checked & str & Mode of the current graph\\
@@ -420,6 +439,16 @@ Finally it set the method \meth{key}\ as a call-back for key-press related event
 Currently this method handle the keys '1', '2', '3' and '4' to toggle cursors, as summarised in Table~\ref{tab:figs:key}.
 It then call \meth{toggle\_cursors}\ from \graph.
 
+The list of graph is provided by the property \prop{graphs}.
+This is a list of dict, whose contain:
+\begin{description}
+\item[num]ber of the graph
+\item[type] of the graph
+\item[current] is True when the graph is the currently selected
+\item[signals] is the list of signal names contained in the graph
+\end{description}
+
+
 \begin{table}[htbp]
   \centering\sf\small
   \begin{tabular}{lll}
@@ -451,6 +480,7 @@ It then call \meth{toggle\_cursors}\ from \graph.
     Property & Read & Write & Type & Summary \\
     \hline
     current & \checked & \checked & int & Select graph \\
+    graphs & \checked & & list of dict & List of graphs\\
     \multicolumn{4}{l}{\textit{Graph management}}\\
     layout & \checked & \checked & str & Disposition of graphs in the figure\\
     mode & \checked & \checked & str & Mode of the current graph\\

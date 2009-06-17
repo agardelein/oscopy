@@ -32,7 +32,7 @@ Class Graph -- Handle the representation of a list of signals
    plot()
       Plot the graph
 
-   get_signals()
+   signals()
       Return a list of the signal names
 
    type()
@@ -384,8 +384,7 @@ may lead to uncertain results"
     def signals(self):
         """ Return a list of the signal names
         """
-        for sn in self._sigs:
-            yield sn
+        return self._sigs
 
     @property
     def type(self):

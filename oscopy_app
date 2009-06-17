@@ -101,7 +101,16 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "Usage : figlist"
             print "   Print the list of figures"
             return
-        self.cmds.figlist()
+
+        SEPARATOR = " "
+        for f in self.cmds.figures:
+            print "%s Figure %d: %s" % ([" ", "*"][f["current"]],\
+                                            f["num"], f["layout"])
+            for g in f["graphs"]:
+                print "    %s Graph %d : (%s) %s"\
+                    %([" ","*"][g["current"]],\
+                          g["num"], g["type"],\
+                          SEPARATOR.join(g["signals"]))
 
     def plot(self, args):
         if args == "help":

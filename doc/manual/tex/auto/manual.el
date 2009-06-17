@@ -54,6 +54,7 @@
      "fig"
      "cursor")
     (TeX-run-style-hooks
+     "hyperref"
      "caption"
      "wasysym"
      "graphicx"

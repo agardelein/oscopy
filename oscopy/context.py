@@ -194,16 +194,15 @@ class Context(object):
         else:
             assert 0, "No figure selected"
 
-    def figlist(self):
+    @property
+    def figures(self):
         """ Print the list of figures
         """
-        for i, f in enumerate(self._figures):
-            if f == self._current:
-                print "*",
-            else:
-                print " ",
-            print "Figure", i + 1, ":", f.layout
-            f.list()
+        return map(lambda (i, f): {"current":(f == self._current),\
+                                       "num":i + 1,\
+                                       "layout":f.layout,\
+                                       "graphs":f.graphs},\
+                       enumerate(self._figures))
 
     def plot(self):
         """ Plot the figures, and enter in the matplotlib main loop

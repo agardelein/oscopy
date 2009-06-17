@@ -123,11 +123,11 @@ class Figure(object):
             assert 0, "Bad type"
         if not isinstance(d, dict):
             assert 0, "Bad type"
-
+            # Check here !!
         for g in self._graphs:
             ug = {}
             dg = {}
-            for sn in g.get_signals():
+            for sn in g.signals():
                 if sn in u:
                     ug[sn] = u[sn]
                 elif sn in d:
@@ -146,15 +146,15 @@ class Figure(object):
             assert 0, "Bad graph number"
         self._current = self._graphs[gn - 1]
 
-    def list(self):
+    @property
+    def graphs(self):
         """ List the graphs from the figure
         """
-        for gn, g in enumerate(self._graphs):
-            if g == self._current:
-                print "   *",
-            else:
-                print "    ",
-            print "Graph", gn + 1, ":", g
+        return map(lambda (gn, g): {"current":(g == self._current),\
+                                        "num": gn + 1,\
+                                        "type": g.type,\
+                                        "signals":g.signals.keys()},\
+                       enumerate(self._graphs))
 
     def get_mode(self):
         """ Return the mode of the current graph"""
