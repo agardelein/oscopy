@@ -128,7 +128,21 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "   Load signal file"
             return
         fn = args
-        return self.cmds.read(fn)
+        try:
+            self.cmds.read(fn)
+        except ReadError, e:
+            print "Failed to read:", e
+            return
+        except NotImplementedError:
+            print "File format not supported"
+            return
+
+        print fn, ":"
+        for signal in self.cmds.signals:
+            if signal["reader"] == fn:
+                print '%s / %s %s' % (signal['name'],\
+                                          signal['reference'],\
+                                          signal['unit'])
 
     def write(self, args):
         if args == "help":
@@ -151,7 +165,14 @@ FITNESS FOR A PARTICULAR PURPOSE."
                 tmp = on.split(':', 1)
                 if len(tmp) == 2:
                     opts[tmp[0]] = tmp[1]
-        self.cmds.write(fn, fmt, sns, opts)
+        try:
+            self.cmds.write(fn, fmt, sns, opts)
+        except WriteError, e:
+            print "Write error:", e
+            return
+        except NotImplementedError:
+            print "File format not supported"
+            return
 
     def update(self, args):
         if args == "help":
@@ -268,7 +289,11 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "Usage: destsig=mathexpr"
             print "   Define a new signal destsig using mathematical expression"
             return
-        self.cmds.math(inp)
+        try:
+            self.cmds.math(inp)
+        except ReadError, e:
+            print "Error creating signal from math expression", e
+            return
 
     def get_signames(self, args):
         """ Return the signal names list extracted from the commandline

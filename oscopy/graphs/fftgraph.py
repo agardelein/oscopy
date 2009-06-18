@@ -36,9 +36,9 @@ class FFTGraph(Graph):
         for sn, s in origsigs.iteritems():
             s2 = Signal(sn, s.unit)
             # Check whether ref sig is Time
-            if s.ref.name != "Time":
-                print "Warning : ref sig of", s.name ,"is not 'Time'.\
- I hope you know what you do !"
+#            if s.ref.name != "Time":
+#                print "Warning : ref sig of", s.name ,"is not 'Time'.\
+# I hope you know what you do !"
             # Do a fft
             y = numpy.fft.fft(s.data)
             y = y[0:int(len(y)/2)-1]
@@ -84,9 +84,9 @@ class IFFTGraph(Graph):
         for sn, s in origsigs.iteritems():
             # Check whether ref sig is Freq
             s2 = Signal(s)
-            if s.ref.name != "Freq":
-                print "Warning : ref sig of", s.name ,"is not 'Freq'.\
- I hope you know what you do !"
+#            if s.ref.name != "Freq":
+#               print "Warning : ref sig of", s.name ,"is not 'Freq'.\
+#I hope you know what you do !"
             # Do a inverse fft
             y = numpy.fft.ifft(s.data)
             y = y[0:int(len(y)/2)-1]

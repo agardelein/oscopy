@@ -154,10 +154,6 @@ class Context(object):
                 # Go to next element
                 self._current = self._figures[num]
         del self._figures[num - 1]
-        if self._current is not None:
-            print "Curfig : ", self._figures.index(self._current) + 1
-        else:
-            print "No figures"
 
     def get_current(self):
         """ Return the selected figure and graph
@@ -222,22 +218,17 @@ class Context(object):
         """
         # File already loaded ?
         if fn in self._readers.keys():
-            print "File already loaded"
-            return
+            raise "File already loaded, use update to read it again"
 
         r = DetectReader(fn)
         if r is None:
-            print "File format unknown"
-            return
+            raise NotImplementedError()
         sigs = r.read(fn)
 
         # Insert signals into the dict
         for sn in sigs.keys():
             self._signals[sn] = sigs[sn]
             self._signal_name_to_reader[sn] = r
-        print fn, ":"
-        for s in sigs.itervalues():
-            print s
         self._readers[fn] = r
 
     def write(self, fn, fmt, sns, opts):
@@ -245,36 +236,32 @@ class Context(object):
         """
         # Create the object
         sigs = self._names_to_signals(sns)
-        if len(sigs) < 1:
+        if not sigs:
             return
-        try:
-            w = DetectWriter(fmt, fn, True)
-        except WriteError, e:
-            print "Write error:", e
-            return
+        w = DetectWriter(fmt, fn, True)
         if w is not None:
-            try:
-                w.write(fn, sigs, opts)
-            except WriteError, e:
-                print "Write error:", e
+            w.write(fn, sigs, opts)
+        else:
+            raise NotImplementedError()
 
     def update(self, r=None, upn=-1):
         """ Reread signal from files.
         For each file, reread it, and for updated, new and deleted signal,
         update the signal dict accordingly.
+        Act recursively.
         """
         n = {}    # New signals
         if r is None:
             # Normal call create the new list etc etc
             self._update_num += 1
             for reader in self._readers.itervalues():
-                print "Updating signals from", reader
+#                print "Updating signals from", reader
                 n.update(self.update(reader, self._update_num))
         else:
             # First look at its dependencies
             if hasattr(r, "get_depends") and callable(r.get_depends):
                 for sn in r.get_depends():
-                    print " Updating signals from", self._signal_name_to_reader[sn]
+#                    print " Updating signals from", self._signal_name_to_reader[sn]
                     n.update(self.update(self._signal_name_to_reader[sn], self._update_num))
                     # TODO: Update depencies: what happens to vo when
                     # vout is deleted ? It seems it is not deleted: it should!
@@ -453,11 +440,10 @@ class Context(object):
                         if self._signals.has_key(sn):
                             sigs[sn] = self._signals[sn]
                         else:
-                            print "What is", sn
+                            raise ReadError("What is %s" % sn)
                     r.set_origsigs(sigs)
                     ss = r.read(inp)
-                    if not ss:
-                        print "Signal not generated"
+
         for sn, s in ss.iteritems():
             self._signals[sn] = s
             self._signal_name_to_reader[sn] = inp
@@ -467,25 +453,21 @@ class Context(object):
         """ Return a signal dict from the signal names list provided
         If no signals are found, return {}
         """
-        if not sns:
+        if not sns or not self._signals:
             return {}
         sigs = {}
-        # Are there signals ?
-        if not self._signals:
-            print "No signal loaded"
-            return {}
 
         # Prepare the signal list
         for sn in sns:
             if sn in self._signals.keys():
                 sigs[sn] = self._signals[sn]
             else:
-                print sn + ": Not here"
+#                print sn + ": Not here"
+                pass
 
         # No signals found
-        if not sigs:
-            print "No signals found"
-            return {}
+#        if not sigs:
+#            print "No signals found"
         return sigs
 
     layout = property(get_layout, set_layout)
