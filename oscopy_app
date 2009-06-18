@@ -117,10 +117,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "Usage : plot"
             print "   Draw and show the figures"
             return
-        try:
-            self.cmds.plot()
-        except OverflowError, e:
-            print "OverflowError in plot:", e.message, ", log(0) somewhere ?"
+        self.cmds.plot()
 
     def read(self, args):
         if args == "help":
