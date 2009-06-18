@@ -166,14 +166,7 @@ class Graph(object):
             # Scaling factor
             x = s.ref.data * pow(10, fx)
             y = s.data * pow(10, fy)
-            try:
-                self._plotf(x, y, label=sn)
-            except OverflowError, e:
-                print "OverflowError in plot:", e.message, ", log(0) somewhere ?"
-                ax.hold(False)
-                ax.set_xlabel(xl)
-                ax.set_ylabel(yl)
-                return
+            self._plotf(x, y, label=sn)
         ax.hold(False)
         ax.set_xlabel(xl)
         ax.set_ylabel(yl)
