@@ -573,7 +573,9 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object, and
 \end{table}
 \subsubsection{Data management methods}
 The data is inserted into the graph with \meth{insert}, and removed with \meth{remove}.
-It can be parsed by calling the generator \meth{get\_signals}.
+\meth{insert} return a dict of the signals that failed to be inserted, i.e. the reference signal name is different of the x axis name.
+When the graph is empty, the x axis name take the name if the reference signal.
+It can be parsed with the property \prop{signals}.
 
 \subsubsection{Viewing management}
 The central function of this object is \meth{plot}, that does the work to present the data to the user.

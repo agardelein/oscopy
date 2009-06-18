@@ -389,7 +389,7 @@ class Context(object):
 
         if self._current is not None:
             sigs = self._names_to_signals(sns)
-            self._current.insert(sigs)
+            return self._current.insert(sigs)
         else:
             assert 0, "No figure selected"
 

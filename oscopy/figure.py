@@ -220,13 +220,15 @@ class Figure(object):
         for gn, g in enumerate(self._graphs):
             ax = fig.add_subplot(nx, ny, gn+1)
             g.plot(ax)
-        self.kid = fig.canvas.mpl_connect('key_press_event', self._key)
+        self._kid = fig.canvas.mpl_connect('key_press_event', self._key)
 
     def insert(self, sigs):
         """ Add a signal into the current graph
         """
         if self._current is not None:
-            self._current.insert(sigs)
+            return self._current.insert(sigs)
+        else:
+            assert 0, "No graph defined"
 
     def remove(self, sigs, where="current"):
         """ Delete a signal from the current graph
@@ -261,8 +263,7 @@ class Figure(object):
         if self._current is not None:
             return self._current.scale
         else:
-            assert 0, "No graph defined"
-        
+            assert 0, "No graph defined"        
 
     def set_scale(self, scale):
         """ Set the current graph axis scale

@@ -73,14 +73,6 @@ class Graph(object):
             self._FUNC_TO_SCALES[v] = k
 
         if isinstance(sigs, Graph):
-            # Warn on some conversion that may lead to nasty things
-            if (sigs.type.find('fft') == 0 \
-                    and self.type.find('ifft') == 0) \
-                    or (sigs.type.find('ifft') == 0 \
-                            and self.type.find('fft') == 0):
-                print "Warning: fft <=> ifft conversions and vice versa \
-may lead to uncertain results"
-
             mysigs = {}
             mysigs = sigs.sigs.copy()
             self.insert(mysigs)
@@ -118,6 +110,7 @@ may lead to uncertain results"
         The remaining signals to be added must have the same abscisse name,
         otherwise they are ignored
         """
+        rejected = {}
         for sn, s in sigs.iteritems():
             if not self._sigs:
                 # First signal, set_ the abscisse name and add signal
@@ -132,8 +125,8 @@ may lead to uncertain results"
                     self._sigs[sn] = s
                 else:
                     # Ignore signal
-                    print "Not the same ref:", sn, "-", self._xaxis,"-"
-        return len(self._sigs)
+                    rejected.update[sn] = s
+        return rejected
 
     def remove(self, sigs={}):
         """ Delete signals from the graph
