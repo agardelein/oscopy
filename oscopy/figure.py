@@ -123,7 +123,6 @@ class Figure(object):
             assert 0, "Bad type"
         if not isinstance(d, dict):
             assert 0, "Bad type"
-            # Check here !!
         for g in self._graphs:
             ug = {}
             dg = {}

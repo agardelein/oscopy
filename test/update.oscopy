@@ -1,0 +1,23 @@
+# First read data from IRF540 simulation
+echo *** Reading files and setting plots
+# Plot filter response
+read demo/ac.dat
+create
+add vout
+scale loglog
+# Create a copy of vout and freeze it
+vo = vout
+freeze vo
+insert vo
+# Plot things
+echo *** Now plotting everything
+plot
+# Updating
+echo *** Now change C value in schematic and rerun gnetlist + gnucap
+pause
+echo *** Updating
+update
+echo *** Now look at figure 3
+plot
+# Saving results
+#write gnucap (ow:1) demo/res.dat v1,vsqu

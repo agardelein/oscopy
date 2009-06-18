@@ -1,0 +1,17 @@
+# Load files
+read demo/tran.dat
+read demo/irf540.dat
+add vsqu
+add vsqu
+vsqud = diff(vsqu)
+add vsqud
+echo *** Just check everything is fine...
+v1=vsqu*10+15
+add v1
+# Now with IRF540 results
+create
+add vds
+vdsd = diff(vds)
+add vdsd
+siglist
+plot

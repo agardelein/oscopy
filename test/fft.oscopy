@@ -1,0 +1,16 @@
+# Load files
+read demo/tran.dat
+add vsqu
+echo *** Now doing new way...
+vsqufft = fft(vsqu)
+add vsqufft
+echo *** Diff
+vdiff = diff(vsqu)
+add vdiff
+echo *** Just check everything is fine...
+v1=vsqu*10+15
+v1v1=v1+vsqu/10
+vsquvsqu=v1v1+v1-vsqu
+add v1
+siglist
+plot

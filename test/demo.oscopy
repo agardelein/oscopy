@@ -1,0 +1,53 @@
+# First read data from IRF540 simulation
+echo *** Reading files and setting plots
+read demo/irf540.dat
+add vgs
+create
+add iRD
+add vgs
+add vgs
+add vds
+layout quad
+# Oops, forgot a signal in figure 2 graph 3
+select 2-3
+insert vds
+# Plot filter response
+read demo/ac.dat
+create
+add vout
+scale loglog
+# Plot square signal, its FFT and a math signal
+read demo/tran.dat
+create
+add vsqu
+vsqufft=fft(vsqu)
+add vsqufft
+#range 0 10 -0.2 0.2
+unit V
+v1=vsqu*3+10
+add v1
+unit V
+# Use of Time
+vs = sin(Time(vsqu)*1e6)
+create vs
+unit V
+echo ** List of figures
+figlist
+# Create a copy of vout and freeze it
+vo = vout
+freeze vo
+select 3
+insert vo
+siglist
+# Plot things
+echo *** Now plotting everything
+#plot
+# Updating
+echo *** Now change C value in schematic and rerun gnetlist + gnucap
+#pause
+echo *** Updating
+update
+echo *** Now look at figure 3
+#plot
+# Saving results
+write gnucap (ow:1) demo/res.dat v1,vsqu
