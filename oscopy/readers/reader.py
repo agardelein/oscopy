@@ -120,13 +120,18 @@ class Reader(object):
  #                   print os.name, "not updated: something changed"
 
         # Find deleted signals, i.e. present in old dict but not in new one
+        d = []
         for sn, s in oldsigs.iteritems():
             if sn not in sigs:
                 if not keep:
                     s.data = None
+                    d.append(sn)
  #                   print s.name, "DELETED !"
         self._update_num = upn
         self._signals = oldsigs
+        # Delete signals from dict
+        for sn in d:
+            del self._signals[sn]
         return n
 
     def detect(self, fn):

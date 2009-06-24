@@ -9,6 +9,10 @@ scale loglog
 vo = vout
 freeze vo
 insert vo
+# Signal name change
+read demo/irf540.dat
+add vgs
+siglist
 # Plot things
 echo *** Now plotting everything
 plot
@@ -17,6 +21,7 @@ echo *** Now change C value in schematic and rerun gnetlist + gnucap
 pause
 echo *** Updating
 update
+siglist
 echo *** Now look at figure 3
 plot
 # Saving results
