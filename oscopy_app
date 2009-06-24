@@ -131,7 +131,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
         try:
             self.cmds.read(fn)
         except ReadError, e:
-            print "Failed to read:", e
+            print "Failed to read %s:" % fn, e
             return
         except NotImplementedError:
             print "File format not supported"

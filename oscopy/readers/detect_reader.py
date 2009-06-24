@@ -15,10 +15,7 @@ def DetectReader(filename):
     """
     for reader in READERS:
         r = reader()
-        try:
-            if r.detect(filename):
-                return r
-        except ReadError:
-            pass
+        if r.detect(filename):
+            return r
     return None
 
