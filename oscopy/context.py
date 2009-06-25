@@ -298,7 +298,7 @@ class Context(object):
         """ Delete a graph from the current figure
         """
         if self._current is not None:
-            self._current.delete(gn)
+            self._current.delete(int(gn))
         else:
             assert 0, "No figure selected"
 

@@ -102,19 +102,18 @@ class Figure(object):
         """
         if not isinstance(num, int):
             assert 0, "Bad graph number"
-        gn = eval(num)   # Graph number
-        if len(self._graphs) < 1 or gn < 1 or gn > len(self._graphs):
+        if len(self._graphs) < 1 or num < 1 or num > len(self._graphs):
             assert 0, "Bad graph number"
-        if self._current == self._graphs[gn - 1]:
+        if self._current == self._graphs[num - 1]:
             if len(self._graphs) == 1:
                 # Only one element in the list
                 self._current = None
-            elif gn == len(self._graphs):
+            elif num == len(self._graphs):
                 # Last element, go to the previous
-                self._current = self._graphs[gn - 2]
+                self._current = self._graphs[num - 2]
             else:
-                self._current = self._graphs[gn]
-        del self._graphs[gn - 1]
+                self._current = self._graphs[num]
+        del self._graphs[num - 1]
         
     def update(self, u, d):
         """ Update the graphs
