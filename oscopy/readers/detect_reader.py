@@ -8,7 +8,7 @@ from reader import ReadError
 from gnucap_reader import GnucapReader
 from math_reader import MathReader
 
-READERS = [GnucapReader, MathReader]
+READERS = [MathReader, GnucapReader]
 
 def DetectReader(filename):
     """ Return a reader object
