@@ -446,7 +446,7 @@ class Context(object):
 
         for sn, s in ss.iteritems():
             self._signals[sn] = s
-            self._signal_name_to_reader[sn] = inp
+            self._signal_name_to_reader[sn] = r
         self._readers[inp] = r
 
     def _names_to_signals(self, sns):
