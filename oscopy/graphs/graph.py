@@ -82,6 +82,7 @@ class Graph(object):
             self._ax = sigs.ax
             self._cursors = {"horiz": [None, None], "vert": [None, None]}
             self._txt = None
+            self._signals2lines = sigs._signals2lines.copy()
         else:
             self._xaxis = ""
             self._yaxis = ""
@@ -95,6 +96,7 @@ class Graph(object):
             # Cursors values, only two horiz and two vert but can be changed
             self._cursors = {"horiz":[None, None], "vert":[None, None]}
             self._txt = None
+            self._signals2lines = {}
 
     def __str__(self):
         """ Return a string with the type and the signal list of the graph
@@ -134,6 +136,7 @@ class Graph(object):
         for sn in sigs.iterkeys():
             if sn in self._sigs.keys():
                 del self._sigs[sn]
+                del self._signals2lines[sn]
         return len(self._sigs)
 
     def plot(self, ax=None):
@@ -166,7 +169,8 @@ class Graph(object):
             # Scaling factor
             x = s.ref.data * pow(10, fx)
             y = s.data * pow(10, fy)
-            self._plotf(x, y, label=sn)
+            line, = self._plotf(x, y, label=sn)
+            self._signals2lines[sn] = line
         ax.hold(False)
         ax.set_xlabel(xl)
         ax.set_ylabel(yl)

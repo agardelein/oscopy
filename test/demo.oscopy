@@ -41,7 +41,7 @@ insert vo
 siglist
 # Plot things
 echo *** Now plotting everything
-#plot
+plot
 # Updating
 echo *** Now change C value in schematic and rerun gnetlist + gnucap
 #pause
