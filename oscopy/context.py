@@ -112,7 +112,7 @@ class Context(object):
         self._signal_name_to_reader = {}
         
     def create(self, sigs):
-        """ Create a new figure and set_ it as current
+        """ Create a new figure and set it as current
         Can be either called from commandline or a function.
         When called from commandline, call _names_to_signals to retrieve
         the signal list

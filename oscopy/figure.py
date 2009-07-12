@@ -68,6 +68,7 @@ class Figure(object):
         By default, create an empty list of graph and set_ the layout to horiz
         """
         self._graphs = []
+        self._axes = []
         self._layout = "horiz"
         self._current = None
         self._MODES_NAMES_TO_OBJ = {"lin":LinGraph}
@@ -114,6 +115,7 @@ class Figure(object):
             else:
                 self._current = self._graphs[num]
         del self._graphs[num - 1]
+        del self._axes[num - 1]
         
     def update(self, u, d):
         """ Update the graphs
@@ -218,6 +220,7 @@ class Figure(object):
         for gn, g in enumerate(self._graphs):
             ax = fig.add_subplot(nx, ny, gn+1)
             g.plot(ax)
+            self._axes = ax
         self._kid = fig.canvas.mpl_connect('key_press_event', self._key)
 
     def insert(self, sigs):
