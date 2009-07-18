@@ -119,6 +119,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
             return
         try:
             self.cmds.plot()
+            self.cmds.show()
         except OverflowError, e:
             print "OverflowError in plot:", e.message, ", log(0) somewhere ?"
 

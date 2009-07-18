@@ -77,6 +77,8 @@ class Figure(object):
         for k, v in self._MODES_NAMES_TO_OBJ.iteritems():
             self._OBJ_TO_MODES_NAMES[v] = k
 
+        self._fig = plt.figure()
+
         if not sigs:
             return
         elif isinstance(sigs, dict):
@@ -85,7 +87,7 @@ class Figure(object):
             assert 0, "Bad type"
 
     def add(self, sigs={}):
-        """ Add a graph into the figure and set_ it as current graph.
+        """ Add a graph into the figure and set it as current graph.
         Up to four graphs can be plotted on the same figure.
         Additionnal attemps are ignored.
         By default, do nothing.
@@ -134,6 +136,8 @@ class Figure(object):
                     dg[sn] = d[sn]
             g.insert(ug)
             g.remove(dg)
+            # ipython: to update data in a line2D:
+            # l.set_data() and then plot() from matplotlib to update the plot
 
     def get_current(self):
         """ Return the number of the current graph """
@@ -181,13 +185,14 @@ class Figure(object):
         quad  : graphs are 2 x 2 at maximum
         Other values are ignored
         """
+        # To change the layout: use ax.set_position
         if layout == "horiz" or layout == "vert" or layout == "quad":
             self._layout = layout
             return
         else:
             assert 0, "Bad layout"
 
-    def plot(self, fig):
+    def plot(self):
         """ Plot the figure in Matplotlib Figure instance fig
         First compute the number of subplot and the layout
         And then really call the plot function of each graph
@@ -218,10 +223,10 @@ class Figure(object):
 
         # Plot the whole figure
         for gn, g in enumerate(self._graphs):
-            ax = fig.add_subplot(nx, ny, gn+1)
+            ax = self._fig.add_subplot(nx, ny, gn+1)
             g.plot(ax)
             self._axes = ax
-        self._kid = fig.canvas.mpl_connect('key_press_event', self._key)
+        self._kid = self._fig.canvas.mpl_connect('key_press_event', self._key)
 
     def insert(self, sigs):
         """ Add a signal into the current graph

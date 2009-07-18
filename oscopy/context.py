@@ -206,9 +206,9 @@ class Context(object):
         if not self._figures:
             assert 0, "No figure to plot"
         for i, f in enumerate(self._figures):
-            fig = plt.figure(i + 1)
-            f.plot(fig)
-        plt.show()
+#            fig = plt.figure(i + 1)
+            f.plot()
+#        plt.show()
 
     def read(self, fn):
         """ Read signals from file.
@@ -448,6 +448,11 @@ class Context(object):
             self._signals[sn] = s
             self._signal_name_to_reader[sn] = r
         self._readers[inp] = r
+
+    def show(self):
+        """ Show the plot
+        """
+        plt.show()
 
     def _names_to_signals(self, sns):
         """ Return a signal dict from the signal names list provided

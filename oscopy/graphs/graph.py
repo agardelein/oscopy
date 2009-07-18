@@ -136,6 +136,8 @@ class Graph(object):
         for sn in sigs.iterkeys():
             if sn in self._sigs.keys():
                 del self._sigs[sn]
+                ## ipython: To remove the line from the plot:
+                ## line.remove() and then plot() <- matplotlib plot
                 del self._signals2lines[sn]
         return len(self._sigs)
 
@@ -147,6 +149,7 @@ class Graph(object):
         """
         if not self._sigs:
             return
+
         # Prepare labels
         xl = self._xaxis
         if not self._xunit:
@@ -169,7 +172,7 @@ class Graph(object):
             # Scaling factor
             x = s.ref.data * pow(10, fx)
             y = s.data * pow(10, fy)
-            line, = self._plotf(x, y, label=sn)
+            line, = ax.plot(x, y, label=sn)
             self._signals2lines[sn] = line
         ax.hold(False)
         ax.set_xlabel(xl)
