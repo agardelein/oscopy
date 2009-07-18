@@ -94,8 +94,32 @@ class Figure(object):
         """
         if len(self._graphs) > 3:
             assert 0, "Bad graph number"
-        gr = LinGraph(sigs)
+        if self._layout == "horiz":
+            nx = len(self._graphs) + 1
+            ny = 1
+        elif self._layout == "vert":
+            nx = 1
+            ny = len(self._graphs) + 1
+        elif self._layout == "quad":
+            if len(self._graphs) + 1 == 1:
+                nx = 1
+                ny = 1
+            elif len(self._graphs) + 1 == 2:
+                # For two graphs in quad config, go to horiz
+                nx = 2
+                ny = 1
+            else:
+                nx = 2
+                ny = 2
+        else:
+            nx = 2
+            ny = 2
+        gn = len(self._graphs)
+        ax = self._fig.add_subplot(nx, ny, gn + 1)
+
+        gr = LinGraph(ax, sigs)
         self._graphs.append(gr)
+        self._axes.append(ax)
         self.set_current(self._graphs.index(gr) + 1)
 
     def delete(self, num=1):
@@ -200,32 +224,11 @@ class Figure(object):
         # Set the number of lines and rows
         if not self._graphs:
             assert 0, "No graphs defined"
-        if self._layout == "horiz":
-            nx = len(self._graphs)
-            ny = 1
-        elif self._layout == "vert":
-            nx = 1
-            ny = len(self._graphs)
-        elif self._layout == "quad":
-            if len(self._graphs) == 1:
-                nx = 1
-                ny = 1
-            elif len(self._graphs) == 2:
-                # For two graphs in quad config, go to horiz
-                nx = 2
-                ny = 1
-            else:
-                nx = 2
-                ny = 2
-        else:
-            nx = 2
-            ny = 2
 
         # Plot the whole figure
         for gn, g in enumerate(self._graphs):
-            ax = self._fig.add_subplot(nx, ny, gn+1)
-            g.plot(ax)
-            self._axes = ax
+            g.plot()
+#            self._axes = ax
         self._kid = self._fig.canvas.mpl_connect('key_press_event', self._key)
 
     def insert(self, sigs):

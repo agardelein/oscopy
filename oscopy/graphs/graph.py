@@ -53,7 +53,7 @@ from matplotlib import rc
 from cursor import Cursor
 
 class Graph(object):
-    def __init__(self, sigs={}):
+    def __init__(self, ax, sigs={}):
         """ Create a graph
         If signals are provided, fill in the graph otherwise the graph is empty
         Signals are assumed to exist and to be valid
@@ -92,7 +92,7 @@ class Graph(object):
             self._yrange = []
             self.insert(sigs)
             self._plotf = plt.plot
-            self._ax = None
+            self._ax = ax
             # Cursors values, only two horiz and two vert but can be changed
             self._cursors = {"horiz":[None, None], "vert":[None, None]}
             self._txt = None
@@ -141,7 +141,7 @@ class Graph(object):
                 del self._signals2lines[sn]
         return len(self._sigs)
 
-    def plot(self, ax=None):
+    def plot(self):
         """ Plot the graph in Matplotlib Axes instance ax
         Each signal is plotted regarding to its proper abscisse.
         In this way, signals with a different sampling can be plotted toget_her.
@@ -167,23 +167,22 @@ class Graph(object):
         yl = yl + " (" + l + yu + ")"
         
         # Plot the signals
-        ax.hold(True)
+        self._ax.hold(True)
         for sn, s in self._sigs.iteritems():
             # Scaling factor
             x = s.ref.data * pow(10, fx)
             y = s.data * pow(10, fy)
-            line, = ax.plot(x, y, label=sn)
+            line, = self._ax.plot(x, y, label=sn)
             self._signals2lines[sn] = line
-        ax.hold(False)
-        ax.set_xlabel(xl)
-        ax.set_ylabel(yl)
+        self._ax.hold(False)
+        self._ax.set_xlabel(xl)
+        self._ax.set_ylabel(yl)
         if len(self._xrange) == 2:
-            ax.set_xlim(self._xrange[0], self._xrange[1])
+            self._ax.set_xlim(self._xrange[0], self._xrange[1])
         if len(self._yrange) == 2:
-            ax.set_ylim(self._yrange[0], self._yrange[1])
-        ax.legend()
+            self._ax.set_ylim(self._yrange[0], self._yrange[1])
+        self._ax.legend()
 
-        self._ax = ax
         self._draw_cursors()
         self._print_cursors()
     
@@ -367,6 +366,16 @@ class Graph(object):
         # Update text
         self._txt.set_text("%s\n%s" % (txt["horiz"], txt["vert"]))
 
+    def get_position(self):
+        """ Return the position of the graph in the figure
+        """
+        return self._ax.get_position()
+
+    def set_position(self, pos):
+        """ Set the position of the graph in the figure
+        """
+        self._ax.set_position(pos)
+
     @property
     def ax(self):
         """ Return the Matplotlib axe
@@ -389,3 +398,4 @@ class Graph(object):
     unit = property(get_unit, set_unit)
     scale = property(get_scale, set_scale)
     range = property(get_range, set_range)
+    position = property(get_position, set_position)
