@@ -338,9 +338,9 @@ class Figure(object):
 
         pos_x = num_to_xy[num][0]
         pos_y = num_to_xy[len(self._graphs) - num - 1][1]
-        x1 = pos_x * dx + 0.1 * dx
-        y1 = pos_y * dy + 0.1 * dy
-        return [x1, y1, dx * 0.8, dy * 0.8]
+        x1 = pos_x * dx + 0.15 * dx
+        y1 = pos_y * dy + 0.15 * dy
+        return [x1, y1, dx * 0.75, dy * 0.75]
 
     @property
     def signals(self):

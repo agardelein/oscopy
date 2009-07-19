@@ -247,12 +247,28 @@ class Graph(object):
     def get_scale(self):
         """ Return the axes scale
         """
-        return self._FUNC_TO_SCALES[self._plotf]
+#        return self._FUNC_TO_SCALES[self._plotf]
+        # Is there a better way?
+        x = self._ax.get_xscale()
+        y = self._ax.get_yscale()
+        if x == "linear" and y == "linear":
+            return "lin"
+        elif x == "linear" and y == "log":
+            return "logy"
+        elif y == "linear":
+            return "logx"
+        else:
+            return "loglog"
 
     def set_scale(self, scale):
         """ Set axes scale, either lin, logx, logy or loglog
         """
-        self._plotf = self._SCALES_TO_FUNC[scale]
+        SCALES_TO_STR = {"lin": ["linear", "linear"],\
+                             "logx": ["log","linear"],\
+                             "logy": ["linear", "log"],\
+                             "loglog": ["log", "log"]}
+        self._ax.set_xscale(SCALES_TO_STR[scale][0])
+        self._ax.set_yscale(SCALES_TO_STR[scale][1])
 
     def get_range(self):
         """ Return the axes limits
