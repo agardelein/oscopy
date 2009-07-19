@@ -94,33 +94,18 @@ class Figure(object):
         """
         if len(self._graphs) > 3:
             assert 0, "Bad graph number"
-        if self._layout == "horiz":
-            nx = len(self._graphs) + 1
-            ny = 1
-        elif self._layout == "vert":
-            nx = 1
-            ny = len(self._graphs) + 1
-        elif self._layout == "quad":
-            if len(self._graphs) + 1 == 1:
-                nx = 1
-                ny = 1
-            elif len(self._graphs) + 1 == 2:
-                # For two graphs in quad config, go to horiz
-                nx = 2
-                ny = 1
-            else:
-                nx = 2
-                ny = 2
-        else:
-            nx = 2
-            ny = 2
-        gn = len(self._graphs)
-        ax = self._fig.add_subplot(nx, ny, gn + 1)
 
+        self._graphs.append(None)
+
+        ax = self._fig.add_axes(self._graph_position(len(self._graphs) - 1),\
+                                    label=str(len(self._graphs)))
         gr = LinGraph(ax, sigs)
-        self._graphs.append(gr)
+
+        self._graphs[self._graphs.index(None)] = gr
         self._axes.append(ax)
         self.set_current(self._graphs.index(gr) + 1)
+        # Force layout refresh
+        self.set_layout(self._layout)
 
     def delete(self, num=1):
         """ Delete a graph from the figure
@@ -210,11 +195,14 @@ class Figure(object):
         Other values are ignored
         """
         # To change the layout: use ax.set_position
+
         if layout == "horiz" or layout == "vert" or layout == "quad":
             self._layout = layout
-            return
         else:
             assert 0, "Bad layout"
+
+        for gn, g in enumerate(self._graphs):
+            g.position = self._graph_position(gn)
 
     def plot(self):
         """ Plot the figure in Matplotlib Figure instance fig
@@ -325,6 +313,34 @@ class Figure(object):
         else:
             return
         event.canvas.draw()
+
+    def _graph_position(self, num):
+        """ Compute the position of the graph upon its number
+        """
+        # 1 graph: x:0->1 y:0->1   dx=1 dy=1
+        # 3 graphs horiz: x:0->.333 y:0->1 dx=.333 dy=1
+        # 3 graphs quads: x:0->.5 y:0->.5  dx=.5 dy=.5
+
+        if self._layout == "horiz":
+            dx = 1
+            dy = 1.0 / len(self._graphs)
+            num_to_xy = [[0, y] for y in xrange(len(self._graphs))]
+        elif self._layout == "vert":
+            dx = 1.0 / len(self._graphs)
+            dy = 1
+            num_to_xy = [[x, 0] for x in xrange(len(self._graphs))]
+        elif self._layout == "quad":
+            dx = 0.5
+            dy = 0.5
+            num_to_xy = [[x, y] for y in xrange(2) for x in xrange(2)]
+        else:
+            assert 0, "Bad layout"
+
+        pos_x = num_to_xy[num][0]
+        pos_y = num_to_xy[len(self._graphs) - num - 1][1]
+        x1 = pos_x * dx + 0.1 * dx
+        y1 = pos_y * dy + 0.1 * dy
+        return [x1, y1, dx * 0.8, dy * 0.8]
 
     @property
     def signals(self):

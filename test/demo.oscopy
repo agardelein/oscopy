@@ -7,7 +7,9 @@ add iRD
 add vgs
 add vgs
 add vds
+echo *** Fig 2 layout to quad
 layout quad
+echo *** Done
 # Oops, forgot a signal in figure 2 graph 3
 select 2-3
 insert vds
