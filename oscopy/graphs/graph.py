@@ -155,6 +155,7 @@ class Graph(object):
                 del self._sigs[sn]
                 ## ipython: To remove the line from the plot:
                 ## line.remove() and then plot() <- matplotlib plot
+                self._signals2lines[sn].remove()
                 del self._signals2lines[sn]
         return len(self._sigs)
 
