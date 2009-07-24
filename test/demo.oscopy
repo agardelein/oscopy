@@ -29,6 +29,10 @@ unit V
 v1=vsqu*3+10
 add v1
 unit V
+echo *** Insert and remove a signal
+select 4-1
+insert v1
+remove v1
 # Use of Time
 vs = sin(Time(vsqu)*1e6)
 create vs
