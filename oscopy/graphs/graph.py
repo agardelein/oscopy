@@ -122,10 +122,26 @@ class Graph(object):
                 self._yunit = s.unit
                 self._sigs[sn] = s
                 self.set_unit((self._xunit, self._yunit))
+                fx, l = self._find_scale_factor("X")
+                fy, l = self._find_scale_factor("Y")
+                x = s.ref.data * pow(10, fx)
+                y = s.data * pow(10, fy)
+                line, = self._ax.plot(x, y, label=sn)
+                self._signals2lines[sn] = line
+                self._draw_cursors()
+                self._print_cursors()
+                self._ax.legend()
             else:
                 if s.ref.name == self._xaxis:
                     # Add signal
                     self._sigs[sn] = s
+                    fx, l = self._find_scale_factor("X")
+                    fy, l = self._find_scale_factor("Y")
+                    x = s.ref.data * pow(10, fx)
+                    y = s.data * pow(10, fy)
+                    line, = self._ax.plot(x, y, label=sn)
+                    self._signals2lines[sn] = line
+                    self._ax.legend()
                 else:
                     # Ignore signal
                     rejected.update[sn] = s
@@ -150,24 +166,7 @@ class Graph(object):
         """
         if not self._sigs:
             return
-
-        fx, l = self._find_scale_factor("X")
-        fy, l = self._find_scale_factor("Y")
         
-        # Plot the signals
-        self._ax.hold(True)
-        for sn, s in self._sigs.iteritems():
-            # Scaling factor
-            x = s.ref.data * pow(10, fx)
-            y = s.data * pow(10, fy)
-            line, = self._ax.plot(x, y, label=sn)
-            self._signals2lines[sn] = line
-        self._ax.hold(False)
-        self.set_range(self.get_range())
-        self._ax.legend()
-
-        self._draw_cursors()
-        self._print_cursors()
     
     def _find_scale_factor(self, a):
         """ Choose the right scale for data on axis a
