@@ -75,7 +75,6 @@ class Graph(object):
         if isinstance(sigs, Graph):
             mysigs = {}
             mysigs = sigs.sigs.copy()
-            self.insert(mysigs)
             self._plotf = sigs.plotf
             self._xrange = sigs.xrange
             self._yrange = sigs.yrange
@@ -83,6 +82,7 @@ class Graph(object):
             self._cursors = {"horiz": [None, None], "vert": [None, None]}
             self._txt = None
             self._signals2lines = sigs._signals2lines.copy()
+            self.insert(mysigs)
         else:
             self._xaxis = ""
             self._yaxis = ""
@@ -90,13 +90,13 @@ class Graph(object):
             self._yunit = ""
             self._xrange = []
             self._yrange = []
-            self.insert(sigs)
             self._plotf = plt.plot
             self._ax = ax
             # Cursors values, only two horiz and two vert but can be changed
             self._cursors = {"horiz":[None, None], "vert":[None, None]}
             self._txt = None
             self._signals2lines = {}
+            self.insert(sigs)
 
     def __str__(self):
         """ Return a string with the type and the signal list of the graph
@@ -121,6 +121,7 @@ class Graph(object):
                 self._yaxis = "Signals"  # To change
                 self._yunit = s.unit
                 self._sigs[sn] = s
+                self.set_unit((self._xunit, self._yunit))
             else:
                 if s.ref.name == self._xaxis:
                     # Add signal
@@ -150,21 +151,8 @@ class Graph(object):
         if not self._sigs:
             return
 
-        # Prepare labels
-        xl = self._xaxis
-        if not self._xunit:
-            xu = "a.u."
-        else:
-            xu = self._xunit
         fx, l = self._find_scale_factor("X")
-        xl = xl + " (" + l + xu + ")"
-        yl = self._yaxis
-        if not self._yunit:
-            yu = "a.u."
-        else:
-            yu = self._yunit
         fy, l = self._find_scale_factor("Y")
-        yl = yl + " (" + l + yu + ")"
         
         # Plot the signals
         self._ax.hold(True)
@@ -175,8 +163,6 @@ class Graph(object):
             line, = self._ax.plot(x, y, label=sn)
             self._signals2lines[sn] = line
         self._ax.hold(False)
-        self._ax.set_xlabel(xl)
-        self._ax.set_ylabel(yl)
         if len(self._xrange) == 2:
             self._ax.set_xlim(self._xrange[0], self._xrange[1])
         if len(self._yrange) == 2:
@@ -243,6 +229,24 @@ class Graph(object):
                 assert 0, "Invalid argument"
         else:
             assert 0, "Invalid argument"
+
+        xl = self._xaxis
+        if not self._xunit:
+            xu = "a.u."
+        else:
+            xu = self._xunit
+        fx, l = self._find_scale_factor("X")
+        xl = xl + " (" + l + xu + ")"
+        yl = self._yaxis
+        if not self._yunit:
+            yu = "a.u."
+        else:
+            yu = self._yunit
+        fy, l = self._find_scale_factor("Y")
+        yl = yl + " (" + l + yu + ")"
+        self._ax.set_xlabel(xl)
+        self._ax.set_ylabel(yl)
+        
 
     def get_scale(self):
         """ Return the axes scale
