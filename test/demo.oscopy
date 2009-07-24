@@ -24,7 +24,7 @@ create
 add vsqu
 vsqufft=fft(vsqu)
 add vsqufft
-#range 0 10 -0.2 0.2
+range -2 2 -100 200
 unit V
 v1=vsqu*3+10
 add v1
