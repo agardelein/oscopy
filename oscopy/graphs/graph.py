@@ -164,6 +164,7 @@ class Graph(object):
             self._signals2lines[sn] = line
         self._ax.hold(False)
         self.set_range(self.get_range())
+        self._ax.legend()
 
         self._draw_cursors()
         self._print_cursors()
@@ -304,7 +305,6 @@ class Graph(object):
             self._ax.set_xlim(self._xrange[0], self._xrange[1])
         if len(self._yrange) == 2:
             self._ax.set_ylim(self._yrange[0], self._yrange[1])
-        self._ax.legend()
         
     def toggle_cursors(self, ctype="", num=None, val=None):
         """ Toggle the cursors in the graph
