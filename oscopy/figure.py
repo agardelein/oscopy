@@ -223,7 +223,13 @@ class Figure(object):
 #            self._axes = ax
         if not self._kid:
             self._kid = self._fig.canvas.mpl_connect('key_press_event', self._key)
-        self._fig.draw()
+
+    def draw(self):
+        """ Draw the figure
+        To be called by when the figure should be updated
+        """
+        self._fig.canvas.draw()
+
 
     def insert(self, sigs):
         """ Add a signal into the current graph
