@@ -62,7 +62,7 @@ from graphs import Graph, LinGraph
 
 class Figure(object):
 
-    def __init__(self, sigs={}):
+    def __init__(self, sigs={}, fig=None):
         """ Create a Figure.
         If a signal list is provided, add a graph with the signal list
         By default, create an empty list of graph and set_ the layout to horiz
@@ -78,7 +78,10 @@ class Figure(object):
         for k, v in self._MODES_NAMES_TO_OBJ.iteritems():
             self._OBJ_TO_MODES_NAMES[v] = k
 
-        self._fig = plt.figure()
+        if fig == None:
+            self._fig = plt.figure()
+        else:
+            self._fig = fig
 
         if not sigs:
             return
