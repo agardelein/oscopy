@@ -72,6 +72,7 @@ class Figure(object):
         self._layout = "horiz"
         self._current = None
         self._MODES_NAMES_TO_OBJ = {"lin":LinGraph}
+        self._kid = None
         # Slow way... Surely there exist something faster
         self._OBJ_TO_MODES_NAMES = {}
         for k, v in self._MODES_NAMES_TO_OBJ.iteritems():
@@ -217,7 +218,9 @@ class Figure(object):
         for gn, g in enumerate(self._graphs):
             g.plot()
 #            self._axes = ax
-        self._kid = self._fig.canvas.mpl_connect('key_press_event', self._key)
+        if not self._kid:
+            self._kid = self._fig.canvas.mpl_connect('key_press_event', self._key)
+        self._fig.draw()
 
     def insert(self, sigs):
         """ Add a signal into the current graph
