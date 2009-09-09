@@ -59,6 +59,10 @@ under certain conditions.\n\
 There is ABSOLUTELY NO WARRANTY; not even for MERCHANTIBILITY or\n\
 FITNESS FOR A PARTICULAR PURPOSE."
 
+        # Current graph and current figure
+        self._current_figure = None
+        self._current_graph = None
+
         # Start main loop
         self.loop(p, f, batch)
 
@@ -68,6 +72,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "   Create a new figure, set_ it as current, add the signals"
             return
         self.cmds.create(self.get_signames(args))
+        self._current_figure = self.cmds.figs[len(self.cmds.figs) - 1]
 
     def destroy(self, args):
         if args == "help":
@@ -75,6 +80,16 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "   Destroy a figure"
             return        
         self.cmds.destroy(eval(args))
+        # Go back to the first graph of the first figure or None
+        if len(self.cmds.figs):
+            self._current_figure = self.cmds.figs[0]
+            if self._current_figure.grafs:
+                self._current_graph = self._current_figure.graphs[0]
+            else:
+                self._current_graph = None
+        else:
+            self._current_figure = None
+            self._current_graph = None
 
     def select(self, args):
         if args == "help":
@@ -87,13 +102,18 @@ FITNESS FOR A PARTICULAR PURPOSE."
             gn = eval(s[1])
         else:
             print "Usage: select FIG#-GRAPH#"
+            return
         self.cmds.current = num, gn
+        self._current_figure = self.cmds.figs[num - 1]
+        self._current_graph = self._current_figure.grafs[gn - 1]
 
     def layout(self, args):
         if args == "help":
             print "Usage : layout horiz|vert|quad"
             print "   Define the layout of the current figure"
             return
+#        if self._current_figure is not None:
+#            self._current_figure.layout = args
         self.cmds.layout = args
 
     def figlist(self, args):
@@ -188,6 +208,9 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "   Add a graph to the current figure"
             return
         self.cmds.add(self.get_signames(args))
+        if self._current_figure:
+            self._current_graph =\
+                self._current_figure.grafs[len(self._current_figure.grafs) - 1]
 
     def delete(self, args):
         if args == "help":

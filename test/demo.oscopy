@@ -42,7 +42,7 @@ figlist
 # Create a copy of vout and freeze it
 vo = vout
 freeze vo
-select 3
+select 3-1
 insert vo
 siglist
 # Plot things
