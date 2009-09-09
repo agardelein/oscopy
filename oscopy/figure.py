@@ -362,6 +362,11 @@ class Figure(object):
             for sn in g.get_signals():
                 yield sn
 
+    @property
+    def grafs(self):
+        """ Return the graph list """
+        return self._graphs
+
     layout = property(get_layout, set_layout)
     range = property(get_range, set_range)
     scale = property(get_scale, set_scale)
