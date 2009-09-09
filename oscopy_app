@@ -71,14 +71,14 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def destroy(self, args):
         if args == "help":
-            print "Usage : delete FIG#"
-            print "   Delete a figure"
+            print "Usage : destroy FIG#"
+            print "   Destroy a figure"
             return        
         self.cmds.destroy(eval(args))
 
     def select(self, args):
         if args == "help":
-            print "Usage: select FIG#[, GRAPH#]"
+            print "Usage: select FIG#-GRAPH#"
             print "   Select the current figure and the current graph"
             return
         s = args.split('-')
@@ -86,7 +86,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
         if len(s) > 1:
             gn = eval(s[1])
         else:
-            gn = 0
+            print "Usage: select FIG#-GRAPH#"
         self.cmds.current = num, gn
 
     def layout(self, args):
