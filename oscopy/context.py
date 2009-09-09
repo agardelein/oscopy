@@ -475,6 +475,11 @@ class Context(object):
 #            print "No signals found"
         return sigs
 
+    @property
+    def figs(self):
+        """ Return the figure list"""
+        return self._figures
+
     layout = property(get_layout, set_layout)
     mode = property(get_mode, set_mode)
     scale = property(get_scale, set_scale)
