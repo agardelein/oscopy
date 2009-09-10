@@ -307,7 +307,7 @@ class Figure(object):
                 yield sn
 
     @property
-    def grafs(self):
+    def graphs(self):
         """ Return the graph list """
         return self._graphs
 

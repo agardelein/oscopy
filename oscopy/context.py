@@ -351,7 +351,7 @@ class Context(object):
         return sigs
 
     @property
-    def figs(self):
+    def figures(self):
         """ Return the figure list"""
         return self._figures
 

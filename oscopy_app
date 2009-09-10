@@ -33,9 +33,15 @@ class OscopyApp(object):
         #   -i : interactive mode, do not quit at the end of batch file
         #   -q : do not display startup message
         parser = OptionParser()
-        parser.add_option("-b", "--batch", dest="fn", help="Execute commands in FILE then exit", metavar="FILE")
-        parser.add_option("-i", "--interactive", action="store_true", dest="inter", help="Go to interactive mode after executing batch file")
-        parser.add_option("-q", "--quiet", action="store_true", dest="quiet", help="Do not display startup message")
+        parser.add_option("-b", "--batch", dest="fn",\
+                              help="Execute commands in FILE then exit",\
+                              metavar="FILE")
+        parser.add_option("-i", "--interactive", action="store_true",\
+                              dest="inter",\
+                              help="Go to interactive mode after executing batch file")
+        parser.add_option("-q", "--quiet", action="store_true",\
+                              dest="quiet",\
+                              help="Do not display startup message")
         (options, args) = parser.parse_args()
         if options.fn is None:
             f = None
@@ -72,9 +78,11 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "   Create a new figure, set_ it as current, add the signals"
             return
         self.cmds.create(self.get_signames(args))
-        self._current_figure = self.cmds.figs[len(self.cmds.figs) - 1]
-        if self._current_figure.grafs:
-            self._current_graph = self._current_figure.grafs[len(self._current_figure.grafs) - 1]
+        self._current_figure = self.cmds.figures[len(self.cmds.figures) - 1]
+        if self._current_figure.graphs:
+            self._current_graph =\
+                self._current_figure.graphs[len(\
+                    self._current_figure.graphs) - 1]
         else:
             self._current_graph = None
 
@@ -85,9 +93,9 @@ FITNESS FOR A PARTICULAR PURPOSE."
             return        
         self.cmds.destroy(eval(args))
         # Go back to the first graph of the first figure or None
-        if len(self.cmds.figs):
-            self._current_figure = self.cmds.figs[0]
-            if self._current_figure.grafs:
+        if len(self.cmds.figures):
+            self._current_figure = self.cmds.figures[0]
+            if self._current_figure.graphs:
                 self._current_graph = self._current_figure.graphs[0]
             else:
                 self._current_graph = None
@@ -108,8 +116,8 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "Usage: select FIG#-GRAPH#"
             return
         self.cmds.current = num, gn
-        self._current_figure = self.cmds.figs[num - 1]
-        self._current_graph = self._current_figure.grafs[gn - 1]
+        self._current_figure = self.cmds.figures[num - 1]
+        self._current_graph = self._current_figure.graphs[gn - 1]
 
     def layout(self, args):
         if args == "help":
@@ -126,11 +134,11 @@ FITNESS FOR A PARTICULAR PURPOSE."
             return
 
         SEPARATOR = " "
-        for fn, f in enumerate(self.cmds.figs):
+        for fn, f in enumerate(self.cmds.figures):
             print "%s Figure %d: %s" %\
                 ([" ", "*"][f == self._current_figure],\
                      fn + 1, f.layout)
-            for gn, g in enumerate(f.grafs):
+            for gn, g in enumerate(f.graphs):
                 print "    %s Graph %d : (%s) %s" %\
                     ([" ","*"][g == self._current_graph],\
                          gn + 1, g.type,\
@@ -212,13 +220,15 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "   Add a graph to the current figure"
             return
         if self._current_figure is not None:
-            self._current_figure.add(self.cmds.names_to_signals(self.get_signames(args)))
+            self._current_figure.add(self.cmds.names_to_signals(\
+                    self.get_signames(args)))
             self._current_graph =\
-                self._current_figure.grafs[len(self._current_figure.grafs) - 1]
+                self._current_figure.graphs[len(\
+                    self._current_figure.graphs) - 1]
         else:
             self.cmds.add(self.get_signames(args))
-            if self.cmds.figs:
-                self._current_figure = self.cmds.figs[0]
+            if self.cmds.figures:
+                self._current_figure = self.cmds.figures[0]
             else:
                 print "Add failed"
 
@@ -229,8 +239,8 @@ FITNESS FOR A PARTICULAR PURPOSE."
             return
         if self._current_figure is not None:
             self._current_figure.delete(args)
-            if self._current_figure.grafs:
-                self._current_graph = self._current_figure.grafs[0]
+            if self._current_figure.graphs:
+                self._current_graph = self._current_figure.graphs[0]
             else:
                 self._current_graph = None
 
@@ -299,7 +309,8 @@ FITNESS FOR A PARTICULAR PURPOSE."
             return
         if self._current_graph is None:
             return
-        self._current_graph.insert(self.cmds.names_to_signals(self.get_signames(args)))
+        self._current_graph.insert(self.cmds.names_to_signals(\
+                self.get_signames(args)))
 
     def remove(self, args):
         if args == "help":
@@ -308,7 +319,8 @@ FITNESS FOR A PARTICULAR PURPOSE."
             return
         if self._current_graph is None:
             return
-        self._current_graph.remove(self.cmds.names_to_signals(self.get_signames(args)))
+        self._current_graph.remove(self.cmds.names_to_signals(\
+                self.get_signames(args)))
 
     def freeze(self, args):
         if args == "help":
