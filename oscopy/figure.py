@@ -163,16 +163,6 @@ class Figure(object):
             assert 0, "Bad graph number"
         self._current = self._graphs[gn - 1]
 
-    @property
-    def graphs(self):
-        """ List the graphs from the figure
-        """
-        return map(lambda (gn, g): {"current":(g == self._current),\
-                                        "num": gn + 1,\
-                                        "type": g.type,\
-                                        "signals":g.signals.keys()},\
-                       enumerate(self._graphs))
-
     def get_mode(self):
         """ Return the mode of the current graph"""
         return self._OBJ_TO_MODES_NAMES(self._current)

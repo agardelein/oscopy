@@ -174,16 +174,6 @@ class Context(object):
         if gn > 0:
             self._current.current = gn
 
-    @property
-    def figures(self):
-        """ Print the list of figures
-        """
-        return map(lambda (i, f): {"current":(f == self._current),\
-                                       "num":i + 1,\
-                                       "layout":f.layout,\
-                                       "graphs":f.graphs},\
-                       enumerate(self._figures))
-
     def plot(self):
         """ Plot the figures, and enter in the matplotlib main loop
         """
