@@ -70,7 +70,6 @@ class Figure(object):
         self._graphs = []
         self._axes = []
         self._layout = "horiz"
-        self._current = None
         self._MODES_NAMES_TO_OBJ = {"lin":LinGraph}
         self._kid = None
         # Slow way... Surely there exist something faster
@@ -107,7 +106,6 @@ class Figure(object):
 
         self._graphs[self._graphs.index(None)] = gr
         self._axes.append(ax)
-        self.set_current(self._graphs.index(gr) + 1)
         # Force layout refresh
         self.set_layout(self._layout)
 
@@ -120,15 +118,6 @@ class Figure(object):
             assert 0, "Bad graph number"
         if len(self._graphs) < 1 or num < 1 or num > len(self._graphs):
             assert 0, "Bad graph number"
-        if self._current == self._graphs[num - 1]:
-            if len(self._graphs) == 1:
-                # Only one element in the list
-                self._current = None
-            elif num == len(self._graphs):
-                # Last element, go to the previous
-                self._current = self._graphs[num - 2]
-            else:
-                self._current = self._graphs[num]
         del self._graphs[num - 1]
         del self._axes[num - 1]
         
@@ -149,33 +138,21 @@ class Figure(object):
                     dg[sn] = d[sn]
             g.insert(ug)
             g.remove(dg)
-            # ipython: to update data in a line2D:
-            # l.set_data() and then plot() from matplotlib to update the plot
-
-    def get_current(self):
-        """ Return the number of the current graph """
-        return self._graphs.index(self._current) + 1
-
-    def set_current(self, gn=0):
-        """ Select the current graph
-        """
-        if gn < 1 or gn > len(self._graphs):
-            assert 0, "Bad graph number"
-        self._current = self._graphs[gn - 1]
 
     def get_mode(self):
         """ Return the mode of the current graph"""
         return self._OBJ_TO_MODES_NAMES(self._current)
 
-    def set_mode(self, gmode):
+    def set_mode(self, args):
         """ Set the mode of the current graph
         """
         # Currently this cannot be tested (only one mode available)
-        if self._current is None:
+        old_graph = args[0]
+        gmode = args[1]
+        if not self._graphs:
             assert 0, "No graph defined"
-        g = (self._MODES_NAMES_TO_OBJ(gmode))(self._current)
-        self._graphs[self._graphs.index(self._current)] = g
-        self._current = g
+        g = (self._MODES_NAMES_TO_OBJ(gmode))(old_graph)
+        self._graphs[self._graphs.index(old_graph)] = g
 
     def get_layout(self):
         """ Return the figure layout"""
@@ -219,27 +196,6 @@ class Figure(object):
         To be called by when the figure should be updated
         """
         self._fig.canvas.draw()
-
-
-    def insert(self, sigs):
-        """ Add a signal into the current graph
-        """
-        if self._current is not None:
-            return self._current.insert(sigs)
-        else:
-            assert 0, "No graph defined"
-
-    def remove(self, sigs, where="current"):
-        """ Delete a signal from the current graph
-        """
-        if where == "current":
-            if self._current is not None:
-                self._current.remove(sigs)
-        elif where == "all":
-            for g in self._graphs:
-                g.remove(sigs)
-        else:
-            assert 0, "Bad location"
 
     def _key(self, event):
         """ Handle key press event
@@ -313,4 +269,3 @@ class Figure(object):
 
     layout = property(get_layout, set_layout)
     mode = property(get_mode, set_mode)
-    current = property(get_current, set_current)

@@ -104,7 +104,6 @@ class Context(object):
     def __init__(self):
         """ Create the instance variables
         """
-        self._current = None
         self._readers = {}
         self._figures = []
         self._signals = {}

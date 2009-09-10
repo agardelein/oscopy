@@ -255,7 +255,9 @@ FITNESS FOR A PARTICULAR PURPOSE."
             return
         if self._current_graph is None:
             return
-        self._current_graph.mode = mode
+        idx = self._current_figure.graphs.index(self._current_graph)
+        self._current_figure.mode = self._current_graph, mode
+        self._current_graph = self._current_figure.graphs[idx]
 
     def scale(self, args):
         if args == "help":
