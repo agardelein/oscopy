@@ -174,22 +174,6 @@ class Context(object):
         if gn > 0:
             self._current.current = gn
 
-    def get_layout(self):
-        """ Define the layout of the current figure
-        """
-        if self._current is not None:
-            return self._current.layout
-        else:
-            assert 0, "No figure selected"
-
-    def set_layout(self, layout):
-        """ Define the layout of the current figure
-        """
-        if self._current is not None:
-            self._current.layout = layout
-        else:
-            assert 0, "No figure selected"
-
     @property
     def figures(self):
         """ Print the list of figures
@@ -294,105 +278,6 @@ class Context(object):
             sigs = self.names_to_signals(sns)
             self._current.add(sigs)
 
-    def delete(self, gn):
-        """ Delete a graph from the current figure
-        """
-        if self._current is not None:
-            self._current.delete(int(gn))
-        else:
-            assert 0, "No figure selected"
-
-    def get_mode(self):
-        """ Return the mode of the current graph of the current figure
-        """
-        if self._current is not None:
-            return self._current.mode
-        else:
-            assert 0, "No figure selected"
-        
-
-    def set_mode(self, mode):
-        """ Set the mode of the current graph of the current figure
-        """
-        if self._current is not None:
-            self._current.mode = mode
-        else:
-            assert 0, "No figure selected"
-
-    def get_scale(self):
-        """ Return the axis scale of the current graph of the current figure
-        """
-        if self._current is not None:
-            return self._current.scale
-        else:
-            assert 0, "No figure selected"
-
-    def set_scale(self, scale):
-        """ Set the axis scale of the current graph of the current figure
-        """
-        if self._current is not None:
-            self._current.scale = scale
-        else:
-            assert 0, "No figure selected"
-
-    def get_range(self):
-        """ Return the axis range of the current graph of the current figure
-        """
-        if self._current is not None:
-            return self._current.range
-        else:
-            assert 0, "No figure selected"
-
-    def set_range(self, range):
-        """ Set the axis range of the current graph of the current figure
-        """
-        if self._current is not None:
-            self._current.range = range
-        else:
-            assert 0, "No figure selected"
-
-    def get_unit(self):
-        """ Return the units of current graph of current figure
-        """
-        if self._current is not None:
-            return self._current.unit
-        else:
-            assert 0, "No figure selected"
-            
-    def set_unit(self, unit):
-        """ Set the units of current graph of current figure
-        """
-        if self._current is not None:
-            self._current.unit = unit
-        else:
-            assert 0, "No figure selected"
-            
-    def insert(self, sns):
-        """ Insert a list of signals into the current graph 
-        of the current figure
-        """
-        if not self._figures:
-            assert 0, "No figure present"
-
-        if self._current is not None:
-            sigs = self.names_to_signals(sns)
-            return self._current.insert(sigs)
-        else:
-            assert 0, "No figure selected"
-
-    def remove(self, sns):
-        """ Remove a list of signals from the current graph
-        of the current figure
-        """
-        if not self._figures:
-            assert 0, "No figure present"
-
-        if self._current is not None:
-            sigs = self.names_to_signals(sns)
-            self._current.remove(sigs)
-        else:
-            assert 0, "No figure selected"
-
     def freeze(self, sns):
         """ Set the freeze flag of signals
         """
@@ -480,9 +365,4 @@ class Context(object):
         """ Return the figure list"""
         return self._figures
 
-    layout = property(get_layout, set_layout)
-    mode = property(get_mode, set_mode)
-    scale = property(get_scale, set_scale)
-    range = property(get_range, set_range)
-    unit = property(get_unit, set_unit)
     current = property(get_current, set_current)
