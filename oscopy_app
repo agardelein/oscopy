@@ -73,6 +73,10 @@ FITNESS FOR A PARTICULAR PURPOSE."
             return
         self.cmds.create(self.get_signames(args))
         self._current_figure = self.cmds.figs[len(self.cmds.figs) - 1]
+        if self._current_figure.grafs:
+            self._current_graph = self._current_figure.grafs[len(self._current_figure.grafs) - 1]
+        else:
+            self._current_graph = None
 
     def destroy(self, args):
         if args == "help":
@@ -122,14 +126,15 @@ FITNESS FOR A PARTICULAR PURPOSE."
             return
 
         SEPARATOR = " "
-        for f in self.cmds.figures:
-            print "%s Figure %d: %s" % ([" ", "*"][f["current"]],\
-                                            f["num"], f["layout"])
-            for g in f["graphs"]:
-                print "    %s Graph %d : (%s) %s"\
-                    %([" ","*"][g["current"]],\
-                          g["num"], g["type"],\
-                          SEPARATOR.join(g["signals"]))
+        for fn, f in enumerate(self.cmds.figs):
+            print "%s Figure %d: %s" %\
+                ([" ", "*"][f == self._current_figure],\
+                     fn + 1, f.layout)
+            for gn, g in enumerate(f.grafs):
+                print "    %s Graph %d : (%s) %s" %\
+                    ([" ","*"][g == self._current_graph],\
+                         gn + 1, g.type,\
+                         SEPARATOR.join(g.signals.keys()))
 
     def plot(self, args):
         if args == "help":
