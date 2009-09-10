@@ -112,9 +112,8 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "Usage : layout horiz|vert|quad"
             print "   Define the layout of the current figure"
             return
-#        if self._current_figure is not None:
-#            self._current_figure.layout = args
-        self.cmds.layout = args
+        if self._current_figure is not None:
+            self._current_figure.layout = args
 
     def figlist(self, args):
         if args == "help":
@@ -207,17 +206,28 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "Usage : add SIG [, SIG [, SIG]...]"
             print "   Add a graph to the current figure"
             return
-        self.cmds.add(self.get_signames(args))
-        if self._current_figure:
+        if self._current_figure is not None:
+            self._current_figure.add(self.cmds.names_to_signals(self.get_signames(args)))
             self._current_graph =\
                 self._current_figure.grafs[len(self._current_figure.grafs) - 1]
+        else:
+            self.cmds.add(self.get_signames(args))
+            if self.cmds.figs:
+                self._current_figure = self.cmds.figs[0]
+            else:
+                print "Add failed"
 
     def delete(self, args):
         if args == "help":
             print "Usage : delete GRAPH#"
             print "   Delete a graph from the current figure"
             return
-        self.cmds.delete(args)
+        if self._current_figure is not None:
+            self._current_figure.delete(args)
+            if self._current_figure.grafs:
+                self._current_graph = self._current_figure.grafs[0]
+            else:
+                self._current_graph = None
 
     def mode(self, args):
         if args == "help":
@@ -228,29 +238,38 @@ FITNESS FOR A PARTICULAR PURPOSE."
 #   fft      Fast Fourier Transform (FFT) of signals\n\
 #   ifft     Inverse FFT of signals"
             return
-        self.cmds.mode = args
+        if self._current_graph is None:
+            return
+        self._current_graph.mode = mode
 
     def scale(self, args):
         if args == "help":
             print "Usage: scale [lin|logx|logy|loglog]"
             print "   Set the axis scale"
             return
-        self.cmds.scale = args
+        if self._current_graph is None:
+            return
+        self._current_graph.scale = args
 
     def range(self, args):
         if args == "help":
             print "Usage: range [x|y min max]|[xmin xmax ymin ymax]|[reset]"
             print "   Set the axis range of the current graph of the current figure"
             return
+        if self._current_graph is None:
+            return
+
         range = args.split()
         if len(range) == 1:
             if range[0] == "reset":
-                self.cmds.range = range[0]
+                self._current_graph.range = range[0]
         elif len(range) == 3:
             if range[0] == 'x' or range[0] == 'y':
-                self.cmds.range = range[0], [float(range[1]), float(range[2])]
+                self._current_graph.range = range[0],\
+                    [float(range[1]), float(range[2])]
         elif len(range) == 4:
-            self.cmds.range = [float(range[0]), float(range[1]), float(range[2]), float(range[3])]
+            self._current_graph.range = [float(range[0]), float(range[1]),\
+                                             float(range[2]), float(range[3])]
 
     def unit(self, args):
         if args == "help":
@@ -259,12 +278,12 @@ FITNESS FOR A PARTICULAR PURPOSE."
             return
 
         units = args.split(",", 1)
-        if len(units) < 1:
+        if len(units) < 1 or self._current_graph is None:
             return
         elif len(units) == 1:
-            self.cmds.unit = units[0].strip(),
+            self._current_graph.unit = units[0].strip(),
         elif len(units) == 2:
-            self.cmds.unit = units[0].strip(), units[1].strip()
+            self._current_graph.unit = units[0].strip(), units[1].strip()
         else:
             return
 
@@ -273,14 +292,18 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "Usage: insert SIG [, SIG [, SIG]...]"
             print "   Insert a list of signals into the current graph"
             return
-        self.cmds.insert(self.get_signames(args))
+        if self._current_graph is None:
+            return
+        self._current_graph.insert(self.cmds.names_to_signals(self.get_signames(args)))
 
     def remove(self, args):
         if args == "help":
             print "Usage: remove SIG [, SIG [, SIG]...]"
             print "   Delete a list of signals into from current graph"
             return
-        self.cmds.remove(self.get_signames(args))
+        if self._current_graph is None:
+            return
+        self._current_graph.remove(self.cmds.names_to_signals(self.get_signames(args)))
 
     def freeze(self, args):
         if args == "help":
