@@ -115,7 +115,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
         else:
             print "Usage: select FIG#-GRAPH#"
             return
-        self.cmds.current = num, gn
+#        self.cmds.current = num, gn
         self._current_figure = self.cmds.figures[num - 1]
         self._current_graph = self._current_figure.graphs[gn - 1]
 
@@ -226,11 +226,11 @@ FITNESS FOR A PARTICULAR PURPOSE."
                 self._current_figure.graphs[len(\
                     self._current_figure.graphs) - 1]
         else:
-            self.cmds.add(self.get_signames(args))
+            self.cmds.create(self.get_signames(args))
             if self.cmds.figures:
                 self._current_figure = self.cmds.figures[0]
             else:
-                print "Add failed"
+                print "Create failed"
 
     def delete(self, args):
         if args == "help":

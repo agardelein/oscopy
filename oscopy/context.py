@@ -133,7 +133,6 @@ class Context(object):
         # toplot is now a list
         f = Figure(sigs)
         self._figures.append(f)
-        self._current = f
 
     def destroy(self, num):
         """ Delete a figure
@@ -143,36 +142,7 @@ class Context(object):
         """
         if num > len(self._figures) or num < 1:
             assert 0, "Out of range figure number"
-        if self._current == self._figures[num - 1]:
-            if len(self._figures) == 1:
-                # Only one element remaining in the list
-                self._current = None
-            elif num == len(self._figures):
-                # Last element, go to the previous
-                self._current = self._figures[num - 2]
-            else:
-                # Go to next element
-                self._current = self._figures[num]
         del self._figures[num - 1]
-
-    def get_current(self):
-        """ Return the selected figure and graph
-        """
-        return self._figures.index(self._current) + 1, self._current.current
-
-    def set_current(self, currents):
-        """ Select the current figure
-        """
-        if not isinstance(currents, tuple) or len(currents) != 2:
-            assert 0, "Bad type"
-        num = currents[0]
-        gn = currents[1]
-
-        if num > len(self._figures) or num < 1:
-            assert 0, "Out of range figure number"
-        self._current = self._figures[num - 1]
-        if gn > 0:
-            self._current.current = gn
 
     def plot(self):
         """ Plot the figures, and enter in the matplotlib main loop
@@ -256,17 +226,6 @@ class Context(object):
             for f in self._figures:
                 f.remove({sn:self._signals[sn]}, "all")
             del self._signals[sn]
-
-    def add(self, sns):
-        """ Add a graph to the current figure
-        The signal list is a coma separated list of signal names
-        If no figure exist, create a new one.
-        """
-        if not self._figures:
-            self.create(sns)
-        else:
-            sigs = self.names_to_signals(sns)
-            self._current.add(sigs)
 
     def freeze(self, sns):
         """ Set the freeze flag of signals
@@ -354,5 +313,3 @@ class Context(object):
     def figures(self):
         """ Return the figure list"""
         return self._figures
-
-    current = property(get_current, set_current)
