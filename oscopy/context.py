@@ -69,7 +69,7 @@ Class Context: Commands callables from oscopy commandline
    math(expr)
    Create a signal from a mathematical expression
 
-   _names_to_signals(sns)
+   names_to_signals(sns)
    Return a list of the signal names from the arguments provided by the user
    Should not be called from the command line
 
@@ -114,7 +114,7 @@ class Context(object):
     def create(self, sigs):
         """ Create a new figure and set it as current
         Can be either called from commandline or a function.
-        When called from commandline, call _names_to_signals to retrieve
+        When called from commandline, call names_to_signals to retrieve
         the signal list
         When called from a function, if the argument is not a list
         then return.
@@ -124,7 +124,7 @@ class Context(object):
             # Called from commandline,
             # Get the signal list from args
             if not sigs == "":
-                sigs = self._names_to_signals(sigs)
+                sigs = self.names_to_signals(sigs)
             else:
                 # No signal list provided
                 sigs = {}
@@ -235,7 +235,7 @@ class Context(object):
         """ Write signals to file
         """
         # Create the object
-        sigs = self._names_to_signals(sns)
+        sigs = self.names_to_signals(sns)
         if not sigs:
             return
         w = DetectWriter(fmt, fn, True)
@@ -291,7 +291,7 @@ class Context(object):
         if not self._figures:
             self.create(sns)
         else:
-            sigs = self._names_to_signals(sns)
+            sigs = self.names_to_signals(sns)
             self._current.add(sigs)
 
     def delete(self, gn):
@@ -375,7 +375,7 @@ class Context(object):
             assert 0, "No figure present"
 
         if self._current is not None:
-            sigs = self._names_to_signals(sns)
+            sigs = self.names_to_signals(sns)
             return self._current.insert(sigs)
         else:
             assert 0, "No figure selected"
@@ -388,7 +388,7 @@ class Context(object):
             assert 0, "No figure present"
 
         if self._current is not None:
-            sigs = self._names_to_signals(sns)
+            sigs = self.names_to_signals(sns)
             self._current.remove(sigs)
         else:
             assert 0, "No figure selected"
@@ -396,14 +396,14 @@ class Context(object):
     def freeze(self, sns):
         """ Set the freeze flag of signals
         """
-        sigs = self._names_to_signals(sns)
+        sigs = self.names_to_signals(sns)
         for s in sigs.itervalues():
             s.freeze = True
 
     def unfreeze(self, sns):
         """ Unset the freeze flag of signals
         """
-        sigs = self._names_to_signals(sns)
+        sigs = self.names_to_signals(sns)
         for s in sigs.itervalues():
             s.freeze = False
 
@@ -454,7 +454,7 @@ class Context(object):
         """
         plt.show()
 
-    def _names_to_signals(self, sns):
+    def names_to_signals(self, sns):
         """ Return a signal dict from the signal names list provided
         If no signals are found, return {}
         """
