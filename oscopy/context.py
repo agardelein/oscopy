@@ -220,10 +220,11 @@ class Context(object):
                 d.append(sn)
         # Insert new signals
         self._signals.update(n)
-        # Delete signals: first from figure and after from dict
+        # Delete signals from all graphs of all figures
+        for f in self._figures:
+            for g in f.graphs:
+                g.remove(self.names_to_signals(d))
         for sn in d:
-            for f in self._figures:
-                f.remove({sn:self._signals[sn]}, "all")
             del self._signals[sn]
 
     def freeze(self, sns):
