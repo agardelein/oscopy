@@ -144,7 +144,7 @@ class Graph(object):
                     self._ax.legend()
                 else:
                     # Ignore signal
-                    rejected.update[sn] = s
+                    rejected[sn] = s
         return rejected
 
     def remove(self, sigs={}):
@@ -158,16 +158,6 @@ class Graph(object):
                 self._ax.legend()
                 del self._signals2lines[sn]
         return len(self._sigs)
-
-    def plot(self):
-        """ Plot the graph in Matplotlib Axes instance ax
-        Each signal is plotted regarding to its proper abscisse.
-        In this way, signals with a different sampling can be plotted toget_her.
-        The x axis is labelled with the abscisse name of the graph.
-        """
-        if not self._sigs:
-            return
-        
     
     def _find_scale_factor(self, a):
         """ Choose the right scale for data on axis a

@@ -80,6 +80,8 @@ opts: options
 fn  : filename
 gn  : graph number
 """
+import gobject
+import gtk
 
 import sys
 import re
@@ -89,6 +91,8 @@ from readers.reader import ReadError
 from writers.detect_writer import DetectWriter
 from writers.writer import WriteError
 from figure import Figure
+from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
+from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 
 class Context(object):
     """ Class Context -- Interface between signals and figures
@@ -109,6 +113,7 @@ class Context(object):
         self._signals = {}
         self._update_num = -1
         self._signal_name_to_reader = {}
+        self._figcount = 0
         
     def create(self, sigs):
         """ Create a new figure and set it as current
@@ -148,10 +153,32 @@ class Context(object):
         """
         if not self._figures:
             assert 0, "No figure to plot"
-        for i, f in enumerate(self._figures):
-#            fig = plt.figure(i + 1)
-            f.plot()
-#        plt.show()
+        if self._figcount == len(self._figures):
+            self._main_loop.run()
+        else:
+            self._figcount = 0
+            for i, f in enumerate(self._figures):
+                # fig = plt.figure(i + 1)
+                w = gtk.Window()
+                self._figcount += 1
+                w.set_title('Figure %d' % self._figcount)
+                vbox = gtk.VBox()
+                w.add(vbox)
+                canvas = FigureCanvas(f)
+                canvas.connect('destroy', self._window_destroy)
+                vbox.pack_start(canvas)
+                toolbar = NavigationToolbar(canvas, w)
+                vbox.pack_start(toolbar, False, False)
+                w.resize(640, 480)
+                w.show_all()
+            self._main_loop = gobject.MainLoop()
+            self._main_loop.run()
+
+    def _window_destroy(self, arg):
+        self._figcount = self._figcount - 1
+        if not self._figcount:
+            self._main_loop.quit()
+        return False
 
     def read(self, fn):
         """ Read signals from file.

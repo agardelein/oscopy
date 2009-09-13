@@ -58,15 +58,18 @@ Figure -- Handle a list of graphs
 """
 
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import Figure as MplFig
 from graphs import Graph, LinGraph
 
-class Figure(object):
+class Figure(MplFig):
 
     def __init__(self, sigs={}, fig=None):
         """ Create a Figure.
         If a signal list is provided, add a graph with the signal list
         By default, create an empty list of graph and set_ the layout to horiz
         """
+        MplFig.__init__(self)
+
         self._graphs = []
         self._axes = []
         self._layout = "horiz"
@@ -76,11 +79,6 @@ class Figure(object):
         self._OBJ_TO_MODES_NAMES = {}
         for k, v in self._MODES_NAMES_TO_OBJ.iteritems():
             self._OBJ_TO_MODES_NAMES[v] = k
-
-        if fig == None:
-            self._fig = plt.figure()
-        else:
-            self._fig = fig
 
         if not sigs:
             return
@@ -100,7 +98,7 @@ class Figure(object):
 
         self._graphs.append(None)
 
-        ax = self._fig.add_axes(self._graph_position(len(self._graphs) - 1),\
+        ax = self.add_axes(self._graph_position(len(self._graphs) - 1),\
                                     label=str(len(self._graphs)))
         gr = LinGraph(ax, sigs)
 
@@ -174,28 +172,6 @@ class Figure(object):
 
         for gn, g in enumerate(self._graphs):
             g.position = self._graph_position(gn)
-
-    def plot(self):
-        """ Plot the figure in Matplotlib Figure instance fig
-        First compute the number of subplot and the layout
-        And then really call the plot function of each graph
-        """
-        # Set the number of lines and rows
-        if not self._graphs:
-            assert 0, "No graphs defined"
-
-        # Plot the whole figure
-        for gn, g in enumerate(self._graphs):
-            g.plot()
-#            self._axes = ax
-        if not self._kid:
-            self._kid = self._fig.canvas.mpl_connect('key_press_event', self._key)
-
-    def draw(self):
-        """ Draw the figure
-        To be called by when the figure should be updated
-        """
-        self._fig.canvas.draw()
 
     def _key(self, event):
         """ Handle key press event
