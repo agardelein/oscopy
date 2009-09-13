@@ -164,8 +164,6 @@ It present an interface that can be split into a few parts:
 \begin{itemize}
 \item Data management
 \item Figure management
-\item Graph of current figure management
-\item Pass-through to current graph of current figure
 \end{itemize}
 The methods of this interface are summarised in Table~\ref{tab:ctxt:meth}.
 
@@ -176,13 +174,7 @@ The property \prop{signals} is a list of signals, each signal is represented thr
 \item[reference] name of the signal
 \item[reader] name handling the signal
 \end{description}
-The property{figures} is a list of figures, each figure is represented as a dict with the keys:
-\begin{description}
-\item[layout] of the figure
-\item[num] of the figure
-\item[graphs] of the figure
-\item[current] which is True if the figure is currently selected
-\end{description}
+The property \prop{figures} is a list of figures handled.
 
 \begin{table}[htbp]
   \centering\sf\small
@@ -203,13 +195,6 @@ The property{figures} is a list of figures, each figure is represented as a dict
     create & Public & Create a new figure\\
     destroy & Public & Destroy a figure \\
     plot & Public & Draw the figures\\    
-    \multicolumn{3}{l}{\textit{Graph management of current figure}} \\
-    add & Public & Add a graph into the figure \\
-    delete & Public & Delete a graph from the figure \\
-    list & Public & Print a list of the graphs\\
-    \multicolumn{3}{l}{\textit{Pass-through to current Graph of current figure}} \\
-    insert & Public & Insert signals into the graph\\
-    remove & Public & Take away signals from the graph\\
     \hline
   \end{tabular}
   \caption{Methods of Context}
@@ -221,17 +206,8 @@ The property{figures} is a list of figures, each figure is represented as a dict
     \hline
     Property & Read & Write & Type & Summary \\
     \hline
-    current & \checked & \checked & tuple of int & Selected figure and graph \\
     figures & \checked & & dict & List of figures \\
-    \multicolumn{4}{l}{\textit{Pass-through to current figure}}\\
-    layout & \checked & \checked & str & Disposition of graphs in the figure\\
-    mode & \checked & \checked & str & Mode of the current graph\\
-    \multicolumn{4}{l}{\textit{Data management}}\\
     signals & \checked & & list & Signals loaded\\
-    \multicolumn{4}{l}{\textit{Pass-through to current graph}}\\
-    unit  & \checked & \checked& Tuple of str & The unit to be displayed in x/y labels\\
-    scale & \checked & \checked & str & Scale of the axis (one of lin,logx,logy,loglog) \\
-    range & \checked & \checked & list[4] & Axis limits \\
     \hline
   \end{tabular}
   \caption{Properties of \ctx.}
@@ -439,15 +415,7 @@ Finally it set the method \meth{key}\ as a call-back for key-press related event
 Currently this method handle the keys '1', '2', '3' and '4' to toggle cursors, as summarised in Table~\ref{tab:figs:key}.
 It then call \meth{toggle\_cursors}\ from \graph.
 
-The list of graph is provided by the property \prop{graphs}.
-This is a list of dict, whose contain:
-\begin{description}
-\item[num]ber of the graph
-\item[type] of the graph
-\item[current] is True when the graph is the currently selected
-\item[signals] is the list of signal names contained in the graph
-\end{description}
-
+The list of graphs contained into the figure is provided by the property \prop{graphs}.
 
 \begin{table}[htbp]
   \centering\sf\small
@@ -460,10 +428,6 @@ This is a list of dict, whose contain:
     \multicolumn{3}{l}{\textit{Graph management}} \\
     add & Public & Add a graph into the figure \\
     delete & Public & Delete a graph from the figure \\
-    list & Public & Print a list of the graphs\\
-    \multicolumn{3}{l}{\textit{Pass-through to current Graph}} \\
-    insert & Public & Insert signals into the graph\\
-    remove & Public & Take away signals from the graph\\
     \multicolumn{3}{l}{\textit{Viewing management}} \\
     key & Private & Handle keystrokes when displaying plots \\
     \multicolumn{3}{l}{\textit{Data management}} \\
@@ -479,17 +443,12 @@ This is a list of dict, whose contain:
     \hline
     Property & Read & Write & Type & Summary \\
     \hline
-    current & \checked & \checked & int & Select graph \\
-    graphs & \checked & & list of dict & List of graphs\\
+    graphs & \checked & & list of graph & List of graphs\\
     \multicolumn{4}{l}{\textit{Graph management}}\\
     layout & \checked & \checked & str & Disposition of graphs in the figure\\
     mode & \checked & \checked & str & Mode of the current graph\\
     \multicolumn{4}{l}{\textit{Data management}}\\
     signals & \checked & & iter & Signals contained in the figure \\
-    \multicolumn{4}{l}{\textit{Pass-through to current graph}}\\
-    unit  & \checked & \checked& Tuple of str & The unit to be displayed in x/y labels\\
-    scale & \checked & \checked & str & Scale of the axis (one of lin,logx,logy,loglog) \\
-    range & \checked & \checked & list[4] & Axis limits \\
     \hline
   \end{tabular}
   \caption{Properties of \fig.}
