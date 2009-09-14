@@ -173,6 +173,13 @@ class Figure(MplFig):
         for gn, g in enumerate(self._graphs):
             g.position = self._graph_position(gn)
 
+    def draw(self, canvas):
+        tmp = MplFig.draw(self, canvas)
+        if not self._kid:
+            self._kid = self.canvas.mpl_connect('key_press_event', self._key)
+
+        return tmp
+
     def _key(self, event):
         """ Handle key press event
         1, 2: toggle vertical cursors #0 and #1
