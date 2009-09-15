@@ -12,14 +12,8 @@ Class Context: Commands callables from oscopy commandline
    destroy(num)
    Delete a figure
 
-   select(num, gn = 0)
-   Select the figure and the graph to become the current ones
-
-   layout(l)
-   set_ the layout of the current figure
-
-   figlist()
-   Print a list of figures
+   figures()
+   List of figures
 
    plot()
    plot all the figure
@@ -33,37 +27,13 @@ Class Context: Commands callables from oscopy commandline
    update()
    Reread all signals from files
 
-   add(sns)
-   Add a graph to the current figure
-
-   delete(gn)
-   Delete a graph from the current figure
-
-   mode(mode)
-   Set the mode of the current graph
-
-   scale(sc)
-   Set the axis scale of the current graph e.g. log or lin
-
-   range(a1, a2, a3, a4)
-   Set the axis range of the current graph
-
-   unit(xu, yu)
-   Set the unit of current graph from current figure
-
-   insert(sns)
-   Add signals to the current graph of the current figure
-
-   remove(sns)
-   Remove signals from the current graph of the current figure
-
    freeze(sns)
    Set the freeze flag of signals
 
    unfreeze(sns)
    Unset_ the freeze flag of signals
 
-   siglist()
+   signals()
    List all the signals
 
    math(expr)
@@ -73,12 +43,14 @@ Class Context: Commands callables from oscopy commandline
    Return a list of the signal names from the arguments provided by the user
    Should not be called from the command line
 
+   show()
+   Call the matplotlib main loop
+
 Abbreviations:
 sigs: dict of sigs
 sns : signal names
 opts: options
 fn  : filename
-gn  : graph number
 """
 import gobject
 import gtk

@@ -26,32 +26,17 @@ Figure -- Handle a list of graphs
    update(toupdate, todelete)
       Update the signals of the figure
 
-   select(graphnum)
-      Select the graph to be the default
-
-   list()
-      List the graph of the current figure
-
-   set_mode(mode)
+   [get|set]_mode(mode)
       Set the mode of the current graph
 
-   set_layout(layout)
+   [get|set]_layout(layout)
       Set the layout, either horiz, vert or quad
 
-   plot()
-      Plot the figure
+   draw()
+      Overload of matplotlib.pyplot.figure.draw()
 
-   get_signals()
+   signals()
       Return a list of the signals in all graphs
-
-   set_unit()
-      Set the current graph units
-
-   set_scale()
-      Set the current graph axis scale
-
-   set_range()
-      Set the current graph axis range
 
    _key()
       Handle keystrokes during plot
