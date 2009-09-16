@@ -55,8 +55,6 @@ class Figure(MplFig):
         """
         MplFig.__init__(self)
 
-        self._graphs = []
-        self._axes = []
         self._layout = "horiz"
         self._MODES_NAMES_TO_OBJ = {"lin":LinGraph}
         self._kid = None
@@ -78,17 +76,18 @@ class Figure(MplFig):
         Additionnal attemps are ignored.
         By default, do nothing.
         """
-        if len(self._graphs) > 3:
-            assert 0, "Bad graph number"
+        if len(self.axes) > 3:
+            assert 0, "Maximum graph number reached"
 
-        self._graphs.append(None)
+        # _graph_position use the current length of self.axes to compute
+        # the graph coordinates. So we add a fake element into the list
+        # and we remove it once the size is computed
+        self.axes.append(None)
+        gr = LinGraph(self, self._graph_position(len(self.axes) - 1),\
+                          sigs, label=str(len(self.axes)))
+        del self.axes[len(self.axes) - 1]
+        ax = self.add_axes(gr)
 
-        ax = self.add_axes(self._graph_position(len(self._graphs) - 1),\
-                                    label=str(len(self._graphs)))
-        gr = LinGraph(ax, sigs)
-
-        self._graphs[self._graphs.index(None)] = gr
-        self._axes.append(ax)
         # Force layout refresh
         self.set_layout(self._layout)
 
@@ -99,10 +98,9 @@ class Figure(MplFig):
         """
         if not isinstance(num, int):
             assert 0, "Bad graph number"
-        if len(self._graphs) < 1 or num < 1 or num > len(self._graphs):
+        if len(self.axes) < 1 or num < 1 or num > len(self.axes):
             assert 0, "Bad graph number"
-        del self._graphs[num - 1]
-        del self._axes[num - 1]
+        del self.axes[num - 1]
         
     def update(self, u, d):
         """ Update the graphs
@@ -111,7 +109,7 @@ class Figure(MplFig):
             assert 0, "Bad type"
         if not isinstance(d, dict):
             assert 0, "Bad type"
-        for g in self._graphs:
+        for g in self.axes:
             ug = {}
             dg = {}
             for sn in g.signals():
@@ -122,9 +120,9 @@ class Figure(MplFig):
             g.insert(ug)
             g.remove(dg)
 
-    def get_mode(self):
-        """ Return the mode of the current graph"""
-        return self._OBJ_TO_MODES_NAMES(self._current)
+#    def get_mode(self):
+#        """ Return the mode of the current graph"""
+#        return self._OBJ_TO_MODES_NAMES(self._current)
 
     def set_mode(self, args):
         """ Set the mode of the current graph
@@ -155,8 +153,8 @@ class Figure(MplFig):
         else:
             assert 0, "Bad layout"
 
-        for gn, g in enumerate(self._graphs):
-            g.position = self._graph_position(gn)
+        for gn, g in enumerate(self.axes):
+            g.set_position(self._graph_position(gn))
 
     def draw(self, canvas):
         tmp = MplFig.draw(self, canvas)
@@ -174,8 +172,8 @@ class Figure(MplFig):
             return
         # Find graph
         g = None
-        for g in self._graphs:
-            if g.ax == event.inaxes:
+        for g in self.axes:
+            if g == event.inaxes:
                 break
             else:
                 g = None
@@ -203,12 +201,12 @@ class Figure(MplFig):
 
         if self._layout == "horiz":
             dx = 1
-            dy = 1.0 / len(self._graphs)
-            num_to_xy = [[0, y] for y in xrange(len(self._graphs))]
+            dy = 1.0 / len(self.axes)
+            num_to_xy = [[0, y] for y in xrange(len(self.axes))]
         elif self._layout == "vert":
-            dx = 1.0 / len(self._graphs)
+            dx = 1.0 / len(self.axes)
             dy = 1
-            num_to_xy = [[x, 0] for x in xrange(len(self._graphs))]
+            num_to_xy = [[x, 0] for x in xrange(len(self._axes))]
         elif self._layout == "quad":
             dx = 0.5
             dy = 0.5
@@ -217,7 +215,7 @@ class Figure(MplFig):
             assert 0, "Bad layout"
 
         pos_x = num_to_xy[num][0]
-        pos_y = num_to_xy[len(self._graphs) - num - 1][1]
+        pos_y = num_to_xy[len(self.axes) - num - 1][1]
         x1 = pos_x * dx + 0.15 * dx
         y1 = pos_y * dy + 0.15 * dy
         return [x1, y1, dx * 0.75, dy * 0.75]
@@ -226,14 +224,14 @@ class Figure(MplFig):
     def signals(self):
         """ Return the list of signals in all graphs
         """
-        for g in self._graphs:
+        for g in self.axes:
             for sn in g.get_signals():
                 yield sn
 
     @property
     def graphs(self):
         """ Return the graph list """
-        return self._graphs
+        return self.axes
 
     layout = property(get_layout, set_layout)
-    mode = property(get_mode, set_mode)
+#    mode = property(get_mode, set_mode)

@@ -49,36 +49,28 @@ Class Graph -- Handle the representation of a list of signals
 """
 
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import Axes as mplAxes
 from matplotlib import rc
 from cursor import Cursor
 
-class Graph(object):
-    def __init__(self, ax, sigs={}):
+class Graph(mplAxes):
+    def __init__(self, fig, rect, sigs={}, **kwargs):
         """ Create a graph
         If signals are provided, fill in the graph otherwise the graph is empty
         Signals are assumed to exist and to be valid
         If first argument is a Graph, then copy things
         """
+        mplAxes.__init__(self, fig, rect, **kwargs)
         self._sigs = {}
         self._factor_names = {-18: "a", -15:"f", -12:"p", -9:"n", -6:"u",\
                                    -3:"m", 0:"", 3:"k", 6:"M", 9:"G", 12:"T",\
                                    15:"P", 18:"E"}
-        self._SCALES_TO_FUNC = {"lin": plt.plot,\
-                           "logx": plt.semilogx,\
-                           "logy": plt.semilogy,\
-                           "loglog": plt.loglog}
-        # Slow way... Surely there exist something faster
-        self._FUNC_TO_SCALES = {}
-        for k, v in self._SCALES_TO_FUNC.iteritems():
-            self._FUNC_TO_SCALES[v] = k
 
         if isinstance(sigs, Graph):
             mysigs = {}
             mysigs = sigs.sigs.copy()
-            self._plotf = sigs.plotf
             self._xrange = sigs.xrange
             self._yrange = sigs.yrange
-            self._ax = sigs.ax
             self._cursors = {"horiz": [None, None], "vert": [None, None]}
             self._txt = None
             self._signals2lines = sigs._signals2lines.copy()
@@ -90,8 +82,6 @@ class Graph(object):
             self._yunit = ""
             self._xrange = []
             self._yrange = []
-            self._plotf = plt.plot
-            self._ax = ax
             # Cursors values, only two horiz and two vert but can be changed
             self._cursors = {"horiz":[None, None], "vert":[None, None]}
             self._txt = None
@@ -126,11 +116,11 @@ class Graph(object):
                 fy, l = self._find_scale_factor("Y")
                 x = s.ref.data * pow(10, fx)
                 y = s.data * pow(10, fy)
-                line, = self._ax.plot(x, y, label=sn)
+                line, = self.plot(x, y, label=sn)
                 self._signals2lines[sn] = line
                 self._draw_cursors()
                 self._print_cursors()
-                self._ax.legend()
+                self.legend()
             else:
                 if s.ref.name == self._xaxis:
                     # Add signal
@@ -139,9 +129,9 @@ class Graph(object):
                     fy, l = self._find_scale_factor("Y")
                     x = s.ref.data * pow(10, fx)
                     y = s.data * pow(10, fy)
-                    line, = self._ax.plot(x, y, label=sn)
+                    line, = self.plot(x, y, label=sn)
                     self._signals2lines[sn] = line
-                    self._ax.legend()
+                    self.legend()
                 else:
                     # Ignore signal
                     rejected[sn] = s
@@ -154,8 +144,8 @@ class Graph(object):
             if sn in self._sigs.keys():
                 del self._sigs[sn]
                 self._signals2lines[sn].remove()
-                self._ax.plot()
-                self._ax.legend()
+                self.plot()
+                self.legend()
                 del self._signals2lines[sn]
         return len(self._sigs)
     
@@ -231,8 +221,8 @@ class Graph(object):
             yu = self._yunit
         fy, l = self._find_scale_factor("Y")
         yl = yl + " (" + l + yu + ")"
-        self._ax.set_xlabel(xl)
-        self._ax.set_ylabel(yl)
+        mplAxes.set_xlabel(self, xl)
+        mplAxes.set_ylabel(self, yl)
         
 
     def get_scale(self):
@@ -240,8 +230,8 @@ class Graph(object):
         """
 #        return self._FUNC_TO_SCALES[self._plotf]
         # Is there a better way?
-        x = self._ax.get_xscale()
-        y = self._ax.get_yscale()
+        x = self.get_xscale()
+        y = self.get_yscale()
         if x == "linear" and y == "linear":
             return "lin"
         elif x == "linear" and y == "log":
@@ -258,8 +248,8 @@ class Graph(object):
                              "logx": ["log","linear"],\
                              "logy": ["linear", "log"],\
                              "loglog": ["log", "log"]}
-        self._ax.set_xscale(SCALES_TO_STR[scale][0])
-        self._ax.set_yscale(SCALES_TO_STR[scale][1])
+        mplAxes.set_xscale(self, SCALES_TO_STR[scale][0])
+        mplAxes.set_yscale(self, SCALES_TO_STR[scale][1])
 
     def get_range(self):
         """ Return the axes limits
@@ -292,9 +282,9 @@ class Graph(object):
             assert 0, "Unrecognized argument"
 
         if len(self._xrange) == 2:
-            self._ax.set_xlim(self._xrange[0], self._xrange[1])
+            mplAxes.set_xlim(self, self._xrange[0], self._xrange[1])
         if len(self._yrange) == 2:
-            self._ax.set_ylim(self._yrange[0], self._yrange[1])
+            mplAxes.set_ylim(self, self._yrange[0], self._yrange[1])
         
     def toggle_cursors(self, ctype="", num=None, val=None):
         """ Toggle the cursors in the graph
@@ -315,7 +305,7 @@ class Graph(object):
         else:
             self._cursors[ctype][num].value = val
             self._cursors[ctype][num].set_visible()
-            self._cursors[ctype][num].draw(self._ax)
+            self._cursors[ctype][num].draw(self)
         self._print_cursors()
         fx, lx = self._find_scale_factor("X")
         fy, ly = self._find_scale_factor("Y")
@@ -331,7 +321,7 @@ class Graph(object):
         for t, ct in self._cursors.iteritems():
             for c in ct:
                 if c is not None:
-                    c.draw(self._ax, ct.index(c))
+                    c.draw(self, ct.index(c))
 
     def _set_cursor(self, ctype, num, val):
         """ Add a cursor to the graph
@@ -340,7 +330,7 @@ class Graph(object):
             if num >= 0 and num < 2:
                 # Just handle two cursor
                 self._cursors[ctype][num] = Cursor(val, ctype)
-                self._cursors[ctype][num].draw(self._ax, num)
+                self._cursors[ctype][num].draw(self, num)
             else:
                 assert 0, "Invalid cursor number"
         else:
@@ -368,31 +358,15 @@ class Graph(object):
                     % (u[t], float(cl[1].value - cl[0].value),\
                            l[t], u[t])
 
-        if self._txt is None or not self._txt.axes == self._ax:
+        if self._txt is None or not self._txt.axes == self:
             # Add text to graph
             rc('font', family='monospace')
-            self._txt = self._ax.text(0.02, 0.1, "",\
-                                        transform=self._ax.transAxes,\
-                                        axes=self._ax)
+            self._txt = self.text(0.02, 0.1, "",\
+                                        transform=self.transAxes,\
+                                        axes=self)
             self._txt.set_size(0.75 * self._txt.get_size())
         # Update text
         self._txt.set_text("%s\n%s" % (txt["horiz"], txt["vert"]))
-
-    def get_position(self):
-        """ Return the position of the graph in the figure
-        """
-        return self._ax.get_position()
-
-    def set_position(self, pos):
-        """ Set the position of the graph in the figure
-        """
-        self._ax.set_position(pos)
-
-    @property
-    def ax(self):
-        """ Return the Matplotlib axe
-        """
-        return self._ax
 
     @property
     def signals(self):
@@ -410,4 +384,3 @@ class Graph(object):
     unit = property(get_unit, set_unit)
     scale = property(get_scale, set_scale)
     range = property(get_range, set_range)
-    position = property(get_position, set_position)
