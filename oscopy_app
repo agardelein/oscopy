@@ -2,12 +2,18 @@
 """
 Sample command line application
 """
+import gobject
+import gtk
+
 import re
 import readline
 import os.path
 from optparse import OptionParser
 import oscopy
 from oscopy.readers.reader import ReadError
+
+from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
+from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 
 class OscopyApp(object):
     """ Analyse command arguments and call function from Cmd
@@ -68,6 +74,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
         # Current graph and current figure
         self._current_figure = None
         self._current_graph = None
+        self._figcount = 0
 
         # Start main loop
         self.loop(p, f, batch)
@@ -149,11 +156,33 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "Usage : plot"
             print "   Draw and show the figures"
             return
-        try:
-            self.cmds.plot()
-            self.cmds.show()
-        except OverflowError, e:
-            print "OverflowError in plot:", e.message, ", log(0) somewhere ?"
+        if self._figcount == len(self.cmds.figures):
+            self._main_loop.run()
+        else:
+            # Create a window for each figure, add navigation toolbar
+            self._figcount = 0
+            for i, f in enumerate(self.cmds.figures):
+                # fig = plt.figure(i + 1)
+                w = gtk.Window()
+                self._figcount += 1
+                w.set_title('Figure %d' % self._figcount)
+                vbox = gtk.VBox()
+                w.add(vbox)
+                canvas = FigureCanvas(f)
+                canvas.connect('destroy', self._window_destroy)
+                vbox.pack_start(canvas)
+                toolbar = NavigationToolbar(canvas, w)
+                vbox.pack_start(toolbar, False, False)
+                w.resize(640, 480)
+                w.show_all()
+            self._main_loop = gobject.MainLoop()
+            self._main_loop.run()
+
+    def _window_destroy(self, arg):
+        self._figcount = self._figcount - 1
+        if not self._figcount:
+            self._main_loop.quit()
+        return False
 
     def read(self, args):
         if args == "help":
