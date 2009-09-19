@@ -284,3 +284,8 @@ class Context(object):
     def figures(self):
         """ Return the figure list"""
         return self._figures
+
+    @property
+    def readers(self):
+        """ Return the reader list"""
+        return self._readers

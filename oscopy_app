@@ -373,11 +373,12 @@ FITNESS FOR A PARTICULAR PURPOSE."
         SEPARATOR = "\t"
         HEADER=["Name", "Unit", "Ref", "Reader"]
         print SEPARATOR.join(HEADER)
-        for signal in self.cmds.signals:
-            print SEPARATOR.join((signal["name"], \
-                                      signal["unit"],\
-                                      signal["reference"],\
-                                      signal["reader"]))
+        for reader_name, reader in self.cmds.readers.iteritems():
+            for signal_name, signal in reader.signals.iteritems():
+                print SEPARATOR.join((signal_name, \
+                                          signal.unit,\
+                                          signal.ref.name,\
+                                          reader_name))
 
     def math(self, inp):
         if inp == "help":
