@@ -149,7 +149,7 @@ class Graph(mplAxes):
                 del self._signals2lines[sn]
         return len(self._sigs)
 
-    def update(self):
+    def update_signals(self):
         """
         """
         for sn, s in self._sigs.iteritems():

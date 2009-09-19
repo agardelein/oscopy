@@ -47,7 +47,7 @@ refdes=C1
 T 44600 49500 5 10 0 0 90 0 1
 symversion=0.1
 T 45600 49500 5 10 1 1 0 0 1
-value=.10n
+value=10n
 }
 C 44400 50100 1 0 0 resistor-2.sym
 {
