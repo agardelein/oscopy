@@ -148,6 +148,18 @@ class Graph(mplAxes):
                 self.legend()
                 del self._signals2lines[sn]
         return len(self._sigs)
+
+    def update(self):
+        """
+        """
+        for sn, s in self._sigs.iteritems():
+            fx, l = self._find_scale_factor("X")
+            fy, l = self._find_scale_factor("Y")
+            x = s.ref.data * pow(10, fx)
+            y = s.data * pow(10, fy)
+            self._signals2lines[sn].set_xdata(x)
+            self._signals2lines[sn].set_ydata(y)
+            
     
     def _find_scale_factor(self, a):
         """ Choose the right scale for data on axis a

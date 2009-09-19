@@ -193,6 +193,8 @@ class Context(object):
         for f in self._figures:
             for g in f.graphs:
                 g.remove(self.names_to_signals(d))
+                g.update()
+            f.canvas.draw()
         for sn in d:
             del self._signals[sn]
 

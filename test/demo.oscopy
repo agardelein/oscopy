@@ -50,7 +50,7 @@ echo *** Now plotting everything
 plot
 # Updating
 echo *** Now change C value in schematic and rerun gnetlist + gnucap
-#pause
+pause
 echo *** Updating
 update
 echo *** Now look at figure 3
