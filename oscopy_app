@@ -378,16 +378,16 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "   List loaded signals"
             return
         SEPARATOR = "\t"
-        HEADER=["Name", "Unit", "Ref", "Reader"]
+        HEADER=["Name", "Unit", "Ref", "Reader","Last updated (sec)"]
         print SEPARATOR.join(HEADER)
+        t = time.time()
         for reader_name, reader in self.cmds.readers.iteritems():
             for signal_name, signal in reader.signals.iteritems():
                 print SEPARATOR.join((signal_name, \
                                           signal.unit,\
                                           signal.ref.name,\
                                           reader_name,\
-                                          time.ctime(\
-                                reader.info['last_update'])))
+                                          str(int(t - reader.info['last_update']))))
 
     def math(self, inp):
         if inp == "help":
