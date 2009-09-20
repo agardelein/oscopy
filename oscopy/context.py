@@ -161,14 +161,17 @@ class Context(object):
         For each file, reread it, and for updated, new and deleted signal,
         update the signal dict accordingly.
         Act recursively.
-        """
+        """        ## SUPPORT FOR UPDATE SINGLE READER
         n = {}    # New signals
-        if r is None:
+        if upn == -1:
             # Normal call create the new list etc etc
             self._update_num += 1
-            for reader in self._readers.itervalues():
-#                print "Updating signals from", reader
-                n.update(self.update(reader, self._update_num))
+            if r is None:
+                for reader in self._readers.itervalues():
+                    #                print "Updating signals from", reader
+                    n.update(self.update(reader, self._update_num))
+            else:
+                n.update(self.update(r, self._update_num))
         else:
             # First look at its dependencies
             if hasattr(r, "get_depends") and callable(r.get_depends):
@@ -194,7 +197,8 @@ class Context(object):
             for g in f.graphs:
                 g.remove(self.names_to_signals(d))
                 g.update_signals()
-            f.canvas.draw()
+            if f.canvas is not None:
+                f.canvas.draw()
         for sn in d:
             del self._signals[sn]
 

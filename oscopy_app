@@ -242,7 +242,13 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "Usage: update"
             print "   Reread data files"
             return
-        self.cmds.update()
+        if not args:
+            self.cmds.update()
+        else:
+            if self.cmds.readers.has_key(args):
+                self.cmds.update(self.cmds.readers[args])
+            else:
+                print "%s not found in readers" % args
 
     def add(self, args):
         if args == "help":
