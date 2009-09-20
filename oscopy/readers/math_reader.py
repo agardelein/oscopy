@@ -37,6 +37,7 @@ import numpy
 import re
 import math
 import sys
+import time
 from reader import Reader, ReadError
 from oscopy import Signal
 
@@ -60,6 +61,8 @@ class MathReader(Reader):
             return {}
         if self.validate_expr(inp):
             self._fn = inp
+            self._info['file'] = self._fn
+            self._info['last_update'] = time.time()
             return self._read_signals()
         else:
             return {}

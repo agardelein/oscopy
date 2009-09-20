@@ -35,6 +35,7 @@ Class Reader -- Define the common functions for reader objects
 """
 
 import os.path
+import time
 
 class ReadError(Exception):
     def __init__(self, value):
@@ -51,6 +52,7 @@ class Reader(object):
         self._fn = ""
         self._signals = {}
         self._update_num = -1  # Update number
+        self._info = {}
 
     # Certify the path is valid and is a file
     def read(self, fn):
@@ -58,6 +60,8 @@ class Reader(object):
         """
         self._check(fn)
         self._fn = fn
+        self._info['file'] = self._fn
+        self._info['last_update'] = time.time()
         return self._read_signals()
 
     def _read_signals(self):
@@ -132,6 +136,7 @@ class Reader(object):
         # Delete signals from dict
         for sn in d:
             del self._signals[sn]
+        self._info['last_update'] = time.time()
         return n
 
     def detect(self, fn):
@@ -160,3 +165,8 @@ class Reader(object):
         """ Return the list of signals names
         """
         return self._signals
+
+    @property
+    def info(self):
+        """ Return the reader infos"""
+        return self._info

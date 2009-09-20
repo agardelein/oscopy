@@ -8,6 +8,7 @@ import gtk
 import re
 import readline
 import os.path
+import time
 from optparse import OptionParser
 import oscopy
 from oscopy.readers.reader import ReadError
@@ -378,7 +379,9 @@ FITNESS FOR A PARTICULAR PURPOSE."
                 print SEPARATOR.join((signal_name, \
                                           signal.unit,\
                                           signal.ref.name,\
-                                          reader_name))
+                                          reader_name,\
+                                          time.ctime(\
+                                reader.info['last_update'])))
 
     def math(self, inp):
         if inp == "help":
