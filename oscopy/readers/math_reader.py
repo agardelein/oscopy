@@ -121,7 +121,7 @@ class MathReader(Reader):
 
         _sn = _expr.split("=", 1)[0].strip()  # Result signal name
         _expr = _expr.split("=", 1)[1].strip()
-        _tmp = Signal(_sn)
+        _tmp = Signal(_sn, self.unit_from_signal_name(_sn))
         # Replace sn by sigs["sn"]
         for sn in _sigs.iterkeys():
             _expr = re.sub("\\b" + sn + "\\b", '_sigs[\"%s\"].data'%sn, _expr)
@@ -241,3 +241,15 @@ class MathReader(Reader):
             if s.data is None or s.ref.data is None:
                 return False
         return True
+
+    def unit_from_signal_name(self, name):
+        """ Return the unit guessed from the signal name
+        """
+        units = {"i":"I", "I":"A", "v":"V", "V":"V"}
+        first = units.keys()
+        first.sort()
+        first.reverse()
+        for f in first:
+            if name.startswith(f):
+                return units.get(f, '')
+        return ''
