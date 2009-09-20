@@ -122,7 +122,7 @@ class Graph(mplAxes):
                 self._print_cursors()
                 self.legend()
             else:
-                if s.ref.name == self._xaxis:
+                if s.ref.name == self._xaxis and s.unit == self._yunit:
                     # Add signal
                     self._sigs[sn] = s
                     fx, l = self._find_scale_factor("X")
