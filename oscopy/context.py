@@ -15,9 +15,6 @@ Class Context: Commands callables from oscopy commandline
    figures()
    List of figures
 
-   plot()
-   plot all the figure
-
    read(fn)
    Read signals from file fn
 
@@ -42,9 +39,6 @@ Class Context: Commands callables from oscopy commandline
    names_to_signals(sns)
    Return a list of the signal names from the arguments provided by the user
    Should not be called from the command line
-
-   show()
-   Call the matplotlib main loop
 
 Abbreviations:
 sigs: dict of sigs
@@ -114,13 +108,6 @@ class Context(object):
         if num > len(self._figures) or num < 1:
             assert 0, "Out of range figure number"
         del self._figures[num - 1]
-
-    def plot(self):
-        """ Plot the figures, and enter in the matplotlib main loop
-        """
-        if not self._figures:
-            assert 0, "No figure to plot"
-        return
 
     def read(self, fn):
         """ Read signals from file.
@@ -257,11 +244,6 @@ class Context(object):
             self._signals[sn] = s
             self._signal_name_to_reader[sn] = r
         self._readers[inp] = r
-
-    def show(self):
-        """ Show the plot
-        """
-        plt.show()
 
     def names_to_signals(self, sns):
         """ Return a signal dict from the signal names list provided
