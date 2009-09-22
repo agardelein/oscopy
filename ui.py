@@ -115,6 +115,21 @@ class App(object):
         if fig.canvas is not None:
             fig.canvas.draw()
 
+    def _scale_menu_item_activated(self, menuitem, user_data):
+        fig, scale = user_data
+        fig.graphs[0].set_scale(scale)
+        if fig.canvas is not None:
+            fig.canvas.draw()
+
+    def _create_scale_menu(self, fig):
+        menu = gtk.Menu()
+        for scale in ['lin', 'logx', 'logy', 'loglog']:
+            item = gtk.MenuItem(scale)
+            item.connect('activate', self._scale_menu_item_activated,
+                         (fig, scale))
+            menu.append(item)
+        return menu
+
     def _create_signals_menu(self, fig, parent_it):
         menu = gtk.Menu()
         it = self._store.iter_children(parent_it)
@@ -146,6 +161,9 @@ class App(object):
         item_add = gtk.MenuItem('Add signal')
         item_add.set_submenu(self._create_filename_menu(fig))
         menu.append(item_add)
+        item_scale = gtk.MenuItem('Scale')
+        item_scale.set_submenu(self._create_scale_menu(fig))
+        menu.append(item_scale)
         return menu
 
     def _button_press(self, widget, event):
