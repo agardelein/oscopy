@@ -108,8 +108,12 @@ class App(object):
         fig, parent_it, it = user_data
         name, sig = self._store.get(it, 0, 1)
         print 'Adding signal %s to %s' % (name, fig)
-        fig.insert({name: sig})
-        fig.draw()
+        if not fig.graphs:
+            fig.add({name:sig})
+        else:
+            fig.graphs[0].insert({name: sig})
+        if fig.canvas is not None:
+            fig.canvas.draw()
 
     def _create_signals_menu(self, fig, parent_it):
         menu = gtk.Menu()
@@ -161,7 +165,6 @@ class App(object):
         row = self._store[path]
         fig = Figure()
         fig.add({row[0]: row[1]})
-        fig.plot()
 
         w = gtk.Window()
         self._figcount += 1
@@ -169,7 +172,7 @@ class App(object):
         w.set_title('Figure %d' % self._figcount)
         vbox = gtk.VBox()
         w.add(vbox)
-        canvas = FigureCanvas(fig._fig)
+        canvas = FigureCanvas(fig)
         canvas.connect('button-press-event', self._button_press)
         vbox.pack_start(canvas)
         toolbar = NavigationToolbar(canvas, w)
