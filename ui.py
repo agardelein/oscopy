@@ -126,7 +126,8 @@ class App(object):
     def _create_scale_menu(self, fig):
         menu = gtk.Menu()
         for scale in self._scale_to_str.keys():
-            item = gtk.MenuItem(self._scale_to_str[scale])
+            item = gtk.CheckMenuItem(self._scale_to_str[scale])
+            item.set_active(fig.graphs[0].scale == scale)
             item.connect('activate', self._scale_menu_item_activated,
                          (fig, scale))
             menu.append(item)
