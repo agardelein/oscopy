@@ -27,8 +27,10 @@ class App(object):
     </ui>'''
 
     def __init__(self):
-        self._scale_to_str = {'lin':'Linear', 'logx': 'LogX', 'logy':'LogY',\
-                                  'loglog':'Loglog'}
+        self._scale_to_str = {'lin': 'Linear', 'logx': 'LogX', 'logy': 'LogY',\
+                                  'loglog': 'Loglog'}
+        self._layout_to_str = {'horiz': 'Horizontal', 'vert':'Vertical',\
+                                   'quad':'Quad'}
         self._ctxt = oscopy.Context()
         self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)
         self._create_widgets()
@@ -132,6 +134,12 @@ class App(object):
         if fig.canvas is not None:
             fig.canvas.draw()
 
+    def _layout_menu_item_activated(self, menuitem, user_data):
+        fig, layout = user_data
+        fig.layout = layout
+        if fig.canvas is not None:
+            fig.canvas.draw()
+
     def _create_scale_menu(self, fig):
         menu = gtk.Menu()
         for scale in self._scale_to_str.keys():
@@ -139,6 +147,16 @@ class App(object):
             item.set_active(self._current_graph.scale == scale)
             item.connect('activate', self._scale_menu_item_activated,
                          (fig, scale))
+            menu.append(item)
+        return menu
+
+    def _create_layout_menu(self, fig):
+        menu = gtk.Menu()
+        for layout in self._layout_to_str.keys():
+            item = gtk.CheckMenuItem(self._layout_to_str[layout])
+            item.set_active(fig.layout == layout)
+            item.connect('activate', self._layout_menu_item_activated,
+                         (fig, layout))
             menu.append(item)
         return menu
 
@@ -188,6 +206,9 @@ class App(object):
         item_scale = gtk.MenuItem('Scale')
         item_scale.set_submenu(self._create_scale_menu(fig))
         menu.append(item_scale)
+        item_layout = gtk.MenuItem('Layout')
+        item_layout.set_submenu(self._create_layout_menu(fig))
+        menu.append(item_layout)
         item_graph = gtk.MenuItem('Graph')
         item_graph.set_submenu(self._create_graph_menu(fig))
         menu.append(item_graph)
