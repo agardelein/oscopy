@@ -37,6 +37,7 @@ class App(object):
         #self._add_file('demo/res.dat')
         self._figcount = 0
         self._windows_to_figures = {}
+        self._current_graph = None
 
     def _add_file(self, filename):
         try:
@@ -115,13 +116,19 @@ class App(object):
         if not fig.graphs:
             fig.add({name:sig})
         else:
-            fig.graphs[0].insert({name: sig})
+            if self._current_graph is not None:
+                self._current_graph.insert({name: sig})
         if fig.canvas is not None:
             fig.canvas.draw()
 
+    def _graph_menu_item_activated(self, menuitem, user_data):
+        fig = user_data
+        fig.add()
+        fig.canvas.draw()
+
     def _scale_menu_item_activated(self, menuitem, user_data):
         fig, scale = user_data
-        fig.graphs[0].set_scale(scale)
+        self._current_graph.set_scale(scale)
         if fig.canvas is not None:
             fig.canvas.draw()
 
@@ -129,10 +136,18 @@ class App(object):
         menu = gtk.Menu()
         for scale in self._scale_to_str.keys():
             item = gtk.CheckMenuItem(self._scale_to_str[scale])
-            item.set_active(fig.graphs[0].scale == scale)
+            item.set_active(self._current_graph.scale == scale)
             item.connect('activate', self._scale_menu_item_activated,
                          (fig, scale))
             menu.append(item)
+        return menu
+
+    def _create_graph_menu(self, fig):
+        menu = gtk.Menu()
+        item_add = gtk.MenuItem('Add graph')
+        item_add.connect('activate', self._graph_menu_item_activated,
+                         (fig))
+        menu.append(item_add)
         return menu
 
     def _create_signals_menu(self, fig, parent_it):
@@ -163,12 +178,19 @@ class App(object):
 
     def _create_figure_popup_menu(self, fig):
         menu = gtk.Menu()
+        if self._current_graph is None:
+            item_nograph = gtk.MenuItem('No graph selected')
+            menu.append(item_nograph)
+            return menu
         item_add = gtk.MenuItem('Add signal')
         item_add.set_submenu(self._create_filename_menu(fig))
         menu.append(item_add)
         item_scale = gtk.MenuItem('Scale')
         item_scale.set_submenu(self._create_scale_menu(fig))
         menu.append(item_scale)
+        item_graph = gtk.MenuItem('Graph')
+        item_graph.set_submenu(self._create_graph_menu(fig))
+        menu.append(item_graph)
         return menu
 
     def _button_press(self, widget, event):
@@ -197,12 +219,21 @@ class App(object):
         w.add(vbox)
         canvas = FigureCanvas(fig)
         canvas.connect('button-press-event', self._button_press)
+        canvas.mpl_connect('axes_enter_event', self._axes_enter)
+        canvas.mpl_connect('axes_leave_event', self._axes_leave)
         vbox.pack_start(canvas)
         toolbar = NavigationToolbar(canvas, w)
         vbox.pack_start(toolbar, False, False)
         w.resize(400, 300)
         w.show_all()
 
+    def _axes_enter(self, event):
+        self._current_graph = event.inaxes
+
+    def _axes_leave(self, event):
+        # Unused for better user interaction
+#        self._current_graph = None
+        pass
 
 if __name__ == '__main__':
     app = App()
