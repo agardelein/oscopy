@@ -206,7 +206,7 @@ class Figure(MplFig):
         elif self._layout == "vert":
             dx = 1.0 / len(self.axes)
             dy = 1
-            num_to_xy = [[x, 0] for x in xrange(len(self._axes))]
+            num_to_xy = [[x, 0] for x in xrange(len(self.axes))]
         elif self._layout == "quad":
             dx = 0.5
             dy = 0.5
