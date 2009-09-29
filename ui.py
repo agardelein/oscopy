@@ -3,6 +3,7 @@ import gtk
 
 from oscopy.readers.detect_reader import DetectReader
 from oscopy import Figure
+import oscopy
 
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
@@ -26,6 +27,9 @@ class App(object):
     </ui>'''
 
     def __init__(self):
+        self._scale_to_str = {'lin':'Linear', 'logx': 'LogX', 'logy':'LogY',\
+                                  'loglog':'Loglog'}
+        self._ctxt = oscopy.Context()
         self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)
         self._create_widgets()
         #self._add_file('demo/irf540.dat')
@@ -33,18 +37,16 @@ class App(object):
         #self._add_file('demo/res.dat')
         self._figcount = 0
         self._windows_to_figures = {}
-        self._scale_to_str = {'lin':'Linear', 'logx': 'LogX', 'logy':'LogY',\
-                                  'loglog':'Loglog'}
 
     def _add_file(self, filename):
-        r = DetectReader(filename)
-        if r is None:
+        try:
+            self._ctxt.read(filename)
+        except NotImplementedError:
             report_error(self._mainwindow,
                          'Could not find a reader for %s' % filename)
             return
-        sigs = r.read(filename)
         it = self._store.append(None, (filename, None))
-        for name, sig in sigs.iteritems():
+        for name, sig in self._ctxt.readers[filename].signals.iteritems():
             self._store.append(it, (name, sig))
 
     def _action_add_file(self, action):
