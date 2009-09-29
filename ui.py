@@ -186,8 +186,8 @@ class App(object):
             return
 
         row = self._store[path]
-        fig = Figure()
-        fig.add({row[0]: row[1]})
+        self._ctxt.create({row[0]: row[1]})
+        fig = self._ctxt.figures[len(self._ctxt.figures) - 1]
 
         w = gtk.Window()
         self._figcount += 1
