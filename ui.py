@@ -163,10 +163,23 @@ class App(object):
 
     def _create_graph_menu(self, fig):
         menu = gtk.Menu()
+        item_scale = gtk.MenuItem('Scale')
+        item_scale.set_submenu(self._create_scale_menu(fig))
+        menu.append(item_scale)
+        item_add = gtk.MenuItem('Insert signal')
+        item_add.set_submenu(self._create_filename_menu(fig))
+        menu.append(item_add)
+        return menu
+
+    def _create_figure_menu(self, fig):
+        menu = gtk.Menu()
         item_add = gtk.MenuItem('Add graph')
         item_add.connect('activate', self._graph_menu_item_activated,
                          (fig))
         menu.append(item_add)
+        item_layout = gtk.MenuItem('Layout')
+        item_layout.set_submenu(self._create_layout_menu(fig))
+        menu.append(item_layout)
         return menu
 
     def _create_signals_menu(self, fig, parent_it):
@@ -201,15 +214,9 @@ class App(object):
             item_nograph = gtk.MenuItem('No graph selected')
             menu.append(item_nograph)
             return menu
-        item_add = gtk.MenuItem('Add signal')
-        item_add.set_submenu(self._create_filename_menu(fig))
-        menu.append(item_add)
-        item_scale = gtk.MenuItem('Scale')
-        item_scale.set_submenu(self._create_scale_menu(fig))
-        menu.append(item_scale)
-        item_layout = gtk.MenuItem('Layout')
-        item_layout.set_submenu(self._create_layout_menu(fig))
-        menu.append(item_layout)
+        item_figure = gtk.MenuItem('Figure')
+        item_figure.set_submenu(self._create_figure_menu(fig))
+        menu.append(item_figure)
         item_graph = gtk.MenuItem('Graph')
         item_graph.set_submenu(self._create_graph_menu(fig))
         menu.append(item_graph)
