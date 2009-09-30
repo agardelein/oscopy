@@ -141,6 +141,15 @@ class App(object):
         if fig.canvas is not None:
             fig.canvas.draw()
 
+    def _delete_graph_menu_item_activate(self, menuitem, user_data):
+        fig = user_data
+        if self._current_graph is not None:
+            idx = fig.graphs.index(self._current_graph)
+            fig.delete(idx + 1)
+            self._current_graph = None
+            if fig.canvas is not None:
+                fig.canvas.draw()
+
     def _create_scale_menu(self, fig):
         menu = gtk.Menu()
         for scale in self._scale_to_str.keys():
@@ -177,6 +186,10 @@ class App(object):
         item_add.connect('activate', self._graph_menu_item_activated,
                          (fig))
         menu.append(item_add)
+        item_delete = gtk.MenuItem('Delete graph')
+        item_delete.connect('activate', self._delete_graph_menu_item_activate,
+                            (fig))
+        menu.append(item_delete)
         item_layout = gtk.MenuItem('Layout')
         item_layout.set_submenu(self._create_layout_menu(fig))
         menu.append(item_layout)
