@@ -141,7 +141,7 @@ class App(object):
         if fig.canvas is not None:
             fig.canvas.draw()
 
-    def _delete_graph_menu_item_activate(self, menuitem, user_data):
+    def _delete_graph_menu_item_activated(self, menuitem, user_data):
         fig = user_data
         if self._current_graph is not None:
             idx = fig.graphs.index(self._current_graph)
@@ -149,6 +149,14 @@ class App(object):
             self._current_graph = None
             if fig.canvas is not None:
                 fig.canvas.draw()
+
+    def _remove_signal_menu_item_activated(self, menuitem, user_data):
+        fig, signals = user_data
+        if self._current_graph is None:
+            return
+        self._current_graph.remove(signals)
+        if fig.canvas is not None:
+            fig.canvas.draw()
 
     def _create_scale_menu(self, fig):
         menu = gtk.Menu()
@@ -170,6 +178,19 @@ class App(object):
             menu.append(item)
         return menu
 
+    def _create_remove_signal_menu(self, fig):
+        menu = gtk.Menu()
+        if self._current_graph is None:
+            item_nograph = gtk.MenuItem('No graph selected')
+            menu.append(item_nograph)
+            return menu
+        for name, signal in self._current_graph.signals.iteritems():
+            item = gtk.MenuItem(name)
+            item.connect('activate', self._remove_signal_menu_item_activated,
+                         (fig, {name: signal}))
+            menu.append(item)
+        return menu
+
     def _create_graph_menu(self, fig):
         menu = gtk.Menu()
         item_scale = gtk.MenuItem('Scale')
@@ -178,6 +199,9 @@ class App(object):
         item_add = gtk.MenuItem('Insert signal')
         item_add.set_submenu(self._create_filename_menu(fig))
         menu.append(item_add)
+        item_remove = gtk.MenuItem('Remove signal')
+        item_remove.set_submenu(self._create_remove_signal_menu(fig))
+        menu.append(item_remove)
         return menu
 
     def _create_figure_menu(self, fig):
@@ -187,7 +211,7 @@ class App(object):
                          (fig))
         menu.append(item_add)
         item_delete = gtk.MenuItem('Delete graph')
-        item_delete.connect('activate', self._delete_graph_menu_item_activate,
+        item_delete.connect('activate', self._delete_graph_menu_item_activated,
                             (fig))
         menu.append(item_delete)
         item_layout = gtk.MenuItem('Layout')
