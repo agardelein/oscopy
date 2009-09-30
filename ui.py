@@ -40,6 +40,7 @@ class App(object):
         self._figcount = 0
         self._windows_to_figures = {}
         self._current_graph = None
+        self._current_figure = None
 
     def _add_file(self, filename):
         try:
@@ -242,6 +243,8 @@ class App(object):
         canvas.connect('button-press-event', self._button_press)
         canvas.mpl_connect('axes_enter_event', self._axes_enter)
         canvas.mpl_connect('axes_leave_event', self._axes_leave)
+        canvas.mpl_connect('figure_enter_event', self._figure_enter)
+        canvas.mpl_connect('figure_leave_event', self._figure_leave)
         vbox.pack_start(canvas)
         toolbar = NavigationToolbar(canvas, w)
         vbox.pack_start(toolbar, False, False)
@@ -254,6 +257,13 @@ class App(object):
     def _axes_leave(self, event):
         # Unused for better user interaction
 #        self._current_graph = None
+        pass
+
+    def _figure_enter(self, event):
+        self._current_figure = event.canvas.figure
+
+    def _figure_leave(self, event):
+#        self._current_figure = None
         pass
 
 if __name__ == '__main__':
