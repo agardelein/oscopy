@@ -112,6 +112,47 @@ class App(object):
         w.set_default_size(400, 300)
         w.show_all()
 
+    def _create_units_window(self, fig):
+        dlg = gtk.Dialog('Enter graph units',\
+                             buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
+                                          gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        # Label and entry for X axis
+        hbox_x = gtk.HBox()
+        label_xunits = gtk.Label('X axis unit:')
+        hbox_x.pack_start(label_xunits)
+        entry_xunits = gtk.Entry()
+        entry_xunits.set_text(self._current_graph.unit[0])
+        hbox_x.pack_start(entry_xunits)
+        dlg.vbox.pack_start(hbox_x)
+
+        # Label and entry for Y axis
+        hbox_y = gtk.HBox()
+        label_yunits = gtk.Label('Y axis unit:')
+        hbox_y.pack_start(label_yunits)
+        entry_yunits = gtk.Entry()
+        entry_yunits.set_text(self._current_graph.unit[1])
+        hbox_y.pack_start(entry_yunits)
+        dlg.vbox.pack_start(hbox_y)
+
+        dlg.show_all()
+        resp = dlg.run()
+        if resp == gtk.RESPONSE_ACCEPT:
+            self._current_graph.set_unit((entry_xunits.get_text(),\
+                                             entry_yunits.get_text()))
+            if fig.canvas is not None:
+                fig.canvas.draw()
+        dlg.destroy()
+
+    def _ok_button_units_window_clicked(self, widget, data=None):
+        print "OK Clicked"
+
+    def _cancel_button_units_window_clicked(self, widget, data=None):
+        print "Cancel clicked"
+
+    def _units_menu_item_activated(self, menuitem, user_data):
+        fig = user_data
+        self._create_units_window(fig)
+
     def _signals_menu_item_activated(self, menuitem, user_data):
         fig, parent_it, it = user_data
         name, sig = self._store.get(it, 0, 1)
@@ -196,6 +237,9 @@ class App(object):
         item_scale = gtk.MenuItem('Scale')
         item_scale.set_submenu(self._create_scale_menu(fig))
         menu.append(item_scale)
+        item_units = gtk.MenuItem('Units...')
+        item_units.connect('activate', self._units_menu_item_activated, (fig))
+        menu.append(item_units)
         item_add = gtk.MenuItem('Insert signal')
         item_add.set_submenu(self._create_filename_menu(fig))
         menu.append(item_add)
