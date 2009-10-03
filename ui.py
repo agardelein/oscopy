@@ -22,6 +22,7 @@ class App(object):
       <menu action="File">
         <menuitem action="Add file"/>
         <menuitem action="Update files"/>
+        <menuitem action="New Math Signal..."/>
         <menuitem action="Quit"/>
       </menu>
     </menubar>
@@ -67,6 +68,36 @@ class App(object):
     def _action_update(self, action):
         self._ctxt.update()
 
+    def _action_new_math(self, action):
+        dlg = gtk.Dialog('New math signal', parent=self._mainwindow,
+                         buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                                  gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+
+        # Label and entry
+        hbox = gtk.HBox()
+        label = gtk.Label('Expression:')
+        hbox.pack_start(label)
+        entry = gtk.Entry()
+        hbox.pack_start(entry)
+        dlg.vbox.pack_start(hbox)
+
+        dlg.show_all()
+        resp = dlg.run()
+        if resp == gtk.RESPONSE_ACCEPT:
+            expr = entry.get_text()
+            try:
+                self._ctxt.math(expr)
+            except ReadError, e:
+                report_error(self._mainwindow,
+                             'Could not find a reader for %s' % expr)
+                return
+            it = self._store.append(None, (expr, None))
+            for name, sig in self._ctxt.readers[expr].signals.iteritems():
+                self._store.append(it, (name, sig))
+
+        dlg.destroy()
+        
+
     def _action_quit(self, action):
         main_loop.quit()
 
@@ -79,6 +110,8 @@ class App(object):
              self._action_add_file),
             ('Update files', gtk.STOCK_REFRESH, '_Update', None, None,
              self._action_update),
+            ("New Math Signal...", gtk.STOCK_NEW, '_New Math Signal', None,
+             None, self._action_new_math),
             ('Quit', gtk.STOCK_QUIT, '_Quit', None, None,
              self._action_quit),
             ]
