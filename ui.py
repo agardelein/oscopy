@@ -21,6 +21,7 @@ class App(object):
     <menubar name="MenuBar">
       <menu action="File">
         <menuitem action="Add file"/>
+        <menuitem action="Update files"/>
         <menuitem action="Quit"/>
       </menu>
     </menubar>
@@ -63,6 +64,9 @@ class App(object):
         if resp == gtk.RESPONSE_ACCEPT:
             self._add_file(filename)
 
+    def _action_update(self, action):
+        self._ctxt.update()
+
     def _action_quit(self, action):
         main_loop.quit()
 
@@ -72,10 +76,12 @@ class App(object):
         actions = [
             ('File', None, '_File'),
             ('Add file', gtk.STOCK_ADD, '_Add file', None, None,
-                self._action_add_file),
+             self._action_add_file),
+            ('Update files', gtk.STOCK_REFRESH, '_Update', None, None,
+             self._action_update),
             ('Quit', gtk.STOCK_QUIT, '_Quit', None, None,
-                self._action_quit),
-                ]
+             self._action_quit),
+            ]
         actiongroup = gtk.ActionGroup('App')
         actiongroup.add_actions(actions)
 
