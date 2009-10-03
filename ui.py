@@ -113,6 +113,8 @@ class App(object):
         w.show_all()
 
     def _create_units_window(self, fig):
+        if self._current_graph is None:
+            return
         dlg = gtk.Dialog('Enter graph units',\
                              buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
                                           gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
@@ -143,15 +145,60 @@ class App(object):
                 fig.canvas.draw()
         dlg.destroy()
 
-    def _ok_button_units_window_clicked(self, widget, data=None):
-        print "OK Clicked"
-
-    def _cancel_button_units_window_clicked(self, widget, data=None):
-        print "Cancel clicked"
-
     def _units_menu_item_activated(self, menuitem, user_data):
         fig = user_data
         self._create_units_window(fig)
+
+    def _create_range_window(self, fig):
+        if self._current_graph is None:
+            return
+        dlg = gtk.Dialog('Enter graph range',\
+                             buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
+                                          gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        [xmin, xmax], [ymin, ymax] = self._current_graph.get_range()
+        # Label and entry for X axis
+        hbox_x = gtk.HBox()
+        label_xmin = gtk.Label('Xmin:')
+        hbox_x.pack_start(label_xmin)
+        entry_xmin = gtk.Entry()
+        entry_xmin.set_text(str(xmin))
+        hbox_x.pack_start(entry_xmin)
+        label_xmax = gtk.Label('Xmax:')
+        hbox_x.pack_start(label_xmax)
+        entry_xmax = gtk.Entry()
+        entry_xmax.set_text(str(xmax))
+        hbox_x.pack_start(entry_xmax)
+        dlg.vbox.pack_start(hbox_x)
+
+        # Label and entry for Y axis
+        hbox_y = gtk.HBox()
+        label_ymin = gtk.Label('Ymin:')
+        hbox_y.pack_start(label_ymin)
+        entry_ymin = gtk.Entry()
+        entry_ymin.set_text(str(ymin))
+        hbox_y.pack_start(entry_ymin)
+        label_ymax = gtk.Label('Ymax:')
+        hbox_y.pack_start(label_ymax)
+        entry_ymax = gtk.Entry()
+        entry_ymax.set_text(str(ymax))
+        hbox_y.pack_start(entry_ymax)
+        dlg.vbox.pack_start(hbox_y)
+
+        dlg.show_all()
+        resp = dlg.run()
+        if resp == gtk.RESPONSE_ACCEPT:
+            r = [float(entry_xmin.get_text()),\
+                     float(entry_xmax.get_text()),\
+                     float(entry_ymin.get_text()),\
+                     float(entry_ymax.get_text())]
+            self._current_graph.set_range(r)
+            if fig.canvas is not None:
+                fig.canvas.draw()
+        dlg.destroy()
+
+    def _range_menu_item_activated(self, menuitem, user_data):
+        fig = user_data
+        self._create_range_window(fig)
 
     def _signals_menu_item_activated(self, menuitem, user_data):
         fig, parent_it, it = user_data
@@ -234,12 +281,15 @@ class App(object):
 
     def _create_graph_menu(self, fig):
         menu = gtk.Menu()
-        item_scale = gtk.MenuItem('Scale')
-        item_scale.set_submenu(self._create_scale_menu(fig))
-        menu.append(item_scale)
+        item_range = gtk.MenuItem('Range...')
+        item_range.connect('activate', self._range_menu_item_activated, (fig))
+        menu.append(item_range)
         item_units = gtk.MenuItem('Units...')
         item_units.connect('activate', self._units_menu_item_activated, (fig))
         menu.append(item_units)
+        item_scale = gtk.MenuItem('Scale')
+        item_scale.set_submenu(self._create_scale_menu(fig))
+        menu.append(item_scale)
         item_add = gtk.MenuItem('Insert signal')
         item_add.set_submenu(self._create_filename_menu(fig))
         menu.append(item_add)
