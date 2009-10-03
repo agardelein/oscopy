@@ -266,6 +266,8 @@ class Graph(mplAxes):
     def get_range(self):
         """ Return the axes limits
         """
+        self._xrange = mplAxes.get_xlim(self)
+        self._yrange = mplAxes.get_ylim(self)
         return self._xrange, self._yrange
 
     def set_range(self, arg="reset"):
