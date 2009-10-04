@@ -129,6 +129,7 @@ class App(object):
         tv.append_column(col)
         tv.set_model(self._store)
         tv.connect('row-activated', self._row_activated)
+        tv.connect('button-press-event', self._treeview_button_press)
         return tv
 
     def _create_widgets(self):
@@ -391,6 +392,39 @@ class App(object):
         item_graph.set_submenu(self._create_graph_menu(fig))
         menu.append(item_graph)
         return menu
+
+    def _create_treeview_popup_menu(self, signals):
+        menu = gtk.Menu()
+        if not signals:
+            item_none = gtk.MenuItem("No signal selected")
+            menu.append(item_none)
+            return menu
+        for name, signal in signals.iteritems():
+            item_freeze = gtk.CheckMenuItem("Freeze %s" % name)
+            item_freeze.set_active(signal.freeze)
+            item_freeze.connect('activate',\
+                                    self._signal_freeze_menu_item_activated,\
+                                    (signal))
+        menu.append(item_freeze)
+        return menu
+
+    def _signal_freeze_menu_item_activated(self, menuitem, signal):
+        signal.freeze = not signal.freeze
+        # Modify also the signal in the treeview
+        # (italic font? gray font color? a freeze column?)
+
+    def _treeview_button_press(self, widget, event):
+        if event.button == 3:
+            tv = widget
+            path, tvc, x, y = tv.get_path_at_pos(int(event.x), int(event.y))
+            if len(path) == 1:
+                return
+            tv.set_cursor(path)
+            row = self._store[path]
+            signals = {row[0]: row[1]}
+            menu = self._create_treeview_popup_menu(signals)
+            menu.show_all()
+            menu.popup(None, None, None, event.button, event.time)
 
     def _button_press(self, widget, event):
         if event.button == 3:
