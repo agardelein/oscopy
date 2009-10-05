@@ -1,5 +1,6 @@
 import gobject
 import gtk
+import signal
 
 from oscopy.readers.detect_reader import DetectReader
 from oscopy import Figure
@@ -243,7 +244,7 @@ class App(object):
     def _signals_menu_item_activated(self, menuitem, user_data):
         fig, parent_it, it = user_data
         name, sig = self._store.get(it, 0, 1)
-        print 'Adding signal %s to %s' % (name, fig)
+        # print 'Adding signal %s to %s' % (name, fig)
         if not fig.graphs:
             fig.add({name:sig})
         else:
@@ -477,8 +478,16 @@ class App(object):
 #        self._current_figure = None
         pass
 
+    def update_from_usr1(self):
+        self._ctxt.update()
+        
+
+def usr1_handler(signum, frame):
+    app.update_from_usr1()
+
 if __name__ == '__main__':
     app = App()
     main_loop = gobject.MainLoop()
+    signal.signal(signal.SIGUSR1, usr1_handler)
     main_loop.run()
 
