@@ -200,13 +200,6 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "File format not supported"
             return
 
-        print fn, ":"
-        for signal in self.cmds.signals:
-            if signal["reader"] == fn:
-                print '%s / %s %s' % (signal['name'],\
-                                          signal['reference'],\
-                                          signal['unit'])
-
     def write(self, args):
         if args == "help":
             print "Usage: write format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]"

@@ -207,15 +207,7 @@ class Context(object):
     def signals(self):
         """ List loaded signals
         """
-        signals = []
-        for r_name, reader in self._readers.iteritems():
-            signals = signals +\
-                map(lambda x: {"name":x.name, "unit":x.unit,\
-                                   "reference":x.ref.name,\
-                                   "reader": r_name},\
-                        reader.signals.values())
-
-        return signals
+        return self._signals
 
     def math(self, inp):
         """ Create a signal from mathematical expression
