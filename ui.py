@@ -36,16 +36,21 @@ class App(object):
                                   'loglog': 'Loglog'}
         self._layout_to_str = {'horiz': 'Horizontal', 'vert':'Vertical',\
                                    'quad':'Quad'}
+        self._figcount = 0
+        self._windows_to_figures = {}
+        self._current_graph = None
+        self._current_figure = None
+        self._TARGET_TYPE_SIGNAL = 10354
+        self._from_signal_list = [("oscopy-signals", gtk.TARGET_SAME_APP,\
+                                       self._TARGET_TYPE_SIGNAL)]
+        self._to_figure = [("oscopy-signals", gtk.TARGET_SAME_APP,\
+                                self._TARGET_TYPE_SIGNAL)]
         self._ctxt = oscopy.Context()
         self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)
         self._create_widgets()
         #self._add_file('demo/irf540.dat')
         #self._add_file('demo/ac.dat')
         #self._add_file('demo/res.dat')
-        self._figcount = 0
-        self._windows_to_figures = {}
-        self._current_graph = None
-        self._current_figure = None
 
     def _add_file(self, filename):
         try:
@@ -136,6 +141,10 @@ class App(object):
         tv.set_model(self._store)
         tv.connect('row-activated', self._row_activated)
         tv.connect('button-press-event', self._treeview_button_press)
+        tv.connect('drag_data_get', self._drag_data_get_cb)
+        tv.drag_source_set(gtk.gdk.BUTTON1_MASK,\
+                               self._from_signal_list,\
+                               gtk.gdk.ACTION_COPY)
         return tv
 
     def _create_widgets(self):
@@ -462,6 +471,11 @@ class App(object):
         canvas.mpl_connect('axes_leave_event', self._axes_leave)
         canvas.mpl_connect('figure_enter_event', self._figure_enter)
         canvas.mpl_connect('figure_leave_event', self._figure_leave)
+        w.connect("drag_data_received", self._drag_data_received_cb)
+        w.drag_dest_set(gtk.DEST_DEFAULT_MOTION |\
+                                 gtk.DEST_DEFAULT_HIGHLIGHT |\
+                                 gtk.DEST_DEFAULT_DROP,
+                             self._to_figure, gtk.gdk.ACTION_COPY)
         vbox.pack_start(canvas)
         toolbar = NavigationToolbar(canvas, w)
         vbox.pack_start(toolbar, False, False)
@@ -528,6 +542,24 @@ class App(object):
                 self._ctxt.update()
         dialog.destroy()
 
+    def _drag_data_get_cb(self, widget, drag_context, selection, target_type,\
+                              time):
+        if target_type == self._TARGET_TYPE_SIGNAL:
+            tv = widget
+            (path, col) = tv.get_cursor()
+            row = self._store[path]
+            print row[0]
+            selection.set(selection.target, 8, row[0])
+
+    def _drag_data_received_cb(self, widget, drag_context, x, y, selection,\
+                                   target_type, time):
+        if target_type == self._TARGET_TYPE_SIGNAL:
+            if self._current_graph is not None:
+                signals = {selection.data: self._ctxt.signals[selection.data]}
+                self._current_graph.insert(signals)
+                if self._current_figure.canvas is not None:
+                    self._current_figure.canvas.draw()
+        
 def usr1_handler(signum, frame):
     app.update_from_usr1()
 
