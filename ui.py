@@ -166,7 +166,7 @@ class App(object):
         w.show_all()
 
     def _create_units_window(self, figure, graph):
-        if self._current_graph is None:
+        if graph is None:
             return
         dlg = gtk.Dialog('Enter graph units',\
                              buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
@@ -176,7 +176,7 @@ class App(object):
         label_xunits = gtk.Label('X axis unit:')
         hbox_x.pack_start(label_xunits)
         entry_xunits = gtk.Entry()
-        entry_xunits.set_text(self._current_graph.unit[0])
+        entry_xunits.set_text(graph.unit[0])
         hbox_x.pack_start(entry_xunits)
         dlg.vbox.pack_start(hbox_x)
 
@@ -185,14 +185,14 @@ class App(object):
         label_yunits = gtk.Label('Y axis unit:')
         hbox_y.pack_start(label_yunits)
         entry_yunits = gtk.Entry()
-        entry_yunits.set_text(self._current_graph.unit[1])
+        entry_yunits.set_text(graph.unit[1])
         hbox_y.pack_start(entry_yunits)
         dlg.vbox.pack_start(hbox_y)
 
         dlg.show_all()
         resp = dlg.run()
         if resp == gtk.RESPONSE_ACCEPT:
-            self._current_graph.set_unit((entry_xunits.get_text(),\
+            graph.set_unit((entry_xunits.get_text(),\
                                              entry_yunits.get_text()))
             if figure.canvas is not None:
                 figure.canvas.draw()
@@ -203,12 +203,12 @@ class App(object):
         self._create_units_window(figure, graph)
 
     def _create_range_window(self, figure, graph):
-        if self._current_graph is None:
+        if graph is None:
             return
         dlg = gtk.Dialog('Enter graph range',\
                              buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
                                           gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-        [xmin, xmax], [ymin, ymax] = self._current_graph.get_range()
+        [xmin, xmax], [ymin, ymax] = graph.get_range()
         # Label and entry for X axis
         hbox_x = gtk.HBox()
         label_xmin = gtk.Label('Xmin:')
@@ -244,7 +244,7 @@ class App(object):
                      float(entry_xmax.get_text()),\
                      float(entry_ymin.get_text()),\
                      float(entry_ymax.get_text())]
-            self._current_graph.set_range(r)
+            graph.set_range(r)
             if figure.canvas is not None:
                 figure.canvas.draw()
         dlg.destroy()
@@ -254,14 +254,14 @@ class App(object):
         self._create_range_window(figure, graph)
 
     def _signals_menu_item_activated(self, menuitem, user_data):
-        fig, parent_it, it = user_data
+        fig, graph, parent_it, it = user_data
         name, sig = self._store.get(it, 0, 1)
         # print 'Adding signal %s to %s' % (name, fig)
         if not fig.graphs:
             fig.add({name:sig})
         else:
-            if self._current_graph is not None:
-                self._current_graph.insert({name: sig})
+            if graph is not None:
+                graph.insert({name: sig})
         if fig.canvas is not None:
             fig.canvas.draw()
 
@@ -271,10 +271,10 @@ class App(object):
         fig.canvas.draw()
 
     def _scale_menu_item_activated(self, menuitem, user_data):
-        fig, scale = user_data
-        self._current_graph.set_scale(scale)
-        if fig.canvas is not None:
-            fig.canvas.draw()
+        figure, graph, scale = user_data
+        graph.set_scale(scale)
+        if figure.canvas is not None:
+            figure.canvas.draw()
 
     def _layout_menu_item_activated(self, menuitem, user_data):
         fig, layout = user_data
@@ -284,10 +284,9 @@ class App(object):
 
     def _delete_graph_menu_item_activated(self, menuitem, user_data):
         figure, graph = user_data
-        if self._current_graph is not None:
-            idx = figure.graphs.index(self._current_graph)
+        if graph is not None:
+            idx = figure.graphs.index(graph)
             figure.delete(idx + 1)
-            self._current_graph = None
             if figure.canvas is not None:
                 figure.canvas.draw()
 
@@ -295,7 +294,7 @@ class App(object):
         figure, graph, signals = user_data
         if graph is None:
             return
-        self._current_graph.remove(signals)
+        graph.remove(signals)
         if figure.canvas is not None:
             figure.canvas.draw()
 
@@ -304,9 +303,9 @@ class App(object):
         menu = gtk.Menu()
         for scale in self._scale_to_str.keys():
             item = gtk.CheckMenuItem(self._scale_to_str[scale])
-            item.set_active(self._current_graph.scale == scale)
+            item.set_active(graph.scale == scale)
             item.connect('activate', self._scale_menu_item_activated,
-                         (figure, scale))
+                         (figure, graph, scale))
             menu.append(item)
         return menu
 
@@ -323,11 +322,11 @@ class App(object):
     def _create_remove_signal_menu(self, data):
         figure, graph = data
         menu = gtk.Menu()
-        if self._current_graph is None:
+        if graph is None:
             item_nograph = gtk.MenuItem('No graph selected')
             menu.append(item_nograph)
             return menu
-        for name, signal in self._current_graph.signals.iteritems():
+        for name, signal in graph.signals.iteritems():
             item = gtk.MenuItem(name)
             item.connect('activate', self._remove_signal_menu_item_activated,
                          (figure, graph, {name: signal}))
@@ -370,14 +369,14 @@ class App(object):
         menu.append(item_layout)
         return menu
 
-    def _create_signals_menu(self, fig, parent_it):
+    def _create_signals_menu(self, fig, graph, parent_it):
         menu = gtk.Menu()
         it = self._store.iter_children(parent_it)
         while it is not None:
             name = self._store.get_value(it, 0)
             item = gtk.MenuItem(name)
             item.connect('activate', self._signals_menu_item_activated,
-                         (fig, parent_it, it))
+                         (fig, graph, parent_it, it))
             menu.append(item)
             it = self._store.iter_next(it)
         return menu
@@ -392,7 +391,7 @@ class App(object):
         while it is not None:
             filename = self._store.get_value(it, 0)
             item = gtk.MenuItem(filename)
-            item.set_submenu(self._create_signals_menu(figure, it))
+            item.set_submenu(self._create_signals_menu(figure, graph, it))
             menu.append(item)
             it = self._store.iter_next(it)
         return menu
