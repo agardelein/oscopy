@@ -3,8 +3,6 @@ import gtk
 import signal
 import commands
 
-from oscopy.readers.detect_reader import DetectReader
-from oscopy import Figure
 import oscopy
 
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
