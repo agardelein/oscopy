@@ -46,7 +46,7 @@ class App(object):
         self._ctxt = oscopy.Context()
         self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)
         self._create_widgets()
-        #self._add_file('demo/irf540.dat')
+        self._add_file('demo/irf540.dat')
         #self._add_file('demo/ac.dat')
         #self._add_file('demo/res.dat')
 
@@ -165,7 +165,7 @@ class App(object):
         w.set_default_size(400, 300)
         w.show_all()
 
-    def _create_units_window(self, fig):
+    def _create_units_window(self, figure, graph):
         if self._current_graph is None:
             return
         dlg = gtk.Dialog('Enter graph units',\
@@ -194,15 +194,15 @@ class App(object):
         if resp == gtk.RESPONSE_ACCEPT:
             self._current_graph.set_unit((entry_xunits.get_text(),\
                                              entry_yunits.get_text()))
-            if fig.canvas is not None:
-                fig.canvas.draw()
+            if figure.canvas is not None:
+                figure.canvas.draw()
         dlg.destroy()
 
     def _units_menu_item_activated(self, menuitem, user_data):
-        fig = user_data
-        self._create_units_window(fig)
+        figure, graph = user_data
+        self._create_units_window(figure, graph)
 
-    def _create_range_window(self, fig):
+    def _create_range_window(self, figure, graph):
         if self._current_graph is None:
             return
         dlg = gtk.Dialog('Enter graph range',\
@@ -245,13 +245,13 @@ class App(object):
                      float(entry_ymin.get_text()),\
                      float(entry_ymax.get_text())]
             self._current_graph.set_range(r)
-            if fig.canvas is not None:
-                fig.canvas.draw()
+            if figure.canvas is not None:
+                figure.canvas.draw()
         dlg.destroy()
 
     def _range_menu_item_activated(self, menuitem, user_data):
-        fig = user_data
-        self._create_range_window(fig)
+        figure, graph = user_data
+        self._create_range_window(figure, graph)
 
     def _signals_menu_item_activated(self, menuitem, user_data):
         fig, parent_it, it = user_data
@@ -292,20 +292,21 @@ class App(object):
                 fig.canvas.draw()
 
     def _remove_signal_menu_item_activated(self, menuitem, user_data):
-        fig, signals = user_data
+        figure, signals = user_data
         if self._current_graph is None:
             return
         self._current_graph.remove(signals)
-        if fig.canvas is not None:
-            fig.canvas.draw()
+        if figure.canvas is not None:
+            figure.canvas.draw()
 
-    def _create_scale_menu(self, fig):
+    def _create_scale_menu(self, data):
+        figure, graph = data
         menu = gtk.Menu()
         for scale in self._scale_to_str.keys():
             item = gtk.CheckMenuItem(self._scale_to_str[scale])
             item.set_active(self._current_graph.scale == scale)
             item.connect('activate', self._scale_menu_item_activated,
-                         (fig, scale))
+                         (figure, scale))
             menu.append(item)
         return menu
 
@@ -319,7 +320,8 @@ class App(object):
             menu.append(item)
         return menu
 
-    def _create_remove_signal_menu(self, fig):
+    def _create_remove_signal_menu(self, data):
+        figure, graph = data
         menu = gtk.Menu()
         if self._current_graph is None:
             item_nograph = gtk.MenuItem('No graph selected')
@@ -328,26 +330,28 @@ class App(object):
         for name, signal in self._current_graph.signals.iteritems():
             item = gtk.MenuItem(name)
             item.connect('activate', self._remove_signal_menu_item_activated,
-                         (fig, {name: signal}))
+                         (figure, {name: signal}))
             menu.append(item)
         return menu
 
-    def _create_graph_menu(self, fig):
+    def _create_graph_menu(self, figure, graph):
         menu = gtk.Menu()
         item_range = gtk.MenuItem('Range...')
-        item_range.connect('activate', self._range_menu_item_activated, (fig))
+        item_range.connect('activate', self._range_menu_item_activated,\
+                               (figure, graph))
         menu.append(item_range)
         item_units = gtk.MenuItem('Units...')
-        item_units.connect('activate', self._units_menu_item_activated, (fig))
+        item_units.connect('activate', self._units_menu_item_activated,\
+                               (figure, graph))
         menu.append(item_units)
         item_scale = gtk.MenuItem('Scale')
-        item_scale.set_submenu(self._create_scale_menu(fig))
+        item_scale.set_submenu(self._create_scale_menu((figure, graph)))
         menu.append(item_scale)
         item_add = gtk.MenuItem('Insert signal')
-        item_add.set_submenu(self._create_filename_menu(fig))
+        item_add.set_submenu(self._create_filename_menu((figure, graph)))
         menu.append(item_add)
         item_remove = gtk.MenuItem('Remove signal')
-        item_remove.set_submenu(self._create_remove_signal_menu(fig))
+        item_remove.set_submenu(self._create_remove_signal_menu((figure, graph)))
         menu.append(item_remove)
         return menu
 
@@ -378,7 +382,8 @@ class App(object):
             it = self._store.iter_next(it)
         return menu
 
-    def _create_filename_menu(self, fig):
+    def _create_filename_menu(self, data):
+        figure, graph = data
         it = self._store.get_iter_root()
         if it is None:
             return gtk.Menu()
@@ -387,22 +392,22 @@ class App(object):
         while it is not None:
             filename = self._store.get_value(it, 0)
             item = gtk.MenuItem(filename)
-            item.set_submenu(self._create_signals_menu(fig, it))
+            item.set_submenu(self._create_signals_menu(figure, it))
             menu.append(item)
             it = self._store.iter_next(it)
         return menu
 
-    def _create_figure_popup_menu(self, fig):
+    def _create_figure_popup_menu(self, figure, graph):
         menu = gtk.Menu()
-        if self._current_graph is None:
+        if graph is None:
             item_nograph = gtk.MenuItem('No graph selected')
             menu.append(item_nograph)
             return menu
         item_figure = gtk.MenuItem('Figure')
-        item_figure.set_submenu(self._create_figure_menu(fig))
+        item_figure.set_submenu(self._create_figure_menu(figure))
         menu.append(item_figure)
         item_graph = gtk.MenuItem('Graph')
-        item_graph.set_submenu(self._create_graph_menu(fig))
+        item_graph.set_submenu(self._create_graph_menu(figure, graph))
         menu.append(item_graph)
         return menu
 
@@ -439,13 +444,11 @@ class App(object):
             menu.show_all()
             menu.popup(None, None, None, event.button, event.time)
 
-    def _button_press(self, widget, event):
+    def _button_press(self, event):
         if event.button == 3:
-            window = widget.parent.parent
-            fig = self._windows_to_figures[window]
-            menu = self._create_figure_popup_menu(fig)
+            menu = self._create_figure_popup_menu(event.canvas.figure, event.inaxes)
             menu.show_all()
-            menu.popup(None, None, None, event.button, event.time)
+            menu.popup(None, None, None, event.button, event.guiEvent.time)
 
     #TODO: _windows_to_figures consistency...
     # think of a better way to map events to Figure objects
@@ -464,7 +467,7 @@ class App(object):
         vbox = gtk.VBox()
         w.add(vbox)
         canvas = FigureCanvas(fig)
-        canvas.connect('button-press-event', self._button_press)
+        canvas.mpl_connect('button_press_event', self._button_press)
         canvas.mpl_connect('axes_enter_event', self._axes_enter)
         canvas.mpl_connect('axes_leave_event', self._axes_leave)
         canvas.mpl_connect('figure_enter_event', self._figure_enter)
