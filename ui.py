@@ -283,17 +283,17 @@ class App(object):
             fig.canvas.draw()
 
     def _delete_graph_menu_item_activated(self, menuitem, user_data):
-        fig = user_data
+        figure, graph = user_data
         if self._current_graph is not None:
-            idx = fig.graphs.index(self._current_graph)
-            fig.delete(idx + 1)
+            idx = figure.graphs.index(self._current_graph)
+            figure.delete(idx + 1)
             self._current_graph = None
-            if fig.canvas is not None:
-                fig.canvas.draw()
+            if figure.canvas is not None:
+                figure.canvas.draw()
 
     def _remove_signal_menu_item_activated(self, menuitem, user_data):
-        figure, signals = user_data
-        if self._current_graph is None:
+        figure, graph, signals = user_data
+        if graph is None:
             return
         self._current_graph.remove(signals)
         if figure.canvas is not None:
@@ -330,7 +330,7 @@ class App(object):
         for name, signal in self._current_graph.signals.iteritems():
             item = gtk.MenuItem(name)
             item.connect('activate', self._remove_signal_menu_item_activated,
-                         (figure, {name: signal}))
+                         (figure, graph, {name: signal}))
             menu.append(item)
         return menu
 
@@ -355,7 +355,7 @@ class App(object):
         menu.append(item_remove)
         return menu
 
-    def _create_figure_menu(self, fig):
+    def _create_figure_menu(self, fig, graph):
         menu = gtk.Menu()
         item_add = gtk.MenuItem('Add graph')
         item_add.connect('activate', self._graph_menu_item_activated,
@@ -363,7 +363,7 @@ class App(object):
         menu.append(item_add)
         item_delete = gtk.MenuItem('Delete graph')
         item_delete.connect('activate', self._delete_graph_menu_item_activated,
-                            (fig))
+                            (fig, graph))
         menu.append(item_delete)
         item_layout = gtk.MenuItem('Layout')
         item_layout.set_submenu(self._create_layout_menu(fig))
@@ -404,7 +404,7 @@ class App(object):
             menu.append(item_nograph)
             return menu
         item_figure = gtk.MenuItem('Figure')
-        item_figure.set_submenu(self._create_figure_menu(figure))
+        item_figure.set_submenu(self._create_figure_menu(figure, graph))
         menu.append(item_figure)
         item_graph = gtk.MenuItem('Graph')
         item_graph.set_submenu(self._create_graph_menu(figure, graph))
