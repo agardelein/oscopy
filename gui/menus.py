@@ -1,4 +1,5 @@
 import gtk
+import dialogs
 
 class FigureMenu(object):
 
@@ -102,35 +103,14 @@ class GraphMenu(object):
     def _create_units_window(self, figure, graph):
         if graph is None:
             return
-        dlg = gtk.Dialog('Enter graph units',\
-                             buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
-                                          gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-        # Label and entry for X axis
-        hbox_x = gtk.HBox()
-        label_xunits = gtk.Label('X axis unit:')
-        hbox_x.pack_start(label_xunits)
-        entry_xunits = gtk.Entry()
-        entry_xunits.set_text(graph.unit[0])
-        hbox_x.pack_start(entry_xunits)
-        dlg.vbox.pack_start(hbox_x)
-
-        # Label and entry for Y axis
-        hbox_y = gtk.HBox()
-        label_yunits = gtk.Label('Y axis unit:')
-        hbox_y.pack_start(label_yunits)
-        entry_yunits = gtk.Entry()
-        entry_yunits.set_text(graph.unit[1])
-        hbox_y.pack_start(entry_yunits)
-        dlg.vbox.pack_start(hbox_y)
-
-        dlg.show_all()
-        resp = dlg.run()
-        if resp == gtk.RESPONSE_ACCEPT:
-            graph.set_unit((entry_xunits.get_text(),\
-                                             entry_yunits.get_text()))
+        unitdlg = dialogs.Enter_Units_Dialog()
+        unitdlg.display(graph.unit)
+        units = unitdlg.run()
+        if units:
+            graph.unit = units
             if figure.canvas is not None:
                 figure.canvas.draw()
-        dlg.destroy()
+
 
     def _units_menu_item_activated(self, menuitem, user_data):
         figure, graph = user_data
