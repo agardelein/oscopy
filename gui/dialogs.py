@@ -11,23 +11,24 @@ class Enter_Units_Dialog(object):
         self._dlg = gtk.Dialog('Enter graph units',\
                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
                                                gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        table = gtk.Table(2, 2, False)
+        table.set_col_spacing(0, 12)
+        table.set_col_spacing(1, 12)
         # Label and entry for X axis
-        hbox_x = gtk.HBox()
         label_xunits = gtk.Label('X axis unit:')
-        hbox_x.pack_start(label_xunits)
+        table.attach(label_xunits, 0, 1, 0, 1)
         self._entry_xunits = gtk.Entry()
         self._entry_xunits.set_text(units[0])
-        hbox_x.pack_start(self._entry_xunits)
-        self._dlg.vbox.pack_start(hbox_x)
+        table.attach(self._entry_xunits, 1, 2, 0, 1)
 
         # Label and entry for Y axis
-        hbox_y = gtk.HBox()
         label_yunits = gtk.Label('Y axis unit:')
-        hbox_y.pack_start(label_yunits)
+        table.attach(label_yunits, 0, 1, 1, 2)
         self._entry_yunits = gtk.Entry()
         self._entry_yunits.set_text(units[1])
-        hbox_y.pack_start(self._entry_yunits)
-        self._dlg.vbox.pack_start(hbox_y)
+        table.attach(self._entry_yunits, 1, 2, 1, 2)
+        self._dlg.vbox.pack_start(table)
+        self._dlg.set_border_width(12)
 
         self._dlg.show_all()
 
