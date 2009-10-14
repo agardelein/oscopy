@@ -43,40 +43,33 @@ class Enter_Units_Dialog(object):
 
 class Enter_Range_Dialog(object):
     def Enter_Range_Dialog(self):
-        pass
+        self._dlg = None
+        self._entries = None
 
     def display(self, r):
         self._dlg = gtk.Dialog('Enter graph range',\
                              buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
                                           gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-        [xmin, xmax], [ymin, ymax] = r
         # Label and entry for X axis
-        hbox_x = gtk.HBox()
-        label_xmin = gtk.Label('Xmin:')
-        hbox_x.pack_start(label_xmin)
-        self._entry_xmin = gtk.Entry()
-        self._entry_xmin.set_text(str(xmin))
-        hbox_x.pack_start(self._entry_xmin)
-        label_xmax = gtk.Label('Xmax:')
-        hbox_x.pack_start(label_xmax)
-        self._entry_xmax = gtk.Entry()
-        self._entry_xmax.set_text(str(xmax))
-        hbox_x.pack_start(self._entry_xmax)
-        self._dlg.vbox.pack_start(hbox_x)
-
-        # Label and entry for Y axis
-        hbox_y = gtk.HBox()
-        label_ymin = gtk.Label('Ymin:')
-        hbox_y.pack_start(label_ymin)
-        self._entry_ymin = gtk.Entry()
-        self._entry_ymin.set_text(str(ymin))
-        hbox_y.pack_start(self._entry_ymin)
-        label_ymax = gtk.Label('Ymax:')
-        hbox_y.pack_start(label_ymax)
-        self._entry_ymax = gtk.Entry()
-        self._entry_ymax.set_text(str(ymax))
-        hbox_y.pack_start(self._entry_ymax)
-        self._dlg.vbox.pack_start(hbox_y)
+        self._entries = []
+        xy = ['X', 'Y']
+        minmax = ['min', 'max']
+        table = gtk.Table(2, 4, False)
+        for col in range(0, 4):
+            table.set_col_spacing(col, 12)
+        for row in range(0, 2):
+            entries_row = []
+            for col in range(0, 4, 2):
+                label = gtk.Label(xy[row] + minmax[col / 2])
+                entry = gtk.Entry()
+                entry.set_text(str(r[row][col/2]))
+                table.attach(label, col, col + 1, row, row + 1)
+                table.attach(entry, col + 1, col + 2, row, row + 1)
+                entries_row.append(entry)
+            self._entries.append(entries_row)
+                
+        self._dlg.vbox.pack_start(table)
+        self._dlg.set_border_width(12)
 
         self._dlg.show_all()
 
@@ -84,9 +77,9 @@ class Enter_Range_Dialog(object):
         r = []
         resp = self._dlg.run()
         if resp == gtk.RESPONSE_ACCEPT:
-            r = [float(self._entry_xmin.get_text()),\
-                     float(self._entry_xmax.get_text()),\
-                     float(self._entry_ymin.get_text()),\
-                     float(self._entry_ymax.get_text())]
+            r = [float(self._entries[0][0].get_text()),\
+                     float(self._entries[0][1].get_text()),\
+                     float(self._entries[1][0].get_text()),\
+                     float(self._entries[1][1].get_text())]
         self._dlg.destroy()
         return r
