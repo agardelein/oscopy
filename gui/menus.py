@@ -119,49 +119,13 @@ class GraphMenu(object):
     def _create_range_window(self, figure, graph):
         if graph is None:
             return
-        dlg = gtk.Dialog('Enter graph range',\
-                             buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
-                                          gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-        [xmin, xmax], [ymin, ymax] = graph.get_range()
-        # Label and entry for X axis
-        hbox_x = gtk.HBox()
-        label_xmin = gtk.Label('Xmin:')
-        hbox_x.pack_start(label_xmin)
-        entry_xmin = gtk.Entry()
-        entry_xmin.set_text(str(xmin))
-        hbox_x.pack_start(entry_xmin)
-        label_xmax = gtk.Label('Xmax:')
-        hbox_x.pack_start(label_xmax)
-        entry_xmax = gtk.Entry()
-        entry_xmax.set_text(str(xmax))
-        hbox_x.pack_start(entry_xmax)
-        dlg.vbox.pack_start(hbox_x)
-
-        # Label and entry for Y axis
-        hbox_y = gtk.HBox()
-        label_ymin = gtk.Label('Ymin:')
-        hbox_y.pack_start(label_ymin)
-        entry_ymin = gtk.Entry()
-        entry_ymin.set_text(str(ymin))
-        hbox_y.pack_start(entry_ymin)
-        label_ymax = gtk.Label('Ymax:')
-        hbox_y.pack_start(label_ymax)
-        entry_ymax = gtk.Entry()
-        entry_ymax.set_text(str(ymax))
-        hbox_y.pack_start(entry_ymax)
-        dlg.vbox.pack_start(hbox_y)
-
-        dlg.show_all()
-        resp = dlg.run()
-        if resp == gtk.RESPONSE_ACCEPT:
-            r = [float(entry_xmin.get_text()),\
-                     float(entry_xmax.get_text()),\
-                     float(entry_ymin.get_text()),\
-                     float(entry_ymax.get_text())]
+        rangedlg = dialogs.Enter_Range_Dialog()
+        rangedlg.display(graph.get_range())
+        r = rangedlg.run()
+        if r:
             graph.set_range(r)
             if figure.canvas is not None:
                 figure.canvas.draw()
-        dlg.destroy()
 
     def _range_menu_item_activated(self, menuitem, user_data):
         figure, graph = user_data

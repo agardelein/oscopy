@@ -40,3 +40,53 @@ class Enter_Units_Dialog(object):
                          self._entry_yunits.get_text())
         self._dlg.destroy()
         return units
+
+class Enter_Range_Dialog(object):
+    def Enter_Range_Dialog(self):
+        pass
+
+    def display(self, r):
+        self._dlg = gtk.Dialog('Enter graph range',\
+                             buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
+                                          gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        [xmin, xmax], [ymin, ymax] = r
+        # Label and entry for X axis
+        hbox_x = gtk.HBox()
+        label_xmin = gtk.Label('Xmin:')
+        hbox_x.pack_start(label_xmin)
+        self._entry_xmin = gtk.Entry()
+        self._entry_xmin.set_text(str(xmin))
+        hbox_x.pack_start(self._entry_xmin)
+        label_xmax = gtk.Label('Xmax:')
+        hbox_x.pack_start(label_xmax)
+        self._entry_xmax = gtk.Entry()
+        self._entry_xmax.set_text(str(xmax))
+        hbox_x.pack_start(self._entry_xmax)
+        self._dlg.vbox.pack_start(hbox_x)
+
+        # Label and entry for Y axis
+        hbox_y = gtk.HBox()
+        label_ymin = gtk.Label('Ymin:')
+        hbox_y.pack_start(label_ymin)
+        self._entry_ymin = gtk.Entry()
+        self._entry_ymin.set_text(str(ymin))
+        hbox_y.pack_start(self._entry_ymin)
+        label_ymax = gtk.Label('Ymax:')
+        hbox_y.pack_start(label_ymax)
+        self._entry_ymax = gtk.Entry()
+        self._entry_ymax.set_text(str(ymax))
+        hbox_y.pack_start(self._entry_ymax)
+        self._dlg.vbox.pack_start(hbox_y)
+
+        self._dlg.show_all()
+
+    def run(self):
+        r = []
+        resp = self._dlg.run()
+        if resp == gtk.RESPONSE_ACCEPT:
+            r = [float(self._entry_xmin.get_text()),\
+                     float(self._entry_xmax.get_text()),\
+                     float(self._entry_ymin.get_text()),\
+                     float(self._entry_ymax.get_text())]
+        self._dlg.destroy()
+        return r
