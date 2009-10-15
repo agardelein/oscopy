@@ -260,46 +260,22 @@ class App(object):
         self._ctxt.update()
 
     def _action_netlist_and_simulate(self, action):
-        dialog = gtk.Dialog("Run netlister and simulate",\
-                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
-                                             gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-        vbox_netl = gtk.VBox()
-        ckbutton_netl = gtk.CheckButton("Run netlister")
-        ckbutton_netl.set_active(True)
-        vbox_netl.pack_start(ckbutton_netl)
-        entry_netl = gtk.Entry()
-        entry_netl.set_text("gnetlist -s -o demo.cir -g spice-sdb demo.sch")
-        vbox_netl.pack_start(entry_netl)
-        dialog.vbox.pack_start(vbox_netl)
-        vbox_netl = gtk.VBox()
-
-        vbox_sim = gtk.VBox()
-        ckbutton_sim = gtk.CheckButton("Run simulator")
-        ckbutton_sim.set_active(True)
-        vbox_sim.pack_start(ckbutton_sim)
-        entry_sim = gtk.Entry()
-        entry_sim.set_text("gnucap -b demo.cir")
-        vbox_sim.pack_start(entry_sim)
-        dialog.vbox.pack_start(vbox_sim)
-        ckbutton_upd = gtk.CheckButton("Update readers")
-        ckbutton_upd.set_active(True)
-        dialog.vbox.pack_start(ckbutton_upd)
-        dialog.show_all()
-        resp = dialog.run()
-        if resp == gtk.RESPONSE_ACCEPT:
-            if ckbutton_netl.get_active():
-                res = commands.getstatusoutput(entry_netl.get_text())
+        netnsimdlg = gui.dialogs.Run_Netlister_and_Simulate_Dialog()
+        netnsimdlg.display()
+        actions = netnsimdlg.run()
+        if actions:
+            if actions['run_netlister'][0]:
+                res = commands.getstatusoutput(actions['run_netlister'][1])
                 if res[0]:
                     report_error(self._mainwindow, res[1])
                 print res[1]
-            if ckbutton_sim.get_active():
-                res = commands.getstatusoutput(entry_sim.get_text())
+            if actions['run_simulator'][0]:
+                res = commands.getstatusoutput(actions['run_simulator'][1])
                 if res[0]:
                     report_error(self._mainwindow, res[1])
                 print res[1]
-            if ckbutton_upd.get_active():
+            if actions['update']:
                 self._ctxt.update()
-        dialog.destroy()
 
     def _drag_data_get_cb(self, widget, drag_context, selection, target_type,\
                               time):

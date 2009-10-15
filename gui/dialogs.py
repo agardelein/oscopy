@@ -83,3 +83,52 @@ class Enter_Range_Dialog(object):
                      float(self._entries[1][1].get_text())]
         self._dlg.destroy()
         return r
+
+class Run_Netlister_and_Simulate_Dialog:
+    def Run_Netlister_and_Simulate_Dialog(self):
+        self._dlg = None
+        pass
+
+    def display(self):
+        # Define functions to enable/disable entries upon toggle buttons
+        # make window a bit larger
+        self._dlg = gtk.Dialog("Run netlister and simulate",\
+                                      buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
+                                                   gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        vbox_netl = gtk.VBox()
+        self._ckbutton_netl = gtk.CheckButton("Run netlister")
+        self._ckbutton_netl.set_active(True)
+        vbox_netl.pack_start(self._ckbutton_netl)
+        self._entry_netl = gtk.Entry()
+        self._entry_netl.set_text("gnetlist -s -o demo.cir -g spice-sdb demo.sch")
+        vbox_netl.pack_start(self._entry_netl)
+        self._dlg.vbox.pack_start(vbox_netl)
+        vbox_netl = gtk.VBox()
+
+        vbox_sim = gtk.VBox()
+        self._ckbutton_sim = gtk.CheckButton("Run simulator")
+        self._ckbutton_sim.set_active(True)
+        vbox_sim.pack_start(self._ckbutton_sim)
+        self._entry_sim = gtk.Entry()
+        self._entry_sim.set_text("gnucap -b demo.cir")
+        vbox_sim.pack_start(self._entry_sim)
+        self._dlg.vbox.pack_start(vbox_sim)
+        self._ckbutton_upd = gtk.CheckButton("Update readers")
+        self._ckbutton_upd.set_active(True)
+        self._dlg.vbox.pack_start(self._ckbutton_upd)
+        self._dlg.show_all()
+
+    def run(self):
+        actions = {}
+        # 1 -> run netlister
+        # 2 -> run simulator
+        # 4 -> update signals
+        resp = self._dlg.run()
+        if resp == gtk.RESPONSE_ACCEPT:
+            actions['run_netlister'] = (self._ckbutton_netl.get_active(),\
+                                            self._entry_netl.get_text())
+            actions['run_simulator'] = (self._ckbutton_sim.get_active(),\
+                                            self._entry_sim.get_text())
+            actions['update'] = self._ckbutton_netl.get_active()
+        self._dlg.destroy()
+        return actions
