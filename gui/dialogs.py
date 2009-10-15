@@ -119,6 +119,7 @@ class Run_Netlister_and_Simulate_Dialog:
         self._ckbutton_upd = gtk.CheckButton("Update readers")
         self._ckbutton_upd.set_active(actions['update'])
         self._dlg.vbox.pack_start(self._ckbutton_upd)
+        self._dlg.resize(300, 100)
         self._dlg.show_all()
 
     def run(self):
