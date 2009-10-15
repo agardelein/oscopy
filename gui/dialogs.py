@@ -89,7 +89,7 @@ class Run_Netlister_and_Simulate_Dialog:
         self._dlg = None
         pass
 
-    def display(self):
+    def display(self, actions):
         # Define functions to enable/disable entries upon toggle buttons
         # make window a bit larger
         self._dlg = gtk.Dialog("Run netlister and simulate",\
@@ -97,9 +97,9 @@ class Run_Netlister_and_Simulate_Dialog:
                                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         vbox_netl = gtk.VBox()
         self._entry_netl = gtk.Entry()
-        self._entry_netl.set_text("gnetlist -s -o demo.cir -g spice-sdb demo.sch")
+        self._entry_netl.set_text(actions['run_netlister'][1])
         self._ckbutton_netl = gtk.CheckButton("Run netlister")
-        self._ckbutton_netl.set_active(True)
+        self._ckbutton_netl.set_active(actions['run_netlister'][0])
         self._ckbutton_netl.connect('toggled', self._check_button_toggled,\
                                         self._entry_netl)
         vbox_netl.pack_start(self._ckbutton_netl)
@@ -108,16 +108,16 @@ class Run_Netlister_and_Simulate_Dialog:
 
         vbox_sim = gtk.VBox()
         self._entry_sim = gtk.Entry()
-        self._entry_sim.set_text("gnucap -b demo.cir")
+        self._entry_sim.set_text(actions['run_simulator'][1])
         self._ckbutton_sim = gtk.CheckButton("Run simulator")
-        self._ckbutton_sim.set_active(True)
+        self._ckbutton_sim.set_active(actions['run_netlister'][0])
         self._ckbutton_sim.connect('toggled', self._check_button_toggled,\
                                         self._entry_sim)
         vbox_sim.pack_start(self._ckbutton_sim)
         vbox_sim.pack_start(self._entry_sim)
         self._dlg.vbox.pack_start(vbox_sim)
         self._ckbutton_upd = gtk.CheckButton("Update readers")
-        self._ckbutton_upd.set_active(True)
+        self._ckbutton_upd.set_active(actions['update'])
         self._dlg.vbox.pack_start(self._ckbutton_upd)
         self._dlg.show_all()
 

@@ -260,8 +260,12 @@ class App(object):
         self._ctxt.update()
 
     def _action_netlist_and_simulate(self, action):
+        actions = {'run_netlister': (True, "gnetlist -s -o demo.cir -g spice-sdb demo.sch"),\
+                       'run_simulator': (True, "gnucap -b demo.cir"),\
+                       'update': True}
+
         netnsimdlg = gui.dialogs.Run_Netlister_and_Simulate_Dialog()
-        netnsimdlg.display()
+        netnsimdlg.display(actions)
         actions = netnsimdlg.run()
         if actions:
             if actions['run_netlister'][0]:
