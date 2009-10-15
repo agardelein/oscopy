@@ -96,21 +96,24 @@ class Run_Netlister_and_Simulate_Dialog:
                                       buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
                                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         vbox_netl = gtk.VBox()
-        self._ckbutton_netl = gtk.CheckButton("Run netlister")
-        self._ckbutton_netl.set_active(True)
-        vbox_netl.pack_start(self._ckbutton_netl)
         self._entry_netl = gtk.Entry()
         self._entry_netl.set_text("gnetlist -s -o demo.cir -g spice-sdb demo.sch")
+        self._ckbutton_netl = gtk.CheckButton("Run netlister")
+        self._ckbutton_netl.set_active(True)
+        self._ckbutton_netl.connect('toggled', self._check_button_toggled,\
+                                        self._entry_netl)
+        vbox_netl.pack_start(self._ckbutton_netl)
         vbox_netl.pack_start(self._entry_netl)
         self._dlg.vbox.pack_start(vbox_netl)
-        vbox_netl = gtk.VBox()
 
         vbox_sim = gtk.VBox()
-        self._ckbutton_sim = gtk.CheckButton("Run simulator")
-        self._ckbutton_sim.set_active(True)
-        vbox_sim.pack_start(self._ckbutton_sim)
         self._entry_sim = gtk.Entry()
         self._entry_sim.set_text("gnucap -b demo.cir")
+        self._ckbutton_sim = gtk.CheckButton("Run simulator")
+        self._ckbutton_sim.set_active(True)
+        self._ckbutton_sim.connect('toggled', self._check_button_toggled,\
+                                        self._entry_sim)
+        vbox_sim.pack_start(self._ckbutton_sim)
         vbox_sim.pack_start(self._entry_sim)
         self._dlg.vbox.pack_start(vbox_sim)
         self._ckbutton_upd = gtk.CheckButton("Update readers")
@@ -132,3 +135,9 @@ class Run_Netlister_and_Simulate_Dialog:
             actions['update'] = self._ckbutton_netl.get_active()
         self._dlg.destroy()
         return actions
+
+    def _check_button_toggled(self, button, entry=None):
+        if entry is not None:
+            entry.set_editable(button.get_active())
+            print "Here", entry.get_text(), entry.get_editable(), button.get_active()
+        pass
