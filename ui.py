@@ -2,7 +2,9 @@ import gobject
 import gtk
 import signal
 import commands
-import xdg
+import ConfigParser
+import os
+from xdg import BaseDirectory
 
 import oscopy
 
@@ -34,9 +36,7 @@ class App(object):
     def __init__(self):
         self._scale_to_str = {'lin': 'Linear', 'logx': 'LogX', 'logy': 'LogY',\
                                   'loglog': 'Loglog'}
-        self._actions = {'run_netlister': (True, "gnetlist -s -o demo.cir -g spice-sdb demo.sch"),\
-                       'run_simulator': (True, "gnucap -b demo.cir"),\
-                       'update': True}
+        self._configfile = "gui"
         self._figcount = 0
         self._windows_to_figures = {}
         self._current_graph = None
@@ -47,6 +47,8 @@ class App(object):
         self._to_figure = [("oscopy-signals", gtk.TARGET_SAME_APP,\
                                 self._TARGET_TYPE_SIGNAL)]
         self._ctxt = oscopy.Context()
+        self._resource = "oscopy"
+        self._read_config()
         self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)
         self._create_widgets()
         self._add_file('demo/irf540.dat')
@@ -108,6 +110,7 @@ class App(object):
         
 
     def _action_quit(self, action):
+        self._write_config()
         main_loop.quit()
 
     def _create_menubar(self):
@@ -299,6 +302,36 @@ class App(object):
                 self._current_graph.insert(signals)
                 if self._current_figure.canvas is not None:
                     self._current_figure.canvas.draw()
+
+    def _read_config(self):
+        cmdsec = 'Commands'
+        netlopt = 'Netlister'
+        simopt = 'Simulator'
+        path = BaseDirectory.load_first_config(self._resource)
+        self._confparse = ConfigParser.SafeConfigParser()
+        res = self._confparse.read('/'.join((path, self._configfile)))
+        if not res:
+            self._confparse.add_section(cmdsec)
+            self._confparse.set(cmdsec, netlopt, '')
+            self._confparse.set(cmdsec, simopt, '')
+            
+        self._actions = {'run_netlister': (True,
+                                           self._confparse.get(cmdsec, netlopt)),
+                         'run_simulator': (True,
+                                           self._confparse.get(cmdsec, simopt)),
+                         'update': True}
+
+    def _write_config(self):
+        cmdsec = 'Commands'
+        netlopt = 'Netlister'
+        simopt = 'Simulator'
+        self._confparse.set(cmdsec, netlopt, self._actions['run_netlister'][1])
+        self._confparse.set(cmdsec, simopt, self._actions['run_simulator'][1])
+        path = BaseDirectory.save_config_path(self._resource)
+        f = open('/'.join((path, self._configfile)), 'w')
+        res = self._confparse.write(f)
+        f.close()
+
         
 def usr1_handler(signum, frame):
     app.update_from_usr1()
