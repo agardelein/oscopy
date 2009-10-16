@@ -11,6 +11,7 @@ class Enter_Units_Dialog(object):
         self._dlg = gtk.Dialog('Enter graph units',
                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        self._dlg.set_default_response(gtk.RESPONSE_ACCEPT)
         table = gtk.Table(2, 2, False)
         table.set_col_spacing(0, 12)
         table.set_col_spacing(1, 12)
@@ -50,6 +51,7 @@ class Enter_Range_Dialog(object):
         self._dlg = gtk.Dialog('Enter graph range',
                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        self._dlg.set_default_response(gtk.RESPONSE_ACCEPT)
         # Label and entry for X axis
         self._entries = []
         xy = ['X', 'Y']
@@ -95,6 +97,7 @@ class Run_Netlister_and_Simulate_Dialog:
         self._dlg = gtk.Dialog("Run netlister and simulate",
                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        self._dlg.set_default_response(gtk.RESPONSE_ACCEPT)
         vbox_netl = gtk.VBox()
         self._entry_netl = gtk.Entry()
         self._entry_netl.set_text(actions['run_netlister'][1])
