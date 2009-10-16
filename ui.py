@@ -2,6 +2,7 @@ import gobject
 import gtk
 import signal
 import commands
+import xdg
 
 import oscopy
 
@@ -33,6 +34,9 @@ class App(object):
     def __init__(self):
         self._scale_to_str = {'lin': 'Linear', 'logx': 'LogX', 'logy': 'LogY',\
                                   'loglog': 'Loglog'}
+        self._actions = {'run_netlister': (True, "gnetlist -s -o demo.cir -g spice-sdb demo.sch"),\
+                       'run_simulator': (True, "gnucap -b demo.cir"),\
+                       'update': True}
         self._figcount = 0
         self._windows_to_figures = {}
         self._current_graph = None
@@ -260,25 +264,22 @@ class App(object):
         self._ctxt.update()
 
     def _action_netlist_and_simulate(self, action):
-        actions = {'run_netlister': (True, "gnetlist -s -o demo.cir -g spice-sdb demo.sch"),\
-                       'run_simulator': (True, "gnucap -b demo.cir"),\
-                       'update': True}
-
         netnsimdlg = gui.dialogs.Run_Netlister_and_Simulate_Dialog()
-        netnsimdlg.display(actions)
+        netnsimdlg.display(self._actions)
         actions = netnsimdlg.run()
-        if actions:
-            if actions['run_netlister'][0]:
-                res = commands.getstatusoutput(actions['run_netlister'][1])
+        if actions is not None:
+            self._actions = actions
+            if self._actions['run_netlister'][0]:
+                res = commands.getstatusoutput(self._actions['run_netlister'][1])
                 if res[0]:
                     report_error(self._mainwindow, res[1])
                 print res[1]
-            if actions['run_simulator'][0]:
-                res = commands.getstatusoutput(actions['run_simulator'][1])
+            if self._actions['run_simulator'][0]:
+                res = commands.getstatusoutput(self._actions['run_simulator'][1])
                 if res[0]:
                     report_error(self._mainwindow, res[1])
                 print res[1]
-            if actions['update']:
+            if self._actions['update']:
                 self._ctxt.update()
 
     def _drag_data_get_cb(self, widget, drag_context, selection, target_type,\

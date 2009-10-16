@@ -93,8 +93,8 @@ class Run_Netlister_and_Simulate_Dialog:
         # Define functions to enable/disable entries upon toggle buttons
         # make window a bit larger
         self._dlg = gtk.Dialog("Run netlister and simulate",\
-                                      buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
-                                                   gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
+                                                gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         vbox_netl = gtk.VBox()
         self._entry_netl = gtk.Entry()
         self._entry_netl.set_text(actions['run_netlister'][1])
@@ -103,6 +103,7 @@ class Run_Netlister_and_Simulate_Dialog:
         self._ckbutton_netl.connect('toggled', self._check_button_toggled,\
                                         self._entry_netl)
         vbox_netl.pack_start(self._ckbutton_netl)
+        self._entry_netl.set_editable(self._ckbutton_netl.get_active())
         vbox_netl.pack_start(self._entry_netl)
         self._dlg.vbox.pack_start(vbox_netl)
 
@@ -110,10 +111,11 @@ class Run_Netlister_and_Simulate_Dialog:
         self._entry_sim = gtk.Entry()
         self._entry_sim.set_text(actions['run_simulator'][1])
         self._ckbutton_sim = gtk.CheckButton("Run simulator")
-        self._ckbutton_sim.set_active(actions['run_netlister'][0])
+        self._ckbutton_sim.set_active(actions['run_simulator'][0])
         self._ckbutton_sim.connect('toggled', self._check_button_toggled,\
                                         self._entry_sim)
         vbox_sim.pack_start(self._ckbutton_sim)
+        self._entry_sim.set_editable(self._ckbutton_sim.get_active())
         vbox_sim.pack_start(self._entry_sim)
         self._dlg.vbox.pack_start(vbox_sim)
         self._ckbutton_upd = gtk.CheckButton("Update readers")
@@ -123,22 +125,20 @@ class Run_Netlister_and_Simulate_Dialog:
         self._dlg.show_all()
 
     def run(self):
-        actions = {}
-        # 1 -> run netlister
-        # 2 -> run simulator
-        # 4 -> update signals
         resp = self._dlg.run()
         if resp == gtk.RESPONSE_ACCEPT:
+            actions = {}
             actions['run_netlister'] = (self._ckbutton_netl.get_active(),\
                                             self._entry_netl.get_text())
             actions['run_simulator'] = (self._ckbutton_sim.get_active(),\
                                             self._entry_sim.get_text())
-            actions['update'] = self._ckbutton_netl.get_active()
-        self._dlg.destroy()
-        return actions
+            actions['update'] = self._ckbutton_upd.get_active()
+            self._dlg.destroy()
+            return actions
+        else:
+            self._dlg.destroy()
+            return None
 
     def _check_button_toggled(self, button, entry=None):
         if entry is not None:
             entry.set_editable(button.get_active())
-            print "Here", entry.get_text(), entry.get_editable(), button.get_active()
-        pass
