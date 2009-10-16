@@ -124,6 +124,23 @@ class Run_Netlister_and_Simulate_Dialog:
         self._ckbutton_upd = gtk.CheckButton("Update readers")
         self._ckbutton_upd.set_active(actions['update'])
         self._dlg.vbox.pack_start(self._ckbutton_upd)
+
+        hbox = gtk.HBox(False, 12)
+        label = gtk.Label()
+        label.set_markup('<b>Run from:</b>')
+        hbox.pack_start(label)
+        dialog = gtk.FileChooserDialog('Run netlister and simulator in directory...',
+                                       None,
+                                       gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                       buttons=(gtk.STOCK_CANCEL,
+                                                gtk.RESPONSE_REJECT,
+                                                gtk.STOCK_OK,
+                                                gtk.RESPONSE_ACCEPT))
+        dialog.set_filename(actions['run_from'])
+        self._filechoose = gtk.FileChooserButton(dialog)
+        hbox.pack_start(self._filechoose)
+        self._dlg.vbox.pack_start(hbox)
+
         self._dlg.resize(300, 100)
         self._dlg.show_all()
 
@@ -136,6 +153,7 @@ class Run_Netlister_and_Simulate_Dialog:
             actions['run_simulator'] = (self._ckbutton_sim.get_active(),
                                         self._entry_sim.get_text())
             actions['update'] = self._ckbutton_upd.get_active()
+            actions['run_from'] = self._filechoose.get_filename()
             self._dlg.destroy()
             return actions
         else:

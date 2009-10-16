@@ -272,6 +272,8 @@ class App(object):
         actions = netnsimdlg.run()
         if actions is not None:
             self._actions = actions
+            old_dir = os.getcwd()
+            os.chdir(self._actions['run_from'])
             if self._actions['run_netlister'][0]:
                 res = commands.getstatusoutput(self._actions['run_netlister'][1])
                 if res[0]:
@@ -282,6 +284,7 @@ class App(object):
                 if res[0]:
                     report_error(self._mainwindow, res[1])
                 print res[1]
+            os.chdir(old_dir)
             if self._actions['update']:
                 self._ctxt.update()
 
@@ -307,6 +310,7 @@ class App(object):
         cmdsec = 'Commands'
         netlopt = 'Netlister'
         simopt = 'Simulator'
+        runfrom = "RunFrom"
         path = BaseDirectory.load_first_config(self._resource)
         self._confparse = ConfigParser.SafeConfigParser()
         res = self._confparse.read('/'.join((path, self._configfile)))
@@ -314,19 +318,23 @@ class App(object):
             self._confparse.add_section(cmdsec)
             self._confparse.set(cmdsec, netlopt, '')
             self._confparse.set(cmdsec, simopt, '')
+            self._confparse.set(cmdsec, runfrom, '.')
             
         self._actions = {'run_netlister': (True,
                                            self._confparse.get(cmdsec, netlopt)),
                          'run_simulator': (True,
                                            self._confparse.get(cmdsec, simopt)),
-                         'update': True}
+                         'update': True,
+                         'run_from': self._confparse.get(cmdsec, runfrom)}
 
     def _write_config(self):
         cmdsec = 'Commands'
         netlopt = 'Netlister'
         simopt = 'Simulator'
+        runfrom = "RunFrom"
         self._confparse.set(cmdsec, netlopt, self._actions['run_netlister'][1])
         self._confparse.set(cmdsec, simopt, self._actions['run_simulator'][1])
+        self._confparse.set(cmdsec, runfrom, self._actions['run_from'])
         path = BaseDirectory.save_config_path(self._resource)
         f = open('/'.join((path, self._configfile)), 'w')
         res = self._confparse.write(f)
