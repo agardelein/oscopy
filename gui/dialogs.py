@@ -8,9 +8,9 @@ class Enter_Units_Dialog(object):
         pass
 
     def display(self, units):
-        self._dlg = gtk.Dialog('Enter graph units',\
-                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
-                                               gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        self._dlg = gtk.Dialog('Enter graph units',
+                               buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                                        gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         table = gtk.Table(2, 2, False)
         table.set_col_spacing(0, 12)
         table.set_col_spacing(1, 12)
@@ -36,8 +36,8 @@ class Enter_Units_Dialog(object):
         units = ()
         resp = self._dlg.run()
         if resp == gtk.RESPONSE_ACCEPT:
-            units = (self._entry_xunits.get_text(),\
-                         self._entry_yunits.get_text())
+            units = (self._entry_xunits.get_text(),
+                     self._entry_yunits.get_text())
         self._dlg.destroy()
         return units
 
@@ -47,9 +47,9 @@ class Enter_Range_Dialog(object):
         self._entries = None
 
     def display(self, r):
-        self._dlg = gtk.Dialog('Enter graph range',\
-                             buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
-                                          gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        self._dlg = gtk.Dialog('Enter graph range',
+                               buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                                        gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         # Label and entry for X axis
         self._entries = []
         xy = ['X', 'Y']
@@ -77,10 +77,10 @@ class Enter_Range_Dialog(object):
         r = []
         resp = self._dlg.run()
         if resp == gtk.RESPONSE_ACCEPT:
-            r = [float(self._entries[0][0].get_text()),\
-                     float(self._entries[0][1].get_text()),\
-                     float(self._entries[1][0].get_text()),\
-                     float(self._entries[1][1].get_text())]
+            r = [float(self._entries[0][0].get_text()),
+                 float(self._entries[0][1].get_text()),
+                 float(self._entries[1][0].get_text()),
+                 float(self._entries[1][1].get_text())]
         self._dlg.destroy()
         return r
 
@@ -92,16 +92,16 @@ class Run_Netlister_and_Simulate_Dialog:
     def display(self, actions):
         # Define functions to enable/disable entries upon toggle buttons
         # make window a bit larger
-        self._dlg = gtk.Dialog("Run netlister and simulate",\
-                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
-                                                gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        self._dlg = gtk.Dialog("Run netlister and simulate",
+                               buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                                        gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         vbox_netl = gtk.VBox()
         self._entry_netl = gtk.Entry()
         self._entry_netl.set_text(actions['run_netlister'][1])
         self._ckbutton_netl = gtk.CheckButton("Run netlister")
         self._ckbutton_netl.set_active(actions['run_netlister'][0])
-        self._ckbutton_netl.connect('toggled', self._check_button_toggled,\
-                                        self._entry_netl)
+        self._ckbutton_netl.connect('toggled', self._check_button_toggled,
+                                    self._entry_netl)
         vbox_netl.pack_start(self._ckbutton_netl)
         self._entry_netl.set_editable(self._ckbutton_netl.get_active())
         vbox_netl.pack_start(self._entry_netl)
@@ -112,8 +112,8 @@ class Run_Netlister_and_Simulate_Dialog:
         self._entry_sim.set_text(actions['run_simulator'][1])
         self._ckbutton_sim = gtk.CheckButton("Run simulator")
         self._ckbutton_sim.set_active(actions['run_simulator'][0])
-        self._ckbutton_sim.connect('toggled', self._check_button_toggled,\
-                                        self._entry_sim)
+        self._ckbutton_sim.connect('toggled', self._check_button_toggled,
+                                   self._entry_sim)
         vbox_sim.pack_start(self._ckbutton_sim)
         self._entry_sim.set_editable(self._ckbutton_sim.get_active())
         vbox_sim.pack_start(self._entry_sim)
@@ -128,10 +128,10 @@ class Run_Netlister_and_Simulate_Dialog:
         resp = self._dlg.run()
         if resp == gtk.RESPONSE_ACCEPT:
             actions = {}
-            actions['run_netlister'] = (self._ckbutton_netl.get_active(),\
-                                            self._entry_netl.get_text())
-            actions['run_simulator'] = (self._ckbutton_sim.get_active(),\
-                                            self._entry_sim.get_text())
+            actions['run_netlister'] = (self._ckbutton_netl.get_active(),
+                                        self._entry_netl.get_text())
+            actions['run_simulator'] = (self._ckbutton_sim.get_active(),
+                                        self._entry_sim.get_text())
             actions['update'] = self._ckbutton_upd.get_active()
             self._dlg.destroy()
             return actions
