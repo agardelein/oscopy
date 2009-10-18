@@ -145,7 +145,6 @@ class App(object):
         tv.append_column(col)
         tv.set_model(self._store)
         tv.connect('row-activated', self._row_activated)
-        tv.connect('button-press-event', self._treeview_button_press)
         tv.connect('drag_data_get', self._drag_data_get_cb)
         tv.drag_source_set(gtk.gdk.BUTTON1_MASK,\
                                self._from_signal_list,\
@@ -186,28 +185,6 @@ class App(object):
     def _create_figure_popup_menu(self, figure, graph):
         figmenu = gui.menus.FigureMenu()
         return figmenu.create_menu(self._store, figure, graph)
-
-    def _create_treeview_popup_menu(self, signals, path):
-        menu = gtk.Menu()
-        if not signals:
-            item_none = gtk.MenuItem("No signal selected")
-            menu.append(item_none)
-            return menu
-        for name, signal in signals.iteritems():
-            item_freeze = gtk.CheckMenuItem("Freeze %s" % name)
-            item_freeze.set_active(signal.freeze)
-            item_freeze.connect('activate',\
-                                    self._signal_freeze_menu_item_activated,\
-                                    (signal, path))
-        menu.append(item_freeze)
-        return menu
-
-    def _signal_freeze_menu_item_activated(self, menuitem, data):
-        signal, path = data
-        signal.freeze = not signal.freeze
-        self._store[path][2] = signal.freeze
-        # Modify also the signal in the treeview
-        # (italic font? gray font color? a freeze column?)
 
     def _treeview_button_press(self, widget, event):
         if event.button == 3:
