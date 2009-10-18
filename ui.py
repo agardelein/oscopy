@@ -49,10 +49,11 @@ class App(object):
         self._ctxt = oscopy.Context()
         self._resource = "oscopy"
         self._read_config()
-        self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)
+        self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT,
+                                    gobject.TYPE_BOOLEAN)
         self._create_widgets()
         self._add_file('demo/irf540.dat')
-        #self._add_file('demo/ac.dat')
+        self._add_file('demo/ac.dat')
         #self._add_file('demo/res.dat')
 
     def _add_file(self, filename):
@@ -62,9 +63,9 @@ class App(object):
             report_error(self._mainwindow,
                          'Could not find a reader for %s' % filename)
             return
-        it = self._store.append(None, (filename, None))
+        it = self._store.append(None, (filename, None, False))
         for name, sig in self._ctxt.readers[filename].signals.iteritems():
-            self._store.append(it, (name, sig))
+            self._store.append(it, (name, sig, sig.freeze))
 
     def _action_add_file(self, action):
         dlg = gtk.FileChooserDialog('Add file', parent=self._mainwindow,
@@ -102,9 +103,9 @@ class App(object):
                 report_error(self._mainwindow,
                              'Could not find a reader for %s' % expr)
                 return
-            it = self._store.append(None, (expr, None))
+            it = self._store.append(None, (expr, None, False))
             for name, sig in self._ctxt.readers[expr].signals.iteritems():
-                self._store.append(it, (name, sig))
+                self._store.append(it, (name, sig, sig.freeze))
 
         dlg.destroy()
         
@@ -149,7 +150,17 @@ class App(object):
         tv.drag_source_set(gtk.gdk.BUTTON1_MASK,\
                                self._from_signal_list,\
                                gtk.gdk.ACTION_COPY)
+        self._togglecell = gtk.CellRendererToggle()
+        self._togglecell.set_property('activatable', True)
+        self._togglecell.connect('toggled', self._cell_toggled, None)
+        colfreeze = gtk.TreeViewColumn('Freeze', self._togglecell)
+        colfreeze.add_attribute(self._togglecell, 'active', 2)
+        tv.append_column(colfreeze)
         return tv
+
+    def _cell_toggled(self, cellrenderer, path, data):
+        self._store[path][1].freeze = not self._store[path][1].freeze
+        self._store[path][2] = self._store[path][1].freeze
 
     def _create_widgets(self):
         accel_group, self._menubar = self._create_menubar()
@@ -176,7 +187,7 @@ class App(object):
         figmenu = gui.menus.FigureMenu()
         return figmenu.create_menu(self._store, figure, graph)
 
-    def _create_treeview_popup_menu(self, signals):
+    def _create_treeview_popup_menu(self, signals, path):
         menu = gtk.Menu()
         if not signals:
             item_none = gtk.MenuItem("No signal selected")
@@ -187,12 +198,14 @@ class App(object):
             item_freeze.set_active(signal.freeze)
             item_freeze.connect('activate',\
                                     self._signal_freeze_menu_item_activated,\
-                                    (signal))
+                                    (signal, path))
         menu.append(item_freeze)
         return menu
 
-    def _signal_freeze_menu_item_activated(self, menuitem, signal):
+    def _signal_freeze_menu_item_activated(self, menuitem, data):
+        signal, path = data
         signal.freeze = not signal.freeze
+        self._store[path][2] = signal.freeze
         # Modify also the signal in the treeview
         # (italic font? gray font color? a freeze column?)
 
@@ -205,7 +218,7 @@ class App(object):
             tv.set_cursor(path)
             row = self._store[path]
             signals = {row[0]: row[1]}
-            menu = self._create_treeview_popup_menu(signals)
+            menu = self._create_treeview_popup_menu(signals, path)
             menu.show_all()
             menu.popup(None, None, None, event.button, event.time)
 
