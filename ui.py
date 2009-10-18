@@ -140,8 +140,10 @@ class App(object):
         return uimanager.get_accel_group(), uimanager.get_widget('/MenuBar')
 
     def _create_treeview(self):
-        col = gtk.TreeViewColumn('Signal', gtk.CellRendererText(), text=0)
+        celltext = gtk.CellRendererText()
+        col = gtk.TreeViewColumn('Signal', celltext, text=0)
         tv = gtk.TreeView()
+        col.set_cell_data_func(celltext, self._reader_name_in_bold)
         tv.append_column(col)
         tv.set_model(self._store)
         tv.connect('row-activated', self._row_activated)
@@ -157,9 +159,17 @@ class App(object):
         tv.append_column(colfreeze)
         return tv
 
+    def _reader_name_in_bold(self, column, cell, model, iter, data=None):
+        if len(model.get_path(iter)) == 1:
+            cell.set_property('markup', "<b>" + model.get_value(iter, 0) +\
+                                  "</b>")
+        else:
+            cell.set_property('text', model.get_value(iter, 0))
+
     def _cell_toggled(self, cellrenderer, path, data):
-        self._store[path][1].freeze = not self._store[path][1].freeze
-        self._store[path][2] = self._store[path][1].freeze
+        if len(path) == 3:
+            self._store[path][1].freeze = not self._store[path][1].freeze
+            self._store[path][2] = self._store[path][1].freeze
 
     def _create_widgets(self):
         accel_group, self._menubar = self._create_menubar()
