@@ -301,10 +301,9 @@ class App(object):
                               time):
         if target_type == self._TARGET_TYPE_SIGNAL:
             tv = widget
-            (path, col) = tv.get_cursor()
-            row = self._store[path]
-            print row[0]
-            selection.set(selection.target, 8, row[0])
+            sel = tv.get_selection()
+            (model, iter) = sel.get_selected()
+            selection.set(selection.target, 8, model.get_value(iter, 0))
 
     def _drag_data_received_cb(self, widget, drag_context, x, y, selection,\
                                    target_type, time):
