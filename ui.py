@@ -170,6 +170,15 @@ class App(object):
         if len(path) == 3:
             self._store[path][1].freeze = not self._store[path][1].freeze
             self._store[path][2] = self._store[path][1].freeze
+        elif len(path) == 1:
+            parent = self._store.get_iter(path)
+            freeze = not self._store.get_value(parent, 2)
+            self._store.set_value(parent, 2, freeze)
+            iter = self._store.iter_children(parent)
+            while iter:
+                self._store.get_value(iter, 1).freeze = freeze 
+                self._store.set_value(iter, 2, freeze)
+                iter = self._store.iter_next(iter)
 
     def _create_widgets(self):
         accel_group, self._menubar = self._create_menubar()
