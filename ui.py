@@ -157,6 +157,7 @@ class App(object):
         colfreeze = gtk.TreeViewColumn('Freeze', self._togglecell)
         colfreeze.add_attribute(self._togglecell, 'active', 2)
         tv.append_column(colfreeze)
+        tv.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         return tv
 
     def _reader_name_in_bold(self, column, cell, model, iter, data=None):
@@ -302,14 +303,21 @@ class App(object):
         if target_type == self._TARGET_TYPE_SIGNAL:
             tv = widget
             sel = tv.get_selection()
-            (model, iter) = sel.get_selected()
-            selection.set(selection.target, 8, model.get_value(iter, 0))
+            (model, pathlist) = sel.get_selected_rows()
+            iter = self._store.get_iter(pathlist[0])
+            data = " ".join(map(lambda x:self._store[x][1].name, pathlist))
+            selection.set(selection.target, 8, data)
+            # The multiple selection do work, but how to select signals
+            # that are not neighbours in the list? Ctrl+left do not do
+            # anything, neither alt+left or shift+left!
 
     def _drag_data_received_cb(self, widget, drag_context, x, y, selection,\
                                    target_type, time):
         if target_type == self._TARGET_TYPE_SIGNAL:
             if self._current_graph is not None:
-                signals = {selection.data: self._ctxt.signals[selection.data]}
+                signals = {}
+                for name in selection.data.split():
+                    signals[name] = self._ctxt.signals[name]
                 self._current_graph.insert(signals)
                 if self._current_figure.canvas is not None:
                     self._current_figure.canvas.draw()
