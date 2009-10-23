@@ -21,7 +21,7 @@ class OscopyApp(object):
     See Cmd for more help
     """
     def __init__(self):
-        self.cmds = oscopy.Context()
+        self._ctxt = oscopy.Context()
         # Prompt
         p = "oscopy> "
         # History file
@@ -85,8 +85,8 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "Usage : create [SIG [, SIG [, SIG]...]]"
             print "   Create a new figure, set_ it as current, add the signals"
             return
-        self.cmds.create(self.get_signames(args))
-        self._current_figure = self.cmds.figures[len(self.cmds.figures) - 1]
+        self._ctxt.create(self.get_signames(args))
+        self._current_figure = self._ctxt.figures[len(self._ctxt.figures) - 1]
         if self._current_figure.graphs:
             self._current_graph =\
                 self._current_figure.graphs[len(\
@@ -99,10 +99,10 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "Usage : destroy FIG#"
             print "   Destroy a figure"
             return        
-        self.cmds.destroy(eval(args))
+        self._ctxt.destroy(eval(args))
         # Go back to the first graph of the first figure or None
-        if len(self.cmds.figures):
-            self._current_figure = self.cmds.figures[0]
+        if len(self._ctxt.figures):
+            self._current_figure = self._ctxt.figures[0]
             if self._current_figure.graphs:
                 self._current_graph = self._current_figure.graphs[0]
             else:
@@ -123,8 +123,8 @@ FITNESS FOR A PARTICULAR PURPOSE."
         else:
             print "Usage: select FIG#-GRAPH#"
             return
-#        self.cmds.current = num, gn
-        self._current_figure = self.cmds.figures[num - 1]
+#        self._ctxt.current = num, gn
+        self._current_figure = self._ctxt.figures[num - 1]
         self._current_graph = self._current_figure.graphs[gn - 1]
 
     def layout(self, args):
@@ -142,7 +142,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
             return
 
         SEPARATOR = " "
-        for fn, f in enumerate(self.cmds.figures):
+        for fn, f in enumerate(self._ctxt.figures):
             print "%s Figure %d: %s" %\
                 ([" ", "*"][f == self._current_figure],\
                      fn + 1, f.layout)
@@ -157,12 +157,12 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "Usage : plot"
             print "   Draw and show the figures"
             return
-        if self._figcount == len(self.cmds.figures):
+        if self._figcount == len(self._ctxt.figures):
             self._main_loop.run()
         else:
             # Create a window for each figure, add navigation toolbar
             self._figcount = 0
-            for i, f in enumerate(self.cmds.figures):
+            for i, f in enumerate(self._ctxt.figures):
                 # fig = plt.figure(i + 1)
                 w = gtk.Window()
                 self._figcount += 1
@@ -192,7 +192,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
             return
         fn = args
         try:
-            self.cmds.read(fn)
+            self._ctxt.read(fn)
         except ReadError, e:
             print "Failed to read %s:" % fn, e
             return
@@ -222,7 +222,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
                 if len(tmp) == 2:
                     opts[tmp[0]] = tmp[1]
         try:
-            self.cmds.write(fn, fmt, sns, opts)
+            self._ctxt.write(fn, fmt, sns, opts)
         except WriteError, e:
             print "Write error:", e
             return
@@ -236,10 +236,10 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "   Reread data files"
             return
         if not args:
-            self.cmds.update()
+            self._ctxt.update()
         else:
-            if self.cmds.readers.has_key(args):
-                self.cmds.update(self.cmds.readers[args])
+            if self._ctxt.readers.has_key(args):
+                self._ctxt.update(self._ctxt.readers[args])
             else:
                 print "%s not found in readers" % args
 
@@ -249,15 +249,15 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "   Add a graph to the current figure"
             return
         if self._current_figure is not None:
-            self._current_figure.add(self.cmds.names_to_signals(\
+            self._current_figure.add(self._ctxt.names_to_signals(\
                     self.get_signames(args)))
             self._current_graph =\
                 self._current_figure.graphs[len(\
                     self._current_figure.graphs) - 1]
         else:
-            self.cmds.create(self.get_signames(args))
-            if self.cmds.figures:
-                self._current_figure = self.cmds.figures[0]
+            self._ctxt.create(self.get_signames(args))
+            if self._ctxt.figures:
+                self._current_figure = self._ctxt.figures[0]
             else:
                 print "Create failed"
 
@@ -340,7 +340,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
             return
         if self._current_graph is None:
             return
-        self._current_graph.insert(self.cmds.names_to_signals(\
+        self._current_graph.insert(self._ctxt.names_to_signals(\
                 self.get_signames(args)))
 
     def remove(self, args):
@@ -350,20 +350,20 @@ FITNESS FOR A PARTICULAR PURPOSE."
             return
         if self._current_graph is None:
             return
-        self._current_graph.remove(self.cmds.names_to_signals(\
+        self._current_graph.remove(self._ctxt.names_to_signals(\
                 self.get_signames(args)))
 
     def freeze(self, args):
         if args == "help":
             print "Usage: freeze SIG [, SIG [, SIG]...]"
             print "   Do not consider signal for subsequent updates"
-        self.cmds.freeze(self.get_signames(args))
+        self._ctxt.freeze(self.get_signames(args))
 
     def unfreeze(self, args):
         if args == "help":
             print "Usage: unfreeze SIG [, SIG [, SIG]...]"
             print "   Consider signal for subsequent updates"
-        self.cmds.unfreeze(self.get_signames(args))
+        self._ctxt.unfreeze(self.get_signames(args))
 
     def siglist(self, args):
         if args == "help":
@@ -374,7 +374,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
         HEADER=["Name", "Unit", "Ref", "Reader","Last updated (sec)"]
         print SEPARATOR.join(HEADER)
         t = time.time()
-        for reader_name, reader in self.cmds.readers.iteritems():
+        for reader_name, reader in self._ctxt.readers.iteritems():
             for signal_name, signal in reader.signals.iteritems():
                 print SEPARATOR.join((signal_name, \
                                           signal.unit,\
@@ -388,7 +388,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
             print "   Define a new signal destsig using mathematical expression"
             return
         try:
-            self.cmds.math(inp)
+            self._ctxt.math(inp)
         except ReadError, e:
             print "Error creating signal from math expression", e
             return
