@@ -22,9 +22,12 @@ class OscopyApp(Cmd):
     """ Analyse command arguments and call function from Cmd
     See Cmd for more help
     """
-    def __init__(self):
+    def __init__(self, context=None):
         Cmd.__init__(self)
-        self._ctxt = oscopy.Context()
+        if context is None or not isinstance(context, oscopy.Context):
+            self._ctxt = oscopy.Context()
+        else:
+            self._ctxt = context
 
         # Prompt and intro
         self.prompt = "oscopy> "
