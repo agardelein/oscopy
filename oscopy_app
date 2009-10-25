@@ -2,6 +2,7 @@
 """
 Sample command line application
 """
+from __future__ import with_statement
 import gobject
 import gtk
 
@@ -12,18 +13,28 @@ import time
 from optparse import OptionParser
 import oscopy
 from oscopy.readers.reader import ReadError
+from cmd import Cmd
 
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 
-class OscopyApp(object):
+class OscopyApp(Cmd):
     """ Analyse command arguments and call function from Cmd
     See Cmd for more help
     """
     def __init__(self):
+        Cmd.__init__(self)
         self._ctxt = oscopy.Context()
-        # Prompt
-        p = "oscopy> "
+
+        # Prompt and intro
+        self.prompt = "oscopy> "
+        self.intro = "This is oscopy, a program to view electrical simulation results\n\
+Copyright (C) 2009 Arnaud Gardelein.\n\
+This is free software, you are invited to redistribute it \n\
+under certain conditions.\n\
+There is ABSOLUTELY NO WARRANTY; not even for MERCHANTIBILITY or\n\
+FITNESS FOR A PARTICULAR PURPOSE."
+
         # History file
         self.hist_file = ".oscopy_hist"
 
@@ -34,57 +45,15 @@ class OscopyApp(object):
             f.close()
         readline.read_history_file(self.hist_file)
 
-        # Parse command line arguments
-        # Current options:
-        #   -b : batch mode, read commands from file
-        #   -i : interactive mode, do not quit at the end of batch file
-        #   -q : do not display startup message
-        parser = OptionParser()
-        parser.add_option("-b", "--batch", dest="fn",\
-                              help="Execute commands in FILE then exit",\
-                              metavar="FILE")
-        parser.add_option("-i", "--interactive", action="store_true",\
-                              dest="inter",\
-                              help="Go to interactive mode after executing batch file")
-        parser.add_option("-q", "--quiet", action="store_true",\
-                              dest="quiet",\
-                              help="Do not display startup message")
-        (options, args) = parser.parse_args()
-        if options.fn is None:
-            f = None
-        else:
-            try:
-                f = open(options.fn, 'r')
-            except IOError, e:
-                print "Unable to access batch file:", e
-                f = None
-        if options.inter == True:
-            batch = False
-        else:
-            batch = True
-
-        # Startup message
-        if options.quiet is None:
-            print "This is oscopy, a program to view electrical simulation results\n\
-Copyright (C) 2009 Arnaud Gardelein.\n\
-This is free software, you are invited to redistribute it \n\
-under certain conditions.\n\
-There is ABSOLUTELY NO WARRANTY; not even for MERCHANTIBILITY or\n\
-FITNESS FOR A PARTICULAR PURPOSE."
-
         # Current graph and current figure
         self._current_figure = None
         self._current_graph = None
         self._figcount = 0
 
-        # Start main loop
-        self.loop(p, f, batch)
-
-    def create(self, args):
-        if args == "help":
-            print "Usage : create [SIG [, SIG [, SIG]...]]"
-            print "   Create a new figure, set_ it as current, add the signals"
-            return
+    def help_create(self):
+        print "create [SIG [, SIG [, SIG]...]]"
+        print "   Create a new figure, set_ it as current, add the signals"
+    def do_create(self, args):
         self._ctxt.create(self.get_signames(args))
         self._current_figure = self._ctxt.figures[len(self._ctxt.figures) - 1]
         if self._current_figure.graphs:
@@ -94,11 +63,10 @@ FITNESS FOR A PARTICULAR PURPOSE."
         else:
             self._current_graph = None
 
-    def destroy(self, args):
-        if args == "help":
-            print "Usage : destroy FIG#"
-            print "   Destroy a figure"
-            return        
+    def help_destroy(self):
+        print "destroy FIG#"
+        print "   Destroy a figure"
+    def do_destroy(self, args):
         self._ctxt.destroy(eval(args))
         # Go back to the first graph of the first figure or None
         if len(self._ctxt.figures):
@@ -111,36 +79,34 @@ FITNESS FOR A PARTICULAR PURPOSE."
             self._current_figure = None
             self._current_graph = None
 
-    def select(self, args):
-        if args == "help":
-            print "Usage: select FIG#-GRAPH#"
-            print "   Select the current figure and the current graph"
+    def help_select(self):
+        print "select FIG#-GRAPH#"
+        print "   Select the current figure and the current graph"
+    def do_select(self, args):
+        if not args:
+            self.help_select()
             return
         s = args.split('-')
         num = eval(s[0])
         if len(s) > 1:
             gn = eval(s[1])
         else:
-            print "Usage: select FIG#-GRAPH#"
+            self.help_select()
             return
-#        self._ctxt.current = num, gn
         self._current_figure = self._ctxt.figures[num - 1]
         self._current_graph = self._current_figure.graphs[gn - 1]
 
-    def layout(self, args):
-        if args == "help":
-            print "Usage : layout horiz|vert|quad"
-            print "   Define the layout of the current figure"
-            return
+    def help_layout(self):
+        print "layout horiz|vert|quad"
+        print "   Define the layout of the current figure"
+    def do_layout(self, args):
         if self._current_figure is not None:
             self._current_figure.layout = args
 
-    def figlist(self, args):
-        if args == "help":
-            print "Usage : figlist"
-            print "   Print the list of figures"
-            return
-
+    def help_figlist(self):
+        print "figlist"
+        print "   Print the list of figures"
+    def do_figlist(self, args):
         SEPARATOR = " "
         for fn, f in enumerate(self._ctxt.figures):
             print "%s Figure %d: %s" %\
@@ -152,11 +118,10 @@ FITNESS FOR A PARTICULAR PURPOSE."
                          gn + 1, g.type,\
                          SEPARATOR.join(g.signals.keys()))
 
-    def plot(self, args):
-        if args == "help":
-            print "Usage : plot"
-            print "   Draw and show the figures"
-            return
+    def help_plot(self):
+        print "plot"
+        print "   Draw and show the figures"
+    def do_plot(self, args):
         if self._figcount == len(self._ctxt.figures):
             self._main_loop.run()
         else:
@@ -185,31 +150,27 @@ FITNESS FOR A PARTICULAR PURPOSE."
             self._main_loop.quit()
         return False
 
-    def read(self, args):
-        if args == "help":
-            print "Usage : load DATAFILE"
-            print "   Load signal file"
-            return
+    def help_read(self):
+        print "load DATAFILE"
+        print "   Load signal file"
+    def do_read(self, args):
         fn = args
         try:
             self._ctxt.read(fn)
         except ReadError, e:
             print "Failed to read %s:" % fn, e
-            return
         except NotImplementedError:
             print "File format not supported"
-            return
 
-    def write(self, args):
-        if args == "help":
-            print "Usage: write format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]"
-            print "   Write signals to file"
-            return
+    def help_write(self):
+        print "write format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]"
+        print "   Write signals to file"
+    def do_write(self, args):
         # Extract format, options and signal list
         tmp = re.search(r'(?P<fmt>\w+)\s*(?P<opts>\([^\)]*\))?\s+(?P<fn>[\w\./]+)\s+(?P<sigs>\w+(\s*,\s*\w+)*)', args)
 
         if tmp is None:
-            print "What format ? Where ? Which signals ?"
+            self.help_write()
             return
         fmt = tmp.group('fmt')
         fn = tmp.group('fn')
@@ -225,16 +186,13 @@ FITNESS FOR A PARTICULAR PURPOSE."
             self._ctxt.write(fn, fmt, sns, opts)
         except WriteError, e:
             print "Write error:", e
-            return
         except NotImplementedError:
             print "File format not supported"
-            return
 
-    def update(self, args):
-        if args == "help":
-            print "Usage: update"
-            print "   Reread data files"
-            return
+    def help_update(self):
+        print "update"
+        print "   Reread data files"
+    def do_update(self, args):
         if not args:
             self._ctxt.update()
         else:
@@ -243,11 +201,10 @@ FITNESS FOR A PARTICULAR PURPOSE."
             else:
                 print "%s not found in readers" % args
 
-    def add(self, args):
-        if args == "help":
-            print "Usage : add SIG [, SIG [, SIG]...]"
-            print "   Add a graph to the current figure"
-            return
+    def help_add(self):
+        print "add SIG [, SIG [, SIG]...]"
+        print "   Add a graph to the current figure"
+    def do_add(self, args):
         if self._current_figure is not None:
             self._current_figure.add(self._ctxt.names_to_signals(\
                     self.get_signames(args)))
@@ -261,11 +218,10 @@ FITNESS FOR A PARTICULAR PURPOSE."
             else:
                 print "Create failed"
 
-    def delete(self, args):
-        if args == "help":
-            print "Usage : delete GRAPH#"
-            print "   Delete a graph from the current figure"
-            return
+    def help_delete(self):
+        print "delete GRAPH#"
+        print "   Delete a graph from the current figure"
+    def do_delete(self, args):
         if self._current_figure is not None:
             self._current_figure.delete(args)
             if self._current_figure.graphs:
@@ -273,35 +229,32 @@ FITNESS FOR A PARTICULAR PURPOSE."
             else:
                 self._current_graph = None
 
-    def mode(self, args):
-        if args == "help":
-            print "Usage: mode MODE"
-            print "   Set the type of the current graph of the current figure"
-            print "Available modes :\n\
+    def help_mode(self):
+        print "mode MODE"
+        print "   Set the type of the current graph of the current figure"
+        print "Available modes :\n\
    lin      Linear graph\n"
 #   fft      Fast Fourier Transform (FFT) of signals\n\
 #   ifft     Inverse FFT of signals"
-            return
+    def do_mode(self, args):
         if self._current_graph is None:
             return
         idx = self._current_figure.graphs.index(self._current_graph)
         self._current_figure.mode = self._current_graph, mode
         self._current_graph = self._current_figure.graphs[idx]
 
-    def scale(self, args):
-        if args == "help":
-            print "Usage: scale [lin|logx|logy|loglog]"
-            print "   Set the axis scale"
-            return
+    def help_scale(self):
+        print "scale [lin|logx|logy|loglog]"
+        print "   Set the axis scale"
+    def do_scale(self, args):
         if self._current_graph is None:
             return
         self._current_graph.scale = args
 
-    def range(self, args):
-        if args == "help":
-            print "Usage: range [x|y min max]|[xmin xmax ymin ymax]|[reset]"
-            print "   Set the axis range of the current graph of the current figure"
-            return
+    def help_range(self):
+        print "range [x|y min max]|[xmin xmax ymin ymax]|[reset]"
+        print "   Set the axis range of the current graph of the current figure"
+    def do_range(self, args):
         if self._current_graph is None:
             return
 
@@ -317,12 +270,10 @@ FITNESS FOR A PARTICULAR PURPOSE."
             self._current_graph.range = [float(range[0]), float(range[1]),\
                                              float(range[2]), float(range[3])]
 
-    def unit(self, args):
-        if args == "help":
-            print "Usage: unit [XUNIT,] YUNIT"
-            print "   Set the unit to be displayed on graph axis"
-            return
-
+    def help_unit(self):
+        print "unit [XUNIT,] YUNIT"
+        print "   Set the unit to be displayed on graph axis"
+    def do_unit(self, args):
         units = args.split(",", 1)
         if len(units) < 1 or self._current_graph is None:
             return
@@ -333,43 +284,40 @@ FITNESS FOR A PARTICULAR PURPOSE."
         else:
             return
 
-    def insert(self, args):
-        if args == "help":
-            print "Usage: insert SIG [, SIG [, SIG]...]"
-            print "   Insert a list of signals into the current graph"
-            return
+    def help_insert(self):
+        print "insert SIG [, SIG [, SIG]...]"
+        print "   Insert a list of signals into the current graph"
+    def do_insert(self, args):
         if self._current_graph is None:
             return
-        self._current_graph.insert(self._ctxt.names_to_signals(\
+        self._current_graph.insert(self._ctxt.names_to_signals(
                 self.get_signames(args)))
 
-    def remove(self, args):
-        if args == "help":
-            print "Usage: remove SIG [, SIG [, SIG]...]"
-            print "   Delete a list of signals into from current graph"
-            return
+    def help_remove(self):
+        print "remove SIG [, SIG [, SIG]...]"
+        print "   Delete a list of signals into from current graph"
+    def do_remove(self, args):
         if self._current_graph is None:
             return
-        self._current_graph.remove(self._ctxt.names_to_signals(\
+        self._current_graph.remove(self._ctxt.names_to_signals(
                 self.get_signames(args)))
 
-    def freeze(self, args):
-        if args == "help":
-            print "Usage: freeze SIG [, SIG [, SIG]...]"
-            print "   Do not consider signal for subsequent updates"
+    def help_freeze(self):
+        print "freeze SIG [, SIG [, SIG]...]"
+        print "   Do not consider signal for subsequent updates"
+    def do_freeze(self, args):
         self._ctxt.freeze(self.get_signames(args))
 
-    def unfreeze(self, args):
-        if args == "help":
-            print "Usage: unfreeze SIG [, SIG [, SIG]...]"
-            print "   Consider signal for subsequent updates"
+    def help_unfreeze(self):
+        print "unfreeze SIG [, SIG [, SIG]...]"
+        print "   Consider signal for subsequent updates"
+    def do_unfreeze(self, args):
         self._ctxt.unfreeze(self.get_signames(args))
 
-    def siglist(self, args):
-        if args == "help":
-            print "Usage : siglist"
-            print "   List loaded signals"
-            return
+    def help_siglist(self):
+        print "siglist"
+        print "   List loaded signals"
+    def do_siglist(self, args):
         SEPARATOR = "\t"
         HEADER=["Name", "Unit", "Ref", "Reader","Last updated (sec)"]
         print SEPARATOR.join(HEADER)
@@ -382,16 +330,14 @@ FITNESS FOR A PARTICULAR PURPOSE."
                                           reader_name,\
                                           str(int(t - reader.info['last_update']))))
 
-    def math(self, inp):
-        if inp == "help":
-            print "Usage: destsig=mathexpr"
-            print "   Define a new signal destsig using mathematical expression"
-            return
+    def help_math(self):
+        print "destsig=mathexpr"
+        print "   Define a new signal destsig using mathematical expression"
+    def do_math(self, inp):
         try:
             self._ctxt.math(inp)
         except ReadError, e:
             print "Error creating signal from math expression", e
-            return
 
     def get_signames(self, args):
         """ Return the signal names list extracted from the commandline
@@ -406,140 +352,88 @@ FITNESS FOR A PARTICULAR PURPOSE."
                 sns.append(sn.strip())
         return sns
 
-    def help(self, args):
-        """ Display help messages
-        """
-        if args == "":
-            print "\
-Commands related to figures:\n\
-   create      create a new figure\n\
-   destroy     delete a figure\n\
-   select      define the current figure and the current graph\n\
-   layout      set_ the layout (either horiz, vert or quad)\n\
-   figlist     list the existing figures\n\
-   plot        draw and show the figures\n\
-Commands related to graphs:\n\
-   add         add a graph to the current figure\n\
-   delete      delete a graph from the current figure\n\
-   mode        set_ the mode of the current graph of the current figure\n\
-   unit        set_ the units of the current graph of the current figure\n\
-   scale       set_ the scale of the current graph of the current figure\n\
-   range       set_ the axis range of the current graph of the current figure\n\
-Commands related to signals:\n\
-   read        read signals from file\n\
-   write       write signals to file\n\
-   update      reread signals from file(s)\n\
-   insert      add a signal to the current graph of the current figure\n\
-   remove      delete a signal from the current graph of the current figure\n\
-   (un)freeze  toggle signal update\n\
-   siglist     list the signals\n\
-Misc commands:\n\
-   echo        print a message\n\
-   pause       wait for the user to press enter\n\
-   quit, exit  exit the program\n\
-   help        display this help message\n\
-\n\
-During plot:\n\
-   1, 2        Toggle first and second vertical cursors\n\
-   3, 4        Toggle first and second horizontal cursors\n\
-Maths:\n\
-   SIG = EXPR  Compute a signal from mathematical expression\n\
-   SIG = [i]fft(SIG)\n\
-               Compute Fast Fourier Transform (FFT) or inverse FFT from SIG\n\
-\n\
-Help for individual command can be obtained with 'help COMMAND'\
-"
-        else:
-            if args in dir(cmds):
-                eval("self." + args + "(\"help\")")
-            else:
-                print "Unknown command", args
-
-    def echo(self, args):
-        if args == "help":
-            print "Usage: echo [TEXT]"
-            print "   Print text"
-            return
-        print args        
-
-    def pause(self, args):
-        if args == "help":
-            print "Usage: pause"
-            print "   Wait for the user to press enter"
-            return
+    def help_echo(self):
+        print "echo [TEXT]"
+        print "   Print text"
+    def do_echo(self, args):
+        print args
+        
+    def help_pause(self):
+        print "pause"
+        print "   Wait for the user to press enter"
+    def do_pause(self, args):
         inp = raw_input("Press enter")
 
-    def loop(self, p, f = None, batch = False):
-        # Main loop
-        while True:
-            try:
-                if f is None:
-                    inp = raw_input(p)
-                else:
-                    try:
-                        inp = f.readline().rstrip("\n")
-                        if inp == "":
-                            if batch == True:
-                                # Batch mode, exit at the end of script
-                                break
-                            else:
-                                # Interactive mode, continue with command line
-                                f = None
-                                continue
-                    except IOError, e:
-                        print "Script error:", e
-                        f.close()
-                        f = None
-                # Check if line is a comment
-                if inp.lstrip().startswith("#"):
-                    continue
-                # Check if command is assignment
-                if inp.find("=") >= 0:
-                    self.math(inp)
-                    continue
+    def emptyline(self):
+        return
 
-                # Separate command from args
-                if inp.find(" ") >= 0:
-                    st = inp.lstrip().split(' ', 1)    
-                    cmd = st[0]
-                    args = st[1]
-                    # print "cmd:", cmd, "args:", args
-                else:
-                    cmd = inp
-                    args = ""
+    def precmd(self, line):
+        if line.startswith('#'):
+            # Comment
+            return ''
+        elif line.find('=') > 0:
+            return "math " + line
+        else:
+            return line
+
+    def preloop(self):
+        pass
             
-                # End of program
-                if cmd == "exit" or cmd == "quit":
-                    break
-
-                # Evaluate the command
-                if cmd in dir(self):
-                    eval("self." + cmd + "(args)")
-                else:
-                    print cmd, "not supported"
-                    continue
-    
-            except EOFError:
-                break
-
-            #    except AttributeError, e:
-            #        print "Unknown command:", e.message
-            #        continue
-            
-            #    except NameError, e:
-            #        print "Unknown command", e.message
-            #        continue
-
-            except SyntaxError, e:
-                print "Syntax Error", e.message
-                continue
-            
-            except ReadError, e:
-                print "Error in read :", e
-
+    def postloop(self):
         readline.write_history_file(self.hist_file)
 
+    def do_EOF(self, line):
+        return self.do_quit(line)
+
+    def do_exit(self, line):
+        return self.do_quit(line)
+
+    def do_quit(self, line):
+        return True
+
+    def help_exec(self):
+        print "exec FILENAME"
+        print "   execute commands from file"
+    def do_exec(self, file):
+        try:
+            with open(file) as f:
+                lines = iter(f)
+                for line in lines:
+                    self.onecmd(self.precmd(line))
+        except IOError, e:
+            print "Script error:", e
+            f.close()
+
 if __name__ == "__main__":
+    # Parse command line arguments
+    # Current options:
+    #   -b : batch mode, read commands from file
+    #   -i : interactive mode, do not quit at the end of batch file
+    #   -q : do not display startup message
+    parser = OptionParser()
+    parser.add_option("-b", "--batch", dest="fn",\
+                          help="Execute commands in FILE then exit",\
+                          metavar="FILE")
+    parser.add_option("-i", "--interactive", action="store_true",\
+                          dest="inter",\
+                          help="Go to interactive mode after executing batch file")
+    parser.add_option("-q", "--quiet", action="store_true",\
+                          dest="quiet",\
+                          help="Do not display startup message")
+    (options, args) = parser.parse_args()
+
     o = OscopyApp()
-
-
+    # do_Exec(filename)
+    if options.fn is not None:
+        o.do_exec(options.fn)
+        if options.inter:
+            if options.quiet:
+                o.cmdloop("")
+            else:
+                o.cmdloop()
+    else:
+        if options.quiet:
+            o.cmdloop("")
+        else:
+            o.cmdloop()
+                
