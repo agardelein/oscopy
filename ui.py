@@ -31,6 +31,7 @@ class App(object):
         <menuitem action="Update files"/>
         <menuitem action="New Math Signal..."/>
         <menuitem action="Run netlister and simulate..."/>
+        <menuitem action="Show terminal"/>
         <menuitem action="Quit"/>
       </menu>
     </menubar>
@@ -44,6 +45,8 @@ class App(object):
         self._windows_to_figures = {}
         self._current_graph = None
         self._current_figure = None
+        self._term = None
+        self._term_window_is_there = False
         self._TARGET_TYPE_SIGNAL = 10354
         self._from_signal_list = [("oscopy-signals", gtk.TARGET_SAME_APP,\
                                        self._TARGET_TYPE_SIGNAL)]
@@ -111,7 +114,9 @@ class App(object):
                 self._store.append(it, (name, sig, sig.freeze))
 
         dlg.destroy()
-        
+
+    def _action_show_terminal(self, action):
+        self._create_terminal_window()
 
     def _action_quit(self, action):
         self._write_config()
@@ -131,6 +136,8 @@ class App(object):
             ("Run netlister and simulate...", gtk.STOCK_MEDIA_FORWARD,\
                  "_Run netlister and simulate...", None, None,\
                  self._action_netlist_and_simulate),
+            ("Show terminal", None, "_Show terminal", None, None,
+             self._action_show_terminal),
             ('Quit', gtk.STOCK_QUIT, '_Quit', None, None,
              self._action_quit),
             ]
@@ -187,7 +194,7 @@ class App(object):
     def _create_widgets(self):
         accel_group, self._menubar = self._create_menubar()
         self._treeview = self._create_treeview()
-        self._create_term_window()
+        self._create_terminal_window()
 
         sw = gtk.ScrolledWindow()
         sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -205,14 +212,19 @@ class App(object):
         w.set_default_size(400, 300)
         w.show_all()
 
-    def _create_term_window(self):
+    def _create_terminal_window(self):
         cmdw = gtk.Window()
-        self._term = vte.Terminal()
-	self._term.set_cursor_blinks(True)
-	self._term.set_emulation('xterm')
-	self._term.set_font_from_string('monospace 9')
-	self._term.set_scrollback_lines(1000)
-        self._term.show()
+        if self._term is None:
+            self._term = vte.Terminal()
+            self._term.set_cursor_blinks(True)
+            self._term.set_emulation('xterm')
+            self._term.set_font_from_string('monospace 9')
+            self._term.set_scrollback_lines(1000)
+            self._term.show()
+            (master, slave) = pty.openpty()
+            self._term.set_pty(master)
+            sys.stdout = os.fdopen(slave, "w")
+            print "Terminal ready"
 	scrollbar = gtk.VScrollbar()
 	scrollbar.set_adjustment(self._term.get_adjustment())
         
@@ -220,14 +232,16 @@ class App(object):
 	box.pack_start(self._term)
 	box.pack_start(scrollbar)
         
+        cmdw.connect('destroy', self._terminal_window_destroy)
         cmdw.add(box)
         cmdw.show_all()
+        self._term_window_is_there = True
+
+    def _terminal_window_destroy(self, data=None):
+        self._term_window_is_there = False
+        return False
         
         # Redirect stdout to terminal
-        (master, slave) = pty.openpty()
-        self._term.set_pty(master)
-        sys.stdout = os.fdopen(slave, "w")
-        print "Terminal ready"
 
     def _create_figure_popup_menu(self, figure, graph):
         figmenu = gui.menus.FigureMenu()
