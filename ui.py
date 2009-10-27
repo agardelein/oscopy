@@ -225,14 +225,25 @@ class App(object):
             (master, slave) = pty.openpty()
             self._term.set_pty(master)
             sys.stdout = os.fdopen(slave, "w")
-            print "Terminal ready"
+            print self._app.intro
 	scrollbar = gtk.VScrollbar()
 	scrollbar.set_adjustment(self._term.get_adjustment())
         
-	box = gtk.HBox()
-	box.pack_start(self._term)
-	box.pack_start(scrollbar)
-        
+	termbox = gtk.HBox()
+	termbox.pack_start(self._term)
+	termbox.pack_start(scrollbar)
+
+        entrybox = gtk.HBox(False)
+        label = gtk.Label('Command:')
+        entry = gtk.Entry()
+        entry.connect('activate', self._terminal_entry_activate, entry)
+        entrybox.pack_start(label, False, False, 12)
+        entrybox.pack_start(entry, True, True, 12)
+
+        box = gtk.VBox()
+        box.pack_start(termbox)
+        box.pack_start(entrybox)
+
         cmdw.connect('destroy', self._terminal_window_destroy)
         cmdw.add(box)
         cmdw.show_all()
@@ -242,7 +253,13 @@ class App(object):
         self._term_window_is_there = False
         return False
         
-        # Redirect stdout to terminal
+    def _terminal_entry_activate(self, widget, entry):
+        line = entry.get_text()
+        if line is not None:
+            line = self._app.precmd(line)
+            stop = self._app.onecmd(line)
+            self._app.postcmd(stop, line)
+        entry.set_text('')
 
     def _create_figure_popup_menu(self, figure, graph):
         figmenu = gui.menus.FigureMenu()
