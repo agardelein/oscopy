@@ -53,6 +53,7 @@ class App(object):
         self._to_figure = [("oscopy-signals", gtk.TARGET_SAME_APP,\
                                 self._TARGET_TYPE_SIGNAL)]
         self._ctxt = oscopy.Context()
+        self._app = oscopy.OscopyApp(self._ctxt)
         self._resource = "oscopy"
         self._read_config()
         self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT,

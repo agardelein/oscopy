@@ -18,7 +18,7 @@ class OscopyApp(Cmd):
     """
     def __init__(self, context=None):
         Cmd.__init__(self)
-        if context is None or not isinstance(context, oscopy.Context):
+        if context is None or not isinstance(context, Context):
             self._ctxt = Context()
         else:
             self._ctxt = context
