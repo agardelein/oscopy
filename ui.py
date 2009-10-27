@@ -4,6 +4,9 @@ import signal
 import commands
 import ConfigParser
 import os
+import vte
+import pty
+import sys
 from xdg import BaseDirectory
 
 import oscopy
@@ -184,6 +187,7 @@ class App(object):
     def _create_widgets(self):
         accel_group, self._menubar = self._create_menubar()
         self._treeview = self._create_treeview()
+        self._create_term_window()
 
         sw = gtk.ScrolledWindow()
         sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -201,6 +205,29 @@ class App(object):
         w.set_default_size(400, 300)
         w.show_all()
 
+    def _create_term_window(self):
+        cmdw = gtk.Window()
+        self._term = vte.Terminal()
+	self._term.set_cursor_blinks(True)
+	self._term.set_emulation('xterm')
+	self._term.set_font_from_string('monospace 9')
+	self._term.set_scrollback_lines(1000)
+        self._term.show()
+	scrollbar = gtk.VScrollbar()
+	scrollbar.set_adjustment(self._term.get_adjustment())
+        
+	box = gtk.HBox()
+	box.pack_start(self._term)
+	box.pack_start(scrollbar)
+        
+        cmdw.add(box)
+        cmdw.show_all()
+        
+        # Redirect stdout to terminal
+        (master, slave) = pty.openpty()
+        self._term.set_pty(master)
+        sys.stdout = os.fdopen(slave, "w")
+        print "Terminal ready"
 
     def _create_figure_popup_menu(self, figure, graph):
         figmenu = gui.menus.FigureMenu()
