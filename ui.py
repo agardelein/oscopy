@@ -23,6 +23,25 @@ def report_error(parent, msg):
     dlg.run()
     dlg.destroy()
 
+class OscopyAppUI(oscopy.OscopyApp):
+    def __init__(self, context):
+        oscopy.OscopyApp.__init__(self, context)
+        self._callbacks = {}
+        
+    def connect(self, event, func, data):
+        if not isinstance(event, str):
+            return
+        if hasattr(self, 'do_'+event):
+            self._callbacks[event] = {func: data}
+
+    def postcmd(self, stop, line):
+        oscopy.OscopyApp.postcmd(self, stop, line)
+        event = line.split()[0].strip()
+        args = line.split()[1].strip()
+        if self._callbacks.has_key(event):
+            for func, data in self._callbacks[event].iteritems():
+                func(event, args, data)
+
 class App(object):
     __ui = '''<ui>
     <menubar name="MenuBar">
@@ -53,23 +72,18 @@ class App(object):
         self._to_figure = [("oscopy-signals", gtk.TARGET_SAME_APP,\
                                 self._TARGET_TYPE_SIGNAL)]
         self._ctxt = oscopy.Context()
-        self._app = oscopy.OscopyApp(self._ctxt)
+        self._app = OscopyAppUI(self._ctxt)
+        self._app.connect('read', self._add_file, None)
         self._resource = "oscopy"
         self._read_config()
         self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT,
                                     gobject.TYPE_BOOLEAN)
         self._create_widgets()
-        self._add_file('demo/irf540.dat')
-        self._add_file('demo/ac.dat')
+        self._app_exec('read demo/irf540.dat')
+        self._app_exec('read demo/ac.dat')
         #self._add_file('demo/res.dat')
 
-    def _add_file(self, filename):
-        try:
-            self._ctxt.read(filename)
-        except NotImplementedError:
-            report_error(self._mainwindow,
-                         'Could not find a reader for %s' % filename)
-            return
+    def _add_file(self, event, filename, data=None):
         it = self._store.append(None, (filename, None, False))
         for name, sig in self._ctxt.readers[filename].signals.iteritems():
             self._store.append(it, (name, sig, sig.freeze))
@@ -82,7 +96,12 @@ class App(object):
         filename = dlg.get_filename()
         dlg.destroy()
         if resp == gtk.RESPONSE_ACCEPT:
-            self._add_file(filename)
+            self._app_exec("read " + filename)
+
+    def _app_exec(self, line):
+        line = self._app.precmd(line)
+        stop = self._app.onecmd(line)
+        self._app.postcmd(stop, line)
 
     def _action_update(self, action):
         self._ctxt.update()
