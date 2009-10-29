@@ -42,6 +42,9 @@ class OscopyAppUI(oscopy.OscopyApp):
             for func, data in self._callbacks[event].iteritems():
                 func(event, args, data)
 
+    def do_plot(line):
+        print "Plot command disabled in UI"
+
 class App(object):
     __ui = '''<ui>
     <menubar name="MenuBar">
