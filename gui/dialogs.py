@@ -1,7 +1,7 @@
 import gtk
 
 class Enter_Units_Dialog(object):
-    def Enter_Units_Dialog(self):
+    def __init__(self):
         self._dlg = None
         self._entry_xunits = None
         self._entry_yunits = None
@@ -43,7 +43,7 @@ class Enter_Units_Dialog(object):
         return units
 
 class Enter_Range_Dialog(object):
-    def Enter_Range_Dialog(self):
+    def __init__(self):
         self._dlg = None
         self._entries = None
 
@@ -87,7 +87,7 @@ class Enter_Range_Dialog(object):
         return r
 
 class Run_Netlister_and_Simulate_Dialog:
-    def Run_Netlister_and_Simulate_Dialog(self):
+    def __init__(self):
         self._dlg = None
         pass
 

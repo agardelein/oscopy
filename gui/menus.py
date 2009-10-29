@@ -3,7 +3,7 @@ import dialogs
 
 class FigureMenu(object):
 
-    def FigureMenu(self):
+    def __init__(self):
         self._store = None
 
     def create_menu(self, store, figure, graph):
@@ -73,7 +73,7 @@ class FigureMenu(object):
 
 class GraphMenu(object):
 
-    def GraphMenu(self):
+    def __init__(self):
         self._store = None
         pass
 
