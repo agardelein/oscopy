@@ -6,7 +6,7 @@ class FigureMenu(object):
     def __init__(self):
         self._store = None
 
-    def create_menu(self, store, figure, graph):
+    def create_menu(self, store, figure, graph, app_exec):
         self._layout_to_str = {'horiz': 'Horizontal', 'vert':'Vertical',\
                                    'quad':'Quad'}
         self._store = store
@@ -16,22 +16,22 @@ class FigureMenu(object):
             menu.append(item_nograph)
             return menu
         item_figure = gtk.MenuItem('Figure')
-        item_figure.set_submenu(self._create_figure_menu(figure, graph))
+        item_figure.set_submenu(self._create_figure_menu(figure, graph, app_exec))
         menu.append(item_figure)
         item_graph = gtk.MenuItem('Graph')
         item_graph.set_submenu(self._create_graph_menu(figure, graph))
         menu.append(item_graph)
         return menu
 
-    def _create_figure_menu(self, fig, graph):
+    def _create_figure_menu(self, fig, graph, app_exec):
         menu = gtk.Menu()
         item_add = gtk.MenuItem('Add graph')
         item_add.connect('activate', self._graph_menu_item_activated,
-                         (fig))
+                         (fig, app_exec))
         menu.append(item_add)
         item_delete = gtk.MenuItem('Delete graph')
         item_delete.connect('activate', self._delete_graph_menu_item_activated,
-                            (fig, graph))
+                            (fig, graph, app_exec))
         menu.append(item_delete)
         item_layout = gtk.MenuItem('Layout')
         item_layout.set_submenu(self._create_layout_menu(fig))
@@ -39,15 +39,15 @@ class FigureMenu(object):
         return menu
 
     def _graph_menu_item_activated(self, menuitem, user_data):
-        fig = user_data
-        fig.add()
+        fig, app_exec = user_data
+        app_exec('add')
         fig.canvas.draw()
 
     def _delete_graph_menu_item_activated(self, menuitem, user_data):
-        figure, graph = user_data
+        figure, graph, app_exec = user_data
         if graph is not None:
-            idx = figure.graphs.index(graph)
-            figure.delete(idx + 1)
+            idx = figure.graphs.index(graph) + 1
+            app_exec('delete %d' % idx)
             if figure.canvas is not None:
                 figure.canvas.draw()
 
@@ -100,6 +100,7 @@ class GraphMenu(object):
         item_remove.set_submenu(self._create_remove_signal_menu((figure, graph)))
         menu.append(item_remove)
         return menu
+
     def _create_units_window(self, figure, graph):
         if graph is None:
             return

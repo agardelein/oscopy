@@ -91,7 +91,10 @@ FITNESS FOR A PARTICULAR PURPOSE."
             self.help_select()
             return
         self._current_figure = self._ctxt.figures[num - 1]
-        self._current_graph = self._current_figure.graphs[gn - 1]
+        if len(self._current_figure.graphs):
+            self._current_graph = self._current_figure.graphs[gn - 1]
+        else:
+            self._current_graph = None
 
     def help_layout(self):
         print "layout horiz|vert|quad"
@@ -220,7 +223,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
         print "   Delete a graph from the current figure"
     def do_delete(self, args):
         if self._current_figure is not None:
-            self._current_figure.delete(args)
+            self._current_figure.delete(int(args))
             if self._current_figure.graphs:
                 self._current_graph = self._current_figure.graphs[0]
             else:

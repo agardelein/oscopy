@@ -37,7 +37,10 @@ class OscopyAppUI(oscopy.OscopyApp):
     def postcmd(self, stop, line):
         oscopy.OscopyApp.postcmd(self, stop, line)
         event = line.split()[0].strip()
-        args = line.split()[1].strip()
+        if len(line.split()) > 1:
+            args = line.split()[1].strip()
+        else:
+            args = ''
         if self._callbacks.has_key(event):
             for func, data in self._callbacks[event].iteritems():
                 func(event, args, data)
@@ -258,7 +261,7 @@ class App(object):
         entrybox = gtk.HBox(False)
         label = gtk.Label('Command:')
         entry = gtk.Entry()
-        entry.connect('activate', self._terminal_entry_activate, entry)
+        entry.connect('activate', self._terminal_entry_activate)
         entrybox.pack_start(label, False, False, 12)
         entrybox.pack_start(entry, True, True, 12)
 
@@ -275,17 +278,18 @@ class App(object):
         self._term_window_is_there = False
         return False
         
-    def _terminal_entry_activate(self, widget, entry):
-        line = entry.get_text()
-        if line is not None:
-            line = self._app.precmd(line)
-            stop = self._app.onecmd(line)
-            self._app.postcmd(stop, line)
-        entry.set_text('')
+    def _terminal_entry_activate(self, entry, data=None):
+        if isinstance(entry, gtk.Entry):
+            line = entry.get_text()
+            if line is not None:
+                line = self._app.precmd(line)
+                stop = self._app.onecmd(line)
+                self._app.postcmd(stop, line)
+            entry.set_text('')
 
     def _create_figure_popup_menu(self, figure, graph):
         figmenu = gui.menus.FigureMenu()
-        return figmenu.create_menu(self._store, figure, graph)
+        return figmenu.create_menu(self._store, figure, graph, self._app_exec)
 
     def _treeview_button_press(self, widget, event):
         if event.button == 3:
@@ -341,6 +345,9 @@ class App(object):
 
     def _axes_enter(self, event):
         self._current_graph = event.inaxes
+        axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
+        fig_num = self._ctxt.figures.index(self._current_figure) + 1
+        self._app_exec('select %d-%d' % (fig_num, axes_num))
 
     def _axes_leave(self, event):
         # Unused for better user interaction
@@ -349,6 +356,12 @@ class App(object):
 
     def _figure_enter(self, event):
         self._current_figure = event.canvas.figure
+        if hasattr(event, 'inaxes') and event.inaxes is not None:
+            axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
+        else:
+            axes_num = 1
+        fig_num = self._ctxt.figures.index(self._current_figure) + 1
+        self._app_exec('select %d-%d' % (fig_num, axes_num))
 
     def _figure_leave(self, event):
 #        self._current_figure = None
