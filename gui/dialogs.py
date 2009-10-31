@@ -79,10 +79,10 @@ class Enter_Range_Dialog(object):
         r = []
         resp = self._dlg.run()
         if resp == gtk.RESPONSE_ACCEPT:
-            r = [float(self._entries[0][0].get_text()),
-                 float(self._entries[0][1].get_text()),
-                 float(self._entries[1][0].get_text()),
-                 float(self._entries[1][1].get_text())]
+            r = [self._entries[0][0].get_text(),
+                 self._entries[0][1].get_text(),
+                 self._entries[1][0].get_text(),
+                 self._entries[1][1].get_text()]
         self._dlg.destroy()
         return r
 
