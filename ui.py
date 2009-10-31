@@ -81,6 +81,8 @@ class App(object):
         self._app = OscopyAppUI(self._ctxt)
         self._app.connect('read', self._add_file, None)
         self._app.connect('math', self._add_file, None)
+        self._app.connect('freeze', self._freeze, None)
+        self._app.connect('unfreeze', self._freeze, None)
         self._resource = "oscopy"
         self._read_config()
         self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT,
@@ -196,18 +198,58 @@ class App(object):
         else:
             cell.set_property('text', model.get_value(iter, 0))
 
+    # Search algorithm from pygtk tutorial
+    def _match_func(self, row, data):
+        column, key = data
+        return row[column] == key
+
+    def _search(self, rows, func, data):
+        if not rows: return None
+        for row in rows:
+            if func(row, data):
+                return row
+            result = self._search(row.iterchildren(), func, data)
+            if result: return result
+        return None
+
+    def _freeze(self, event, signal, data=None):
+        match_row = self._search(self._store, self._match_func, (0, signal))
+        if match_row is not None:
+            match_row[2] = match_row[1].freeze
+            parent = self._store.iter_parent(match_row.iter)
+            iter = self._store.iter_children(parent)
+            freeze = match_row[2]
+            while iter:
+                if not self._store.get_value(iter, 2) == freeze:
+                    break
+                iter = self._store.iter_next(iter)
+            if iter == None:
+                # All row at the same freeze value, set freeze for the reader
+                self._store.set_value(parent, 2, freeze)
+            else:
+                # Set reader freeze to false
+                self._store.set_value(parent, 2, False)
+
     def _cell_toggled(self, cellrenderer, path, data):
         if len(path) == 3:
-            self._store[path][1].freeze = not self._store[path][1].freeze
-            self._store[path][2] = self._store[path][1].freeze
+            # Single signal
+            if self._store[path][1].freeze:
+                cmd = 'unfreeze'
+            else:
+                cmd = 'freeze'
+            self._app_exec('%s %s' % (cmd, self._store[path][0]))
         elif len(path) == 1:
+            # Whole reader
             parent = self._store.get_iter(path)
             freeze = not self._store.get_value(parent, 2)
+            if self._store[path][2]:
+                cmd = 'unfreeze'
+            else:
+                cmd = 'freeze'
             self._store.set_value(parent, 2, freeze)
             iter = self._store.iter_children(parent)
             while iter:
-                self._store.get_value(iter, 1).freeze = freeze 
-                self._store.set_value(iter, 2, freeze)
+                self._app_exec('%s %s' % (cmd, self._store.get_value(iter, 0)))
                 iter = self._store.iter_next(iter)
 
     def _create_widgets(self):
