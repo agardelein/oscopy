@@ -83,6 +83,7 @@ class App(object):
         self._app.connect('math', self._add_file, None)
         self._app.connect('freeze', self._freeze, None)
         self._app.connect('unfreeze', self._freeze, None)
+        self._app.connect('create', self._create, None)
         self._resource = "oscopy"
         self._read_config()
         self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT,
@@ -352,7 +353,9 @@ class App(object):
             return
 
         row = self._store[path]
-        self._ctxt.create({row[0]: row[1]})
+        self._app_exec('create %s' % row[0])
+
+    def _create(self, event, signal, data=None):
         fig = self._ctxt.figures[len(self._ctxt.figures) - 1]
 
         w = gtk.Window()
@@ -377,6 +380,7 @@ class App(object):
         vbox.pack_start(toolbar, False, False)
         w.resize(400, 300)
         w.show_all()
+        self._app_exec('select %d-1' % len(self._ctxt.figures))
 
     def _axes_enter(self, event):
         self._current_graph = event.inaxes
