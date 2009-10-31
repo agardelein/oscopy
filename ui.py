@@ -80,6 +80,7 @@ class App(object):
         self._ctxt = oscopy.Context()
         self._app = OscopyAppUI(self._ctxt)
         self._app.connect('read', self._add_file, None)
+        self._app.connect('math', self._add_file, None)
         self._resource = "oscopy"
         self._read_config()
         self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT,
@@ -129,15 +130,7 @@ class App(object):
         resp = dlg.run()
         if resp == gtk.RESPONSE_ACCEPT:
             expr = entry.get_text()
-            try:
-                self._ctxt.math(expr)
-            except ReadError, e:
-                report_error(self._mainwindow,
-                             'Could not find a reader for %s' % expr)
-                return
-            it = self._store.append(None, (expr, None, False))
-            for name, sig in self._ctxt.readers[expr].signals.iteritems():
-                self._store.append(it, (name, sig, sig.freeze))
+            self._app_exec('%s' % expr)
 
         dlg.destroy()
 
