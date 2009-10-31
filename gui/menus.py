@@ -34,7 +34,7 @@ class FigureMenu(object):
                             (fig, graph, app_exec))
         menu.append(item_delete)
         item_layout = gtk.MenuItem('Layout')
-        item_layout.set_submenu(self._create_layout_menu(fig))
+        item_layout.set_submenu(self._create_layout_menu(fig, app_exec))
         menu.append(item_layout)
         return menu
 
@@ -51,19 +51,20 @@ class FigureMenu(object):
             if figure.canvas is not None:
                 figure.canvas.draw()
 
-    def _create_layout_menu(self, fig):
+    def _create_layout_menu(self, fig, app_exec):
         menu = gtk.Menu()
         for layout in self._layout_to_str.keys():
             item = gtk.CheckMenuItem(self._layout_to_str[layout])
             item.set_active(fig.layout == layout)
             item.connect('activate', self._layout_menu_item_activated,
-                         (fig, layout))
+                         (fig, layout, app_exec))
             menu.append(item)
         return menu
 
     def _layout_menu_item_activated(self, menuitem, user_data):
-        fig, layout = user_data
-        fig.layout = layout
+        fig, layout, app_exec = user_data
+        app_exec('layout ' + layout)
+#        fig.layout = layout
         if fig.canvas is not None:
             fig.canvas.draw()
 
