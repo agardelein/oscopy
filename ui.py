@@ -348,6 +348,7 @@ class App(object):
         if isinstance(entry, gtk.Entry):
             line = entry.get_text()
             if line is not None:
+                print self._app.prompt + line
                 line = self._app.precmd(line)
                 stop = self._app.onecmd(line)
                 self._app.postcmd(stop, line)
