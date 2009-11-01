@@ -212,11 +212,10 @@ FITNESS FOR A PARTICULAR PURPOSE."
                 self._current_figure.graphs[len(\
                     self._current_figure.graphs) - 1]
         else:
-            self._ctxt.create(self.get_signames(args))
-            if self._ctxt.figures:
-                self._current_figure = self._ctxt.figures[0]
-            else:
-                print "Create failed"
+            line = "create %s" % args
+            line = self.precmd(line)
+            stop = self.onecmd(line)
+            self.postcmd(stop, line)
 
     def help_delete(self):
         print "delete GRAPH#"
