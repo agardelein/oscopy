@@ -27,6 +27,7 @@ class OscopyAppUI(oscopy.OscopyApp):
     def __init__(self, context):
         oscopy.OscopyApp.__init__(self, context)
         self._callbacks = {}
+        self._autorefresh = True
         
     def connect(self, event, func, data):
         if not isinstance(event, str):
@@ -44,8 +45,37 @@ class OscopyAppUI(oscopy.OscopyApp):
         if self._callbacks.has_key(event):
             for func, data in self._callbacks[event].iteritems():
                 func(event, args, data)
+        if self._autorefresh and self._current_figure is not None and\
+                self._current_figure.canvas is not None:
+            self._current_figure.canvas.draw()
 
-    def do_plot(line):
+    def help_refresh(self):
+        print 'refresh FIG#|on|off|current|all'
+        print '  on|off       toggle auto refresh of current figure'
+        print '  current|all  refresh either current figure or all'
+        print '  FIG#         figure to refresh'
+        print 'without arguments refresh current figure'
+    def do_refresh(self, args):
+        if args == 'on':
+            self._autorefresh = True
+        elif args == 'off':
+            self._autorefresh = False
+        elif args == 'current' or args == '':
+            if self._current_figure is not None and\
+                    self._current_figure.canvas is not None:
+                self._current_figure.canvas.draw()
+        elif args == 'all':
+            for fig in self._ctxt.figures:
+                if fig.canvas is not None:
+                    fig.canvas.draw()
+        elif args.isdigit():
+            fignum = int(args) - 1
+            if fignum >= 0 and fignum < len(self._ctxt.figures):
+                if self._ctxt.figures[fignum].canvas is not None:
+                    print 'refreshing'
+                    self._ctxt.figures[fignum].canvas.draw()
+
+    def do_plot(self, line):
         print "Plot command disabled in UI"
 
 class App(object):
