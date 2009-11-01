@@ -37,9 +37,11 @@ class OscopyAppUI(oscopy.OscopyApp):
 
     def postcmd(self, stop, line):
         oscopy.OscopyApp.postcmd(self, stop, line)
+        if not line:
+            return
         event = line.split()[0].strip()
         if len(line.split()) > 1:
-            args = line.split()[1].strip()
+            args = line.split(' ', 1)[1].strip()
         else:
             args = ''
         if self._callbacks.has_key(event):
@@ -119,13 +121,14 @@ class App(object):
         self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT,
                                     gobject.TYPE_BOOLEAN)
         self._create_widgets()
-        self._app_exec('read demo/irf540.dat')
-        self._app_exec('read demo/ac.dat')
+        #self._app_exec('read demo/irf540.dat')
+        #self._app_exec('read demo/ac.dat')
         #self._add_file('demo/res.dat')
 
     def _add_file(self, event, filename, data=None):
-        it = self._store.append(None, (filename, None, False))
-        for name, sig in self._ctxt.readers[filename].signals.iteritems():
+        it = self._store.append(None, (filename.strip(), None, False))
+        for name, sig in self._ctxt.readers[filename.strip()]\
+                .signals.iteritems():
             self._store.append(it, (name, sig, sig.freeze))
 
     def _action_add_file(self, action):

@@ -8,6 +8,7 @@ import os.path
 import time
 from context import Context
 from cmd import Cmd
+from readers.reader import ReadError
 
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
@@ -398,7 +399,9 @@ FITNESS FOR A PARTICULAR PURPOSE."
             with open(file) as f:
                 lines = iter(f)
                 for line in lines:
-                    self.onecmd(self.precmd(line))
+                    line = self.precmd(line)
+                    stop = self.onecmd(line)
+                    self.postcmd(stop, line)
         except IOError, e:
             print "Script error:", e
             f.close()
