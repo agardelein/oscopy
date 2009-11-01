@@ -243,23 +243,26 @@ class App(object):
             if result: return result
         return None
 
-    def _freeze(self, event, signal, data=None):
-        match_row = self._search(self._store, self._match_func, (0, signal))
-        if match_row is not None:
-            match_row[2] = match_row[1].freeze
-            parent = self._store.iter_parent(match_row.iter)
-            iter = self._store.iter_children(parent)
-            freeze = match_row[2]
-            while iter:
-                if not self._store.get_value(iter, 2) == freeze:
-                    break
-                iter = self._store.iter_next(iter)
-            if iter == None:
-                # All row at the same freeze value, set freeze for the reader
-                self._store.set_value(parent, 2, freeze)
-            else:
-                # Set reader freeze to false
-                self._store.set_value(parent, 2, False)
+    def _freeze(self, event, signals, data=None):
+        for signal in signals.split(','):
+            match_row = self._search(self._store, self._match_func,\
+                                         (0, signal.strip()))
+            if match_row is not None:
+                match_row[2] = match_row[1].freeze
+                parent = self._store.iter_parent(match_row.iter)
+                iter = self._store.iter_children(parent)
+                freeze = match_row[2]
+                while iter:
+                    if not self._store.get_value(iter, 2) == freeze:
+                        break
+                    iter = self._store.iter_next(iter)
+                if iter == None:
+                    # All row at the same freeze value,
+                    # set freeze for the reader
+                    self._store.set_value(parent, 2, freeze)
+                else:
+                    # Set reader freeze to false
+                    self._store.set_value(parent, 2, False)
 
     def _cell_toggled(self, cellrenderer, path, data):
         if len(path) == 3:
@@ -386,7 +389,7 @@ class App(object):
         row = self._store[path]
         self._app_exec('create %s' % row[0])
 
-    def _create(self, event, signal, data=None):
+    def _create(self, event, signals, data=None):
         fig = self._ctxt.figures[len(self._ctxt.figures) - 1]
 
         w = gtk.Window()
