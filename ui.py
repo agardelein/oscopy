@@ -86,6 +86,7 @@ class App(object):
       <menu action="File">
         <menuitem action="Add file"/>
         <menuitem action="Update files"/>
+        <menuitem action="Execute script..."/>
         <menuitem action="New Math Signal..."/>
         <menuitem action="Run netlister and simulate..."/>
         <menuitem action="Show terminal"/>
@@ -173,6 +174,16 @@ class App(object):
     def _action_show_terminal(self, action):
         self._create_terminal_window()
 
+    def _action_execute_script(self, action):
+        dlg = gtk.FileChooserDialog('Execute script', parent=self._mainwindow,
+                                    buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                                             gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        resp = dlg.run()
+        filename = dlg.get_filename()
+        dlg.destroy()
+        if resp == gtk.RESPONSE_ACCEPT:
+            self._app_exec("exec " + filename)
+
     def _action_quit(self, action):
         self._write_config()
         main_loop.quit()
@@ -186,6 +197,8 @@ class App(object):
              self._action_add_file),
             ('Update files', gtk.STOCK_REFRESH, '_Update', None, None,
              self._action_update),
+            ('Execute script...', gtk.STOCK_MEDIA_PLAY, '_Execute script...',
+             None, None, self._action_execute_script),
             ("New Math Signal...", gtk.STOCK_NEW, '_New Math Signal', None,
              None, self._action_new_math),
             ("Run netlister and simulate...", gtk.STOCK_MEDIA_FORWARD,\
