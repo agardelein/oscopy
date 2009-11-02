@@ -1,13 +1,10 @@
 import gobject
 import gtk
 import signal
+import os
+import readline
 import commands
 import ConfigParser
-import os
-import vte
-import pty
-import sys
-import readline
 from xdg import BaseDirectory
 
 import oscopy
@@ -107,18 +104,10 @@ class App(object):
         self._windows_to_figures = {}
         self._current_graph = None
         self._current_figure = None
-        self._term = None
-        self._term_window_is_there = False
+        self._term_win = None
+        self._prompt = "oscopy-ui>"
         # History file
         self.hist_file = ".oscopy_hist"
-
-        # Readline configuration
-        if not os.path.exists(self.hist_file):
-            f = open(self.hist_file, "w")
-            f.write("figlist")
-            f.close()
-        readline.read_history_file(self.hist_file)
-        self._term_hist_item = readline.get_current_history_length()
 
         self._TARGET_TYPE_SIGNAL = 10354
         self._from_signal_list = [("oscopy-signals", gtk.TARGET_SAME_APP,\
@@ -340,71 +329,14 @@ class App(object):
         w.show_all()
 
     def _create_terminal_window(self):
-        cmdw = gtk.Window()
-        if self._term is None:
-            self._term = vte.Terminal()
-            self._term.set_cursor_blinks(True)
-            self._term.set_emulation('xterm')
-            self._term.set_font_from_string('monospace 9')
-            self._term.set_scrollback_lines(1000)
-            self._term.show()
-            (master, slave) = pty.openpty()
-            self._term.set_pty(master)
-            sys.stdout = os.fdopen(slave, "w")
-            print self._app.intro
-	scrollbar = gtk.VScrollbar()
-	scrollbar.set_adjustment(self._term.get_adjustment())
-        
-	termbox = gtk.HBox()
-	termbox.pack_start(self._term)
-	termbox.pack_start(scrollbar)
-
-        entrybox = gtk.HBox(False)
-        label = gtk.Label('Command:')
-        entry = gtk.Entry()
-        entry.connect('activate', self._terminal_entry_activate)
-        entry.connect('key-press-event', self._entry_key_pressed)
-        entrybox.pack_start(label, False, False, 12)
-        entrybox.pack_start(entry, True, True, 12)
-
-        box = gtk.VBox()
-        box.pack_start(termbox)
-        box.pack_start(entrybox)
-
-        cmdw.connect('destroy', self._terminal_window_destroy)
-        cmdw.add(box)
-        cmdw.show_all()
-        self._term_window_is_there = True
-
-    def _terminal_window_destroy(self, data=None):
-        self._term_window_is_there = False
-        return False
-        
-    def _terminal_entry_activate(self, entry, data=None):
-        if isinstance(entry, gtk.Entry):
-            line = entry.get_text()
-            if line is not None:
-                print self._app.prompt + line
-                line = self._app.precmd(line)
-                stop = self._app.onecmd(line)
-                self._app.postcmd(stop, line)
-                readline.add_history(line)
-            self._term_hist_item = readline.get_current_history_length()
-            entry.set_text('')
-
-    def _entry_key_pressed(self, entry, event):
-        if gtk.gdk.keyval_name(event.keyval) == "Up":
-            line = readline.get_history_item(self._term_hist_item - 1)
-            if line is not None:
-                self._term_hist_item = self._term_hist_item - 1
-                entry.set_text(line)
-            return True
-        elif gtk.gdk.keyval_name(event.keyval) == "Down":
-            line = readline.get_history_item(self._term_hist_item + 1)
-            if line is not None:
-                self._term_hist_item = self._term_hist_item + 1
-                entry.set_text(line)
-            return True
+        if self._term_win is None:
+            self._term_win = gui.dialogs.TerminalWindow(self._prompt,
+                                                        self._app.intro,
+                                                        self.hist_file,
+                                                        self._app_exec)
+        if not self._term_win.is_there:
+            self._term_win.create()
+        pass
 
     def _create_figure_popup_menu(self, figure, graph):
         figmenu = gui.menus.FigureMenu()

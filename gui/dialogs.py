@@ -1,4 +1,9 @@
+import os
 import gtk
+import vte
+import pty
+import sys
+import readline
 
 class Enter_Units_Dialog(object):
     def __init__(self):
@@ -163,3 +168,89 @@ class Run_Netlister_and_Simulate_Dialog:
     def _check_button_toggled(self, button, entry=None):
         if entry is not None:
             entry.set_editable(button.get_active())
+
+class TerminalWindow:
+    def __init__(self, prompt, intro, hist_file, app_exec):
+        # History file
+        self.hist_file = hist_file
+
+        # Readline configuration
+        if not os.path.exists(self.hist_file):
+            f = open(self.hist_file, "w")
+            f.write("figlist")
+            f.close()
+        # Since history file is already read in OscopyApp
+        # not need to read it once again
+        # readline.read_history_file(self.hist_file)
+        self.prompt = prompt
+        self.intro = intro
+        self._term = None
+        self._app_exec = app_exec
+        self.is_there = False
+        self._term_hist_item = readline.get_current_history_length() + 1
+
+    def create(self):
+        cmdw = gtk.Window()
+        if self._term is None:
+            self._term = vte.Terminal()
+            self._term.set_cursor_blinks(True)
+            self._term.set_emulation('xterm')
+            self._term.set_font_from_string('monospace 9')
+            self._term.set_scrollback_lines(1000)
+            self._term.show()
+            (master, slave) = pty.openpty()
+            self._term.set_pty(master)
+            sys.stdout = os.fdopen(slave, "w")
+            print self.intro
+	scrollbar = gtk.VScrollbar()
+	scrollbar.set_adjustment(self._term.get_adjustment())
+        
+	termbox = gtk.HBox()
+	termbox.pack_start(self._term)
+	termbox.pack_start(scrollbar)
+
+        entrybox = gtk.HBox(False)
+        label = gtk.Label('Command:')
+        entry = gtk.Entry()
+        entry.connect('activate', self._entry_activate)
+        entry.connect('key-press-event', self._entry_key_pressed)
+        entrybox.pack_start(label, False, False, 12)
+        entrybox.pack_start(entry, True, True, 12)
+
+        box = gtk.VBox()
+        box.pack_start(termbox)
+        box.pack_start(entrybox)
+
+        cmdw.connect('destroy', self._destroy)
+        cmdw.add(box)
+        cmdw.show_all()
+        self.is_there = True
+
+    def _destroy(self, data=None):
+        self.is_there = False
+        return False
+        
+    def _entry_activate(self, entry, data=None):
+        if isinstance(entry, gtk.Entry):
+            line = entry.get_text()
+            if line is not None:
+                print self.prompt + line
+                self._app_exec(line)
+                readline.add_history(line)
+            self._term_hist_item = readline.get_current_history_length()
+            entry.set_text('')
+
+    def _entry_key_pressed(self, entry, event):
+        if gtk.gdk.keyval_name(event.keyval) == "Up":
+            line = readline.get_history_item(self._term_hist_item - 1)
+            if line is not None:
+                self._term_hist_item = self._term_hist_item - 1
+                entry.set_text(line)
+            return True
+        elif gtk.gdk.keyval_name(event.keyval) == "Down":
+            line = readline.get_history_item(self._term_hist_item + 1)
+            if line is not None:
+                self._term_hist_item = self._term_hist_item + 1
+                entry.set_text(line)
+            return True
+
