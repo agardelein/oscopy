@@ -78,6 +78,9 @@ class OscopyAppUI(oscopy.OscopyApp):
                     print 'refreshing'
                     self._ctxt.figures[fignum].canvas.draw()
 
+    def do_pause(self, args):
+        print "Pause command disabled in UI"
+
     def do_plot(self, line):
         print "Plot command disabled in UI"
 
