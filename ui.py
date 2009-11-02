@@ -7,6 +7,7 @@ import os
 import vte
 import pty
 import sys
+import readline
 from xdg import BaseDirectory
 
 import oscopy
@@ -105,6 +106,17 @@ class App(object):
         self._current_figure = None
         self._term = None
         self._term_window_is_there = False
+        # History file
+        self.hist_file = ".oscopy_hist"
+
+        # Readline configuration
+        if not os.path.exists(self.hist_file):
+            f = open(self.hist_file, "w")
+            f.write("figlist")
+            f.close()
+        readline.read_history_file(self.hist_file)
+        self._term_hist_item = readline.get_current_history_length()
+
         self._TARGET_TYPE_SIGNAL = 10354
         self._from_signal_list = [("oscopy-signals", gtk.TARGET_SAME_APP,\
                                        self._TARGET_TYPE_SIGNAL)]
@@ -186,6 +198,7 @@ class App(object):
 
     def _action_quit(self, action):
         self._write_config()
+        readline.write_history_file(self.hist_file)
         main_loop.quit()
 
     def _create_menubar(self):
@@ -347,6 +360,7 @@ class App(object):
         label = gtk.Label('Command:')
         entry = gtk.Entry()
         entry.connect('activate', self._terminal_entry_activate)
+        entry.connect('key-press-event', self._entry_key_pressed)
         entrybox.pack_start(label, False, False, 12)
         entrybox.pack_start(entry, True, True, 12)
 
@@ -371,7 +385,23 @@ class App(object):
                 line = self._app.precmd(line)
                 stop = self._app.onecmd(line)
                 self._app.postcmd(stop, line)
+                readline.add_history(line)
+            self._term_hist_item = readline.get_current_history_length()
             entry.set_text('')
+
+    def _entry_key_pressed(self, entry, event):
+        if gtk.gdk.keyval_name(event.keyval) == "Up":
+            line = readline.get_history_item(self._term_hist_item - 1)
+            if line is not None:
+                self._term_hist_item = self._term_hist_item - 1
+                entry.set_text(line)
+            return True
+        elif gtk.gdk.keyval_name(event.keyval) == "Down":
+            line = readline.get_history_item(self._term_hist_item + 1)
+            if line is not None:
+                self._term_hist_item = self._term_hist_item + 1
+                entry.set_text(line)
+            return True
 
     def _create_figure_popup_menu(self, figure, graph):
         figmenu = gui.menus.FigureMenu()
