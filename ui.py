@@ -107,13 +107,16 @@ class App(object):
         self._term_win = None
         self._prompt = "oscopy-ui>"
         # History file
-        self.hist_file = ".oscopy_hist"
+        self.hist_file = None
 
         self._TARGET_TYPE_SIGNAL = 10354
         self._from_signal_list = [("oscopy-signals", gtk.TARGET_SAME_APP,\
                                        self._TARGET_TYPE_SIGNAL)]
         self._to_figure = [("oscopy-signals", gtk.TARGET_SAME_APP,\
                                 self._TARGET_TYPE_SIGNAL)]
+        self._resource = "oscopy"
+        self._read_config()
+
         self._ctxt = oscopy.Context()
         self._app = OscopyAppUI(self._ctxt)
         self._app.connect('read', self._add_file, None)
@@ -121,8 +124,6 @@ class App(object):
         self._app.connect('freeze', self._freeze, None)
         self._app.connect('unfreeze', self._freeze, None)
         self._app.connect('create', self._create, None)
-        self._resource = "oscopy"
-        self._read_config()
         self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT,
                                     gobject.TYPE_BOOLEAN)
         self._create_widgets()
@@ -475,6 +476,7 @@ class App(object):
         netlopt = 'Netlister'
         simopt = 'Simulator'
         runfrom = "RunFrom"
+        history = 'history'
         self._confparse = ConfigParser.SafeConfigParser()
         self._confparse.add_section(cmdsec)
         self._confparse.set(cmdsec, netlopt, '')
@@ -483,6 +485,9 @@ class App(object):
         path = BaseDirectory.load_first_config(self._resource)
         if path is not None:
             res = self._confparse.read('/'.join((path, self._configfile)))
+        else:
+            path = BaseDirectory.save_config_path(self._resource)
+        self.hist_file = '/'.join((path, history))
         self._actions = {'run_netlister': (True,
                                            self._confparse.get(cmdsec, netlopt)),
                          'run_simulator': (True,
