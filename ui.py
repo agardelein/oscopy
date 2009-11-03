@@ -475,15 +475,14 @@ class App(object):
         netlopt = 'Netlister'
         simopt = 'Simulator'
         runfrom = "RunFrom"
-        path = BaseDirectory.load_first_config(self._resource)
         self._confparse = ConfigParser.SafeConfigParser()
-        res = self._confparse.read('/'.join((path, self._configfile)))
-        if not res:
-            self._confparse.add_section(cmdsec)
-            self._confparse.set(cmdsec, netlopt, '')
-            self._confparse.set(cmdsec, simopt, '')
-            self._confparse.set(cmdsec, runfrom, '.')
-            
+        self._confparse.add_section(cmdsec)
+        self._confparse.set(cmdsec, netlopt, '')
+        self._confparse.set(cmdsec, simopt, '')
+        self._confparse.set(cmdsec, runfrom, '.')
+        path = BaseDirectory.load_first_config(self._resource)
+        if path is not None:
+            res = self._confparse.read('/'.join((path, self._configfile)))
         self._actions = {'run_netlister': (True,
                                            self._confparse.get(cmdsec, netlopt)),
                          'run_simulator': (True,
