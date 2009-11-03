@@ -36,13 +36,6 @@ FITNESS FOR A PARTICULAR PURPOSE."
         # History file
         self.hist_file = ".oscopy_hist"
 
-        # Readline configuration
-        if not os.path.exists(self.hist_file):
-            f = open(self.hist_file, "w")
-            f.write("figlist")
-            f.close()
-        readline.read_history_file(self.hist_file)
-
         # Current graph and current figure
         self._current_figure = None
         self._current_graph = None
@@ -377,8 +370,13 @@ FITNESS FOR A PARTICULAR PURPOSE."
             return line
 
     def preloop(self):
-        pass
-            
+        # Readline configuration
+        if not os.path.exists(self.hist_file):
+            f = open(self.hist_file, "w")
+            f.write("figlist")
+            f.close()
+        readline.read_history_file(self.hist_file)
+
     def postloop(self):
         readline.write_history_file(self.hist_file)
 

@@ -179,9 +179,8 @@ class TerminalWindow:
             f = open(self.hist_file, "w")
             f.write("figlist")
             f.close()
-        # Since history file is already read in OscopyApp
-        # not need to read it once again
-        # readline.read_history_file(self.hist_file)
+        readline.read_history_file(self.hist_file)
+
         self.prompt = prompt
         self.intro = intro
         self._term = None
