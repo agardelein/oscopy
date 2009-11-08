@@ -113,7 +113,7 @@ class Run_Netlister_and_Simulate_Dialog:
         vbox_netl.pack_start(self._ckbutton_netl)
         self._entry_netl.set_editable(self._ckbutton_netl.get_active())
         vbox_netl.pack_start(self._entry_netl)
-        self._dlg.vbox.pack_start(vbox_netl)
+        self._dlg.vbox.pack_start(vbox_netl, False)
 
         vbox_sim = gtk.VBox()
         self._entry_sim = gtk.Entry()
@@ -125,15 +125,15 @@ class Run_Netlister_and_Simulate_Dialog:
         vbox_sim.pack_start(self._ckbutton_sim)
         self._entry_sim.set_editable(self._ckbutton_sim.get_active())
         vbox_sim.pack_start(self._entry_sim)
-        self._dlg.vbox.pack_start(vbox_sim)
+        self._dlg.vbox.pack_start(vbox_sim, False)
         self._ckbutton_upd = gtk.CheckButton("Update readers")
         self._ckbutton_upd.set_active(actions['update'])
-        self._dlg.vbox.pack_start(self._ckbutton_upd)
+        self._dlg.vbox.pack_start(self._ckbutton_upd, False)
 
         hbox = gtk.HBox(False, 12)
         label = gtk.Label()
         label.set_markup('<b>Run from:</b>')
-        hbox.pack_start(label)
+        hbox.pack_start(label, False)
         dialog = gtk.FileChooserDialog('Run netlister and simulator in directory...',
                                        None,
                                        gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
@@ -144,7 +144,7 @@ class Run_Netlister_and_Simulate_Dialog:
         dialog.set_filename(actions['run_from'])
         self._filechoose = gtk.FileChooserButton(dialog)
         hbox.pack_start(self._filechoose)
-        self._dlg.vbox.pack_start(hbox)
+        self._dlg.vbox.pack_start(hbox, False)
 
         self._dlg.resize(300, 100)
         self._dlg.show_all()
