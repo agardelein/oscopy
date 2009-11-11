@@ -142,9 +142,9 @@ class Run_Netlister_and_Simulate_Dialog:
         vbox = gtk.VBox()
         box = gtk.HBox(False, 12)
         label = gtk.Label()
-        label.set_markup('Working directory:')
+        label.set_markup('Run from directory:')
         box.pack_start(label, False, False, 12)
-        dialog = gtk.FileChooserDialog('Run netlister and simulator in directory...',
+        dialog = gtk.FileChooserDialog('Run netlister and simulator from directory...',
                                        None,
                                        gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
                                        buttons=(gtk.STOCK_CANCEL,
@@ -163,7 +163,7 @@ class Run_Netlister_and_Simulate_Dialog:
         frame.add(vbox)
         self._dlg.vbox.pack_start(frame, False, False, 6)
 
-        self._dlg.resize(300, 100)
+        self._dlg.resize(400, 100)
         self._dlg.show_all()
 
     def run(self):
