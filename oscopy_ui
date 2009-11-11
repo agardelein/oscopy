@@ -39,10 +39,11 @@ class OscopyAppUI(oscopy.OscopyApp):
         oscopy.OscopyApp.postcmd(self, stop, line)
         if not line:
             return
-        event = line.split()[0].strip()
         if len(line.split()) > 1:
+            event = line.split()[0].strip()
             args = line.split(' ', 1)[1].strip()
         else:
+            event = ''
             args = ''
         if self._callbacks.has_key(event):
             for func, data in self._callbacks[event].iteritems():
