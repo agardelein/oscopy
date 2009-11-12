@@ -52,31 +52,45 @@ class Enter_Range_Dialog(object):
         self._dlg = None
         self._entries = None
 
-    def display(self, r):
+    def display(self, r, xy, scale_factors, units):
         self._dlg = gtk.Dialog('Enter graph range',
+                               flags=gtk.DIALOG_NO_SEPARATOR,
                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         self._dlg.set_default_response(gtk.RESPONSE_ACCEPT)
-        # Label and entry for X axis
+
         self._entries = []
-        xy = ['X', 'Y']
-        minmax = ['min', 'max']
-        table = gtk.Table(2, 4, False)
-        for col in range(0, 4):
-            table.set_col_spacing(col, 12)
-        for row in range(0, 2):
+        minmax = ['From', 'To']
+        
+        hbox = gtk.HBox(False)
+        for col in range(0, 2):
+            frame = gtk.Frame('')
+            frame.get_label_widget().set_markup('<b>'+ xy[col] +'</b>')
+            frame.set_shadow_type(gtk.SHADOW_NONE)
+            table = gtk.Table(1, 3, False)
             entries_row = []
-            for col in range(0, 4, 2):
-                label = gtk.Label(xy[row] + minmax[col / 2])
+            for row in range(0, 2):
+                label = gtk.Label(minmax[row])
+                align_lbl = gtk.Alignment(0, 0.5)
+                align_lbl.add(label)
                 entry = gtk.Entry()
-                entry.set_text(str(r[row][col/2]))
-                table.attach(label, col, col + 1, row, row + 1)
-                table.attach(entry, col + 1, col + 2, row, row + 1)
+                entry.set_text(str(r[col][row]))
+                entry.set_width_chars(7)
+                entry.set_activates_default(True)
+                units_label = gtk.Label(scale_factors[col] + units[col])
+                align_units = gtk.Alignment(0, 0.5)
+                align_units.add(units_label)
+                table.attach(align_lbl, 0, 1, row, row + 1, xpadding=3)
+                table.attach(entry, 1, 2, row, row + 1, xpadding=3)
+                table.attach(align_units, 2, 3, row, row + 1, xpadding=3)
+                table.set_row_spacing(row, 6)
                 entries_row.append(entry)
             self._entries.append(entries_row)
-                
-        self._dlg.vbox.pack_start(table)
-        self._dlg.set_border_width(12)
+            box = gtk.HBox(False)
+            box.pack_start(table, False, False, 12)
+            frame.add(box)
+            hbox.pack_start(frame, False, False, 0)
+        self._dlg.vbox.pack_start(hbox, False, False, 6)
 
         self._dlg.show_all()
 

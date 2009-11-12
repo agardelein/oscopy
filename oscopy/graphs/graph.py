@@ -396,6 +396,18 @@ class Graph(mplAxes):
         """
         return
 
+    @property
+    def axis_names(self):
+        """Return the axis name"""
+        return [self._xaxis, self._yaxis]
+
+    @property
+    def scale_factor_names(self):
+        """Return the scane factors names"""
+        fx, lx = self._find_scale_factor('X')
+        fy, ly = self._find_scale_factor('Y')
+        return [lx, ly]
+
     unit = property(get_unit, set_unit)
     scale = property(get_scale, set_scale)
     range = property(get_range, set_range)

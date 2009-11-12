@@ -115,7 +115,6 @@ class GraphMenu(object):
             if figure.canvas is not None:
                 figure.canvas.draw()
 
-
     def _units_menu_item_activated(self, menuitem, user_data):
         figure, graph, app_exec = user_data
         self._create_units_window(figure, graph, app_exec)
@@ -124,7 +123,8 @@ class GraphMenu(object):
         if graph is None:
             return
         rangedlg = dialogs.Enter_Range_Dialog()
-        rangedlg.display(graph.get_range())
+        rangedlg.display(graph.get_range(), graph.axis_names,
+                         graph.scale_factor_names, graph.unit)
         r = rangedlg.run()
         if r:
             app_exec('range %s' % ' '.join(r))
