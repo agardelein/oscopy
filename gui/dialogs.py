@@ -12,8 +12,9 @@ class Enter_Units_Dialog(object):
         self._entry_yunits = None
         pass
 
-    def display(self, units):
+    def display(self, units, xy, scale_factors):
         self._dlg = gtk.Dialog('Enter graph units',
+                               flags=gtk.DIALOG_NO_SEPARATOR,
                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         self._dlg.set_default_response(gtk.RESPONSE_ACCEPT)
@@ -21,20 +22,25 @@ class Enter_Units_Dialog(object):
         table.set_col_spacing(0, 12)
         table.set_col_spacing(1, 12)
         # Label and entry for X axis
-        label_xunits = gtk.Label('X axis unit:')
-        table.attach(label_xunits, 0, 1, 0, 1)
+        label_xunits = gtk.Label(xy[0])
+        align = gtk.Alignment(0, 0.5)
+        align.add(label_xunits)
+        table.attach(align, 0, 1, 0, 1)
         self._entry_xunits = gtk.Entry()
         self._entry_xunits.set_text(units[0])
+        self._entry_xunits.set_width_chars(7)
         table.attach(self._entry_xunits, 1, 2, 0, 1)
 
         # Label and entry for Y axis
-        label_yunits = gtk.Label('Y axis unit:')
-        table.attach(label_yunits, 0, 1, 1, 2)
+        label_yunits = gtk.Label(xy[1])
+        align = gtk.Alignment(0, 0.5)
+        align.add(label_yunits)
+        table.attach(align, 0, 1, 1, 2)
         self._entry_yunits = gtk.Entry()
         self._entry_yunits.set_text(units[1])
+        self._entry_yunits.set_width_chars(7)
         table.attach(self._entry_yunits, 1, 2, 1, 2)
         self._dlg.vbox.pack_start(table)
-        self._dlg.set_border_width(12)
 
         self._dlg.show_all()
 

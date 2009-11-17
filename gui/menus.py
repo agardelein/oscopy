@@ -108,7 +108,7 @@ class GraphMenu(object):
         if graph is None:
             return
         unitdlg = dialogs.Enter_Units_Dialog()
-        unitdlg.display(graph.unit)
+        unitdlg.display(graph.unit, graph.axis_names, graph.scale_factor_names)
         units = unitdlg.run()
         if units:
             app_exec('unit %s' % ' '.join(units))
