@@ -1,4 +1,5 @@
 import os
+import gobject
 import gtk
 import vte
 import pty
@@ -143,50 +144,59 @@ class Enter_Range_Dialog(object):
         self._dlg.destroy()
         return r
 
+DEFAULT_NETLISTER_COMMAND = 'gnetlist -g spice-sdb -s -o %s.net %s.sch'
+DEFAULT_SIMULATOR_COMMAND = 'gnucap -b %s.net'
+
 class Run_Netlister_and_Simulate_Dialog:
     def __init__(self):
         self._dlg = None
         pass
 
+    def _make_check_entry(self, name, do_run, commands, default_command):
+        # returns a tuple (check_button, combo_box_entry)
+        combo = gtk.combo_box_entry_new_text()
+        if not commands:
+            commands = [default_command]
+        for cmd in commands:
+            combo.append_text(cmd)
+        combo.set_active(0)
+        combo.set_sensitive(do_run)
+
+        btn = gtk.CheckButton('Run %s:' % name)
+        btn.set_active(do_run)
+        btn.connect('toggled', self._check_button_toggled, combo)
+        return btn, combo
+
     def display(self, actions):
-        # Define functions to enable/disable entries upon toggle buttons
-        # make window a bit larger
         self._dlg = gtk.Dialog("Run netlister and simulate",
                                flags=gtk.DIALOG_NO_SEPARATOR,
                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         self._dlg.set_default_response(gtk.RESPONSE_ACCEPT)
-        frame = gtk.Frame('')
-        frame.get_label_widget().set_markup('<b>Netlister</b>')
-        frame.set_shadow_type(gtk.SHADOW_NONE)
-        box = gtk.HBox()
-        self._entry_netl = gtk.Entry()
-        self._entry_netl.set_text(actions['run_netlister'][1])
-        self._ckbutton_netl = gtk.CheckButton("Run")
-        self._ckbutton_netl.set_active(actions['run_netlister'][0])
-        self._ckbutton_netl.connect('toggled', self._check_button_toggled,
-                                    self._entry_netl)
-        self._entry_netl.set_editable(self._ckbutton_netl.get_active())
-        box.pack_start(self._ckbutton_netl, False, False, 12)
-        box.pack_start(self._entry_netl, True, True)
-        frame.add(box)
-        self._dlg.vbox.pack_start(frame, False, False, 6)
 
-        frame = gtk.Frame('')
-        frame.get_label_widget().set_markup('<b>Simulator</b>')
-        frame.set_shadow_type(gtk.SHADOW_NONE)
+        # netlister part
         box = gtk.HBox()
-        self._entry_sim = gtk.Entry()
-        self._entry_sim.set_text(actions['run_simulator'][1])
-        self._ckbutton_sim = gtk.CheckButton('Run')
-        self._ckbutton_sim.set_active(actions['run_simulator'][0])
-        self._ckbutton_sim.connect('toggled', self._check_button_toggled,
-                                   self._entry_sim)
-        self._entry_sim.set_editable(self._ckbutton_sim.get_active())
-        box.pack_start(self._ckbutton_sim, False, False, 12)
-        box.pack_start(self._entry_sim, True, True)
-        frame.add(box)
-        self._dlg.vbox.pack_start(frame, False, False, 6)
+        do_run, commands = actions['run_netlister']
+        btn, combo = self._make_check_entry('netlister', do_run, commands,
+                                            DEFAULT_NETLISTER_COMMAND)
+        self._ckbutton_netl, self._entry_netl = btn, combo
+        box.pack_start(btn, False, False, 12)
+        box.pack_start(combo, True, True)
+        self._dlg.vbox.pack_start(box, False, False, 6)
+
+        # simulator part
+        box = gtk.HBox()
+        do_run, commands = actions['run_simulator']
+        btn, combo = self._make_check_entry('simulator', do_run, commands,
+                                            DEFAULT_SIMULATOR_COMMAND)
+        self._ckbutton_sim, self._entry_sim = btn, combo
+        box.pack_start(btn, False, False, 12)
+        box.pack_start(combo, True, True)
+        self._dlg.vbox.pack_start(box, False, False, 6)
+
+        group = gtk.SizeGroup(gtk.SIZE_GROUP_HORIZONTAL)
+        group.add_widget(self._ckbutton_netl)
+        group.add_widget(self._ckbutton_sim)
 
         frame = gtk.Frame('')
         frame.get_label_widget().set_markup('<b>Options</b>')
@@ -196,7 +206,7 @@ class Run_Netlister_and_Simulate_Dialog:
         label = gtk.Label()
         label.set_markup('Run from directory:')
         box.pack_start(label, False, False, 12)
-        dialog = gtk.FileChooserDialog('Run netlister and simulator from directory...',
+        dialog = gtk.FileChooserDialog('Choose directory',
                                        None,
                                        gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
                                        buttons=(gtk.STOCK_CANCEL,
@@ -211,32 +221,34 @@ class Run_Netlister_and_Simulate_Dialog:
         self._ckbutton_upd = gtk.CheckButton('Update readers once terminated')
         self._ckbutton_upd.set_active(actions['update'])
         box.pack_start(self._ckbutton_upd, False, False, 12)
-        vbox.pack_start(box, False)
+        vbox.pack_start(box, False, False, 6)
         frame.add(vbox)
         self._dlg.vbox.pack_start(frame, False, False, 6)
 
         self._dlg.resize(400, 100)
         self._dlg.show_all()
 
-    def run(self):
-        resp = self._dlg.run()
-        if resp == gtk.RESPONSE_ACCEPT:
-            actions = {}
-            actions['run_netlister'] = (self._ckbutton_netl.get_active(),
-                                        self._entry_netl.get_text())
-            actions['run_simulator'] = (self._ckbutton_sim.get_active(),
-                                        self._entry_sim.get_text())
-            actions['update'] = self._ckbutton_upd.get_active()
-            actions['run_from'] = self._filechoose.get_filename()
-            self._dlg.destroy()
-            return actions
-        else:
-            self._dlg.destroy()
-            return None
+    def _collect_data(self):
+        actions = {}
+        netlister_cmds = [self._entry_netl.get_active_text()]
+        netlister_cmds.extend(row[0] for row in self._entry_netl.get_model())
+        simulator_cmds = [self._entry_sim.get_active_text()]
+        simulator_cmds.extend(row[0] for row in self._entry_sim.get_model())
+        actions['run_netlister'] = (self._ckbutton_netl.get_active(), netlister_cmds)
+        actions['run_simulator'] = (self._ckbutton_sim.get_active(), simulator_cmds)
+        actions['update'] = self._ckbutton_upd.get_active()
+        actions['run_from'] = self._filechoose.get_filename()
+        return actions
 
-    def _check_button_toggled(self, button, entry=None):
-        if entry is not None:
-            entry.set_editable(button.get_active())
+    def run(self):
+        actions = None
+        if self._dlg.run() == gtk.RESPONSE_ACCEPT:
+            actions = self._collect_data()
+        self._dlg.destroy()
+        return actions
+
+    def _check_button_toggled(self, button, entry):
+        entry.set_sensitive(button.get_active())
 
 class TerminalWindow:
     def __init__(self, prompt, intro, hist_file, app_exec):

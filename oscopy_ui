@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from __future__ import with_statement
 
 import gobject
 import gtk
@@ -28,7 +29,7 @@ class OscopyAppUI(oscopy.OscopyApp):
         oscopy.OscopyApp.__init__(self, context)
         self._callbacks = {}
         self._autorefresh = True
-        
+
     def connect(self, event, func, data):
         if not isinstance(event, str):
             return
@@ -101,23 +102,20 @@ class App(object):
     def __init__(self):
         self._scale_to_str = {'lin': 'Linear', 'logx': 'LogX', 'logy': 'LogY',\
                                   'loglog': 'Loglog'}
-        self._configfile = "gui"
         self._figcount = 0
         self._windows_to_figures = {}
         self._current_graph = None
         self._current_figure = None
         self._term_win = None
         self._prompt = "oscopy-ui>"
-        # History file
-        self.hist_file = None
+        self._init_config()
+        self._read_config()
 
         self._TARGET_TYPE_SIGNAL = 10354
         self._from_signal_list = [("oscopy-signals", gtk.TARGET_SAME_APP,\
                                        self._TARGET_TYPE_SIGNAL)]
         self._to_figure = [("oscopy-signals", gtk.TARGET_SAME_APP,\
                                 self._TARGET_TYPE_SIGNAL)]
-        self._resource = "oscopy"
-        self._read_config()
 
         self._ctxt = oscopy.Context()
         self._app = OscopyAppUI(self._ctxt)
@@ -132,6 +130,24 @@ class App(object):
         #self._app_exec('read demo/irf540.dat')
         #self._app_exec('read demo/ac.dat')
         #self._add_file('demo/res.dat')
+
+    SECTION = 'oscopy_ui'
+    OPT_NETLISTER_COMMANDS = 'netlister_commands'
+    OPT_SIMULATOR_COMMANDS = 'simulator_commands'
+    OPT_RUN_DIRECTORY = 'run_directory'
+
+    def _init_config(self):
+        # initialize configuration stuff
+        path = BaseDirectory.load_first_config('oscopy')
+        self.config_file = os.path.join(path, 'gui')
+        self.hist_file = os.path.join(path, 'history')
+        section = App.SECTION
+        self.config = ConfigParser.RawConfigParser()
+        self.config.add_section(section)
+        # defaults
+        self.config.set(section, App.OPT_NETLISTER_COMMANDS, '')
+        self.config.set(section, App.OPT_SIMULATOR_COMMANDS, '')
+        self.config.set(section, App.OPT_RUN_DIRECTORY, '.')
 
     def _add_file(self, event, filename, data=None):
         it = self._store.append(None, (filename.strip(), None, False))
@@ -427,27 +443,34 @@ class App(object):
     def update_from_usr1(self):
         self._ctxt.update()
 
-    def _action_netlist_and_simulate(self, action):
-        netnsimdlg = gui.dialogs.Run_Netlister_and_Simulate_Dialog()
-        netnsimdlg.display(self._actions)
-        actions = netnsimdlg.run()
-        if actions is not None:
-            self._actions = actions
-            old_dir = os.getcwd()
-            os.chdir(self._actions['run_from'])
-            if self._actions['run_netlister'][0]:
-                res = commands.getstatusoutput(self._actions['run_netlister'][1])
-                if res[0]:
-                    report_error(self._mainwindow, res[1])
-                print res[1]
-            if self._actions['run_simulator'][0]:
-                res = commands.getstatusoutput(self._actions['run_simulator'][1])
-                if res[0]:
-                    report_error(self._mainwindow, res[1])
-                print res[1]
+    def _run_ext_command(self, cmd, run_dir):
+        old_dir = os.getcwd()
+        os.chdir(run_dir)
+        try:
+            status, output = commands.getstatusoutput(cmd)
+            if status:
+                msg = "Executing command '%s' failed." % cmd
+                report_error(self._mainwindow, msg)
+            return status == 0
+        finally:
             os.chdir(old_dir)
-            if self._actions['update']:
-                self._ctxt.update()
+
+    def _action_netlist_and_simulate(self, action):
+        dlg = gui.dialogs.Run_Netlister_and_Simulate_Dialog()
+        dlg.display(self._actions)
+        actions = dlg.run()
+        if actions is None:
+            return
+        self._actions = actions
+        run_dir = actions['run_from']
+        if actions['run_netlister'][0]:
+            if not self._run_ext_command(actions['run_netlister'][1][0], run_dir):
+                return
+        if actions['run_simulator'][0]:
+            if not self._run_ext_command(actions['run_simulator'][1][0], run_dir):
+                return
+        if actions['update']:
+            self._ctxt.update()
 
     def _drag_data_get_cb(self, widget, drag_context, selection, target_type,\
                               time):
@@ -473,42 +496,38 @@ class App(object):
                 if self._current_figure.canvas is not None:
                     self._current_figure.canvas.draw()
 
+    def _sanitize_list(self, lst):
+        return filter(lambda x: len(x) > 0, map(lambda x: x.strip(), lst))
+
+    def _actions_from_config(self, config):
+        section = App.SECTION
+        netlister_commands = config.get(section, App.OPT_NETLISTER_COMMANDS)
+        netlister_commands = self._sanitize_list(netlister_commands.split(';'))
+        simulator_commands = config.get(section, App.OPT_SIMULATOR_COMMANDS)
+        simulator_commands = self._sanitize_list(simulator_commands.split(';'))
+        actions = {
+            'run_netlister': (True, netlister_commands),
+            'run_simulator': (True, simulator_commands),
+            'update': True,
+            'run_from': config.get(section, App.OPT_RUN_DIRECTORY)}
+        return actions
+
+    def _actions_to_config(self, actions, config):
+        section = App.SECTION
+        netlister_commands = ';'.join(actions['run_netlister'][1])
+        simulator_commands = ';'.join(actions['run_simulator'][1])
+        config.set(section, App.OPT_NETLISTER_COMMANDS, netlister_commands)
+        config.set(section, App.OPT_SIMULATOR_COMMANDS, simulator_commands)
+        config.set(section, App.OPT_RUN_DIRECTORY, actions['run_from'])
+
     def _read_config(self):
-        cmdsec = 'Commands'
-        netlopt = 'Netlister'
-        simopt = 'Simulator'
-        runfrom = "RunFrom"
-        history = 'history'
-        self._confparse = ConfigParser.SafeConfigParser()
-        self._confparse.add_section(cmdsec)
-        self._confparse.set(cmdsec, netlopt, '')
-        self._confparse.set(cmdsec, simopt, '')
-        self._confparse.set(cmdsec, runfrom, '.')
-        path = BaseDirectory.load_first_config(self._resource)
-        if path is not None:
-            res = self._confparse.read('/'.join((path, self._configfile)))
-        else:
-            path = BaseDirectory.save_config_path(self._resource)
-        self.hist_file = '/'.join((path, history))
-        self._actions = {'run_netlister': (True,
-                                           self._confparse.get(cmdsec, netlopt)),
-                         'run_simulator': (True,
-                                           self._confparse.get(cmdsec, simopt)),
-                         'update': True,
-                         'run_from': self._confparse.get(cmdsec, runfrom)}
+        self.config.read(self.config_file)
+        self._actions = self._actions_from_config(self.config)
 
     def _write_config(self):
-        cmdsec = 'Commands'
-        netlopt = 'Netlister'
-        simopt = 'Simulator'
-        runfrom = "RunFrom"
-        self._confparse.set(cmdsec, netlopt, self._actions['run_netlister'][1])
-        self._confparse.set(cmdsec, simopt, self._actions['run_simulator'][1])
-        self._confparse.set(cmdsec, runfrom, self._actions['run_from'])
-        path = BaseDirectory.save_config_path(self._resource)
-        f = open('/'.join((path, self._configfile)), 'w')
-        res = self._confparse.write(f)
-        f.close()
+        self._actions_to_config(self._actions, self.config)
+        with open(self.config_file, 'w') as f:
+            self.config.write(f)
 
         
 def usr1_handler(signum, frame):
