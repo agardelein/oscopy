@@ -73,6 +73,7 @@ class Graph(mplAxes):
             self._yrange = sigs.yrange
             self._cursors = {"horiz": [None, None], "vert": [None, None]}
             self._txt = None
+            self._scale_factors = sigs.scale_factors
             self._signals2lines = sigs._signals2lines.copy()
             self.insert(mysigs)
         else:
@@ -85,6 +86,7 @@ class Graph(mplAxes):
             # Cursors values, only two horiz and two vert but can be changed
             self._cursors = {"horiz":[None, None], "vert":[None, None]}
             self._txt = None
+            self._scale_factors = [None, None]
             self._signals2lines = {}
             self.insert(sigs)
 
@@ -159,13 +161,17 @@ class Graph(mplAxes):
             x = s.ref.data * pow(10, fx)
             y = s.data * pow(10, fy)
             self._signals2lines[sn].set_xdata(x)
-            self._signals2lines[sn].set_ydata(y)
-            
+            self._signals2lines[sn].set_ydata(y)            
     
     def _find_scale_factor(self, a):
         """ Choose the right scale for data on axis a
-        Return the scale factor (f) and a string with the abbrev. (l)
+        Return the scale factor (f) and a string with the label. (l)
+        E.g. for data from 0.001 to 0.01 return 3 and "m" for milli-
         """
+        if a == "X" and self._scale_factors[0] is not None:
+            return self._scale_factors[0], self._factor_names[-self._scale_factors[0]]
+        if a == "Y" and self._scale_factors[1] is not None:
+            return self._scale_factors[1], self._factor_names[-self._scale_factors[1]]
         # Find the absolute maximum of the data
         mxs = []
         mns = []
@@ -401,13 +407,34 @@ class Graph(mplAxes):
         """Return the axis name"""
         return [self._xaxis, self._yaxis]
 
-    @property
-    def scale_factor_names(self):
+    def get_scale_factors(self):
         """Return the scane factors names"""
         fx, lx = self._find_scale_factor('X')
         fy, ly = self._find_scale_factor('Y')
-        return [lx, ly]
+        return [-fx, -fy]
+
+    def set_scale_factors(self, x_factor, y_factor):
+        old_fx, lx = self._find_scale_factor('X')
+        old_fy, ly = self._find_scale_factor('Y')
+        if x_factor is not None:
+            self._scale_factors[0] = -x_factor
+        else:
+            self._scale_factors[0] = x_factor
+        if y_factor is not None:
+            self._scale_factors[1] = -y_factor
+        else:
+            self._scale_factors[1] = y_factor
+        fx, lx = self._find_scale_factor('X')
+        fy, ly = self._find_scale_factor('Y')
+        xr, yr = self.get_range()
+        self.set_range([xr[0] * pow(10, fx - old_fx),
+                        xr[1] * pow(10, fx - old_fx),
+                        yr[0] * pow(10, fy - old_fy),
+                        yr[1] * pow(10, fy - old_fy)])
+        self.update_signals()
+        self.set_unit((self._xunit, self._yunit))
 
     unit = property(get_unit, set_unit)
     scale = property(get_scale, set_scale)
     range = property(get_range, set_range)
+    scale_factors = property(get_scale_factors, set_scale_factors)

@@ -403,3 +403,22 @@ FITNESS FOR A PARTICULAR PURPOSE."
         except IOError, e:
             print "Script error:", e
             f.close()
+
+    def help_factors(self):
+        print "factors X, Y"
+        print "   set the scaling factor of the graph (in power of ten)"
+        print "   use 'auto' for automatic scaling factor"
+        print "   e.g. factor -3, 6 set the scale factor at 1e-3 and 10e6"
+    def do_factors(self, args):
+        if self._current_graph is None:
+            return
+        factors = args.split(',')
+        if factors[0] == 'auto':
+            fx = None
+        else:
+            fx = int(factors[0])
+        if factors[1] == 'auto':
+            fy = None
+        else:
+            fy = int(factors[1])
+        self._current_graph.set_scale_factors(fx, fy)
