@@ -4,24 +4,37 @@ import vte
 import pty
 import sys
 import readline
+import gobject
+
+from oscopy import factors_to_names, abbrevs_to_factors
 
 class Enter_Units_Dialog(object):
     def __init__(self):
         self._dlg = None
         self._entry_xunits = None
         self._entry_yunits = None
-        pass
+        self._scale_factors = gtk.ListStore(gobject.TYPE_STRING,
+                                            gobject.TYPE_STRING)
+        sorted_list = factors_to_names.keys()
+        sorted_list.sort()
+        for factor in sorted_list:
+            self._scale_factors.append((factors_to_names[factor][0],
+                                       factors_to_names[factor][1]))
 
     def display(self, units, xy, scale_factors):
+
+        sorted_list = factors_to_names.keys()
+        sorted_list.sort()
+        
         self._dlg = gtk.Dialog('Enter graph units',
                                flags=gtk.DIALOG_NO_SEPARATOR,
                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         self._dlg.set_default_response(gtk.RESPONSE_ACCEPT)
-        table = gtk.Table(2, 2, False)
+        table = gtk.Table(2, 3, False)
         table.set_col_spacing(0, 12)
         table.set_col_spacing(1, 12)
-        # Label and entry for X axis
+        # Label, scale factor and entry for X axis
         label_xunits = gtk.Label(xy[0])
         align = gtk.Alignment(0, 0.5)
         align.add(label_xunits)
@@ -29,9 +42,16 @@ class Enter_Units_Dialog(object):
         self._entry_xunits = gtk.Entry()
         self._entry_xunits.set_text(units[0])
         self._entry_xunits.set_width_chars(7)
-        table.attach(self._entry_xunits, 1, 2, 0, 1)
+        self._entry_xunits.set_activates_default(True)
+        table.attach(self._entry_xunits, 2, 3, 0, 1)
+        self._combox_fact = gtk.ComboBox(self._scale_factors)
+        self._combox_fact.set_active(sorted_list.index(scale_factors[0]))
+        cell = gtk.CellRendererText()
+        self._combox_fact.pack_start(cell, True)
+        self._combox_fact.add_attribute(cell, 'text', 1)
+        table.attach(self._combox_fact, 1, 2, 0, 1)
 
-        # Label and entry for Y axis
+        # Label, scale factor and entry for Y axis
         label_yunits = gtk.Label(xy[1])
         align = gtk.Alignment(0, 0.5)
         align.add(label_yunits)
@@ -39,7 +59,14 @@ class Enter_Units_Dialog(object):
         self._entry_yunits = gtk.Entry()
         self._entry_yunits.set_text(units[1])
         self._entry_yunits.set_width_chars(7)
-        table.attach(self._entry_yunits, 1, 2, 1, 2)
+        self._entry_yunits.set_activates_default(True)
+        table.attach(self._entry_yunits, 2, 3, 1, 2)
+        self._comboy_fact = gtk.ComboBox(self._scale_factors)
+        self._comboy_fact.set_active(sorted_list.index(scale_factors[1]))
+        cell = gtk.CellRendererText()
+        self._comboy_fact.pack_start(cell, True)
+        self._comboy_fact.add_attribute(cell, 'text', 1)
+        table.attach(self._comboy_fact, 1, 2, 1, 2)
         self._dlg.vbox.pack_start(table)
 
         self._dlg.show_all()
@@ -50,8 +77,12 @@ class Enter_Units_Dialog(object):
         if resp == gtk.RESPONSE_ACCEPT:
             units = (self._entry_xunits.get_text(),
                      self._entry_yunits.get_text())
+            x_factor_index = self._combox_fact.get_active_iter()
+            y_factor_index = self._comboy_fact.get_active_iter()
+            scale_factors = [self._scale_factors.get(x_factor_index, 0)[0],
+                             self._scale_factors.get(y_factor_index, 0)[0]]
         self._dlg.destroy()
-        return units
+        return units, scale_factors
 
 class Enter_Range_Dialog(object):
     def __init__(self):
@@ -83,7 +114,8 @@ class Enter_Range_Dialog(object):
                 entry.set_text(str(r[col][row]))
                 entry.set_width_chars(7)
                 entry.set_activates_default(True)
-                units_label = gtk.Label(scale_factors[col] + units[col])
+                units_label = gtk.Label(factors_to_names[-scale_factors[col]][0]
+                                        + units[col])
                 align_units = gtk.Alignment(0, 0.5)
                 align_units.add(units_label)
                 table.attach(align_lbl, 0, 1, row, row + 1, xpadding=3)

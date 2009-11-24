@@ -59,14 +59,16 @@ factors_to_names = {-18: ("a", 'atto'), -15:("f", 'femto'),
                  0:("",'(no scaling)'), 3:("k",'kilo'),
                  6:("M", 'mega'), 9:("G",'giga'),
                  12:("T", 'Tera'), 15:("P",'peta'),
-                 18:("E", 'exa'), -3.1416:('', '(auto)')}
+                 18:("E", 'exa'), -31416:('auto', '(auto)')}
 
 abbrevs_to_factors = {'E':18, 'P':15, 'T':12, 'G':9, 'M':6, 'k':3, '':0,
-                     'a':-18, 'f':-15, 'p':-12, 'n':-9, 'u':-6, 'm':-3}
+                     'a':-18, 'f':-15, 'p':-12, 'n':-9, 'u':-6, 'm':-3,
+                      'auto':-31416}
 
 names_to_factors = {'exa':18, 'peta':15, 'tera':12, 'giga':9, 'mega':6,
                     'kilo':3, '(no scaling)':0, 'atto':-18, 'femto':-15,
-                    'pico':-12, 'nano':-9, 'micro':-6, 'milli':-3}
+                    'pico':-12, 'nano':-9, 'micro':-6, 'milli':-3,
+                    '(auto)':-31416}
 
 
 class Graph(mplAxes):

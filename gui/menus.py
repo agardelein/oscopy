@@ -108,10 +108,11 @@ class GraphMenu(object):
         if graph is None:
             return
         unitdlg = dialogs.Enter_Units_Dialog()
-        unitdlg.display(graph.unit, graph.axis_names, graph.scale_factor_names)
-        units = unitdlg.run()
+        unitdlg.display(graph.unit, graph.axis_names, graph.scale_factors)
+        units, scale_factors = unitdlg.run()
         if units:
-            app_exec('unit %s' % ' '.join(units))
+            app_exec('unit %s' % ','.join(units))
+            app_exec('factors %s,%s' % (scale_factors[0],scale_factors[1]))
             if figure.canvas is not None:
                 figure.canvas.draw()
 
@@ -124,7 +125,7 @@ class GraphMenu(object):
             return
         rangedlg = dialogs.Enter_Range_Dialog()
         rangedlg.display(graph.get_range(), graph.axis_names,
-                         graph.scale_factor_names, graph.unit)
+                         graph.scale_factors, graph.unit)
         r = rangedlg.run()
         if r:
             app_exec('range %s' % ' '.join(r))
