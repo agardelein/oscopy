@@ -9,6 +9,7 @@ import time
 from context import Context
 from cmd import Cmd
 from readers.reader import ReadError
+from graphs import factors_to_names, abbrevs_to_factors
 
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
@@ -412,13 +413,17 @@ FITNESS FOR A PARTICULAR PURPOSE."
     def do_factors(self, args):
         if self._current_graph is None:
             return
-        factors = args.split(',')
-        if factors[0] == 'auto':
-            fx = None
-        else:
-            fx = int(factors[0])
-        if factors[1] == 'auto':
-            fy = None
-        else:
-            fy = int(factors[1])
-        self._current_graph.set_scale_factors(fx, fy)
+        factors = [None, None]
+        for i, f in enumerate(args.split(',')):
+            if i > 1:
+                break
+            factor = f.strip()
+            if factor.isdigit() or (len(factor) > 1 and factor[0] == '-' and\
+                                        factor[1:].isdigit()):
+                factors[i] = int(factor)
+            else:
+                if factor == 'auto':
+                    factors[i] = None
+                else:
+                    factors[i] = abbrevs_to_factors[factor]
+        self._current_graph.set_scale_factors(factors[0], factors[1])

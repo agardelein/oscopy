@@ -53,6 +53,22 @@ from matplotlib.pyplot import Axes as mplAxes
 from matplotlib import rc
 from cursor import Cursor
 
+factors_to_names = {-18: ("a", 'atto'), -15:("f", 'femto'),
+                 -12:("p", 'pico'), -9:("n", 'nano'),
+                 -6:("u", 'micro'), -3:("m", 'milli'),
+                 0:("",'(no scaling)'), 3:("k",'kilo'),
+                 6:("M", 'mega'), 9:("G",'giga'),
+                 12:("T", 'Tera'), 15:("P",'peta'),
+                 18:("E", 'exa'), -3.1416:('', '(auto)')}
+
+abbrevs_to_factors = {'E':18, 'P':15, 'T':12, 'G':9, 'M':6, 'k':3, '':0,
+                     'a':-18, 'f':-15, 'p':-12, 'n':-9, 'u':-6, 'm':-3}
+
+names_to_factors = {'exa':18, 'peta':15, 'tera':12, 'giga':9, 'mega':6,
+                    'kilo':3, '(no scaling)':0, 'atto':-18, 'femto':-15,
+                    'pico':-12, 'nano':-9, 'micro':-6, 'milli':-3}
+
+
 class Graph(mplAxes):
     def __init__(self, fig, rect, sigs={}, **kwargs):
         """ Create a graph
@@ -62,9 +78,6 @@ class Graph(mplAxes):
         """
         mplAxes.__init__(self, fig, rect, **kwargs)
         self._sigs = {}
-        self._factor_names = {-18: "a", -15:"f", -12:"p", -9:"n", -6:"u",\
-                                   -3:"m", 0:"", 3:"k", 6:"M", 9:"G", 12:"T",\
-                                   15:"P", 18:"E"}
 
         if isinstance(sigs, Graph):
             mysigs = {}
@@ -169,9 +182,9 @@ class Graph(mplAxes):
         E.g. for data from 0.001 to 0.01 return 3 and "m" for milli-
         """
         if a == "X" and self._scale_factors[0] is not None:
-            return self._scale_factors[0], self._factor_names[-self._scale_factors[0]]
+            return self._scale_factors[0], factors_to_names[-self._scale_factors[0]][0]
         if a == "Y" and self._scale_factors[1] is not None:
-            return self._scale_factors[1], self._factor_names[-self._scale_factors[1]]
+            return self._scale_factors[1], factors_to_names[-self._scale_factors[1]][0]
         # Find the absolute maximum of the data
         mxs = []
         mns = []
@@ -196,10 +209,10 @@ class Graph(mplAxes):
         while not (abs(mx * pow(10.0, f)) < 1000.0 \
                        and abs(mx * pow(10.0, f)) >= 1.0):
             f = f + fct
-        if self._factor_names.has_key(-f) and \
+        if factors_to_names.has_key(-f) and \
                 ((self._xunit != "" and a == "X") or \
                      (self._yunit != "" and a != "X")):
-            l = self._factor_names[-f]
+            l = factors_to_names[-f][0]
         else:
             if f == 0:
                 l = ""
