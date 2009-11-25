@@ -37,7 +37,7 @@ class OscopyAppUI(oscopy.OscopyApp):
 
     def postcmd(self, stop, line):
         oscopy.OscopyApp.postcmd(self, stop, line)
-        if not line:
+        if not line.strip():
             return
         event = line.split()[0].strip()
         if len(line.split()) > 1:
