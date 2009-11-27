@@ -286,8 +286,8 @@ class TerminalWindow:
             self._term.set_emulation('xterm')
             self._term.set_font_from_string('monospace 9')
             self._term.set_scrollback_lines(1000)
-            self._term.show()
-            (master, slave) = pty.openpty()
+            self._term.connect('focus-in-event', self._term_focus_in)
+            master, slave = pty.openpty()
             self._term.set_pty(master)
             sys.stdout = os.fdopen(slave, "w")
             print self.intro
@@ -301,11 +301,11 @@ class TerminalWindow:
 
         entrybox = gtk.HBox(False)
         label = gtk.Label('Command:')
-        entry = gtk.Entry()
-        entry.connect('activate', self._entry_activate)
-        entry.connect('key-press-event', self._entry_key_pressed)
+        self._entry = gtk.Entry()
+        self._entry.connect('activate', self._entry_activate)
+        self._entry.connect('key-press-event', self._entry_key_pressed)
         entrybox.pack_start(label, False, False, 12)
-        entrybox.pack_start(entry, True, True, 12)
+        entrybox.pack_start(self._entry, True, True, 12)
 
         box = gtk.VBox()
         box.pack_start(termbox)
@@ -315,6 +315,9 @@ class TerminalWindow:
         cmdw.add(box)
         cmdw.show_all()
         self.is_there = True
+
+    def _term_focus_in(self, widget, event):
+        self._entry.grab_focus()
 
     def _destroy(self, data=None):
         self.is_there = False
