@@ -229,11 +229,20 @@ class Run_Netlister_and_Simulate_Dialog:
         self._dlg.show_all()
 
     def _collect_data(self):
+        # make sure that the command to run is always the first
+        # element of the list (more recent commands are at the
+        # beginning of the list) and eliminate duplicates
+        netlister_cmds = [row[0] for row in self._entry_netl.get_model()]
+        if self._entry_netl.get_active_text() in netlister_cmds:
+            netlister_cmds.remove(self._entry_netl.get_active_text())
+        netlister_cmds.insert(0, self._entry_netl.get_active_text())
+
+        simulator_cmds = [row[0] for row in self._entry_sim.get_model()]
+        if self._entry_sim.get_active_text() in simulator_cmds:
+            simulator_cmds.remove(self._entry_sim.get_active_text())
+        simulator_cmds.insert(0, self._entry_sim.get_active_text())
+
         actions = {}
-        netlister_cmds = [self._entry_netl.get_active_text()]
-        netlister_cmds.extend(row[0] for row in self._entry_netl.get_model())
-        simulator_cmds = [self._entry_sim.get_active_text()]
-        simulator_cmds.extend(row[0] for row in self._entry_sim.get_model())
         actions['run_netlister'] = (self._ckbutton_netl.get_active(), netlister_cmds)
         actions['run_simulator'] = (self._ckbutton_sim.get_active(), simulator_cmds)
         actions['update'] = self._ckbutton_upd.get_active()
