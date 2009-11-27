@@ -291,12 +291,13 @@ class TerminalWindow:
             self._term.set_pty(master)
             sys.stdout = os.fdopen(slave, "w")
             print self.intro
-	scrollbar = gtk.VScrollbar()
-	scrollbar.set_adjustment(self._term.get_adjustment())
-        
-	termbox = gtk.HBox()
-	termbox.pack_start(self._term)
-	termbox.pack_start(scrollbar)
+
+        scrollbar = gtk.VScrollbar()
+        scrollbar.set_adjustment(self._term.get_adjustment())
+
+        termbox = gtk.HBox()
+        termbox.pack_start(self._term)
+        termbox.pack_start(scrollbar)
 
         entrybox = gtk.HBox(False)
         label = gtk.Label('Command:')
