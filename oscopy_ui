@@ -353,9 +353,10 @@ class App(object):
                                                         self._app.intro,
                                                         self.hist_file,
                                                         self._app_exec)
-        if not self._term_win.is_there:
             self._term_win.create()
-        pass
+            self._term_win.connect('delete-event', lambda w, e: w.hide() or True)
+        if not (self._term_win.flags() & gtk.VISIBLE):
+            self._term_win.show_all()
 
     def _create_figure_popup_menu(self, figure, graph):
         figmenu = gui.menus.FigureMenu()

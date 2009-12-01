@@ -147,7 +147,7 @@ class Enter_Range_Dialog(object):
 DEFAULT_NETLISTER_COMMAND = 'gnetlist -g spice-sdb -s -o %s.net %s.sch'
 DEFAULT_SIMULATOR_COMMAND = 'gnucap -b %s.net'
 
-class Run_Netlister_and_Simulate_Dialog:
+class Run_Netlister_and_Simulate_Dialog(object):
     def __init__(self):
         self._dlg = None
         pass
@@ -259,8 +259,9 @@ class Run_Netlister_and_Simulate_Dialog:
     def _check_button_toggled(self, button, entry):
         entry.set_sensitive(button.get_active())
 
-class TerminalWindow:
+class TerminalWindow(gtk.Window):
     def __init__(self, prompt, intro, hist_file, app_exec):
+        gtk.Window.__init__(self)
         # History file
         self.hist_file = hist_file
 
@@ -275,11 +276,10 @@ class TerminalWindow:
         self.intro = intro
         self._term = None
         self._app_exec = app_exec
-        self.is_there = False
         self._term_hist_item = readline.get_current_history_length() + 1
 
     def create(self):
-        cmdw = gtk.Window()
+        cmdw = self
         if self._term is None:
             self._term = vte.Terminal()
             self._term.set_cursor_blinks(True)
@@ -311,18 +311,11 @@ class TerminalWindow:
         box.pack_start(termbox)
         box.pack_start(entrybox)
 
-        cmdw.connect('destroy', self._destroy)
         cmdw.add(box)
-        cmdw.show_all()
-        self.is_there = True
 
     def _term_focus_in(self, widget, event):
         self._entry.grab_focus()
 
-    def _destroy(self, data=None):
-        self.is_there = False
-        return False
-        
     def _entry_activate(self, entry, data=None):
         if isinstance(entry, gtk.Entry):
             line = entry.get_text()
