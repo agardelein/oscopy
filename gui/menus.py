@@ -110,7 +110,7 @@ class GraphMenu(object):
         unitdlg = dialogs.Enter_Units_Dialog()
         unitdlg.display(graph.unit, graph.axis_names, graph.scale_factors)
         units, scale_factors = unitdlg.run()
-        if units:
+        if units and scale_factors:
             app_exec('unit %s' % ','.join(units))
             app_exec('factors %s,%s' % (scale_factors[0],scale_factors[1]))
             if figure.canvas is not None:

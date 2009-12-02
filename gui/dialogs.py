@@ -74,6 +74,7 @@ class Enter_Units_Dialog(object):
 
     def run(self):
         units = ()
+        scale_factors = []
         resp = self._dlg.run()
         if resp == gtk.RESPONSE_ACCEPT:
             units = (self._entry_xunits.get_text(),
