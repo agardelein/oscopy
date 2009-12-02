@@ -11,18 +11,18 @@ class FigureMenu(object):
                                    'quad':'Quad'}
         self._store = store
         menu = gtk.Menu()
-        if graph is None:
-            item_nograph = gtk.MenuItem('No graph selected')
-            menu.append(item_nograph)
-            return menu
         item_figure = gtk.MenuItem('Figure')
         item_figure.set_submenu(self._create_figure_menu(figure, graph, app_exec))
         menu.append(item_figure)
+
         item_graph = gtk.MenuItem('Graph')
-        item_graph.set_submenu(self._create_graph_menu(figure, graph, app_exec))
+        if graph is None:
+            item_graph.set_sensitive(False)
+        else:
+            item_graph.set_submenu(self._create_graph_menu(figure, graph, app_exec))
         menu.append(item_graph)
         return menu
-
+    
     def _create_figure_menu(self, fig, graph, app_exec):
         menu = gtk.Menu()
         item_add = gtk.MenuItem('Add graph')
@@ -32,6 +32,7 @@ class FigureMenu(object):
         item_delete = gtk.MenuItem('Delete graph')
         item_delete.connect('activate', self._delete_graph_menu_item_activated,
                             (fig, graph, app_exec))
+        item_delete.set_sensitive(graph is not None)
         menu.append(item_delete)
         item_layout = gtk.MenuItem('Layout')
         item_layout.set_submenu(self._create_layout_menu(fig, app_exec))
