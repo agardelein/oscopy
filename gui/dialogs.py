@@ -323,7 +323,7 @@ class TerminalWindow(gtk.Window):
                 print self.prompt + line
                 self._app_exec(line)
                 readline.add_history(line)
-            self._term_hist_item = readline.get_current_history_length()
+            self._term_hist_item = readline.get_current_history_length() + 1
             entry.set_text('')
 
     def _entry_key_pressed(self, entry, event):
