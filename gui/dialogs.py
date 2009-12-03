@@ -116,7 +116,7 @@ class Enter_Range_Dialog(object):
                 entry.set_text(str(r[col][row]))
                 entry.set_width_chars(7)
                 entry.set_activates_default(True)
-                units_label = gtk.Label(factors_to_names[-scale_factors[col]][0]
+                units_label = gtk.Label(factors_to_names[scale_factors[col]][0]
                                         + units[col])
                 align_units = gtk.Alignment(0, 0.5)
                 align_units.add(units_label)
