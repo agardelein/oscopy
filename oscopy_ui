@@ -246,6 +246,7 @@ class App(object):
         col = gtk.TreeViewColumn('Signal', celltext, text=0)
         tv = gtk.TreeView()
         col.set_cell_data_func(celltext, self._reader_name_in_bold)
+        col.set_expand(True)
         tv.append_column(col)
         tv.set_model(self._store)
         tv.connect('row-activated', self._row_activated)
