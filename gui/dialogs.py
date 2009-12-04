@@ -6,6 +6,7 @@ import pty
 import sys
 import readline
 import gobject
+import math
 
 from oscopy import factors_to_names, abbrevs_to_factors
 
@@ -112,9 +113,12 @@ class Enter_Range_Dialog(object):
                 label = gtk.Label(minmax[row])
                 align_lbl = gtk.Alignment(0, 0.5)
                 align_lbl.add(label)
-                entry = gtk.Entry()
-                entry.set_text(str(r[col][row]))
-                entry.set_width_chars(7)
+                step = abs(float(r[col][0] - r[col][1]))/100.0
+                print step
+                adj = gtk.Adjustment(r[col][row], -1e99, 1e99,
+                                     step, step * 10.0, 0)
+                entry = gtk.SpinButton(adj, 1,
+                                       int(math.ceil(abs(math.log10(step)))))
                 entry.set_activates_default(True)
                 units_label = gtk.Label(factors_to_names[scale_factors[col]][0]
                                         + units[col])
@@ -138,10 +142,10 @@ class Enter_Range_Dialog(object):
         r = []
         resp = self._dlg.run()
         if resp == gtk.RESPONSE_ACCEPT:
-            r = [self._entries[0][0].get_text(),
-                 self._entries[0][1].get_text(),
-                 self._entries[1][0].get_text(),
-                 self._entries[1][1].get_text()]
+            r = [str(self._entries[0][0].get_value()),
+                 str(self._entries[0][1].get_value()),
+                 str(self._entries[1][0].get_value()),
+                 str(self._entries[1][1].get_value())]
         self._dlg.destroy()
         return r
 
