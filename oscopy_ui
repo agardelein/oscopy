@@ -93,8 +93,10 @@ class App(object):
         <menuitem action="Execute script..."/>
         <menuitem action="New Math Signal..."/>
         <menuitem action="Run netlister and simulate..."/>
-        <menuitem action="Show terminal"/>
         <menuitem action="Quit"/>
+      </menu>
+      <menu action="Windows">
+        <menuitem action="Show terminal"/>
       </menu>
     </menubar>
     </ui>'''
@@ -228,6 +230,7 @@ class App(object):
             ("Run netlister and simulate...", gtk.STOCK_MEDIA_FORWARD,\
                  "_Run netlister and simulate...", None, None,\
                  self._action_netlist_and_simulate),
+            ('Windows', None, '_Windows'),
             ("Show terminal", None, "_Show terminal", None, None,
              self._action_show_terminal),
             ('Quit', gtk.STOCK_QUIT, '_Quit', None, None,
