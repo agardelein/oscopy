@@ -407,6 +407,7 @@ class App(object):
         canvas.mpl_connect('figure_enter_event', self._figure_enter)
         canvas.mpl_connect('figure_leave_event', self._figure_leave)
         w.connect("drag_data_received", self._drag_data_received_cb)
+        w.connect('delete-event', lambda w, e: w.hide() or True)
         w.drag_dest_set(gtk.DEST_DEFAULT_MOTION |\
                                  gtk.DEST_DEFAULT_HIGHLIGHT |\
                                  gtk.DEST_DEFAULT_DROP,
