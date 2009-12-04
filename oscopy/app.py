@@ -150,6 +150,9 @@ FITNESS FOR A PARTICULAR PURPOSE."
         print "   Load signal file"
     def do_read(self, args):
         fn = args
+        if fn in self._ctxt.readers.keys():
+            print "%s already read, use update to reread it" % fn
+            return
         try:
             self._ctxt.read(fn)
         except ReadError, e:
@@ -201,6 +204,9 @@ FITNESS FOR A PARTICULAR PURPOSE."
         print "   Add a graph to the current figure"
     def do_add(self, args):
         if self._current_figure is not None:
+            if len(self._current_figure.graphs) == 4:
+                print "Maximum graph number reached"
+                return
             self._current_figure.add(self._ctxt.names_to_signals(\
                     self.get_signames(args)))
             self._current_graph =\
