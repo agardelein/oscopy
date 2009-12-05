@@ -197,7 +197,10 @@ class App(object):
         dlg.destroy()
 
     def _action_show_terminal(self, action):
-        self._create_terminal_window()
+        if self._term_win.flags() & gtk.VISIBLE:
+            self._term_win.hide()
+        else:
+            self._term_win.show()
 
     def _action_execute_script(self, action):
         dlg = gtk.FileChooserDialog('Execute script', parent=self._mainwindow,
@@ -231,15 +234,19 @@ class App(object):
                  "_Run netlister and simulate...", None, None,\
                  self._action_netlist_and_simulate),
             ('Windows', None, '_Windows'),
-            ("Show terminal", None, "_Show terminal", None, None,
-             self._action_show_terminal),
             ('Quit', gtk.STOCK_QUIT, '_Quit', None, None,
              self._action_quit),
             ]
+
         actiongroup = gtk.ActionGroup('App')
         actiongroup.add_actions(actions)
 
-        uimanager = gtk.UIManager()
+        ta = gtk.ToggleAction('Show terminal', '_Show terminal', None, None)
+        ta.set_active(True)
+        ta.connect('activate', self._action_show_terminal)
+        actiongroup.add_action(ta)
+
+        uimanager = self._uimanager = gtk.UIManager()
         uimanager.add_ui_from_string(self.__ui)
         uimanager.insert_action_group(actiongroup, 0)
         return uimanager.get_accel_group(), uimanager.get_widget('/MenuBar')
