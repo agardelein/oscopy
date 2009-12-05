@@ -294,7 +294,9 @@ class TerminalWindow(gtk.Window):
             self._term.connect('focus-in-event', self._term_focus_in)
             master, slave = pty.openpty()
             self._term.set_pty(master)
-            sys.stdout = os.fdopen(slave, "w")
+            sys.stdout.close()
+            sys.stderr.close()
+            sys.stdout = sys.stderr = os.fdopen(slave, "w")
             print self.intro
 
         scrollbar = gtk.VScrollbar()

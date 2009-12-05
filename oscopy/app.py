@@ -2,6 +2,7 @@ from __future__ import with_statement
 import gobject
 import gtk
 
+import sys
 import re
 import readline
 import os.path
@@ -14,12 +15,16 @@ from graphs import factors_to_names, abbrevs_to_factors
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 
+class StdoutProxy(object):
+    def __getattr__(self, name):
+        return getattr(sys.stdout, name)
+
 class OscopyApp(Cmd):
     """ Analyse command arguments and call function from Cmd
     See Cmd for more help
     """
     def __init__(self, context=None):
-        Cmd.__init__(self)
+        Cmd.__init__(self, stdout=StdoutProxy())
         if context is None or not isinstance(context, Context):
             self._ctxt = Context()
         else:
