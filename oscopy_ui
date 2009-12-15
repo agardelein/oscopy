@@ -427,7 +427,24 @@ class App(object):
         vbox.pack_start(toolbar, False, False)
         w.resize(400, 300)
         w.show_all()
-        self._app_exec('select %d-1' % len(self._ctxt.figures))
+
+        # Add it to the 'Windows' menu
+        fignum = len(self._ctxt.figures)
+        # Approach suggested by Ivan. Is there another way to get the menu?
+        st = self._uimanager.get_widget('/MenuBar/Windows/Show terminal')
+        menu = st.parent
+        item = gtk.MenuItem('Figure %d' % fignum)
+        item.connect('activate', self._show_figure_item_activated,
+                     (w, fignum))
+        item.show()
+        menu.append(item)
+        self._app_exec('select %d-1' % fignum)
+
+    def _show_figure_item_activated(self, wigdet, data=None):
+        w, fignum = data
+        if not (w.flags() & gtk.VISIBLE):
+            w.show()
+        self._app_exec('select %d-1' % fignum)
 
     def _axes_enter(self, event):
         self._current_graph = event.inaxes
