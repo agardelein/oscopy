@@ -126,6 +126,8 @@ class App(object):
         self._app.connect('freeze', self._freeze, None)
         self._app.connect('unfreeze', self._freeze, None)
         self._app.connect('create', self._create, None)
+        self._app.connect('quit', lambda e, s, d: self._action_quit(None), None)
+        self._app.connect('exit', lambda e, s, d: self._action_quit(None), None)
         self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT,
                                     gobject.TYPE_BOOLEAN)
         self._create_widgets()
