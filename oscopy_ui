@@ -140,25 +140,9 @@ class App(object):
     OPT_SIMULATOR_COMMANDS = 'simulator_commands'
     OPT_RUN_DIRECTORY = 'run_directory'
 
-    def _init_config(self):
-        # initialize configuration stuff
-        path = BaseDirectory.load_first_config('oscopy')
-        self.config_file = os.path.join(path, 'gui')
-        self.hist_file = os.path.join(path, 'history')
-        section = App.SECTION
-        self.config = ConfigParser.RawConfigParser()
-        self.config.add_section(section)
-        # defaults
-        self.config.set(section, App.OPT_NETLISTER_COMMANDS, '')
-        self.config.set(section, App.OPT_SIMULATOR_COMMANDS, '')
-        self.config.set(section, App.OPT_RUN_DIRECTORY, '.')
-
-    def _add_file(self, event, filename, data=None):
-        it = self._store.append(None, (filename.strip(), None, False))
-        for name, sig in self._ctxt.readers[filename.strip()]\
-                .signals.iteritems():
-            self._store.append(it, (name, sig, sig.freeze))
-
+    #
+    # Actions
+    #
     def _action_add_file(self, action):
         dlg = gtk.FileChooserDialog('Add file', parent=self._mainwindow,
                                     buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
@@ -168,11 +152,6 @@ class App(object):
         dlg.destroy()
         if resp == gtk.RESPONSE_ACCEPT:
             self._app_exec("read " + filename)
-
-    def _app_exec(self, line):
-        line = self._app.precmd(line)
-        stop = self._app.onecmd(line)
-        self._app.postcmd(stop, line)
 
     def _action_update(self, action):
         self._ctxt.update()
@@ -214,11 +193,31 @@ class App(object):
         if resp == gtk.RESPONSE_ACCEPT:
             self._app_exec("exec " + filename)
 
+    def _action_netlist_and_simulate(self, action):
+        dlg = gui.dialogs.Run_Netlister_and_Simulate_Dialog()
+        dlg.display(self._actions)
+        actions = dlg.run()
+        if actions is None:
+            return
+        self._actions = actions
+        run_dir = actions['run_from']
+        if actions['run_netlister'][0]:
+            if not self._run_ext_command(actions['run_netlister'][1][0], run_dir):
+                return
+        if actions['run_simulator'][0]:
+            if not self._run_ext_command(actions['run_simulator'][1][0], run_dir):
+                return
+        if actions['update']:
+            self._ctxt.update()
+
     def _action_quit(self, action):
         self._write_config()
         readline.write_history_file(self.hist_file)
         main_loop.quit()
 
+    #
+    # UI Creation functions
+    #
     def _create_menubar(self):
         # tuple format:
         # (name, stock-id, label, accelerator, tooltip, callback)
@@ -282,63 +281,6 @@ class App(object):
         else:
             cell.set_property('text', model.get_value(iter, 0))
 
-    # Search algorithm from pygtk tutorial
-    def _match_func(self, row, data):
-        column, key = data
-        return row[column] == key
-
-    def _search(self, rows, func, data):
-        if not rows: return None
-        for row in rows:
-            if func(row, data):
-                return row
-            result = self._search(row.iterchildren(), func, data)
-            if result: return result
-        return None
-
-    def _freeze(self, event, signals, data=None):
-        for signal in signals.split(','):
-            match_row = self._search(self._store, self._match_func,\
-                                         (0, signal.strip()))
-            if match_row is not None:
-                match_row[2] = match_row[1].freeze
-                parent = self._store.iter_parent(match_row.iter)
-                iter = self._store.iter_children(parent)
-                freeze = match_row[2]
-                while iter:
-                    if not self._store.get_value(iter, 2) == freeze:
-                        break
-                    iter = self._store.iter_next(iter)
-                if iter == None:
-                    # All row at the same freeze value,
-                    # set freeze for the reader
-                    self._store.set_value(parent, 2, freeze)
-                else:
-                    # Set reader freeze to false
-                    self._store.set_value(parent, 2, False)
-
-    def _cell_toggled(self, cellrenderer, path, data):
-        if len(path) == 3:
-            # Single signal
-            if self._store[path][1].freeze:
-                cmd = 'unfreeze'
-            else:
-                cmd = 'freeze'
-            self._app_exec('%s %s' % (cmd, self._store[path][0]))
-        elif len(path) == 1:
-            # Whole reader
-            parent = self._store.get_iter(path)
-            freeze = not self._store.get_value(parent, 2)
-            if self._store[path][2]:
-                cmd = 'unfreeze'
-            else:
-                cmd = 'freeze'
-            self._store.set_value(parent, 2, freeze)
-            iter = self._store.iter_children(parent)
-            while iter:
-                self._app_exec('%s %s' % (cmd, self._store.get_value(iter, 0)))
-                iter = self._store.iter_next(iter)
-
     def _create_widgets(self):
         accel_group, self._menubar = self._create_menubar()
         self._treeview = self._create_treeview()
@@ -375,6 +317,9 @@ class App(object):
         figmenu = gui.menus.FigureMenu()
         return figmenu.create_menu(self._store, figure, graph, self._app_exec)
 
+    #
+    # Event-triggered functions
+    #
     def _treeview_button_press(self, widget, event):
         if event.button == 3:
             tv = widget
@@ -403,6 +348,61 @@ class App(object):
         row = self._store[path]
         self._app_exec('create %s' % row[0])
 
+    def _axes_enter(self, event):
+        self._current_graph = event.inaxes
+        axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
+        fig_num = self._ctxt.figures.index(self._current_figure) + 1
+        self._app_exec('select %d-%d' % (fig_num, axes_num))
+
+    def _axes_leave(self, event):
+        # Unused for better user interaction
+#        self._current_graph = None
+        pass
+
+    def _figure_enter(self, event):
+        self._current_figure = event.canvas.figure
+        if hasattr(event, 'inaxes') and event.inaxes is not None:
+            axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
+        else:
+            axes_num = 1
+        fig_num = self._ctxt.figures.index(self._current_figure) + 1
+        self._app_exec('select %d-%d' % (fig_num, axes_num))
+
+    def _figure_leave(self, event):
+#        self._current_figure = None
+        pass
+
+    def _cell_toggled(self, cellrenderer, path, data):
+        if len(path) == 3:
+            # Single signal
+            if self._store[path][1].freeze:
+                cmd = 'unfreeze'
+            else:
+                cmd = 'freeze'
+            self._app_exec('%s %s' % (cmd, self._store[path][0]))
+        elif len(path) == 1:
+            # Whole reader
+            parent = self._store.get_iter(path)
+            freeze = not self._store.get_value(parent, 2)
+            if self._store[path][2]:
+                cmd = 'unfreeze'
+            else:
+                cmd = 'freeze'
+            self._store.set_value(parent, 2, freeze)
+            iter = self._store.iter_children(parent)
+            while iter:
+                self._app_exec('%s %s' % (cmd, self._store.get_value(iter, 0)))
+                iter = self._store.iter_next(iter)
+
+    def _show_figure_item_activated(self, wigdet, data=None):
+        w, fignum = data
+        if not (w.flags() & gtk.VISIBLE):
+            w.show()
+        self._app_exec('select %d-1' % fignum)
+
+    #
+    # Callbacks for App
+    #
     def _create(self, event, signals, data=None):
         fig = self._ctxt.figures[len(self._ctxt.figures) - 1]
 
@@ -442,68 +442,50 @@ class App(object):
         menu.append(item)
         self._app_exec('select %d-1' % fignum)
 
-    def _show_figure_item_activated(self, wigdet, data=None):
-        w, fignum = data
-        if not (w.flags() & gtk.VISIBLE):
-            w.show()
-        self._app_exec('select %d-1' % fignum)
+    # Search algorithm from pygtk tutorial
+    def _match_func(self, row, data):
+        column, key = data
+        return row[column] == key
 
-    def _axes_enter(self, event):
-        self._current_graph = event.inaxes
-        axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
-        fig_num = self._ctxt.figures.index(self._current_figure) + 1
-        self._app_exec('select %d-%d' % (fig_num, axes_num))
+    def _search(self, rows, func, data):
+        if not rows: return None
+        for row in rows:
+            if func(row, data):
+                return row
+            result = self._search(row.iterchildren(), func, data)
+            if result: return result
+        return None
 
-    def _axes_leave(self, event):
-        # Unused for better user interaction
-#        self._current_graph = None
-        pass
+    def _freeze(self, event, signals, data=None):
+        for signal in signals.split(','):
+            match_row = self._search(self._store, self._match_func,\
+                                         (0, signal.strip()))
+            if match_row is not None:
+                match_row[2] = match_row[1].freeze
+                parent = self._store.iter_parent(match_row.iter)
+                iter = self._store.iter_children(parent)
+                freeze = match_row[2]
+                while iter:
+                    if not self._store.get_value(iter, 2) == freeze:
+                        break
+                    iter = self._store.iter_next(iter)
+                if iter == None:
+                    # All row at the same freeze value,
+                    # set freeze for the reader
+                    self._store.set_value(parent, 2, freeze)
+                else:
+                    # Set reader freeze to false
+                    self._store.set_value(parent, 2, False)
 
-    def _figure_enter(self, event):
-        self._current_figure = event.canvas.figure
-        if hasattr(event, 'inaxes') and event.inaxes is not None:
-            axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
-        else:
-            axes_num = 1
-        fig_num = self._ctxt.figures.index(self._current_figure) + 1
-        self._app_exec('select %d-%d' % (fig_num, axes_num))
+    def _add_file(self, event, filename, data=None):
+        it = self._store.append(None, (filename.strip(), None, False))
+        for name, sig in self._ctxt.readers[filename.strip()]\
+                .signals.iteritems():
+            self._store.append(it, (name, sig, sig.freeze))
 
-    def _figure_leave(self, event):
-#        self._current_figure = None
-        pass
-
-    def update_from_usr1(self):
-        self._ctxt.update()
-
-    def _run_ext_command(self, cmd, run_dir):
-        old_dir = os.getcwd()
-        os.chdir(run_dir)
-        try:
-            status, output = commands.getstatusoutput(cmd)
-            if status:
-                msg = "Executing command '%s' failed." % cmd
-                report_error(self._mainwindow, msg)
-            return status == 0
-        finally:
-            os.chdir(old_dir)
-
-    def _action_netlist_and_simulate(self, action):
-        dlg = gui.dialogs.Run_Netlister_and_Simulate_Dialog()
-        dlg.display(self._actions)
-        actions = dlg.run()
-        if actions is None:
-            return
-        self._actions = actions
-        run_dir = actions['run_from']
-        if actions['run_netlister'][0]:
-            if not self._run_ext_command(actions['run_netlister'][1][0], run_dir):
-                return
-        if actions['run_simulator'][0]:
-            if not self._run_ext_command(actions['run_simulator'][1][0], run_dir):
-                return
-        if actions['update']:
-            self._ctxt.update()
-
+    #
+    # Callbacks for drag and drop
+    #
     def _drag_data_get_cb(self, widget, drag_context, selection, target_type,\
                               time):
         if target_type == self._TARGET_TYPE_SIGNAL:
@@ -527,6 +509,22 @@ class App(object):
                 self._current_graph.insert(signals)
                 if self._current_figure.canvas is not None:
                     self._current_figure.canvas.draw()
+
+    #
+    # Configuration-file related functions
+    #
+    def _init_config(self):
+        # initialize configuration stuff
+        path = BaseDirectory.load_first_config('oscopy')
+        self.config_file = os.path.join(path, 'gui')
+        self.hist_file = os.path.join(path, 'history')
+        section = App.SECTION
+        self.config = ConfigParser.RawConfigParser()
+        self.config.add_section(section)
+        # defaults
+        self.config.set(section, App.OPT_NETLISTER_COMMANDS, '')
+        self.config.set(section, App.OPT_SIMULATOR_COMMANDS, '')
+        self.config.set(section, App.OPT_RUN_DIRECTORY, '.')
 
     def _sanitize_list(self, lst):
         return filter(lambda x: len(x) > 0, map(lambda x: x.strip(), lst))
@@ -560,6 +558,27 @@ class App(object):
         self._actions_to_config(self._actions, self.config)
         with open(self.config_file, 'w') as f:
             self.config.write(f)
+
+    # Misc functions
+    def update_from_usr1(self):
+        self._ctxt.update()
+
+    def _run_ext_command(self, cmd, run_dir):
+        old_dir = os.getcwd()
+        os.chdir(run_dir)
+        try:
+            status, output = commands.getstatusoutput(cmd)
+            if status:
+                msg = "Executing command '%s' failed." % cmd
+                report_error(self._mainwindow, msg)
+            return status == 0
+        finally:
+            os.chdir(old_dir)
+
+    def _app_exec(self, line):
+        line = self._app.precmd(line)
+        stop = self._app.onecmd(line)
+        self._app.postcmd(stop, line)
 
         
 def usr1_handler(signum, frame):
