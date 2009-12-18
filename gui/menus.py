@@ -11,20 +11,14 @@ class FigureMenu(object):
                                    'quad':'Quad'}
         self._store = store
         menu = gtk.Menu()
-        item_figure = gtk.MenuItem('Figure')
-        item_figure.set_submenu(self._create_figure_menu(figure, graph, app_exec))
-        menu.append(item_figure)
+        self._create_figure_menu(menu, figure, graph, app_exec)
+        sep = gtk.SeparatorMenuItem()
+        menu.append(sep)
+        self._create_graph_menu(menu, figure, graph, app_exec)
 
-        item_graph = gtk.MenuItem('Graph')
-        if graph is None:
-            item_graph.set_sensitive(False)
-        else:
-            item_graph.set_submenu(self._create_graph_menu(figure, graph, app_exec))
-        menu.append(item_graph)
         return menu
     
-    def _create_figure_menu(self, fig, graph, app_exec):
-        menu = gtk.Menu()
+    def _create_figure_menu(self, menu, fig, graph, app_exec):
         item_add = gtk.MenuItem('Add graph')
         item_add.connect('activate', self._graph_menu_item_activated,
                          (fig, app_exec))
@@ -68,9 +62,10 @@ class FigureMenu(object):
         if fig.canvas is not None:
             fig.canvas.draw()
 
-    def _create_graph_menu(self, figure, graph, app_exec):
+    def _create_graph_menu(self, menu, figure, graph, app_exec):
         graphmenu = GraphMenu()
-        return graphmenu.create_graph_menu(self._store, figure, graph, app_exec)
+        return graphmenu.create_graph_menu(menu, self._store, figure, graph,
+                                           app_exec)
 
 class GraphMenu(object):
 
@@ -78,30 +73,35 @@ class GraphMenu(object):
         self._store = None
         pass
 
-    def create_graph_menu(self, store, figure, graph, app_exec):
+    def create_graph_menu(self, menu, store, figure, graph, app_exec):
         self._scale_to_str = {'lin': 'Linear', 'logx': 'LogX', 'logy': 'LogY',\
                                   'loglog': 'Loglog'}
         self._store = store
-        menu = gtk.Menu()
+#        menu = gtk.Menu()
         item_range = gtk.MenuItem('Range...')
         item_range.connect('activate', self._range_menu_item_activated,
                            (figure, graph, app_exec))
+        item_range.set_sensitive(graph is not None)
         menu.append(item_range)
         item_units = gtk.MenuItem('Units...')
         item_units.connect('activate', self._units_menu_item_activated,
                            (figure, graph, app_exec))
+        item_units.set_sensitive(graph is not None)
         menu.append(item_units)
         item_scale = gtk.MenuItem('Scale')
         item_scale.set_submenu(self._create_scale_menu((figure, graph,
                                                         app_exec)))
+        item_scale.set_sensitive(graph is not None)
         menu.append(item_scale)
         item_add = gtk.MenuItem('Insert signal')
         item_add.set_submenu(self._create_filename_menu((figure, graph,
                                                          app_exec)))
+        item_add.set_sensitive(graph is not None)
         menu.append(item_add)
         item_remove = gtk.MenuItem('Remove signal')
         item_remove.set_submenu(self._create_remove_signal_menu((figure, graph,
                                                                  app_exec)))
+        item_remove.set_sensitive(graph is not None)
         menu.append(item_remove)
         return menu
 
@@ -150,6 +150,8 @@ class GraphMenu(object):
 
     def _scale_menu_item_activated(self, menuitem, user_data):
         figure, graph, scale, app_exec = user_data
+        if graph is None:
+            return
         app_exec('scale %s' % scale)
         if figure.canvas is not None:
             figure.canvas.draw()
@@ -164,6 +166,8 @@ class GraphMenu(object):
 
     def _create_scale_menu(self, data):
         figure, graph, app_exec = data
+        if graph is None:
+            return
         menu = gtk.Menu()
         for scale in self._scale_to_str.keys():
             item = gtk.CheckMenuItem(self._scale_to_str[scale])
