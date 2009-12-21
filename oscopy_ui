@@ -88,7 +88,7 @@ class App(object):
     __ui = '''<ui>
     <menubar name="MenuBar">
       <menu action="File">
-        <menuitem action="Add file"/>
+        <menuitem action="Add file(s)..."/>
         <menuitem action="Update files"/>
         <menuitem action="Execute script..."/>
         <menuitem action="New Math Signal..."/>
@@ -144,14 +144,15 @@ class App(object):
     # Actions
     #
     def _action_add_file(self, action):
-        dlg = gtk.FileChooserDialog('Add file', parent=self._mainwindow,
+        dlg = gtk.FileChooserDialog('Add file(s)', parent=self._mainwindow,
                                     buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                              gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        dlg.set_select_multiple(True)
         resp = dlg.run()
-        filename = dlg.get_filename()
-        dlg.destroy()
         if resp == gtk.RESPONSE_ACCEPT:
-            self._app_exec("read " + filename)
+            for filename in dlg.get_filenames():
+                self._app_exec("read " + filename)
+        dlg.destroy()
 
     def _action_update(self, action):
         self._ctxt.update()
@@ -223,7 +224,7 @@ class App(object):
         # (name, stock-id, label, accelerator, tooltip, callback)
         actions = [
             ('File', None, '_File'),
-            ('Add file', gtk.STOCK_ADD, '_Add file', None, None,
+            ('Add file(s)...', gtk.STOCK_ADD, '_Add file(s)...', None, None,
              self._action_add_file),
             ('Update files', gtk.STOCK_REFRESH, '_Update', None, None,
              self._action_update),
