@@ -84,12 +84,11 @@ FITNESS FOR A PARTICULAR PURPOSE."
             self.help_select()
             return
         s = args.split('-')
-        num = eval(s[0])
-        if len(s) > 1:
-            gn = eval(s[1])
-        else:
+        if not s[0].isdigit() or len(s) < 2 or not s[1].isdigit():
             self.help_select()
             return
+        num = eval(s[0])
+        gn = eval(s[1])
         self._current_figure = self._ctxt.figures[num - 1]
         if len(self._current_figure.graphs):
             self._current_graph = self._current_figure.graphs[gn - 1]

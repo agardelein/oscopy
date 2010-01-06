@@ -16,6 +16,8 @@ from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanva
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 import gui
 
+# Note: for crosshair, see gtk.gdk.GC / function = gtk.gdk.XOR
+
 def report_error(parent, msg):
     dlg = gtk.MessageDialog(parent,
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,

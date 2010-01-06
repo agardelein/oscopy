@@ -1,0 +1,46 @@
+# First read data from IRF540 simulation
+echo *** Reading files and setting plots
+read demo/irf540.dat
+add vgs
+create
+add iRD
+add vgs
+add vgs,vds
+add vds
+echo *** Fig 2 layout to quad
+layout quad
+# Plot filter response
+read demo/ac.dat
+create
+add vout
+scale loglog
+echo *** select 1-1
+select 1-1
+figlist
+echo *** select 2-1
+select 2-1
+figlist
+echo *** select 2-a
+select 2-a
+figlist
+echo *** select a-1
+select 2-a
+figlist
+echo *** select aaa-sdfsfd
+select aaa-sdfsfd
+figlist
+echo *** select 1-
+select 1-
+figlist
+echo *** select a-
+select a-
+figlist
+echo *** select -
+select -
+figlist
+echo *** select 1
+select 1
+figlist
+echo *** select
+select
+figlist
