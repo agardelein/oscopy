@@ -242,7 +242,7 @@ class App(object):
              self._action_quit),
             ]
 
-        actiongroup = gtk.ActionGroup('App')
+        actiongroup = self._actiongroup = gtk.ActionGroup('App')
         actiongroup.add_actions(actions)
 
         ta = gtk.ToggleAction('Show terminal', '_Show terminal', None, None)
@@ -566,6 +566,14 @@ class App(object):
     def update_from_usr1(self):
         self._ctxt.update()
 
+    def update_from_usr2(self):
+        gobject.idle_add(self._activate_net_and_sim)
+
+    def _activate_net_and_sim(self):
+        if self._actiongroup is not None:
+            action = self._actiongroup.get_action("Run netlister and simulate...")
+            action.activate()
+
     def _run_ext_command(self, cmd, run_dir):
         old_dir = os.getcwd()
         os.chdir(run_dir)
@@ -582,14 +590,17 @@ class App(object):
         line = self._app.precmd(line)
         stop = self._app.onecmd(line)
         self._app.postcmd(stop, line)
-
         
 def usr1_handler(signum, frame):
     app.update_from_usr1()
+
+def usr2_handler(signum, frame):
+    app.update_from_usr2()
 
 if __name__ == '__main__':
     app = App()
     main_loop = gobject.MainLoop()
     signal.signal(signal.SIGUSR1, usr1_handler)
+    signal.signal(signal.SIGUSR2, usr2_handler)
     main_loop.run()
 
