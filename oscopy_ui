@@ -220,6 +220,13 @@ class App(dbus.service.Object):
         readline.write_history_file(self.hist_file)
         main_loop.quit()
 
+    def _action_figure(self, action, w, fignum):
+        if not (w.flags() & gtk.VISIBLE):
+            w.show()
+        else:
+            w.window.show()
+        self._app_exec('select %d-1' % fignum)
+
     #
     # UI Creation functions
     #
@@ -399,12 +406,6 @@ class App(dbus.service.Object):
                 self._app_exec('%s %s' % (cmd, self._store.get_value(iter, 0)))
                 iter = self._store.iter_next(iter)
 
-    def _show_figure_item_activated(self, wigdet, data=None):
-        w, fignum = data
-        if not (w.flags() & gtk.VISIBLE):
-            w.show()
-        self._app_exec('select %d-1' % fignum)
-
     #
     # Callbacks for App
     #
@@ -437,14 +438,17 @@ class App(dbus.service.Object):
 
         # Add it to the 'Windows' menu
         fignum = len(self._ctxt.figures)
-        # Approach suggested by Ivan. Is there another way to get the menu?
-        st = self._uimanager.get_widget('/MenuBar/Windows/Show terminal')
-        menu = st.parent
-        item = gtk.MenuItem('Figure %d' % fignum)
-        item.connect('activate', self._show_figure_item_activated,
-                     (w, fignum))
-        item.show()
-        menu.append(item)
+        actions = [('Figure %d' % fignum, None, 'Figure %d' % fignum,
+                    None, None, self._action_figure)]
+        self._actiongroup.add_actions(actions, (w, fignum))
+        ui = "<ui>\
+        <menubar name=\"MenuBar\">\
+          <menu action=\"Windows\">\
+            <menuitem action=\"Figure %d\"/>\
+          </menu>\
+        </menubar>\
+        </ui>" % fignum
+        merge_id = self._uimanager.add_ui_from_string(ui)
         self._app_exec('select %d-1' % fignum)
 
     # Search algorithm from pygtk tutorial
