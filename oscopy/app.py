@@ -64,7 +64,11 @@ FITNESS FOR A PARTICULAR PURPOSE."
         print "destroy FIG#"
         print "   Destroy a figure"
     def do_destroy(self, args):
-        self._ctxt.destroy(eval(args))
+        if not args.isdigit():
+            return
+        else:
+            fignum = eval(args)
+        self._ctxt.destroy(fignum)
         # Go back to the first graph of the first figure or None
         if len(self._ctxt.figures):
             self._current_figure = self._ctxt.figures[0]
