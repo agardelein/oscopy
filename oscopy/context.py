@@ -103,11 +103,11 @@ class Context(object):
         """ Delete a figure
         User must provide the figure number.
         If the number is out of range, then return
-        Act as a "pop" with self._current
+        To avoid mixing numbers, just replace the figure by None in the list
         """
         if num > len(self._figures) or num < 1:
             assert 0, "Out of range figure number"
-        del self._figures[num - 1]
+        self._figures[num - 1] = None
 
     def read(self, fn):
         """ Read signals from file.

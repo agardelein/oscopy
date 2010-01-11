@@ -108,8 +108,9 @@ class App(dbus.service.Object):
         dbus.service.Object.__init__(self, bus_name, object_path)
         self._scale_to_str = {'lin': 'Linear', 'logx': 'LogX', 'logy': 'LogY',\
                                   'loglog': 'Loglog'}
-        self._figcount = 0
         self._windows_to_figures = {}
+        self._fignum_to_windows = {}
+        self._fignum_to_merge_id = {}
         self._current_graph = None
         self._current_figure = None
         self._term_win = None
@@ -130,6 +131,7 @@ class App(dbus.service.Object):
         self._app.connect('freeze', self._freeze, None)
         self._app.connect('unfreeze', self._freeze, None)
         self._app.connect('create', self._create, None)
+        self._app.connect('destroy', self._destroy, None)
         self._app.connect('quit', lambda e, s, d: self._action_quit(None), None)
         self._app.connect('exit', lambda e, s, d: self._action_quit(None), None)
         self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT,
@@ -361,6 +363,7 @@ class App(dbus.service.Object):
         self._app_exec('create %s' % row[0])
 
     def _axes_enter(self, event):
+        self._figure_enter(event)
         self._current_graph = event.inaxes
         axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
         fig_num = self._ctxt.figures.index(self._current_figure) + 1
@@ -411,11 +414,12 @@ class App(dbus.service.Object):
     #
     def _create(self, event, signals, data=None):
         fig = self._ctxt.figures[len(self._ctxt.figures) - 1]
+        fignum = len(self._ctxt.figures)
 
         w = gtk.Window()
-        self._figcount += 1
         self._windows_to_figures[w] = fig
-        w.set_title('Figure %d' % self._figcount)
+        self._fignum_to_windows[fignum] = w
+        w.set_title('Figure %d' % fignum)
         vbox = gtk.VBox()
         w.add(vbox)
         canvas = FigureCanvas(fig)
@@ -437,7 +441,6 @@ class App(dbus.service.Object):
         w.show_all()
 
         # Add it to the 'Windows' menu
-        fignum = len(self._ctxt.figures)
         actions = [('Figure %d' % fignum, None, 'Figure %d' % fignum,
                     None, None, self._action_figure)]
         self._actiongroup.add_actions(actions, (w, fignum))
@@ -449,7 +452,20 @@ class App(dbus.service.Object):
         </menubar>\
         </ui>" % fignum
         merge_id = self._uimanager.add_ui_from_string(ui)
+        self._fignum_to_merge_id[fignum] = merge_id
         self._app_exec('select %d-1' % fignum)
+
+    def _destroy(self, event, num, data=None):
+        if not num.isdigit() or int(num) > len(self._ctxt.figures):
+            return
+        else:
+            fignum = int(num)
+        action = self._uimanager.get_action('/MenuBar/Windows/Figure %d' %
+                                            fignum)
+        if action is not None:
+            self._actiongroup.remove_action(action)
+            self._uimanager.remove_ui(self._fignum_to_merge_id[fignum])
+            self._fignum_to_windows[fignum].destroy()
 
     # Search algorithm from pygtk tutorial
     def _match_func(self, row, data):

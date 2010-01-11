@@ -65,20 +65,21 @@ FITNESS FOR A PARTICULAR PURPOSE."
         print "   Destroy a figure"
     def do_destroy(self, args):
         if not args.isdigit():
+            self.help_destroy()
             return
         else:
             fignum = eval(args)
-        self._ctxt.destroy(fignum)
+        try:
+            self._ctxt.destroy(fignum)
+        except IndexError:
+            self.help_destroy()
+            return
+        except AssertionError:
+            self.help_destroy()
+            return
         # Go back to the first graph of the first figure or None
-        if len(self._ctxt.figures):
-            self._current_figure = self._ctxt.figures[0]
-            if self._current_figure.graphs:
-                self._current_graph = self._current_figure.graphs[0]
-            else:
-                self._current_graph = None
-        else:
-            self._current_figure = None
-            self._current_graph = None
+        self._current_figure = None
+        self._current_graph = None
 
     def help_select(self):
         print "select FIG#-GRAPH#"
@@ -112,14 +113,15 @@ FITNESS FOR A PARTICULAR PURPOSE."
     def do_figlist(self, args):
         SEPARATOR = " "
         for fn, f in enumerate(self._ctxt.figures):
-            print "%s Figure %d: %s" %\
-                ([" ", "*"][f == self._current_figure],\
-                     fn + 1, f.layout)
-            for gn, g in enumerate(f.graphs):
-                print "    %s Graph %d : (%s) %s" %\
-                    ([" ","*"][g == self._current_graph],\
-                         gn + 1, g.type,\
-                         SEPARATOR.join(g.signals.keys()))
+            if f is not None:
+                print "%s Figure %d: %s" %\
+                    ([" ", "*"][f == self._current_figure],\
+                         fn + 1, f.layout)
+                for gn, g in enumerate(f.graphs):
+                    print "    %s Graph %d : (%s) %s" %\
+                        ([" ","*"][g == self._current_graph],\
+                             gn + 1, g.type,\
+                             SEPARATOR.join(g.signals.keys()))
 
     def help_plot(self):
         print "plot"
