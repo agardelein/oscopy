@@ -589,6 +589,10 @@ class App(dbus.service.Object):
     def dbus_update(self):
         gobject.idle_add(self._activate_net_and_sim)
 
+    @dbus.service.method('org.freedesktop.OscopyIFace')
+    def dbus_running(self):
+        return
+
     # Misc functions
     def update_from_usr1(self):
         self._ctxt.update()

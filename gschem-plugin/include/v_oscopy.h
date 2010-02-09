@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 gboolean v_check(void) ;
-void v_get_name(gchar * name) ;
+void v_get_name(gchar ** name) ;
 
 #ifdef __cplusplus
 }

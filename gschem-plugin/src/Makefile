@@ -70,7 +70,8 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
-v_oscopy_la_LIBADD =
+am__DEPENDENCIES_1 =
+v_oscopy_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_v_oscopy_la_OBJECTS = v_oscopy_la-v_oscopy.lo
 v_oscopy_la_OBJECTS = $(am_v_oscopy_la_OBJECTS)
 v_oscopy_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -107,8 +108,8 @@ CFLAGS = -g -O2
 CPP = gcc -E
 CPPFLAGS = 
 CYGPATH_W = echo
-DBUS_GLIB_CFLAGS = -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include  
-DBUS_GLIB_LIBS = -ldbus-glib-1 -ldbus-1 -lpthread -lrt -lgobject-2.0 -lglib-2.0  
+DBUS_CFLAGS = -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include  
+DBUS_LIBS = -ldbus-glib-1 -ldbus-1 -lpthread -lrt -lgobject-2.0 -lglib-2.0  
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
 DSYMUTIL = 
@@ -186,6 +187,7 @@ datadir = ${datarootdir}
 datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
+enable_dbus = yes
 exec_prefix = ${prefix}
 host = i686-pc-linux-gnu
 host_alias = 
@@ -219,9 +221,10 @@ top_srcdir = ..
 pkglib_LTLIBRARIES = v_oscopy.la
 v_oscopy_la_SOURCES = v_oscopy.c
 v_oscopy_la_CFLAGS = $(GCC_CFLAGS) $(GLIB_CFLAGS) $(GTK_CFLAGS)\
-	 $(DBUS_GLIB_CFLAGS)
+	 $(DBUS_CFLAGS)
 
 v_oscopy_la_LDFLAGS = -module
+v_oscopy_la_LIBADD = $(DBUS_LIBS)
 all: all-am
 
 .SUFFIXES:
@@ -538,7 +541,7 @@ uninstall-am: uninstall-pkglibLTLIBRARIES
 
 install-exec-hook:
 	cd $(DESTDIR)$(libdir) && \
-	$(LN_S) v_oscopy/v_oscopy.so .
+	$(LN_S) -f v_oscopy/v_oscopy.so .
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

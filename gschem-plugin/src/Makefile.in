@@ -70,7 +70,8 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
-v_oscopy_la_LIBADD =
+am__DEPENDENCIES_1 =
+v_oscopy_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_v_oscopy_la_OBJECTS = v_oscopy_la-v_oscopy.lo
 v_oscopy_la_OBJECTS = $(am_v_oscopy_la_OBJECTS)
 v_oscopy_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -107,8 +108,8 @@ CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
-DBUS_GLIB_CFLAGS = @DBUS_GLIB_CFLAGS@
-DBUS_GLIB_LIBS = @DBUS_GLIB_LIBS@
+DBUS_CFLAGS = @DBUS_CFLAGS@
+DBUS_LIBS = @DBUS_LIBS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DSYMUTIL = @DSYMUTIL@
@@ -186,6 +187,7 @@ datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
+enable_dbus = @enable_dbus@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
@@ -219,9 +221,10 @@ top_srcdir = @top_srcdir@
 pkglib_LTLIBRARIES = v_oscopy.la
 v_oscopy_la_SOURCES = v_oscopy.c
 v_oscopy_la_CFLAGS = $(GCC_CFLAGS) $(GLIB_CFLAGS) $(GTK_CFLAGS)\
-	 $(DBUS_GLIB_CFLAGS)
+	 $(DBUS_CFLAGS)
 
 v_oscopy_la_LDFLAGS = -module
+v_oscopy_la_LIBADD = $(DBUS_LIBS)
 all: all-am
 
 .SUFFIXES:
@@ -538,7 +541,7 @@ uninstall-am: uninstall-pkglibLTLIBRARIES
 
 install-exec-hook:
 	cd $(DESTDIR)$(libdir) && \
-	$(LN_S) @PACKAGE@/@PACKAGE@.so .
+	$(LN_S) -f @PACKAGE@/@PACKAGE@.so .
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

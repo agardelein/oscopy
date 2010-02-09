@@ -746,8 +746,9 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
-DBUS_GLIB_LIBS
-DBUS_GLIB_CFLAGS
+DBUS_LIBS
+DBUS_CFLAGS
+enable_dbus
 GTK_LIBS
 GTK_CFLAGS
 GLIB_LIBS
@@ -872,6 +873,7 @@ with_pic
 enable_fast_install
 with_gnu_ld
 enable_libtool_lock
+enable_dbus
 '
       ac_precious_vars='build_alias
 host_alias
@@ -887,8 +889,8 @@ GLIB_CFLAGS
 GLIB_LIBS
 GTK_CFLAGS
 GTK_LIBS
-DBUS_GLIB_CFLAGS
-DBUS_GLIB_LIBS'
+DBUS_CFLAGS
+DBUS_LIBS'
 
 
 # Initialize some variables set by options.
@@ -1515,6 +1517,7 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
+  --disable-dbus          disable D-Bus support
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1537,10 +1540,8 @@ Some influential environment variables:
   GLIB_LIBS   linker flags for GLIB, overriding pkg-config
   GTK_CFLAGS  C compiler flags for GTK, overriding pkg-config
   GTK_LIBS    linker flags for GTK, overriding pkg-config
-  DBUS_GLIB_CFLAGS
-              C compiler flags for DBUS_GLIB, overriding pkg-config
-  DBUS_GLIB_LIBS
-              linker flags for DBUS_GLIB, overriding pkg-config
+  DBUS_CFLAGS C compiler flags for DBUS, overriding pkg-config
+  DBUS_LIBS   linker flags for DBUS, overriding pkg-config
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -4987,13 +4988,13 @@ if test "${lt_cv_nm_interface+set}" = set; then :
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:4990: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:4991: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:4993: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:4994: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:4996: output\"" >&5)
+  (eval echo "\"\$as_me:4997: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -6188,7 +6189,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6191 "configure"' > conftest.$ac_ext
+  echo '#line 6192 "configure"' > conftest.$ac_ext
   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7688,11 +7689,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7691: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7692: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7695: \$? = $ac_status" >&5
+   echo "$as_me:7696: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8027,11 +8028,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8030: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8031: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8034: \$? = $ac_status" >&5
+   echo "$as_me:8035: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8132,11 +8133,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8135: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8136: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8139: \$? = $ac_status" >&5
+   echo "$as_me:8140: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -8187,11 +8188,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8190: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8191: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8194: \$? = $ac_status" >&5
+   echo "$as_me:8195: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10571,7 +10572,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 10574 "configure"
+#line 10575 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10667,7 +10668,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 10670 "configure"
+#line 10671 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11495,22 +11496,75 @@ $as_echo "yes" >&6; }
 	:
 fi
 
+#PKG_CHECK_MODULES(DBUS_GLIB, [dbus-glib-1 >= 0.74], [AC_SUBST(DBUS_LIBS)],
+#  AC_MSG_ERROR([dbus-glib-1 0.74 or later is required]))
+# (from pidgin-2.6.5 configure.ac)
+# Check whether --enable-dbus was given.
+if test "${enable_dbus+set}" = set; then :
+  enableval=$enable_dbus;
+else
+  enable_dbus=yes
+fi
+
+
+if test "x$enable_dbus" = "xyes" ; then
+	# Extract the first word of "dbus-binding-tool", so it can be a program name with args.
+set dummy dbus-binding-tool; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_enable_dbus+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$enable_dbus"; then
+  ac_cv_prog_enable_dbus="$enable_dbus" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_enable_dbus="yes"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_prog_enable_dbus" && ac_cv_prog_enable_dbus="no"
+fi
+fi
+enable_dbus=$ac_cv_prog_enable_dbus
+if test -n "$enable_dbus"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_dbus" >&5
+$as_echo "$enable_dbus" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+fi
+
+if test "x$enable_dbus" = "xyes" ; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for DBUS_GLIB" >&5
-$as_echo_n "checking for DBUS_GLIB... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for DBUS" >&5
+$as_echo_n "checking for DBUS... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$DBUS_GLIB_CFLAGS"; then
-        pkg_cv_DBUS_GLIB_CFLAGS="$DBUS_GLIB_CFLAGS"
+    if test -n "$DBUS_CFLAGS"; then
+        pkg_cv_DBUS_CFLAGS="$DBUS_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"dbus-glib-1 >= 0.74\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "dbus-glib-1 >= 0.74") 2>&5
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"dbus-1 >= 0.74 dbus-glib-1 >= 0.74\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "dbus-1 >= 0.74 dbus-glib-1 >= 0.74") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_DBUS_GLIB_CFLAGS=`$PKG_CONFIG --cflags "dbus-glib-1 >= 0.74" 2>/dev/null`
+  pkg_cv_DBUS_CFLAGS=`$PKG_CONFIG --cflags "dbus-1 >= 0.74 dbus-glib-1 >= 0.74" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -11519,16 +11573,16 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$DBUS_GLIB_LIBS"; then
-        pkg_cv_DBUS_GLIB_LIBS="$DBUS_GLIB_LIBS"
+    if test -n "$DBUS_LIBS"; then
+        pkg_cv_DBUS_LIBS="$DBUS_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"dbus-glib-1 >= 0.74\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "dbus-glib-1 >= 0.74") 2>&5
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"dbus-1 >= 0.74 dbus-glib-1 >= 0.74\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "dbus-1 >= 0.74 dbus-glib-1 >= 0.74") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_DBUS_GLIB_LIBS=`$PKG_CONFIG --libs "dbus-glib-1 >= 0.74" 2>/dev/null`
+  pkg_cv_DBUS_LIBS=`$PKG_CONFIG --libs "dbus-1 >= 0.74 dbus-glib-1 >= 0.74" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -11547,25 +11601,46 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        DBUS_GLIB_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "dbus-glib-1 >= 0.74"`
+	        DBUS_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "dbus-1 >= 0.74 dbus-glib-1 >= 0.74"`
         else
-	        DBUS_GLIB_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "dbus-glib-1 >= 0.74"`
+	        DBUS_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "dbus-1 >= 0.74 dbus-glib-1 >= 0.74"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$DBUS_GLIB_PKG_ERRORS" >&5
+	echo "$DBUS_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-                as_fn_error "dbus-glib-1 0.74 or later is required" "$LINENO" 5
+
+	enable_dbus=no
+	if test "x$force_deps" = "xyes" ; then
+		as_fn_error "
+D-Bus development headers not found.
+Use --disable-dbus if you do not need D-Bus support.
+" "$LINENO" 5
+	fi
 elif test $pkg_failed = untried; then
-	as_fn_error "dbus-glib-1 0.74 or later is required" "$LINENO" 5
+
+	enable_dbus=no
+	if test "x$force_deps" = "xyes" ; then
+		as_fn_error "
+D-Bus development headers not found.
+Use --disable-dbus if you do not need D-Bus support.
+" "$LINENO" 5
+	fi
 else
-	DBUS_GLIB_CFLAGS=$pkg_cv_DBUS_GLIB_CFLAGS
-	DBUS_GLIB_LIBS=$pkg_cv_DBUS_GLIB_LIBS
+	DBUS_CFLAGS=$pkg_cv_DBUS_CFLAGS
+	DBUS_LIBS=$pkg_cv_DBUS_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-	:
+
+
+
+		enable_dbus=yes
+
 fi
+fi
+
+
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure

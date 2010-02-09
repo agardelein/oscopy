@@ -46,21 +46,18 @@
 #endif
 
 #include <gtk/gtk.h>
+#include <dbus/dbus-glib.h>
 
 #define V_OSCOPY_NAME "oscopy"
 #define V_OSCOPY_CMD "/home/agard/src/scope/oscopy_ui"
 #define V_OSCOPY_MAX_STR 256
 
-#ifdef HAVE_DBUS
-#include <dbus/dbus-glib.h>
-
 #define V_OSCOPY_DBUS_SERVICE "org.freedesktop.Oscopy"
 #define V_OSCOPY_DBUS_PATH "/org/freedesktop/Oscopy"
 #define V_OSCOPY_DBUS_IFACE "org.freedesktop.OscopyIFace"
 
-
-gboolean v_oscopy_check(void) {
-  DBusConnection *connection = NULL ;
+gboolean v_check(void) {
+  DBusGConnection *connection = NULL ;
   GError * error = NULL ;
   DBusGProxy *proxy = NULL ;
 
@@ -87,31 +84,52 @@ gboolean v_oscopy_check(void) {
   else
     return TRUE ;
 }
-#else
 
 /* Return True if an instance of oscopy is running
  */
-gboolean v_oscopy_check(void) {
-  return FALSE ;
+gboolean v_is_running(gboolean * running, GError ** error) {
+  DBusGConnection *connection = NULL ;
+  DBusGProxy *proxy = NULL ;
+  *running = FALSE ;
+  /* Get the session bus */
+  error = NULL ;
+  connection = dbus_g_bus_get(DBUS_BUS_SESSION, error) ;
+
+  /* Make sure it is valid*/
+  if( connection == NULL ) {
+    /* g_printerr("Failed to get connection to bus: %s\n", (*error)->message);*/
+    /* g_error_free(error) ; */
+    return FALSE ;
+  }
+
+  /* Get the proxy for oscopy interface */
+  proxy = dbus_g_proxy_new_for_name(connection,
+				    V_OSCOPY_DBUS_SERVICE,
+				    V_OSCOPY_DBUS_PATH,
+				    V_OSCOPY_DBUS_IFACE) ;
+
+  /* If no error then oscopy is there */
+  if(dbus_g_proxy_call(proxy, "dbus_running", error,
+			  G_TYPE_INVALID,
+			  G_TYPE_INVALID) == TRUE) {
+    *running = TRUE ;
+  }
+  else
+    *running = FALSE ;
+  g_object_unref(proxy) ;
+  return TRUE ;
 }
-#endif
 
 /* The viewer name
    The returned value should be freed when no longer needed
  */
-void v_oscopy_get_name(gchar * name) {
-  return g_strndup(V_OSCOPY_NAME, V_OSCOPY_MAX_STR) ;
+void v_get_name(gchar ** name) {
+  *name = g_strndup(V_OSCOPY_NAME, V_OSCOPY_MAX_STR) ;
 }
 
 /* The command line
    The returned value should be freed when no longer needed
  */
-void v_oscopy_get_cmd(gchar * cmd) {
-  return g_strndup(V_OSCOPY_CMD, V_OSCOPY_MAX_STR) ;
-}
-
-/* Return an integer identifiying the viewer
- */
-void v_oscopy_get_id(void) {
-  return 1 ;
+void v_oscopy_get_cmd(gchar ** cmd) {
+  *cmd = g_strndup(V_OSCOPY_CMD, V_OSCOPY_MAX_STR) ;
 }

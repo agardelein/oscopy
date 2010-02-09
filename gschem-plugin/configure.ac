@@ -45,7 +45,30 @@ PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.12.0], ,
 PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= 2.10.0], ,
   AC_MSG_ERROR([GTK+ 2.10.0 or later is required.]))
 
-PKG_CHECK_MODULES(DBUS_GLIB, [dbus-glib-1 >= 0.74], ,
-  AC_MSG_ERROR([dbus-glib-1 0.74 or later is required]))
+#PKG_CHECK_MODULES(DBUS_GLIB, [dbus-glib-1 >= 0.74], [AC_SUBST(DBUS_LIBS)],
+#  AC_MSG_ERROR([dbus-glib-1 0.74 or later is required]))
+# (from pidgin-2.6.5 configure.ac)
+AC_ARG_ENABLE(dbus, [AC_HELP_STRING([--disable-dbus], [disable D-Bus support])], , enable_dbus=yes)
+
+if test "x$enable_dbus" = "xyes" ; then
+	AC_CHECK_PROG(enable_dbus, dbus-binding-tool, yes, no)
+fi
+
+if test "x$enable_dbus" = "xyes" ; then
+	PKG_CHECK_MODULES(DBUS, [dbus-1 >= 0.74 dbus-glib-1 >= 0.74], [
+		AC_SUBST(DBUS_CFLAGS)
+		AC_SUBST(DBUS_LIBS)
+		enable_dbus=yes
+	], [
+	enable_dbus=no
+	if test "x$force_deps" = "xyes" ; then
+		AC_MSG_ERROR([
+D-Bus development headers not found.
+Use --disable-dbus if you do not need D-Bus support.
+])
+	fi])
+fi
+
+
 
 AC_OUTPUT
