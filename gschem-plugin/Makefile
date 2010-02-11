@@ -37,8 +37,11 @@ host_triplet = i686-pc-linux-gnu
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(dist_doc_DATA) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/config.h.in $(top_srcdir)/configure compile \
-	config.guess config.sub depcomp install-sh ltmain.sh missing
+	$(srcdir)/config.h.in $(top_srcdir)/configure \
+	build-tools/compile build-tools/config.guess \
+	build-tools/config.sub build-tools/depcomp \
+	build-tools/install-sh build-tools/ltmain.sh \
+	build-tools/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
@@ -128,12 +131,12 @@ DIST_ARCHIVES = $(distdir).tar.gz
 GZIP_ENV = --best
 distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/agard/src/scope/gschem-plugin/missing --run aclocal-1.11
-AMTAR = ${SHELL} /home/agard/src/scope/gschem-plugin/missing --run tar
+ACLOCAL = ${SHELL} /home/agard/src/scope/gschem-plugin/build-tools/missing --run aclocal-1.11
+AMTAR = ${SHELL} /home/agard/src/scope/gschem-plugin/build-tools/missing --run tar
 AR = ar
-AUTOCONF = ${SHELL} /home/agard/src/scope/gschem-plugin/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/agard/src/scope/gschem-plugin/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/agard/src/scope/gschem-plugin/missing --run automake-1.11
+AUTOCONF = ${SHELL} /home/agard/src/scope/gschem-plugin/build-tools/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/agard/src/scope/gschem-plugin/build-tools/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/agard/src/scope/gschem-plugin/build-tools/missing --run automake-1.11
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -175,7 +178,7 @@ LIPO =
 LN_S = ln -s
 LTLIBOBJS = 
 M4 = /usr/bin/m4
-MAKEINFO = ${SHELL} /home/agard/src/scope/gschem-plugin/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/agard/src/scope/gschem-plugin/build-tools/missing --run makeinfo
 MKDIR_P = /bin/mkdir -p
 NM = /usr/bin/nm -B
 NMEDIT = 
@@ -230,7 +233,7 @@ host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/agard/src/scope/gschem-plugin/install-sh
+install_sh = ${SHELL} /home/agard/src/scope/gschem-plugin/build-tools/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -240,7 +243,7 @@ mandir = ${datarootdir}/man
 mkdir_p = /bin/mkdir -p
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /home/agard/geda/share/gEDA/gschem-plugins
+prefix = /usr/local
 program_transform_name = s,x,x,
 psdir = ${docdir}
 sbindir = ${exec_prefix}/sbin
