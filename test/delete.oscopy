@@ -1,0 +1,19 @@
+echo *** Load file
+read demo/irf540.dat
+add vgs
+add vds
+add iRD
+add vgs,vds
+figlist
+echo *** Will delete 2
+delete 2
+figlist
+echo *** Will delete 3
+delete 3
+figlist
+echo *** Will delete 1
+delete 1
+figlist
+echo *** Will delete 1
+delete 1
+figlist

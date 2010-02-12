@@ -1,0 +1,6 @@
+# Load signal
+read demo/tran.dat
+add vsqu
+add vsqu
+mode fft
+plot

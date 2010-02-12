@@ -5,3 +5,10 @@ doc/manual/tex/auto/*
 *.log
 *#
 *.pdf
+demo/*.cir
+demo/*.net
+gschem-plugin/.deps
+gschem-plugin/autom4te.cache
+gschem-plugin/src/.deps
+gschem-plugin/src/.libs
+gschem-plugin/src/*.l[ao]

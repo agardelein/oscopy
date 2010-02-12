@@ -1,0 +1,27 @@
+echo *** Reading files and setting plots
+read demo/irf540.dat
+create
+add iRD
+add vgs
+add vgs,vds
+add vds
+echo *** Layout horiz
+layout horiz
+echo *** Reading files and setting plots
+create
+add iRD
+add vgs
+add vgs,vds
+add vds
+echo *** Layout vert
+layout vert
+echo *** Reading files and setting plots
+create
+add iRD
+add vgs
+add vgs,vds
+add vds
+echo *** Layout quad
+layout quad
+echo *** Done	
+plot

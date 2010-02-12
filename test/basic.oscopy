@@ -1,0 +1,6 @@
+read demo/irf540.dat
+add vgs
+add vds
+add iRD
+add vgs,vds
+
