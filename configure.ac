@@ -8,7 +8,7 @@ dnl directory.
 # Set up configuration system
 #####################################################################
 
-AC_INIT([v_oscopy], [0.1], [agardelein@yahoo.fr])
+AC_INIT([oscopy], [0.32], [agardelein@yahoo.fr])
 AC_PROG_CC
 AC_PROG_LN_S
 AC_CONFIG_MACRO_DIR([m4])
@@ -16,7 +16,8 @@ AC_CONFIG_AUX_DIR([build-tools])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
 	Makefile
-	src/Makefile
+	gschem-plugin/Makefile
+	gschem-plugin/src/Makefile
 ])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
