@@ -15,7 +15,7 @@ import oscopy
 
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
-import gui
+import oscopy_gui
 
 # Note: for crosshair, see gtk.gdk.GC / function = gtk.gdk.XOR
 
@@ -201,7 +201,7 @@ class App(dbus.service.Object):
             self._app_exec("exec " + filename)
 
     def _action_netlist_and_simulate(self, action):
-        dlg = gui.dialogs.Run_Netlister_and_Simulate_Dialog()
+        dlg = oscopy_gui.dialogs.Run_Netlister_and_Simulate_Dialog()
         dlg.display(self._actions)
         actions = dlg.run()
         if actions is None:
@@ -318,17 +318,17 @@ class App(dbus.service.Object):
 
     def _create_terminal_window(self):
         if self._term_win is None:
-            self._term_win = gui.dialogs.TerminalWindow(self._prompt,
-                                                        self._app.intro,
-                                                        self.hist_file,
-                                                        self._app_exec)
+            self._term_win = oscopy_gui.dialogs.TerminalWindow(self._prompt,
+                                                               self._app.intro,
+                                                               self.hist_file,
+                                                               self._app_exec)
             self._term_win.create()
             self._term_win.connect('delete-event', lambda w, e: w.hide() or True)
         if not (self._term_win.flags() & gtk.VISIBLE):
             self._term_win.show_all()
 
     def _create_figure_popup_menu(self, figure, graph):
-        figmenu = gui.menus.FigureMenu()
+        figmenu = oscopy_gui.menus.FigureMenu()
         return figmenu.create_menu(self._store, figure, graph, self._app_exec)
 
     #

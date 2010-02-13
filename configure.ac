@@ -16,6 +16,11 @@ AC_CONFIG_AUX_DIR([build-tools])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
 	Makefile
+	oscopy/Makefile
+	oscopy/graphs/Makefile
+	oscopy/readers/Makefile
+	oscopy/writers/Makefile
+	oscopy_gui/Makefile
 	gschem-plugin/Makefile
 	gschem-plugin/src/Makefile
 ])
@@ -37,6 +42,7 @@ AM_PROG_LEX
 AX_PROG_AWK
 AX_PROG_GROFF
 AC_PATH_PROGS([M4], [gm4 m4], [m4])
+AM_PATH_PYTHON([2.5])
 
 #####################################################################
 # Check for libraries that use pkg-config
