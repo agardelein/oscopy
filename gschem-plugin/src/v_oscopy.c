@@ -136,3 +136,38 @@ gboolean v_get_argv(gchar *** argv, GError ** error) {
   (*argv)[1] = NULL ;
   return TRUE ;
 }
+
+/* Update!!
+ */
+gboolean v_update(GError ** error) {
+  DBusGConnection *connection = NULL ;
+  DBusGProxy *proxy = NULL ;
+  /* Get the session bus */
+  error = NULL ;
+  connection = dbus_g_bus_get(DBUS_BUS_SESSION, error) ;
+
+  /* Make sure it is valid*/
+  if( connection == NULL ) {
+    /* g_printerr("Failed to get connection to bus: %s\n", (*error)->message);*/
+    /* g_error_free(error) ; */
+    return FALSE ;
+  }
+
+  /* Get the proxy for oscopy interface */
+  proxy = dbus_g_proxy_new_for_name(connection,
+				    V_OSCOPY_DBUS_SERVICE,
+				    V_OSCOPY_DBUS_PATH,
+				    V_OSCOPY_DBUS_IFACE) ;
+
+  /* Then update */
+  if(dbus_g_proxy_call(proxy, "dbus_update", error,
+			  G_TYPE_INVALID,
+			  G_TYPE_INVALID) == TRUE) {
+    g_object_unref(proxy) ;
+    return TRUE ;
+  }
+  else {
+    g_object_unref(proxy) ;
+    return FALSE ;
+  }
+}
