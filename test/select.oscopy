@@ -17,6 +17,9 @@ scale loglog
 echo *** select 1-1
 select 1-1
 figlist
+echo *** select 1-2
+select 1-2
+figlist
 echo *** select 2-1
 select 2-1
 figlist

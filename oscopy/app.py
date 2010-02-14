@@ -95,7 +95,9 @@ FITNESS FOR A PARTICULAR PURPOSE."
         num = eval(s[0])
         gn = eval(s[1])
         self._current_figure = self._ctxt.figures[num - 1]
-        if len(self._current_figure.graphs):
+        if len(self._current_figure.graphs) and\
+                (gn - 1) < len(self._current_figure.graphs) and\
+                (gn - 1) > 0:
             self._current_graph = self._current_figure.graphs[gn - 1]
         else:
             self._current_graph = None
