@@ -9,7 +9,7 @@ v_oscopy_la_LIBADD = $(DBUS_LIBS)
 
 install-exec-hook:
 	cd $(DESTDIR)$(libdir) && \
-	$(LN_S) -f @PACKAGE@/@PACKAGE@.so v_@PACKAGE@.so
+	$(LN_S) -f @PACKAGE@/v_@PACKAGE@.so v_@PACKAGE@.so
 
 uninstall-hook:
 	rm -f $(DESTDIR)$(libdir)/v_@PACKAGE@.so

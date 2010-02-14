@@ -49,7 +49,7 @@
 #include <dbus/dbus-glib.h>
 
 #define V_OSCOPY_NAME "oscopy"
-#define V_OSCOPY_CMD "/home/agard/src/scope/oscopy_ui"
+#define V_OSCOPY_ARGV "oscopy_ui.py"
 #define V_OSCOPY_MAX_STR 256
 
 #define V_OSCOPY_DBUS_SERVICE "org.freedesktop.Oscopy"
@@ -130,6 +130,9 @@ void v_get_name(gchar ** name) {
 /* The command line
    The returned value should be freed when no longer needed
  */
-void v_oscopy_get_cmd(gchar ** cmd) {
-  *cmd = g_strndup(V_OSCOPY_CMD, V_OSCOPY_MAX_STR) ;
+gboolean v_get_argv(gchar *** argv, GError ** error) {
+  *argv = (gchar **) g_malloc(sizeof(gchar *) * 2) ;
+  (*argv)[0] = g_strndup(V_OSCOPY_ARGV, V_OSCOPY_MAX_STR) ;
+  (*argv)[1] = NULL ;
+  return TRUE ;
 }

@@ -551,7 +551,7 @@ uninstall-am: uninstall-pkglibLTLIBRARIES
 
 install-exec-hook:
 	cd $(DESTDIR)$(libdir) && \
-	$(LN_S) -f oscopy/oscopy.so v_oscopy.so
+	$(LN_S) -f oscopy/v_oscopy.so v_oscopy.so
 
 uninstall-hook:
 	rm -f $(DESTDIR)$(libdir)/v_oscopy.so
