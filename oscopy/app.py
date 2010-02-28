@@ -158,8 +158,8 @@ FITNESS FOR A PARTICULAR PURPOSE."
         return False
 
     def help_read(self):
-        print "load DATAFILE"
-        print "   Load signal file"
+        print "read DATAFILE"
+        print "   Read signal file"
     def do_read(self, args):
         fn = args
         if fn in self._ctxt.readers.keys():

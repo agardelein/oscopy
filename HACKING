@@ -1,0 +1,91 @@
+EXTENDING OSCOPY:
+-----------------
+Oscopy is designed to be easily extendable. Support of new data file formats is done by adding new Readers/Writers, new types of Graph and Figures by deriving Graph and Figure...
+
+New data file format can be added by deriving Reader and
+redefining the function readsigs(), which fills the list
+of signals self.sigs and return a dict of signals.
+During execution, Reader.read() check the validity
+of the provided path, and then call readsigs().
+
+New graph mode can be added by deriving Graph and redefining
+the function set_axes() which if called by plot(), or eventually 
+redefining plot(). See FFTGraph.py for example.
+NOTE : Figure.set_mode() has to be updated when new mode are added !
+
+Vocabular:
+A figure is CREATEd or DESTROYed, a graph is ADDed to a figure or DELETEd and a signal is INSERTed or REMOVEd from a graph.
+
+Template for new import format:
+---
+import Signal
+import Readers
+
+class xxxReader(Readers.Reader.Reader):
+      def readsigs(self):
+          #[...] read the signals data from file and for each signal:
+              #create signal:
+	      # Reference signal, or X axis
+	      sref = Signal("name_ref", self, "unit_ref")
+	      sref.set_pts([with X data from file as a list or numpy.array])
+	      # Signal, or Y axis
+	      s = Signal("name_sig", self, "unit_sig")
+	      s.set_pts([with data from file as a list or numpy.array])
+	      # Assign reference to signal
+	      s.set_ref(sref)
+          #fill self.slist
+	      self.slist.append(s)
+	      sigs["name_ref"] = s
+          #and return a dict of sigs where key is signal name
+	  return sigs
+
+      def detect(self, fn):
+          # return True if file fn can be read using this Reader
+---
+When a importing a signal, first detect is called.
+If format is supported, read() and subsequent update() will call readsigs()
+
+Template for new export format:
+---
+import Signal
+import Writers
+
+class xxxWriter(Writers.Writer.Writer):
+      def getfmtname(self):
+      ... return a string containing the name of the format
+
+      def fmtcheck(self, sigs):
+      ... return True if format can be use to write dict of signals sigs
+
+      def writesigs(self, sigs)
+      ... write signals to file
+---
+When an export command is issued, the format name is compared to the
+one provided by the class, and then the signals are passed to the class
+to check whether it can write them properly, e.g. if they have the same
+abscisse. If eveyrthing is fine, writesigs() is called.
+Options passed by user can be found in self.opts.
+
+Template for new graphs:
+---
+import Graphs
+import Signal
+
+class xxxGraph(Graphs.Graph.Graph):
+      def plot():
+      ... define the plot function, using signals in self.sigs
+---
+
+A SCHEME:
+---------
+
+   READER -- SIGNAL+           + FIGURE +-- GRAPH +-- SIGNAL
+          \- SIGNAL+           |        |         +-- SIGNAL
+   READER -- SIGNAL+           |        |
+                   |           |        +-- GRAPH +-- SIGNAL
+                   |           |                  +-- SIGNAL
+                   |           + FIGURE ...
+                   |           ...
+                   |           |
+                   +- CONTEXT -+
+
