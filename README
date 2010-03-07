@@ -14,9 +14,9 @@ Features highlight:
   * D-Bus support: update recursively signals
   * Run netlister and simulator
 
-There are two applications:
-  * oscopy_app.py: command-line interface (CLI)
-  * oscopy_ui.py:  graphical user interface (GUI) fully integrating the CLI.
+There are two interfaces:
+  * Command-line interface (CLI): oscopy_app.py
+  * Graphical user interface (GUI) fully integrating the CLI: oscopy_ui.py
 Scripting is supported in both application, although in the GUI some commands are disabled since plots are displayed dynamically.
 
 Support for mathematic with signals is implemented. Supported functions:
@@ -24,6 +24,8 @@ trig, sqrt, log...
 Support for (i)fft: fft(v1) + fft(v2) is possible, but please avoid things like ifft(fft(v1) + fft(v2))
 First order diff is supported: diff(v1) or diff(v1, 1)
 Access to X axis data is provided through Time and Freq, e.g. sin(Time(vsqu)*1e6)
+
+In each plot window, horizontal and vertical cursors can be toggled by using keys '1', '2', '3' and '4'.
 
 GETTING THE SOURCE
 ------------------
@@ -43,6 +45,7 @@ Dependencies:
   * python
   * python-numpy
   * python-matplotlib
+
 If you want to use the dbus capabilities:
   * python-dbus
   * glib
