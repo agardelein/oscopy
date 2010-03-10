@@ -51,6 +51,8 @@ INSTALLING
 ----------
 If you want to install oscopy on a system:
 # ./autogen.sh && ./configure && make install
+Note that you might need to update your PYTHONPATH, for example if you install it in ${HOME}/geda, to launch oscopy you might need the following line:
+PYTHONPATH=${HOME}/geda/lib/python2.5/site-packages:$PYTHONPATH
 
 QUICKSTART
 ----------
