@@ -1,4 +1,4 @@
-SUBDIRS = gschem-plugin oscopy_gui oscopy
+SUBDIRS = oscopy_gui oscopy
 
 oscopydir = $(pkgpythondir)
 

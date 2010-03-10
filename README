@@ -39,22 +39,18 @@ BUILDING FROM SOURCE
 --------------------
 Oscopy can work out of the box when downloaded, but it supports also installing on the system using autotools.
 In the latter case:
-$ ./configure && make
+$ ./autogen.sh && ./configure && make
 
 Dependencies:
   * python
   * python-numpy
   * python-matplotlib
-
-If you want to use the dbus capabilities:
   * python-dbus
-  * glib
-  * dbus-glib
 
 INSTALLING
 ----------
 If you want to install oscopy on a system:
-# ./configure && make install
+# ./autogen.sh && ./configure && make install
 
 QUICKSTART
 ----------

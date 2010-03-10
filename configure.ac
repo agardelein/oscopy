@@ -9,10 +9,11 @@ dnl directory.
 #####################################################################
 
 AC_INIT([oscopy], [0.32], [agardelein@yahoo.fr])
+AC_CONFIG_AUX_DIR([build-tools])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_PROG_CC
 AC_PROG_LN_S
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_AUX_DIR([build-tools])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
 	Makefile
@@ -21,10 +22,7 @@ AC_CONFIG_FILES([
 	oscopy/readers/Makefile
 	oscopy/writers/Makefile
 	oscopy_gui/Makefile
-	gschem-plugin/Makefile
-	gschem-plugin/src/Makefile
 ])
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
 #####################################################################
 # Check for compiling & linking tools
@@ -47,36 +45,6 @@ AM_PATH_PYTHON([2.5])
 #####################################################################
 # Check for libraries that use pkg-config
 #####################################################################
-PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.12.0], ,
-  AC_MSG_ERROR([GLib 2.12.0 or later is required.]))
-
-PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= 2.10.0], ,
-  AC_MSG_ERROR([GTK+ 2.10.0 or later is required.]))
-
-#PKG_CHECK_MODULES(DBUS_GLIB, [dbus-glib-1 >= 0.74], [AC_SUBST(DBUS_LIBS)],
-#  AC_MSG_ERROR([dbus-glib-1 0.74 or later is required]))
-# (from pidgin-2.6.5 configure.ac)
-AC_ARG_ENABLE(dbus, [AC_HELP_STRING([--disable-dbus], [disable D-Bus support])], , enable_dbus=yes)
-
-if test "x$enable_dbus" = "xyes" ; then
-	AC_CHECK_PROG(enable_dbus, dbus-binding-tool, yes, no)
-fi
-
-if test "x$enable_dbus" = "xyes" ; then
-	PKG_CHECK_MODULES(DBUS, [dbus-1 >= 0.74 dbus-glib-1 >= 0.74], [
-		AC_SUBST(DBUS_CFLAGS)
-		AC_SUBST(DBUS_LIBS)
-		enable_dbus=yes
-	], [
-	enable_dbus=no
-	if test "x$force_deps" = "xyes" ; then
-		AC_MSG_ERROR([
-D-Bus development headers not found.
-Use --disable-dbus if you do not need D-Bus support.
-])
-	fi])
-fi
-
 
 
 AC_OUTPUT
