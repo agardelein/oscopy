@@ -1,0 +1,86 @@
+;; -*- Scheme -*-
+;;
+;; $Id$
+;;
+;; Copyright (C) 2010 Arnaud Gardelein
+;;
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 2 of the License, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program; if not, write to the Free Software
+;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+;;
+;;
+
+(define oscopy:bindir "@BINDIR@")
+(define oscopy:pythonpath "@PYEXECDIR@")
+
+(define oscopy:oscopy-cmd
+        (string-append "PATH=" oscopy:bindir ":$PATH "
+                       "PYTHONPATH=" oscopy:pythonpath
+                       " oscopy_ui.py &"))
+
+(define oscopy:dbus-oscopy-is-running-cmd "dbus-send --print-reply --session --dest=org.freedesktop.Oscopy /org/freedesktop/Oscopy org.freedesktop.OscopyIFace.dbus_running")
+(define oscopy:dbus-oscopy-update-cmd "dbus-send --print-reply --session --dest=org.freedesktop.Oscopy /org/freedesktop/Oscopy org.freedesktop.OscopyIFace.dbus_update")
+
+;; Menu
+(define (oscopy:about)
+  (gschem-msg (string-append
+               "This is the oscopy major mode for gschem\n"
+               "oscopy.scm\n"
+               "This is highly experimental\n"
+               "You should save your work often\n"
+               "and keep backup copies.  You have\n"
+               "been warned.\n"
+               )
+              )
+  )
+
+(define (oscopy:is-running)
+  (eq? (status:exit-val (system oscopy:dbus-oscopy-is-running-cmd)) 0))
+
+(define (oscopy:launch-oscopy)
+  (if (oscopy:is-running)
+      (if (gschem-confirm (string-append "An instance of oscopy is already running\n"
+                                         "Launch anyway ?"))
+          (system oscopy:oscopy-cmd)
+          )
+      (system oscopy:oscopy-cmd)
+      )
+  )
+
+(define (oscopy:update-oscopy)
+  (if (oscopy:is-running)
+      (system oscopy:dbus-oscopy-update-cmd)
+      (if (gschem-confirm (string-append "No running instance of oscopy\n"
+                                         "Launch oscopy ?"))
+          (system oscopy:oscopy-cmd)
+          )
+      )
+  )
+
+(define oscopy:oscopy-keymap
+  '(
+    ("?" . oscopy:about)
+    ("l" . oscopy:launch-oscopy)
+    ("u" . oscopy:update-oscopy)
+    )
+)
+
+(define oscopy:menu-items
+  '( ("About..."     oscopy:about    oscopy:about)
+     ("Launch oscopy" oscopy:launch-oscopy oscopy:launch-oscopy)
+     ("Update oscopy" oscopy:update-oscopy oscopy:update-oscopy)
+     )
+)
+
+(add-menu "oscopy" oscopy:menu-items)
+

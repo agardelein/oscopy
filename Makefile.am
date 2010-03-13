@@ -1,4 +1,4 @@
-SUBDIRS = oscopy_gui oscopy
+SUBDIRS = oscopy_gui oscopy scheme
 
 oscopydir = $(pkgpythondir)
 
