@@ -458,7 +458,7 @@ class App(dbus.service.Object):
     #
     def _init_config(self):
         # initialize configuration stuff
-        path = BaseDirectory.load_first_config('oscopy')
+        path = BaseDirectory.save_config_path('oscopy')
         self.config_file = os.path.join(path, 'gui')
         self.hist_file = os.path.join(path, 'history')
         section = App.SECTION
