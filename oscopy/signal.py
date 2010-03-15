@@ -116,6 +116,11 @@ class Signal(object):
         ref_name = self.ref.name if self.ref else '(no reference)'
         return '%s / %s %s' % (self.name, ref_name, self.unit)
 
+    def __repr__(self):
+        ref_name = self.ref.name if self.ref else '(no reference)'
+        return '<%s[0x%x] %s / %s [%s]>' % (type(self).__name__, id(self),
+                                            self.name, ref_name, self.unit)
+
     ref = property(get_ref, set_ref)
     data = property(get_data, set_data)
     freeze = property(get_freeze, set_freeze)
