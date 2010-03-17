@@ -48,7 +48,6 @@ Class Graph -- Handle the representation of a list of signals
       Set plot axis range
 """
 
-import matplotlib.pyplot as plt
 from matplotlib.pyplot import Axes as mplAxes
 from matplotlib import rc
 from cursor import Cursor

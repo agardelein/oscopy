@@ -42,7 +42,6 @@ Figure -- Handle a list of graphs
       Handle keystrokes during plot
 """
 
-import matplotlib.pyplot as plt
 from matplotlib.pyplot import Figure as MplFig
 from graphs import Graph, LinGraph
 

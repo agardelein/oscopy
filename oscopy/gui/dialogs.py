@@ -5,7 +5,6 @@ import vte
 import pty
 import sys
 import readline
-import gobject
 import math
 
 from oscopy import factors_to_names, abbrevs_to_factors

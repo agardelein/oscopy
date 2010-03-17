@@ -47,9 +47,6 @@ opts: options
 fn  : filename
 """
 
-import sys
-import re
-import matplotlib.pyplot as plt
 from readers.detect_reader import DetectReader
 from readers.reader import ReadError
 from writers.detect_writer import DetectWriter
