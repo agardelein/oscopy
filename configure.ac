@@ -11,10 +11,9 @@ dnl directory.
 AC_INIT([oscopy], [0.32], [agardelein@yahoo.fr])
 AC_CONFIG_AUX_DIR([build-tools])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
-AC_PROG_CC
+
 AC_PROG_LN_S
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
 	Makefile
 	oscopy/Makefile
@@ -29,23 +28,20 @@ AC_CONFIG_FILES([
 # Check for compiling & linking tools
 #####################################################################
 
-AC_PROG_CC
-
-AC_DISABLE_STATIC
-AC_PROG_LIBTOOL
-
-AM_PROG_CC_C_O
-#AX_GCC_FLAGS([-Wall])
-
-AM_PROG_LEX
-AX_PROG_AWK
-AX_PROG_GROFF
 AC_PATH_PROGS([M4], [gm4 m4], [m4])
 AM_PATH_PYTHON([2.5])
 
 #####################################################################
 # Check for libraries that use pkg-config
 #####################################################################
+
+PKG_PROG_PKG_CONFIG
+
+PKG_CHECK_MODULES(PYGTK, [pygtk-2.0 >= 2.10.0], ,
+  AC_MSG_ERROR([PyGTK 2.10.0 or later is required.]))
+
+PKG_CHECK_MODULES(PYVTE, [pyvte], ,
+  AC_MSG_ERROR([pyvte not found.]))
 
 
 AC_OUTPUT
