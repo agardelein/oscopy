@@ -421,7 +421,9 @@ FITNESS FOR A PARTICULAR PURPOSE."
                     self.postcmd(stop, line)
         except IOError, e:
             print "Script error:", e
-            f.close()
+            if hasattr(self, "f") and hasattr(f, "close")\
+                    and callable(f.close):
+                f.close()
 
     def help_factors(self):
         print "factors X, Y"
