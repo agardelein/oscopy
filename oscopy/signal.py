@@ -112,10 +112,6 @@ class Signal(object):
         else:
             assert 0, _("Bad type")
 
-    def __str__(self):
-        ref_name = self.ref.name if self.ref else '(no reference)'
-        return '%s / %s %s' % (self.name, ref_name, self.unit)
-
     def __repr__(self):
         ref_name = self.ref.name if self.ref else '(no reference)'
         if self.data is not None:
