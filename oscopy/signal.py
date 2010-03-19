@@ -118,8 +118,19 @@ class Signal(object):
 
     def __repr__(self):
         ref_name = self.ref.name if self.ref else '(no reference)'
-        return '<%s[0x%x] %s / %s [%s]>' % (type(self).__name__, id(self),
-                                            self.name, ref_name, self.unit)
+        if self.data is not None:
+            if len(self.data) > 4:
+                data = '[%s, %s, ..., %s, %s]' % (self.data[0],
+                                                  self.data[1],
+                                                  self.data[-2],
+                                                  self.data[-1])
+            else:
+                data = '[' + ', '.join(map(str, self.data)) + ']'
+        else:
+            data = 'None'
+        return '<%s[0x%x] %s / %s [%s] data=%s>' % (type(self).__name__, id(self),
+                                                    self.name, ref_name, self.unit,
+                                                    data)
 
     ref = property(get_ref, set_ref)
     data = property(get_data, set_data)
