@@ -34,6 +34,7 @@ Class Signal -- Contains the signal points and other information
       Returns a string with the signal name, the reference name
       and the reader name.
 """
+import operator
 import numpy
 
 # Signals class
@@ -127,6 +128,56 @@ class Signal(object):
         return '<%s[0x%x] %s / %s [%s] data=%s>' % (type(self).__name__, id(self),
                                                     self.name, ref_name, self.unit,
                                                     data)
+
+    __op_name = {
+        operator.add: '+',
+        operator.sub: '-',
+        operator.mul: '*',
+        operator.div: '/',
+    }
+
+    def __make_method(op):
+        def func(self, other):
+            other_name = other.name if isinstance(other, Signal) else str(other)
+            other_data = other.data if isinstance(other, Signal) else other
+            name = '(%s %s %s)' % (self.name, Signal.__op_name[op], other_name)
+            s = Signal(name, None)
+            s.data = op(self.data, other_data)
+            return s
+        return func
+
+    def __make_method_inplace(op):
+        def func(self, other):
+            other_data = other.data if isinstance(other, Signal) else other
+            self.data = op(self.data, other_data)
+            return self
+        return func
+
+    __add__ = __make_method(operator.add)
+    __iadd__ = __make_method_inplace(operator.iadd)
+
+    __sub__ = __make_method(operator.sub)
+    __isub__ = __make_method_inplace(operator.isub)
+
+    __mul__ = __make_method(operator.mul)
+    __imul__ = __make_method_inplace(operator.imul)
+
+    __div__ = __make_method(operator.div)
+    __idiv__ = __make_method_inplace(operator.idiv)
+
+    __radd__ = __add__
+    __rsub__ = __sub__
+    __rmul__ = __mul__
+    __rdiv__ = __div__
+
+    def __neg__(self):
+        name = '-%s' % self.name
+        s = Signal(name, None)
+        s.data = -self.data
+        return s
+
+    def __iter__(self):
+        return iter(self.data)
 
     ref = property(get_ref, set_ref)
     data = property(get_data, set_data)
