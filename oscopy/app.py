@@ -97,7 +97,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
         self._current_figure = self._ctxt.figures[num - 1]
         if len(self._current_figure.graphs) and\
                 (gn - 1) < len(self._current_figure.graphs) and\
-                (gn - 1) > 0:
+                (gn - 1) >= 0:
             self._current_graph = self._current_figure.graphs[gn - 1]
         else:
             self._current_graph = None
@@ -287,7 +287,8 @@ FITNESS FOR A PARTICULAR PURPOSE."
         print "   Set the unit to be displayed on graph axis"
     def do_unit(self, args):
         units = args.split(",", 1)
-        if len(units) < 1 or self._current_graph is None:
+        if len(units) < 1 or self._current_graph is None\
+                or not self._current_graph.signals:
             return
         elif len(units) == 1:
             self._current_graph.unit = units[0].strip(),
@@ -349,7 +350,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
         try:
             self._ctxt.math(inp)
         except ReadError, e:
-            print "Error creating signal from math expression", e
+            print "Error creating signal from math expression:", e
 
     def get_signames(self, args):
         """ Return the signal names list extracted from the commandline
@@ -413,6 +414,8 @@ FITNESS FOR A PARTICULAR PURPOSE."
         print "   execute commands from file"
     def do_exec(self, file):
         try:
+            if not file.startswith('/'):
+                file = "/".join((os.getcwd(), file))
             with open(file) as f:
                 lines = iter(f)
                 for line in lines:
@@ -424,6 +427,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
             if hasattr(self, "f") and hasattr(f, "close")\
                     and callable(f.close):
                 f.close()
+            print os.getcwd()
 
     def help_factors(self):
         print "factors X, Y"

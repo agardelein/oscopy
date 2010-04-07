@@ -1,6 +1,6 @@
 # First read data from IRF540 simulation
 echo *** Reading files and setting plots
-read demo/irf540.dat
+read irf540.dat
 add vgs
 create
 add iRD
@@ -12,12 +12,12 @@ layout quad
 select 2-3
 insert vds
 # Plot filter response
-read demo/ac.dat
+read ac.dat
 create
 add vout
 scale loglog
 # Plot square signal, its FFT and a math signal
-read demo/tran.dat
+read tran.dat
 create
 add vsqu
 vsqufft=fft(vsqu)
@@ -49,4 +49,4 @@ update
 echo *** Now look at figure 3
 plot
 # Saving results
-write gnucap (ow:1) demo/res.dat v1,vsqu
+write gnucap (ow:1) res.dat v1,vsqu

@@ -503,10 +503,11 @@ class App(dbus.service.Object):
                     self._store.set_value(parent, 2, False)
 
     def _add_file(self, event, filename, data=None):
-        it = self._store.append(None, (filename.strip(), None, False))
-        for name, sig in self._ctxt.readers[filename.strip()]\
-                .signals.iteritems():
-            self._store.append(it, (name, sig, sig.freeze))
+        if filename.strip() in self._ctxt.readers:
+            it = self._store.append(None, (filename.strip(), None, False))
+            for name, sig in self._ctxt.readers[filename.strip()]\
+                    .signals.iteritems():
+                self._store.append(it, (name, sig, sig.freeze))
 
     #
     # Callbacks for drag and drop
