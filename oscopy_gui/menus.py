@@ -7,8 +7,8 @@ class FigureMenu(object):
         self._store = None
 
     def create_menu(self, store, figure, graph, app_exec):
-        self._layout_to_str = {'horiz': _('Horizontal', 'vert':_('Vertical'),\
-                                   'quad':_('Quad'}
+        self._layout_to_str = {'horiz': _('Horizontal'), 'vert':_('Vertical'),\
+                                   'quad':_('Quad')}
         self._store = store
         menu = gtk.Menu()
         self._create_figure_menu(menu, figure, graph, app_exec)
@@ -75,7 +75,7 @@ class GraphMenu(object):
 
     def create_graph_menu(self, menu, store, figure, graph, app_exec):
         self._scale_to_str = {'lin': _('Linear'), 'logx': _('LogX'), 'logy': _('LogY'),\
-                                  'loglog': _('Loglog')
+                                  'loglog': _('Loglog')}
         self._store = store
 #        menu = gtk.Menu()
         item_range = gtk.MenuItem(_('Range...'))
@@ -83,7 +83,7 @@ class GraphMenu(object):
                            (figure, graph, app_exec))
         item_range.set_sensitive(graph is not None)
         menu.append(item_range)
-        item_units = gtk.MenuItem('_(Units...'))
+        item_units = gtk.MenuItem(_('Units...'))
         item_units.connect('activate', self._units_menu_item_activated,
                            (figure, graph, app_exec))
         item_units.set_sensitive(graph is not None)
