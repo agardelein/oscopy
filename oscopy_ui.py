@@ -236,27 +236,27 @@ class App(dbus.service.Object):
         # tuple format:
         # (name, stock-id, label, accelerator, tooltip, callback)
         actions = [
-            (_('File'), None, _('_File')),
-            (_('Add file(s)...'), gtk.STOCK_ADD, _('_Add file(s)...'), None, None,
+            ('File', None, _('_File')),
+            ('Add file(s)...', gtk.STOCK_ADD, _('_Add file(s)...'), None, None,
              self._action_add_file),
-            (_('Update files'), gtk.STOCK_REFRESH, _('_Update'), None, None,
+            ('Update files', gtk.STOCK_REFRESH, _('_Update'), None, None,
              self._action_update),
-            (_('Execute script...'), gtk.STOCK_MEDIA_PLAY, _('_Execute script...'),
+            ('Execute script...', gtk.STOCK_MEDIA_PLAY, _('_Execute script...'),
              None, None, self._action_execute_script),
-            (_("New Math Signal..."), gtk.STOCK_NEW, _('_New Math Signal'), None,
+            ("New Math Signal...", gtk.STOCK_NEW, _('_New Math Signal'), None,
              None, self._action_new_math),
-            (_("Run netlister and simulate..."), gtk.STOCK_MEDIA_FORWARD,\
+            ("Run netlister and simulate...", gtk.STOCK_MEDIA_FORWARD,\
                  _("_Run netlister and simulate..."), None, None,\
                  self._action_netlist_and_simulate),
-            (_('Windows'), None, _('_Windows')),
-            (_('Quit'), gtk.STOCK_QUIT, _('_Quit'), None, None,
+            ('Windows', None, _('_Windows')),
+            ('Quit', gtk.STOCK_QUIT, _('_Quit'), None, None,
              self._action_quit),
             ]
 
         actiongroup = self._actiongroup = gtk.ActionGroup('App')
         actiongroup.add_actions(actions)
 
-        ta = gtk.ToggleAction(_('Show terminal'), _('_Show terminal'), None, None)
+        ta = gtk.ToggleAction('Show terminal', _('_Show terminal'), None, None)
         ta.set_active(True)
         ta.connect('activate', self._action_show_terminal)
         actiongroup.add_action(ta)
@@ -282,7 +282,7 @@ class App(dbus.service.Object):
         self._togglecell = gtk.CellRendererToggle()
         self._togglecell.set_property('activatable', True)
         self._togglecell.connect('toggled', self._cell_toggled, None)
-        colfreeze = gtk.TreeViewColumn('Freeze', self._togglecell)
+        colfreeze = gtk.TreeViewColumn(_('Freeze'), self._togglecell)
         colfreeze.add_attribute(self._togglecell, 'active', 2)
         tv.append_column(colfreeze)
         tv.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
