@@ -68,7 +68,7 @@ class Figure(MplFig):
         elif isinstance(sigs, dict):
             self.add(sigs)
         else:
-            assert 0, "Bad type"
+            assert 0, _("Bad type")
 
     def add(self, sigs={}):
         """ Add a graph into the figure and set it as current graph.
@@ -77,7 +77,7 @@ class Figure(MplFig):
         By default, do nothing.
         """
         if len(self.axes) > 3:
-            assert 0, "Maximum graph number reached"
+            assert 0, _("Maximum graph number reached")
 
         # _graph_position use the current length of self.axes to compute
         # the graph coordinates. So we add a fake element into the list
@@ -97,18 +97,18 @@ class Figure(MplFig):
         Act as a "pop" with curgraph variable.
         """
         if not isinstance(num, int):
-            assert 0, "Bad graph number"
+            assert 0, _("Bad graph number")
         if len(self.axes) < 1 or num < 1 or num > len(self.axes):
-            assert 0, "Bad graph number"
+            assert 0, _("Bad graph number")
         del self.axes[num - 1]
         
     def update(self, u, d):
         """ Update the graphs
         """
         if not isinstance(u, dict):
-            assert 0, "Bad type"
+            assert 0, _("Bad type")
         if not isinstance(d, dict):
-            assert 0, "Bad type"
+            assert 0, _("Bad type")
         for g in self.axes:
             ug = {}
             dg = {}
@@ -131,7 +131,7 @@ class Figure(MplFig):
         old_graph = args[0]
         gmode = args[1]
         if not self._graphs:
-            assert 0, "No graph defined"
+            assert 0, _("No graph defined")
         g = (self._MODES_NAMES_TO_OBJ(gmode))(old_graph)
         self._graphs[self._graphs.index(old_graph)] = g
 
@@ -151,7 +151,7 @@ class Figure(MplFig):
         if layout == "horiz" or layout == "vert" or layout == "quad":
             self._layout = layout
         else:
-            assert 0, "Bad layout"
+            assert 0, _("Bad layout")
 
         for gn, g in enumerate(self.axes):
             g.set_position(self._graph_position(gn))
@@ -212,7 +212,7 @@ class Figure(MplFig):
             dy = 0.5
             num_to_xy = [[x, y] for y in xrange(2) for x in xrange(2)]
         else:
-            assert 0, "Bad layout"
+            assert 0, _("Bad layout")
 
         pos_x = num_to_xy[num][0]
         pos_y = num_to_xy[len(self.axes) - num - 1][1]

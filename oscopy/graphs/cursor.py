@@ -95,7 +95,7 @@ class Cursor(object):
         if type == "horiz" or type == "vert":
             self._type = type
         else:
-            assert 0, "Bad type"
+            assert 0, _("Bad type")
 
     def set_value(self, val=None):
         if val is not None:

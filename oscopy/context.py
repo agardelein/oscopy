@@ -106,7 +106,7 @@ class Context(object):
         To avoid mixing numbers, just replace the figure by None in the list
         """
         if num > len(self._figures) or num < 1:
-            assert 0, "Out of range figure number"
+            assert 0, _("Out of range figure number")
         self._figures[num - 1] = None
 
     def read(self, fn):
@@ -117,7 +117,7 @@ class Context(object):
         """
         # File already loaded ?
         if fn in self._readers.keys():
-            raise "File already loaded, use update to read it again"
+            raise _("File already loaded, use update to read it again")
 
         r = DetectReader(fn)
         if r is None:
@@ -228,7 +228,7 @@ class Context(object):
                         if self._signals.has_key(sn):
                             sigs[sn] = self._signals[sn]
                         else:
-                            raise ReadError("What is %s" % sn)
+                            raise ReadError(_("What is %s") % sn)
                     r.set_origsigs(sigs)
                     ss = r.read(inp)
 

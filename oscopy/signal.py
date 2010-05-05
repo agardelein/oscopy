@@ -66,7 +66,7 @@ class Signal(object):
             elif isinstance(data, numpy.ndarray):
                 self._data = data
             else:
-                assert 0, "Data %s not handled" % type(data)
+                assert 0, _("Data %s not handled") % type(data)
 
     def get_data(self):
         """ Return the list of point of the signal
@@ -110,7 +110,7 @@ class Signal(object):
         if isinstance(frz, bool):
             self._freeze = frz
         else:
-            assert 0, "Bad type"
+            assert 0, _("Bad type")
 
     def __str__(self):
         ref_name = self.ref.name if self.ref else '(no reference)'

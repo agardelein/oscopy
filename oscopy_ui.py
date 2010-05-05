@@ -57,10 +57,10 @@ class OscopyAppUI(oscopy.OscopyApp):
 
     def help_refresh(self):
         print 'refresh FIG#|on|off|current|all'
-        print '  on|off       toggle auto refresh of current figure'
-        print '  current|all  refresh either current figure or all'
-        print '  FIG#         figure to refresh'
-        print 'without arguments refresh current figure'
+        print _("""  on|off       toggle auto refresh of current figure
+  current|all  refresh either current figure or all
+  FIG#         figure to refresh
+without arguments refresh current figure""")
     def do_refresh(self, args):
         if args == 'on':
             self._autorefresh = True
@@ -78,14 +78,14 @@ class OscopyAppUI(oscopy.OscopyApp):
             fignum = int(args) - 1
             if fignum >= 0 and fignum < len(self._ctxt.figures):
                 if self._ctxt.figures[fignum].canvas is not None:
-                    print 'refreshing'
+                    print _('refreshing')
                     self._ctxt.figures[fignum].canvas.draw()
 
     def do_pause(self, args):
-        print "Pause command disabled in UI"
+        print _("Pause command disabled in UI")
 
     def do_plot(self, line):
-        print "Plot command disabled in UI"
+        print _("Plot command disabled in UI")
 
 class App(dbus.service.Object):
     __ui = '''<ui>
@@ -106,8 +106,8 @@ class App(dbus.service.Object):
 
     def __init__(self, bus_name, object_path='/org/freedesktop/Oscopy'):
         dbus.service.Object.__init__(self, bus_name, object_path)
-        self._scale_to_str = {'lin': 'Linear', 'logx': 'LogX', 'logy': 'LogY',\
-                                  'loglog': 'Loglog'}
+        self._scale_to_str = {'lin': _('Linear'), 'logx': _('LogX'), 'logy': _('LogY'),\
+                                  'loglog': _('Loglog')}
         self._windows_to_figures = {}
         self._fignum_to_windows = {}
         self._fignum_to_merge_id = {}
@@ -150,7 +150,7 @@ class App(dbus.service.Object):
     # Actions
     #
     def _action_add_file(self, action):
-        dlg = gtk.FileChooserDialog('Add file(s)', parent=self._mainwindow,
+        dlg = gtk.FileChooserDialog(_('Add file(s)'), parent=self._mainwindow,
                                     buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                              gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         dlg.set_select_multiple(True)
@@ -164,13 +164,13 @@ class App(dbus.service.Object):
         self._ctxt.update()
 
     def _action_new_math(self, action):
-        dlg = gtk.Dialog('New math signal', parent=self._mainwindow,
+        dlg = gtk.Dialog(_('New math signal'), parent=self._mainwindow,
                          buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                   gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
 
         # Label and entry
         hbox = gtk.HBox()
-        label = gtk.Label('Expression:')
+        label = gtk.Label(_('Expression:'))
         hbox.pack_start(label)
         entry = gtk.Entry()
         hbox.pack_start(entry)
@@ -191,7 +191,7 @@ class App(dbus.service.Object):
             self._term_win.show()
 
     def _action_execute_script(self, action):
-        dlg = gtk.FileChooserDialog('Execute script', parent=self._mainwindow,
+        dlg = gtk.FileChooserDialog(_('Execute script'), parent=self._mainwindow,
                                     buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                              gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         resp = dlg.run()
@@ -236,27 +236,27 @@ class App(dbus.service.Object):
         # tuple format:
         # (name, stock-id, label, accelerator, tooltip, callback)
         actions = [
-            ('File', None, '_File'),
-            ('Add file(s)...', gtk.STOCK_ADD, '_Add file(s)...', None, None,
+            (_('File'), None, _('_File')),
+            (_('Add file(s)...'), gtk.STOCK_ADD, _('_Add file(s)...'), None, None,
              self._action_add_file),
-            ('Update files', gtk.STOCK_REFRESH, '_Update', None, None,
+            (_('Update files'), gtk.STOCK_REFRESH, _('_Update'), None, None,
              self._action_update),
-            ('Execute script...', gtk.STOCK_MEDIA_PLAY, '_Execute script...',
+            (_('Execute script...'), gtk.STOCK_MEDIA_PLAY, _('_Execute script...'),
              None, None, self._action_execute_script),
-            ("New Math Signal...", gtk.STOCK_NEW, '_New Math Signal', None,
+            (_("New Math Signal..."), gtk.STOCK_NEW, _('_New Math Signal'), None,
              None, self._action_new_math),
-            ("Run netlister and simulate...", gtk.STOCK_MEDIA_FORWARD,\
-                 "_Run netlister and simulate...", None, None,\
+            (_("Run netlister and simulate..."), gtk.STOCK_MEDIA_FORWARD,\
+                 _("_Run netlister and simulate..."), None, None,\
                  self._action_netlist_and_simulate),
-            ('Windows', None, '_Windows'),
-            ('Quit', gtk.STOCK_QUIT, '_Quit', None, None,
+            (_('Windows'), None, _('_Windows')),
+            (_('Quit'), gtk.STOCK_QUIT, _('_Quit'), None, None,
              self._action_quit),
             ]
 
         actiongroup = self._actiongroup = gtk.ActionGroup('App')
         actiongroup.add_actions(actions)
 
-        ta = gtk.ToggleAction('Show terminal', '_Show terminal', None, None)
+        ta = gtk.ToggleAction(_('Show terminal'), _('_Show terminal'), None, None)
         ta.set_active(True)
         ta.connect('activate', self._action_show_terminal)
         actiongroup.add_action(ta)
@@ -268,7 +268,7 @@ class App(dbus.service.Object):
 
     def _create_treeview(self):
         celltext = gtk.CellRendererText()
-        col = gtk.TreeViewColumn('Signal', celltext, text=0)
+        col = gtk.TreeViewColumn(_('Signal'), celltext, text=0)
         tv = gtk.TreeView()
         col.set_cell_data_func(celltext, self._reader_name_in_bold)
         col.set_expand(True)
@@ -309,7 +309,7 @@ class App(dbus.service.Object):
         vbox.pack_start(sw)
 
         w = self._mainwindow = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        w.set_title('Oscopy GUI')
+        w.set_title(_('Oscopy GUI'))
         w.add(vbox)
         w.add_accel_group(accel_group)
         w.connect('destroy', lambda *x: self._action_quit(None))
@@ -419,7 +419,7 @@ class App(dbus.service.Object):
         w = gtk.Window()
         self._windows_to_figures[w] = fig
         self._fignum_to_windows[fignum] = w
-        w.set_title('Figure %d' % fignum)
+        w.set_title(_('Figure %d') % fignum)
         vbox = gtk.VBox()
         w.add(vbox)
         canvas = FigureCanvas(fig)
@@ -441,7 +441,7 @@ class App(dbus.service.Object):
         w.show_all()
 
         # Add it to the 'Windows' menu
-        actions = [('Figure %d' % fignum, None, 'Figure %d' % fignum,
+        actions = [(_('Figure %d') % fignum, None, _('Figure %d') % fignum,
                     None, None, self._action_figure)]
         self._actiongroup.add_actions(actions, (w, fignum))
         ui = "<ui>\
@@ -612,7 +612,7 @@ class App(dbus.service.Object):
         try:
             status, output = commands.getstatusoutput(cmd)
             if status:
-                msg = "Executing command '%s' failed." % cmd
+                msg = _("Executing command '%s' failed.") % cmd
                 report_error(self._mainwindow, msg)
             return status == 0
         finally:

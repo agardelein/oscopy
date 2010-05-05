@@ -49,7 +49,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_create(self):
         print "create [SIG [, SIG [, SIG]...]]"
-        print "   Create a new figure, set_ it as current, add the signals"
+        print _("   Create a new figure, set_ it as current, add the signals")
     def do_create(self, args):
         self._ctxt.create(self.get_signames(args))
         self._current_figure = self._ctxt.figures[len(self._ctxt.figures) - 1]
@@ -62,7 +62,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_destroy(self):
         print "destroy FIG#"
-        print "   Destroy a figure"
+        print _("   Destroy a figure")
     def do_destroy(self, args):
         if not args.isdigit():
             self.help_destroy()
@@ -83,7 +83,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_select(self):
         print "select FIG#-GRAPH#"
-        print "   Select the current figure and the current graph"
+        print _("   Select the current figure and the current graph")
     def do_select(self, args):
         if not args:
             self.help_select()
@@ -104,30 +104,30 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_layout(self):
         print "layout horiz|vert|quad"
-        print "   Define the layout of the current figure"
+        print _("   Define the layout of the current figure")
     def do_layout(self, args):
         if self._current_figure is not None:
             self._current_figure.layout = args
 
     def help_figlist(self):
         print "figlist"
-        print "   Print the list of figures"
+        print _("   Print the list of figures")
     def do_figlist(self, args):
         SEPARATOR = " "
         for fn, f in enumerate(self._ctxt.figures):
             if f is not None:
-                print "%s Figure %d: %s" %\
+                print _("%s Figure %d: %s") %\
                     ([" ", "*"][f == self._current_figure],\
                          fn + 1, f.layout)
                 for gn, g in enumerate(f.graphs):
-                    print "    %s Graph %d : (%s) %s" %\
+                    print _("    %s Graph %d : (%s) %s") %\
                         ([" ","*"][g == self._current_graph],\
                              gn + 1, g.type,\
                              SEPARATOR.join(g.signals.keys()))
 
     def help_plot(self):
         print "plot"
-        print "   Draw and show the figures"
+        print _("   Draw and show the figures")
     def do_plot(self, args):
         if self._figcount == len(self._ctxt.figures):
             self._main_loop.run()
@@ -138,7 +138,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
                 # fig = plt.figure(i + 1)
                 w = gtk.Window()
                 self._figcount += 1
-                w.set_title('Figure %d' % self._figcount)
+                w.set_title(_('Figure %d') % self._figcount)
                 vbox = gtk.VBox()
                 w.add(vbox)
                 canvas = FigureCanvas(f)
@@ -159,22 +159,22 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_read(self):
         print "read DATAFILE"
-        print "   Read signal file"
+        print _("   Read signal file")
     def do_read(self, args):
         fn = args
         if fn in self._ctxt.readers.keys():
-            print "%s already read, use update to reread it" % fn
+            print _("%s already read, use update to reread it") % fn
             return
         try:
             self._ctxt.read(fn)
         except ReadError, e:
-            print "Failed to read %s:" % fn, e
+            print _("Failed to read %s:") % fn, e
         except NotImplementedError:
-            print "File format not supported"
+            print _("File format not supported")
 
     def help_write(self):
         print "write format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]"
-        print "   Write signals to file"
+        print _("   Write signals to file")
     def do_write(self, args):
         # Extract format, options and signal list
         tmp = re.search(r'(?P<fmt>\w+)\s*(?P<opts>\([^\)]*\))?\s+(?P<fn>[\w\./]+)\s+(?P<sigs>\w+(\s*,\s*\w+)*)', args)
@@ -195,13 +195,13 @@ FITNESS FOR A PARTICULAR PURPOSE."
         try:
             self._ctxt.write(fn, fmt, sns, opts)
         except WriteError, e:
-            print "Write error:", e
+            print _("Write error:"), e
         except NotImplementedError:
-            print "File format not supported"
+            print _("File format not supported")
 
     def help_update(self):
         print "update"
-        print "   Reread data files"
+        print _("   Reread data files")
     def do_update(self, args):
         if not args:
             self._ctxt.update()
@@ -209,15 +209,15 @@ FITNESS FOR A PARTICULAR PURPOSE."
             if self._ctxt.readers.has_key(args):
                 self._ctxt.update(self._ctxt.readers[args])
             else:
-                print "%s not found in readers" % args
+                print _("%s not found in readers") % args
 
     def help_add(self):
         print "add SIG [, SIG [, SIG]...]"
-        print "   Add a graph to the current figure"
+        print _("   Add a graph to the current figure")
     def do_add(self, args):
         if self._current_figure is not None:
             if len(self._current_figure.graphs) == 4:
-                print "Maximum graph number reached"
+                print _("Maximum graph number reached")
                 return
             self._current_figure.add(self._ctxt.names_to_signals(\
                     self.get_signames(args)))
@@ -232,7 +232,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_delete(self):
         print "delete GRAPH#"
-        print "   Delete a graph from the current figure"
+        print _("   Delete a graph from the current figure")
     def do_delete(self, args):
         if self._current_figure is not None:
             self._current_figure.delete(int(args))
@@ -243,9 +243,9 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_mode(self):
         print "mode MODE"
-        print "   Set the type of the current graph of the current figure"
-        print "Available modes :\n\
-   lin      Linear graph\n"
+        print _("   Set the type of the current graph of the current figure")
+        print _("Available modes :\n\
+   lin      Linear graph\n")
 #   fft      Fast Fourier Transform (FFT) of signals\n\
 #   ifft     Inverse FFT of signals"
     def do_mode(self, args):
@@ -257,7 +257,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_scale(self):
         print "scale [lin|logx|logy|loglog]"
-        print "   Set the axis scale"
+        print _("   Set the axis scale")
     def do_scale(self, args):
         if self._current_graph is None:
             return
@@ -265,7 +265,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_range(self):
         print "range [x|y min max]|[xmin xmax ymin ymax]|[reset]"
-        print "   Set the axis range of the current graph of the current figure"
+        print _("   Set the axis range of the current graph of the current figure")
     def do_range(self, args):
         if self._current_graph is None:
             return
@@ -284,7 +284,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_unit(self):
         print "unit [XUNIT,] YUNIT"
-        print "   Set the unit to be displayed on graph axis"
+        print _("   Set the unit to be displayed on graph axis")
     def do_unit(self, args):
         units = args.split(",", 1)
         if len(units) < 1 or self._current_graph is None\
@@ -299,7 +299,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_insert(self):
         print "insert SIG [, SIG [, SIG]...]"
-        print "   Insert a list of signals into the current graph"
+        print _("   Insert a list of signals into the current graph")
     def do_insert(self, args):
         if self._current_graph is None:
             return
@@ -308,7 +308,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_remove(self):
         print "remove SIG [, SIG [, SIG]...]"
-        print "   Delete a list of signals into from current graph"
+        print _("   Delete a list of signals into from current graph")
     def do_remove(self, args):
         if self._current_graph is None:
             return
@@ -317,19 +317,19 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_freeze(self):
         print "freeze SIG [, SIG [, SIG]...]"
-        print "   Do not consider signal for subsequent updates"
+        print _("   Do not consider signal for subsequent updates")
     def do_freeze(self, args):
         self._ctxt.freeze(self.get_signames(args))
 
     def help_unfreeze(self):
         print "unfreeze SIG [, SIG [, SIG]...]"
-        print "   Consider signal for subsequent updates"
+        print _("   Consider signal for subsequent updates")
     def do_unfreeze(self, args):
         self._ctxt.unfreeze(self.get_signames(args))
 
     def help_siglist(self):
         print "siglist"
-        print "   List loaded signals"
+        print _("   List loaded signals")
     def do_siglist(self, args):
         SEPARATOR = "\t"
         HEADER=["Name", "Unit", "Ref", "Reader","Last updated (sec)"]
@@ -345,12 +345,12 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_math(self):
         print "destsig=mathexpr"
-        print "   Define a new signal destsig using mathematical expression"
+        print _("   Define a new signal destsig using mathematical expression")
     def do_math(self, inp):
         try:
             self._ctxt.math(inp)
         except ReadError, e:
-            print "Error creating signal from math expression:", e
+            print _("Error creating signal from math expression:"), e
 
     def get_signames(self, args):
         """ Return the signal names list extracted from the commandline
@@ -367,13 +367,13 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_echo(self):
         print "echo [TEXT]"
-        print "   Print text"
+        print _("   Print text")
     def do_echo(self, args):
         print args
         
     def help_pause(self):
         print "pause"
-        print "   Wait for the user to press enter"
+        print _("   Wait for the user to press enter")
     def do_pause(self, args):
         inp = raw_input("Press enter")
 
@@ -411,7 +411,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_exec(self):
         print "exec FILENAME"
-        print "   execute commands from file"
+        print _("   execute commands from file")
     def do_exec(self, file):
         try:
             if not file.startswith('/'):
@@ -423,7 +423,7 @@ FITNESS FOR A PARTICULAR PURPOSE."
                     stop = self.onecmd(line)
                     self.postcmd(stop, line)
         except IOError, e:
-            print "Script error:", e
+            print _("Script error:"), e
             if hasattr(self, "f") and hasattr(f, "close")\
                     and callable(f.close):
                 f.close()
@@ -431,9 +431,9 @@ FITNESS FOR A PARTICULAR PURPOSE."
 
     def help_factors(self):
         print "factors X, Y"
-        print "   set the scaling factor of the graph (in power of ten)"
-        print "   use 'auto' for automatic scaling factor"
-        print "   e.g. factor -3, 6 set the scale factor at 1e-3 and 10e6"
+        print _("""   set the scaling factor of the graph (in power of ten)
+   use 'auto' for automatic scaling factor
+   e.g. factor -3, 6 set the scale factor at 1e-3 and 10e6""")
     def do_factors(self, args):
         if self._current_graph is None:
             return

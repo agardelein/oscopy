@@ -125,7 +125,7 @@ class Graph(mplAxes):
                 # First signal, set_ the abscisse name and add signal
                 self._xaxis = s.ref.name
                 self._xunit = s.ref.unit
-                self._yaxis = "Signals"  # To change
+                self._yaxis = _("Signals")  # To change
                 self._yunit = s.unit
                 self._sigs[sn] = s
                 self.set_unit((self._xunit, self._yunit))
@@ -237,9 +237,9 @@ class Graph(mplAxes):
                 self._xunit = unit[0]
                 self._yunit = unit[1]
             else:
-                assert 0, "Invalid argument"
+                assert 0, _("Invalid argument")
         else:
-            assert 0, "Invalid argument"
+            assert 0, _("Invalid argument")
 
         xl = self._xaxis
         if not self._xunit:
@@ -315,7 +315,7 @@ class Graph(mplAxes):
                         len(arg[1]) == 2:
                     self._yrange = arg[1]
         else:
-            assert 0, "Unrecognized argument"
+            assert 0, _("Unrecognized argument")
 
         if len(self._xrange) == 2:
             mplAxes.set_xlim(self, self._xrange[0], self._xrange[1])
@@ -368,9 +368,9 @@ class Graph(mplAxes):
                 self._cursors[ctype][num] = Cursor(val, ctype)
                 self._cursors[ctype][num].draw(self, num)
             else:
-                assert 0, "Invalid cursor number"
+                assert 0, _("Invalid cursor number")
         else:
-            assert 0, "Invalid cursor type"
+            assert 0, _("Invalid cursor type")
 
     def _print_cursors(self):
         """ Print cursors values on the graph

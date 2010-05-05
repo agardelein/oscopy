@@ -149,11 +149,11 @@ class Reader(object):
         Raise ReadError exception if not accessible
         """
         if not fn:
-            raise ReadError("No file specified")
+            raise ReadError(_("No file specified"))
         if not os.path.exists(fn):
-            raise ReadError("File do not exist")
+            raise ReadError(_("File do not exist"))
         if not os.path.isfile(fn):
-            raise ReadError("File is not a file")
+            raise ReadError(_("File is not a file"))
 
     def __str__(self):
         """ Return the signal name.

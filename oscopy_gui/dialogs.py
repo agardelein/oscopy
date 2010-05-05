@@ -28,7 +28,7 @@ class Enter_Units_Dialog(object):
         sorted_list = factors_to_names.keys()
         sorted_list.sort()
         
-        self._dlg = gtk.Dialog('Enter graph units',
+        self._dlg = gtk.Dialog(_('Enter graph units'),
                                flags=gtk.DIALOG_NO_SEPARATOR,
                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
@@ -93,14 +93,14 @@ class Enter_Range_Dialog(object):
         self._entries = None
 
     def display(self, r, xy, scale_factors, units):
-        self._dlg = gtk.Dialog('Enter graph range',
+        self._dlg = gtk.Dialog(_('Enter graph range'),
                                flags=gtk.DIALOG_NO_SEPARATOR,
                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         self._dlg.set_default_response(gtk.RESPONSE_ACCEPT)
 
         self._entries = []
-        minmax = ['From', 'To']
+        minmax = [_('From'), _('To')]
         
         hbox = gtk.HBox(False)
         for col in range(0, 2):
@@ -167,13 +167,13 @@ class Run_Netlister_and_Simulate_Dialog(object):
         combo.set_active(0)
         combo.set_sensitive(do_run)
 
-        btn = gtk.CheckButton('Run %s:' % name)
+        btn = gtk.CheckButton(_('Run %s:') % name)
         btn.set_active(do_run)
         btn.connect('toggled', self._check_button_toggled, combo)
         return btn, combo
 
     def display(self, actions):
-        self._dlg = gtk.Dialog("Run netlister and simulate",
+        self._dlg = gtk.Dialog(_("Run netlister and simulate"),
                                flags=gtk.DIALOG_NO_SEPARATOR,
                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
@@ -182,7 +182,7 @@ class Run_Netlister_and_Simulate_Dialog(object):
         # netlister part
         box = gtk.HBox()
         do_run, commands = actions['run_netlister']
-        btn, combo = self._make_check_entry('netlister', do_run, commands,
+        btn, combo = self._make_check_entry(_('netlister'), do_run, commands,
                                             DEFAULT_NETLISTER_COMMAND)
         self._ckbutton_netl, self._entry_netl = btn, combo
         box.pack_start(btn, False, False, 12)
@@ -192,7 +192,7 @@ class Run_Netlister_and_Simulate_Dialog(object):
         # simulator part
         box = gtk.HBox()
         do_run, commands = actions['run_simulator']
-        btn, combo = self._make_check_entry('simulator', do_run, commands,
+        btn, combo = self._make_check_entry(_('simulator'), do_run, commands,
                                             DEFAULT_SIMULATOR_COMMAND)
         self._ckbutton_sim, self._entry_sim = btn, combo
         box.pack_start(btn, False, False, 12)
@@ -204,14 +204,14 @@ class Run_Netlister_and_Simulate_Dialog(object):
         group.add_widget(self._ckbutton_sim)
 
         frame = gtk.Frame('')
-        frame.get_label_widget().set_markup('<b>Options</b>')
+        frame.get_label_widget().set_markup(_('<b>Options</b>'))
         frame.set_shadow_type(gtk.SHADOW_NONE)
         vbox = gtk.VBox()
         box = gtk.HBox(False, 12)
         label = gtk.Label()
-        label.set_markup('Run from directory:')
+        label.set_markup(_('Run from directory:'))
         box.pack_start(label, False, False, 12)
-        dialog = gtk.FileChooserDialog('Choose directory',
+        dialog = gtk.FileChooserDialog(_('Choose directory'),
                                        None,
                                        gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
                                        buttons=(gtk.STOCK_CANCEL,
@@ -223,7 +223,7 @@ class Run_Netlister_and_Simulate_Dialog(object):
         box.pack_start(self._filechoose)
         vbox.pack_start(box, False)
         box = gtk.HBox()
-        self._ckbutton_upd = gtk.CheckButton('Update readers once terminated')
+        self._ckbutton_upd = gtk.CheckButton(_('Update readers once terminated'))
         self._ckbutton_upd.set_active(actions['update'])
         box.pack_start(self._ckbutton_upd, False, False, 12)
         vbox.pack_start(box, False, False, 6)
@@ -307,7 +307,7 @@ class TerminalWindow(gtk.Window):
         termbox.pack_start(scrollbar)
 
         entrybox = gtk.HBox(False)
-        label = gtk.Label('Command:')
+        label = gtk.Label(_('Command:'))
         self._entry = gtk.Entry()
         self._entry.connect('activate', self._entry_activate)
         self._entry.connect('key-press-event', self._entry_key_pressed)
