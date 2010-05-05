@@ -1,0 +1,481 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-05-05 11:42-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: oscopy_ui.py:60
+msgid ""
+"  on|off       toggle auto refresh of current figure\n"
+"  current|all  refresh either current figure or all\n"
+"  FIG#         figure to refresh\n"
+"without arguments refresh current figure"
+msgstr ""
+
+#: oscopy_ui.py:81
+msgid "refreshing"
+msgstr ""
+
+#: oscopy_ui.py:85
+msgid "Pause command disabled in UI"
+msgstr ""
+
+#: oscopy_ui.py:88
+msgid "Plot command disabled in UI"
+msgstr ""
+
+#: oscopy_ui.py:109 oscopy_gui/menus.py:77
+msgid "Linear"
+msgstr ""
+
+#: oscopy_ui.py:109 oscopy_gui/menus.py:77
+msgid "LogX"
+msgstr ""
+
+#: oscopy_ui.py:109 oscopy_gui/menus.py:77
+msgid "LogY"
+msgstr ""
+
+#: oscopy_ui.py:110 oscopy_gui/menus.py:78
+msgid "Loglog"
+msgstr ""
+
+#: oscopy_ui.py:153
+msgid "Add file(s)"
+msgstr ""
+
+#: oscopy_ui.py:167
+msgid "New math signal"
+msgstr ""
+
+#: oscopy_ui.py:173
+msgid "Expression:"
+msgstr ""
+
+#: oscopy_ui.py:194
+msgid "Execute script"
+msgstr ""
+
+#: oscopy_ui.py:239
+msgid "File"
+msgstr ""
+
+#: oscopy_ui.py:239
+msgid "_File"
+msgstr ""
+
+#: oscopy_ui.py:240
+msgid "Add file(s)..."
+msgstr ""
+
+#: oscopy_ui.py:240
+msgid "_Add file(s)..."
+msgstr ""
+
+#: oscopy_ui.py:242
+msgid "Update files"
+msgstr ""
+
+#: oscopy_ui.py:242
+msgid "_Update"
+msgstr ""
+
+#: oscopy_ui.py:244
+msgid "Execute script..."
+msgstr ""
+
+#: oscopy_ui.py:244
+msgid "_Execute script..."
+msgstr ""
+
+#: oscopy_ui.py:246
+msgid "New Math Signal..."
+msgstr ""
+
+#: oscopy_ui.py:246
+msgid "_New Math Signal"
+msgstr ""
+
+#: oscopy_ui.py:248
+msgid "Run netlister and simulate..."
+msgstr ""
+
+#: oscopy_ui.py:249
+msgid "_Run netlister and simulate..."
+msgstr ""
+
+#: oscopy_ui.py:251
+msgid "Windows"
+msgstr ""
+
+#: oscopy_ui.py:251
+msgid "_Windows"
+msgstr ""
+
+#: oscopy_ui.py:252
+msgid "Quit"
+msgstr ""
+
+#: oscopy_ui.py:252
+msgid "_Quit"
+msgstr ""
+
+#: oscopy_ui.py:259
+msgid "Show terminal"
+msgstr ""
+
+#: oscopy_ui.py:259
+msgid "_Show terminal"
+msgstr ""
+
+#: oscopy_ui.py:271
+msgid "Signal"
+msgstr ""
+
+#: oscopy_ui.py:312
+msgid "Oscopy GUI"
+msgstr ""
+
+#: oscopy_ui.py:422 oscopy_ui.py:444 oscopy/app.py:141
+#, python-format
+msgid "Figure %d"
+msgstr ""
+
+#: oscopy_ui.py:615
+#, python-format
+msgid "Executing command '%s' failed."
+msgstr ""
+
+#: oscopy/readers/reader.py:152
+msgid "No file specified"
+msgstr ""
+
+#: oscopy/readers/reader.py:154
+msgid "File do not exist"
+msgstr ""
+
+#: oscopy/readers/reader.py:156
+msgid "File is not a file"
+msgstr ""
+
+#: oscopy/context.py:109
+msgid "Out of range figure number"
+msgstr ""
+
+#: oscopy/context.py:120
+msgid "File already loaded, use update to read it again"
+msgstr ""
+
+#: oscopy/context.py:231
+#, python-format
+msgid "What is %s"
+msgstr ""
+
+#: oscopy/app.py:52
+msgid "   Create a new figure, set_ it as current, add the signals"
+msgstr ""
+
+#: oscopy/app.py:65
+msgid "   Destroy a figure"
+msgstr ""
+
+#: oscopy/app.py:86
+msgid "   Select the current figure and the current graph"
+msgstr ""
+
+#: oscopy/app.py:107
+msgid "   Define the layout of the current figure"
+msgstr ""
+
+#: oscopy/app.py:114
+msgid "   Print the list of figures"
+msgstr ""
+
+#: oscopy/app.py:119
+#, python-format
+msgid "%s Figure %d: %s"
+msgstr ""
+
+#: oscopy/app.py:123
+#, python-format
+msgid "    %s Graph %d : (%s) %s"
+msgstr ""
+
+#: oscopy/app.py:130
+msgid "   Draw and show the figures"
+msgstr ""
+
+#: oscopy/app.py:162
+msgid "   Read signal file"
+msgstr ""
+
+#: oscopy/app.py:166
+#, python-format
+msgid "%s already read, use update to reread it"
+msgstr ""
+
+#: oscopy/app.py:171
+#, python-format
+msgid "Failed to read %s:"
+msgstr ""
+
+#: oscopy/app.py:173 oscopy/app.py:200
+msgid "File format not supported"
+msgstr ""
+
+#: oscopy/app.py:177
+msgid "   Write signals to file"
+msgstr ""
+
+#: oscopy/app.py:198
+msgid "Write error:"
+msgstr ""
+
+#: oscopy/app.py:204
+msgid "   Reread data files"
+msgstr ""
+
+#: oscopy/app.py:212
+#, python-format
+msgid "%s not found in readers"
+msgstr ""
+
+#: oscopy/app.py:216
+msgid "   Add a graph to the current figure"
+msgstr ""
+
+#: oscopy/app.py:220 oscopy/figure.py:80
+msgid "Maximum graph number reached"
+msgstr ""
+
+#: oscopy/app.py:235
+msgid "   Delete a graph from the current figure"
+msgstr ""
+
+#: oscopy/app.py:246
+msgid "   Set the type of the current graph of the current figure"
+msgstr ""
+
+#: oscopy/app.py:247
+msgid ""
+"Available modes :\n"
+"   lin      Linear graph\n"
+msgstr ""
+
+#: oscopy/app.py:260
+msgid "   Set the axis scale"
+msgstr ""
+
+#: oscopy/app.py:268
+msgid "   Set the axis range of the current graph of the current figure"
+msgstr ""
+
+#: oscopy/app.py:287
+msgid "   Set the unit to be displayed on graph axis"
+msgstr ""
+
+#: oscopy/app.py:302
+msgid "   Insert a list of signals into the current graph"
+msgstr ""
+
+#: oscopy/app.py:311
+msgid "   Delete a list of signals into from current graph"
+msgstr ""
+
+#: oscopy/app.py:320
+msgid "   Do not consider signal for subsequent updates"
+msgstr ""
+
+#: oscopy/app.py:326
+msgid "   Consider signal for subsequent updates"
+msgstr ""
+
+#: oscopy/app.py:332
+msgid "   List loaded signals"
+msgstr ""
+
+#: oscopy/app.py:348
+msgid "   Define a new signal destsig using mathematical expression"
+msgstr ""
+
+#: oscopy/app.py:353
+msgid "Error creating signal from math expression:"
+msgstr ""
+
+#: oscopy/app.py:370
+msgid "   Print text"
+msgstr ""
+
+#: oscopy/app.py:376
+msgid "   Wait for the user to press enter"
+msgstr ""
+
+#: oscopy/app.py:414
+msgid "   execute commands from file"
+msgstr ""
+
+#: oscopy/app.py:426
+msgid "Script error:"
+msgstr ""
+
+#: oscopy/app.py:434
+msgid ""
+"   set the scaling factor of the graph (in power of ten)\n"
+"   use 'auto' for automatic scaling factor\n"
+"   e.g. factor -3, 6 set the scale factor at 1e-3 and 10e6"
+msgstr ""
+
+#: oscopy/graphs/graph.py:128
+msgid "Signals"
+msgstr ""
+
+#: oscopy/graphs/graph.py:240 oscopy/graphs/graph.py:242
+msgid "Invalid argument"
+msgstr ""
+
+#: oscopy/graphs/graph.py:318
+msgid "Unrecognized argument"
+msgstr ""
+
+#: oscopy/graphs/graph.py:371
+msgid "Invalid cursor number"
+msgstr ""
+
+#: oscopy/graphs/graph.py:373
+msgid "Invalid cursor type"
+msgstr ""
+
+#: oscopy/graphs/cursor.py:98 oscopy/figure.py:71 oscopy/figure.py:109
+#: oscopy/figure.py:111 oscopy/signal.py:113
+msgid "Bad type"
+msgstr ""
+
+#: oscopy/figure.py:100 oscopy/figure.py:102
+msgid "Bad graph number"
+msgstr ""
+
+#: oscopy/figure.py:134
+msgid "No graph defined"
+msgstr ""
+
+#: oscopy/figure.py:154 oscopy/figure.py:215
+msgid "Bad layout"
+msgstr ""
+
+#: oscopy/signal.py:69
+#, python-format
+msgid "Data %s not handled"
+msgstr ""
+
+#: oscopy_gui/menus.py:10
+msgid "Horizontal"
+msgstr ""
+
+#: oscopy_gui/menus.py:10
+msgid "Vertical"
+msgstr ""
+
+#: oscopy_gui/menus.py:11
+msgid "Quad"
+msgstr ""
+
+#: oscopy_gui/menus.py:22
+msgid "Add graph"
+msgstr ""
+
+#: oscopy_gui/menus.py:26
+msgid "Delete graph"
+msgstr ""
+
+#: oscopy_gui/menus.py:31
+msgid "Layout"
+msgstr ""
+
+#: oscopy_gui/menus.py:81
+msgid "Range..."
+msgstr ""
+
+#: oscopy_gui/menus.py:86
+msgid "Units..."
+msgstr ""
+
+#: oscopy_gui/menus.py:91
+msgid "Scale"
+msgstr ""
+
+#: oscopy_gui/menus.py:96
+msgid "Insert signal"
+msgstr ""
+
+#: oscopy_gui/menus.py:101
+msgid "Remove signal"
+msgstr ""
+
+#: oscopy_gui/menus.py:184
+msgid "No graph selected"
+msgstr ""
+
+#: oscopy_gui/dialogs.py:31
+msgid "Enter graph units"
+msgstr ""
+
+#: oscopy_gui/dialogs.py:96
+msgid "Enter graph range"
+msgstr ""
+
+#: oscopy_gui/dialogs.py:103
+msgid "From"
+msgstr ""
+
+#: oscopy_gui/dialogs.py:103
+msgid "To"
+msgstr ""
+
+#: oscopy_gui/dialogs.py:170
+#, python-format
+msgid "Run %s:"
+msgstr ""
+
+#: oscopy_gui/dialogs.py:176
+msgid "Run netlister and simulate"
+msgstr ""
+
+#: oscopy_gui/dialogs.py:185
+msgid "netlister"
+msgstr ""
+
+#: oscopy_gui/dialogs.py:195
+msgid "simulator"
+msgstr ""
+
+#: oscopy_gui/dialogs.py:207
+msgid "<b>Options</b>"
+msgstr ""
+
+#: oscopy_gui/dialogs.py:212
+msgid "Run from directory:"
+msgstr ""
+
+#: oscopy_gui/dialogs.py:214
+msgid "Choose directory"
+msgstr ""
+
+#: oscopy_gui/dialogs.py:226
+msgid "Update readers once terminated"
+msgstr ""
+
+#: oscopy_gui/dialogs.py:310
+msgid "Command:"
+msgstr ""
