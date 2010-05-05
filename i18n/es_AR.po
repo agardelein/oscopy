@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: oscopy 0.32\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-05 11:42-0300\n"
+"POT-Creation-Date: 2010-05-05 12:42-0300\n"
 "PO-Revision-Date: 2010-05-05 11:46-0300\n"
 "Last-Translator: Adrian Pardini<pardo.bsso@gmail.com>\n"
 "Language-Team: Argentinian <translation-es-AR@lists.sourceforge.net>\n"
@@ -74,72 +74,36 @@ msgid "Execute script"
 msgstr "Ejecutar script"
 
 #: oscopy_ui.py:239
-msgid "File"
-msgstr "Archivo"
-
-#: oscopy_ui.py:239
 msgid "_File"
 msgstr "_Archivo"
-
-#: oscopy_ui.py:240
-msgid "Add file(s)..."
-msgstr "Añadir archivo(s)..."
 
 #: oscopy_ui.py:240
 msgid "_Add file(s)..."
 msgstr "_Añadir archivo(s)..."
 
 #: oscopy_ui.py:242
-msgid "Update files"
-msgstr "Actualizar archivos"
-
-#: oscopy_ui.py:242
 msgid "_Update"
 msgstr "Actuali_zar"
-
-#: oscopy_ui.py:244
-msgid "Execute script..."
-msgstr "Ejecutar script..."
 
 #: oscopy_ui.py:244
 msgid "_Execute script..."
 msgstr "_Ejecutar script"
 
 #: oscopy_ui.py:246
-msgid "New Math Signal..."
-msgstr "Nueva señal matemática"
-
-#: oscopy_ui.py:246
 msgid "_New Math Signal"
 msgstr "Nueva señal _Matemática"
-
-#: oscopy_ui.py:248
-msgid "Run netlister and simulate..."
-msgstr "Ejecutar el netlister y simular..."
 
 #: oscopy_ui.py:249
 msgid "_Run netlister and simulate..."
 msgstr "E_jecutar el netlister y simular..."
 
 #: oscopy_ui.py:251
-msgid "Windows"
-msgstr "Ventanas"
-
-#: oscopy_ui.py:251
 msgid "_Windows"
 msgstr "_Ventanas"
 
 #: oscopy_ui.py:252
-msgid "Quit"
-msgstr "Salir"
-
-#: oscopy_ui.py:252
 msgid "_Quit"
 msgstr "_Salir"
-
-#: oscopy_ui.py:259
-msgid "Show terminal"
-msgstr "Mostrar la terminal"
 
 #: oscopy_ui.py:259
 msgid "_Show terminal"
@@ -148,6 +112,10 @@ msgstr "Mostrar la _terminal"
 #: oscopy_ui.py:271
 msgid "Signal"
 msgstr "Señal"
+
+#: oscopy_ui.py:285
+msgid "Freeze"
+msgstr "Congelar"
 
 #: oscopy_ui.py:312
 msgid "Oscopy GUI"
@@ -346,7 +314,6 @@ msgstr ""
 "   establece el factor de escala para el gráfico (en potencias de diez)\n"
 "   use 'auto' para calcularlo automáticamente\n"
 "   por ejemplo factor -3, 6 establece el factor de escala en 1e-3 y 10e6"
-
 
 #: oscopy/graphs/graph.py:128
 msgid "Signals"
