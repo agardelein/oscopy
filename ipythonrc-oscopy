@@ -1,0 +1,5 @@
+# -*-Python-*-
+
+import_mod oscopy
+prompt_in1 oscopy> 
+execute print """This is oscopy, a program to view electrical simulation results\nCopyright (C) 2008 - 2010 Arnaud Gardelein and others.\nThis is free software, you are invited to redistribute it \nunder certain conditions.\nThere is ABSOLUTELY NO WARRANTY; not even for MERCHANTIBILITY or\nFITNESS FOR A PARTICULAR PURPOSE."""
