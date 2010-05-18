@@ -5,6 +5,7 @@ from context import Context
 from app import OscopyApp
 from readers.reader import ReadError
 from graphs import factors_to_names, abbrevs_to_factors, names_to_factors
+import ioscopy
 
 GETTEXT_DOMAIN = 'oscopy'
 import gettext
@@ -17,4 +18,6 @@ gettext.textdomain(GETTEXT_DOMAIN)
 
 import __builtin__
 __builtin__._ = gettext.gettext
-_ctxt= Context()
+
+if __IPYTHON__:
+    ioscopy.init()

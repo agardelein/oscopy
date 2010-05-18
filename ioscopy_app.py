@@ -1,1 +1,1 @@
-ipython -profile oscopy -noconfirm_exit -nobanner
+ipython -pylab -profile oscopy -noconfirm_exit -nobanner

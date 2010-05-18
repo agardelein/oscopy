@@ -34,13 +34,13 @@ select 4-1
 insert v1
 remove v1
 # Use of Time
-vs = sin(Time(vsqu)*1e6)
+vs=sin(Time(vsqu)*1e6)
 create vs
 unit V
-echo ** List of figures
+echo *** List of figures
 figlist
 # Create a copy of vout and freeze it
-vo = vout
+vo=vout
 freeze vo
 select 3-1
 insert vo
