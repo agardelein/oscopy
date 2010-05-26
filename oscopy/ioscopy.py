@@ -1,9 +1,14 @@
+from __future__ import with_statement
 import IPython
+import time
+import os
+import gtk
+from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
+from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
+
 from context import Context
-from app import OscopyApp
 
 _ctxt = Context()
-_app = OscopyApp(_ctxt)
 ip = IPython.ipapi.get()
 
 _current_figure = None
@@ -83,11 +88,40 @@ def do_figlist(self, args):
                          SEPARATOR.join(g.signals.keys()))
 
 def do_plot(self, args):
-    _app.do_plot(args)
+    global _figcount
+    if _figcount == len(_ctxt.figures):
+        #        _main_loop.run()
+        pass
+    else:
+        # Create a window for each figure, add navigation toolbar
+        _figcount = 0
+        for i, f in enumerate(_ctxt.figures):
+            # fig = plt.figure(i + 1)
+            w = gtk.Window()
+            _figcount += 1
+            w.set_title(_('Figure %d') % _figcount)
+            vbox = gtk.VBox()
+            w.add(vbox)
+            canvas = FigureCanvas(f)
+            canvas.connect('destroy', _window_destroy)
+            vbox.pack_start(canvas)
+            toolbar = NavigationToolbar(canvas, w)
+            vbox.pack_start(toolbar, False, False)
+            w.resize(640, 480)
+            w.show_all()
+#            _main_loop = gobject.MainLoop()
+#            _main_loop.run()
+
+def _window_destroy(self, arg):
+    _figcount = _figcount - 1
+    if not _figcount:
+        pass
+        #_main_loop.quit()
+    return False
 
 def do_read(self, arg):
     """read DATAFILE
-       Read signal file"""
+    Read signal file"""
 
     fn = arg
     if fn in _ctxt.readers.keys():
@@ -101,52 +135,221 @@ def do_read(self, arg):
         print _("File format not supported")
 
 def do_write(self, arg):
-    _app.do_write(arg)
+    """write format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]
+    Save signals to file"""
+    # Extract format, options and signal list
+    tmp = re.search(r'(?P<fmt>\w+)\s*(?P<opts>\([^\)]*\))?\s+(?P<fn>[\w\./]+)\s+(?P<sigs>\w+(\s*,\s*\w+)*)', args)
+    
+    if tmp is None:
+        raise TypeError(_("do_write: Bad arguments"))
+    fmt = tmp.group('fmt')
+    fn = tmp.group('fn')
+    opt = tmp.group('opts')
+    sns = get_signames(tmp.group('sigs'))
+    opts = {}
+    if opt is not None:
+        for on in opt.strip('()').split(','):
+            tmp = on.split(':', 1)
+            if len(tmp) == 2:
+                opts[tmp[0]] = tmp[1]
+    try:
+        _ctxt.write(fn, fmt, sns, opts)
+    except WriteError, e:
+        print _("Write error:"), e
+    except NotImplementedError:
+        print _("File format not supported")
 
 def do_update(self, args):
-    _app.do_update(args)
+    """ update
+    Reread data files"""
+    if not args:
+        _ctxt.update()
+    else:
+        if _ctxt.readers.has_key(args):
+            _ctxt.update(_ctxt.readers[args])
+        else:
+            print _("%s not found in readers") % args
 
 def do_add(self, args):
-    _app.do_add(args)
+    """add SIG [, SIG [, SIG]...]
+    Add a graph to the current figure.
+    If no figure is selected, then create a new one"""
+    global _current_figure
+    global _current_graph
+
+    if _current_figure is not None:
+        if len(_current_figure.graphs) == 4:
+            print _("Maximum graph number reached")
+            return
+        _current_figure.add(_ctxt.names_to_signals(\
+                get_signames(args)))
+        _current_graph =\
+            _current_figure.graphs[len(\
+                _current_figure.graphs) - 1]
+    else:
+        do_create(self, args)
 
 def do_delete(self, args):
-    _app.do_delete(args)
+    """delete GRAPH#
+    Delete a graph from the current figure"""
+    global _current_figure
+    global _current_graph
+
+    if _current_figure is not None:
+        _current_figure.delete(int(args))
+        if _current_figure.graphs:
+            _current_graph = _current_figure.graphs[0]
+        else:
+            _current_graph = None
 
 def do_mode(self, args):
-    _app.do_mode(args)
+    """mode MODE
+    Set the type of the current graph of the current figure.
+    Available modes :
+    lin      Linear graph"""
+    global _current_figure
+    global _current_graph
+    if _current_graph is None:
+        return
+    idx = _current_figure.graphs.index(_current_graph)
+    _current_figure.mode = _current_graph, mode
+    _current_graph = _current_figure.graphs[idx]
 
 def do_scale(self, args):
-    _app.do_scale(args)
+    """scale [lin|logx|logy|loglog]
+    Set the axis scale"""
+    global _current_graph
+    if _current_graph is None:
+        return
+    _current_graph.scale = args
 
 def do_range(self, args):
-    _app.do_range(args)
+    """range [x|y min max]|[xmin xmax ymin ymax]|[reset]
+    Set the axis range of the current graph of the current figure
+    """
+    global _current_graph
+    if _current_graph is None:
+        return
+
+    range = args.split()
+    if len(range) == 1:
+        if range[0] == "reset":
+            _current_graph.range = range[0]
+    elif len(range) == 3:
+        if range[0] == 'x' or range[0] == 'y':
+            _current_graph.range = range[0],\
+                [float(range[1]), float(range[2])]
+    elif len(range) == 4:
+        _current_graph.range = [float(range[0]), float(range[1]),\
+                                    float(range[2]), float(range[3])]
 
 def do_unit(self, args):
-    _app.do_unit(args)
+    """unit [XUNIT,] YUNIT
+    Set the unit to be displayed on graph axis"""
+    global _current_graph
+    units = args.split(",", 1)
+    if len(units) < 1 or _current_graph is None\
+            or not _current_graph.signals:
+        return
+    elif len(units) == 1:
+        _current_graph.unit = units[0].strip(),
+    elif len(units) == 2:
+        _current_graph.unit = units[0].strip(), units[1].strip()
+    else:
+        return
 
 def do_insert(self, args):
-    _app.do_insert(args)
+    """ insert SIG [, SIG [, SIG]...]
+    Insert a list of signals into the current graph"""
+    global _current_graph
+    if _current_graph is None:
+        return
+    _current_graph.insert(_ctxt.names_to_signals(get_signames(args)))
 
 def do_remove(self, args):
-    _app.do_remove(args)
+    """ remove SIG [, SIG [, SIG]...]
+    Delete a list of signals into from current graph"""
+    global _current_graph
+    if _current_graph is None:
+        return
+    _current_graph.remove(_ctxt.names_to_signals(get_signames(args)))
 
 def do_freeze(self, args):
-    _app.do_freeze(args)
+    """freeze SIG [, SIG [, SIG]...]
+    Do not consider signal for subsequent updates"""
+    _ctxt.freeze(get_signames(args))
 
 def do_unfreeze(self, args):
-    _app.do_unfreeze(args)
+    """freeze SIG [, SIG [, SIG]...]
+    Consider signal for subsequent updates"""
+    _ctxt.unfreeze(get_signames(args))
 
 def do_siglist(self, args):
-    _app.do_siglist(args)
+    """siglist
+    List loaded signals"""
+    SEPARATOR = "\t"
+    HEADER=[_("Name"), _("Unit"), _("Ref"), _("Reader"),_("Last updated (sec)")]
+    print SEPARATOR.join(HEADER)
+    t = time.time()
+    for reader_name, reader in _ctxt.readers.iteritems():
+        for signal_name, signal in reader.signals.iteritems():
+            print SEPARATOR.join((signal_name, \
+                                      signal.unit,\
+                                      signal.ref.name,\
+                                      reader_name,\
+                                      str(int(t - reader.info['last_update']))))
 
 def do_math(self, args):
-    _app.do_math(args)
+    # Note: this function will be useless now, signals will be computed directly
+    """math destsig=mathexpr"
+    Define a new signal destsig using mathematical expression"""
+    try:
+        _ctxt.math(args)
+    except ReadError, e:
+        print _("Error creating signal from math expression:"), e
 
 def do_exec(self, args):
-    _app.do_exec(args)
+    # Does (i)python already provide something similar ?
+    """exec FILENAME
+    execute commands from file"""
+    try:
+        if not file.startswith('/'):
+            file = "/".join((os.getcwd(), file))
+        with open(file) as f:
+            lines = iter(f)
+            for line in lines:
+                line = precmd(line)
+                stop = onecmd(line)
+                postcmd(stop, line)
+    except IOError, e:
+        print _("Script error:"), e
+        if hasattr(self, "f") and hasattr(f, "close")\
+                and callable(f.close):
+            f.close()
+        print os.getcwd()
 
 def do_factors(self, args):
-    _app.do_factors(args)
+    """factors X, Y"
+    set the scaling factor of the graph (in power of ten)
+    use 'auto' for automatic scaling factor
+    e.g. factor -3, 6 set the scale factor at 1e-3 and 10e6"""
+    global _current_graph
+    if _current_graph is None:
+        return
+    factors = [None, None]
+    for i, f in enumerate(args.split(',')):
+        if i > 1:
+            break
+        factor = f.strip()
+        if factor.isdigit() or (len(factor) > 1 and factor[0] == '-' and\
+                                    factor[1:].isdigit()):
+            factors[i] = int(factor)
+        else:
+            if factor == 'auto':
+                factors[i] = None
+            else:
+                factors[i] = abbrevs_to_factors[factor]
+    _current_graph.set_scale_factors(factors[0], factors[1])
 
 def get_signames(args):
     """ Return the signal names list extracted from the commandline
@@ -161,28 +364,30 @@ def get_signames(args):
             sns.append(sn.strip())
     return sns
 
-
 def init():
-    ip.expose_magic('create', do_create)
-    ip.expose_magic('destroy', do_destroy)
-    ip.expose_magic('select', do_select)
-    ip.expose_magic('layout', do_layout)
-    ip.expose_magic('figlist', do_figlist)
-    ip.expose_magic('plot', do_plot)
-    ip.expose_magic('read', do_read)
-    ip.expose_magic('write', do_write)
-    ip.expose_magic('update', do_update)
-    ip.expose_magic('add', do_add)
-    ip.expose_magic('delete', do_delete)
-    ip.expose_magic('mode', do_mode)
-    ip.expose_magic('scale', do_scale)
-    ip.expose_magic('range', do_range)
-    ip.expose_magic('unit', do_unit)
-    ip.expose_magic('insert', do_insert)
-    ip.expose_magic('remove', do_remove)
-    ip.expose_magic('freeze', do_freeze)
-    ip.expose_magic('unfreeze', do_unfreeze)
-    ip.expose_magic('siglist', do_siglist)
-    ip.expose_magic('math', do_math)
-    ip.expose_magic('exec', do_exec)
-    ip.expose_magic('factors', do_factors)
+    oscopy_magics = {'create': do_create,
+                    'destroy': do_destroy,
+                    'select': do_select,
+                    'layout': do_layout,
+                    'figlist': do_figlist,
+                    'plot': do_plot,
+                    'read': do_read,
+                    'write': do_write,
+                    'update': do_update,
+                    'add': do_add,
+                    'delete': do_delete,
+                    'mode': do_mode,
+                    'scale': do_scale,
+                    'range': do_range,
+                    'unit': do_unit,
+                    'insert': do_insert,
+                    'remove': do_remove,
+                    'freeze': do_freeze,
+                    'unfreeze': do_unfreeze,
+                    'siglist': do_siglist,
+                    'math': do_math,
+                    'exec': do_exec,
+                    'factors': do_factors}
+    
+    for name, func in oscopy_magics.iteritems():
+            ip.expose_magic(name, func)
