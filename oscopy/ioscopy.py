@@ -1,12 +1,15 @@
 from __future__ import with_statement
 import IPython
+from IPython.demo import IPythonDemo
 import time
 import os
 import gtk
+import re
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 
 from context import Context
+from readers.reader import ReadError
 
 _ctxt = Context()
 ip = IPython.ipapi.get()
@@ -134,7 +137,7 @@ def do_read(self, arg):
     except NotImplementedError:
         print _("File format not supported")
 
-def do_write(self, arg):
+def do_write(self, args):
     """write format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]
     Save signals to file"""
     # Extract format, options and signal list
@@ -308,19 +311,15 @@ def do_math(self, args):
     except ReadError, e:
         print _("Error creating signal from math expression:"), e
 
-def do_exec(self, args):
+def do_exec(self, file):
     # Does (i)python already provide something similar ?
     """exec FILENAME
     execute commands from file"""
     try:
         if not file.startswith('/'):
             file = "/".join((os.getcwd(), file))
-        with open(file) as f:
-            lines = iter(f)
-            for line in lines:
-                line = precmd(line)
-                stop = onecmd(line)
-                postcmd(stop, line)
+        mydemo = IPythonDemo(file)
+        mydemo()
     except IOError, e:
         print _("Script error:"), e
         if hasattr(self, "f") and hasattr(f, "close")\
