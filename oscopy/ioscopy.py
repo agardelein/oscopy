@@ -5,11 +5,14 @@ import time
 import os
 import gtk
 import re
+import dbus
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
+from graphs import factors_to_names, abbrevs_to_factors
 
 from context import Context
 from readers.reader import ReadError
+from ui import App as OscopyGUI
 
 _ctxt = Context()
 ip = IPython.ipapi.get()
@@ -17,6 +20,11 @@ ip = IPython.ipapi.get()
 _current_figure = None
 _current_graph = None
 _figcount = 0
+_autorefresh = True
+
+session_bus = dbus.SessionBus()
+bus_name = dbus.service.BusName('org.freedesktop.Oscopy', bus=session_bus)
+_gui = OscopyGUI(bus_name, ctxt=_ctxt)
 
 def do_create(self, args):
     """create [SIG [, SIG [, SIG]...]]
@@ -31,6 +39,7 @@ def do_create(self, args):
                 _current_figure.graphs) - 1]
     else:
         _current_graph = None
+    _gui.create()
 
 def do_destroy(self, args):
     """destroy FIG#
@@ -42,6 +51,7 @@ def do_destroy(self, args):
     else:
         fignum = eval(args)
     _ctxt.destroy(fignum)
+    _gui.destroy(args)
     # Go back to the first graph of the first figure or None
     _current_figure = None
     _current_graph = None
@@ -72,6 +82,7 @@ def do_layout(self, args):
     global _current_figure
     if _current_figure is not None:
         _current_figure.layout = args
+    do_refresh(self, '')
 
 def do_figlist(self, args):
     """figlist
@@ -90,38 +101,6 @@ def do_figlist(self, args):
                          gn + 1, g.type,\
                          SEPARATOR.join(g.signals.keys()))
 
-def do_plot(self, args):
-    global _figcount
-    if _figcount == len(_ctxt.figures):
-        #        _main_loop.run()
-        pass
-    else:
-        # Create a window for each figure, add navigation toolbar
-        _figcount = 0
-        for i, f in enumerate(_ctxt.figures):
-            # fig = plt.figure(i + 1)
-            w = gtk.Window()
-            _figcount += 1
-            w.set_title(_('Figure %d') % _figcount)
-            vbox = gtk.VBox()
-            w.add(vbox)
-            canvas = FigureCanvas(f)
-            canvas.connect('destroy', _window_destroy)
-            vbox.pack_start(canvas)
-            toolbar = NavigationToolbar(canvas, w)
-            vbox.pack_start(toolbar, False, False)
-            w.resize(640, 480)
-            w.show_all()
-#            _main_loop = gobject.MainLoop()
-#            _main_loop.run()
-
-def _window_destroy(self, arg):
-    _figcount = _figcount - 1
-    if not _figcount:
-        pass
-        #_main_loop.quit()
-    return False
-
 def do_read(self, arg):
     """read DATAFILE
     Read signal file"""
@@ -132,6 +111,7 @@ def do_read(self, arg):
         return
     try:
         _ctxt.read(fn)
+        _gui.add_file(fn)
     except ReadError, e:
         print _("Failed to read %s:") % fn, e
     except NotImplementedError:
@@ -172,6 +152,7 @@ def do_update(self, args):
             _ctxt.update(_ctxt.readers[args])
         else:
             print _("%s not found in readers") % args
+    do_refresh(self, '')
 
 def do_add(self, args):
     """add SIG [, SIG [, SIG]...]
@@ -191,6 +172,7 @@ def do_add(self, args):
                 _current_figure.graphs) - 1]
     else:
         do_create(self, args)
+    do_refresh(self, '')
 
 def do_delete(self, args):
     """delete GRAPH#
@@ -204,6 +186,7 @@ def do_delete(self, args):
             _current_graph = _current_figure.graphs[0]
         else:
             _current_graph = None
+    do_refresh(self, '')
 
 def do_mode(self, args):
     """mode MODE
@@ -217,6 +200,7 @@ def do_mode(self, args):
     idx = _current_figure.graphs.index(_current_graph)
     _current_figure.mode = _current_graph, mode
     _current_graph = _current_figure.graphs[idx]
+    do_refresh(self, '')
 
 def do_scale(self, args):
     """scale [lin|logx|logy|loglog]
@@ -225,6 +209,7 @@ def do_scale(self, args):
     if _current_graph is None:
         return
     _current_graph.scale = args
+    do_refresh(self, '')
 
 def do_range(self, args):
     """range [x|y min max]|[xmin xmax ymin ymax]|[reset]
@@ -245,6 +230,7 @@ def do_range(self, args):
     elif len(range) == 4:
         _current_graph.range = [float(range[0]), float(range[1]),\
                                     float(range[2]), float(range[3])]
+    do_refresh(self, '')
 
 def do_unit(self, args):
     """unit [XUNIT,] YUNIT
@@ -260,6 +246,7 @@ def do_unit(self, args):
         _current_graph.unit = units[0].strip(), units[1].strip()
     else:
         return
+    do_refresh(self, '')
 
 def do_insert(self, args):
     """ insert SIG [, SIG [, SIG]...]
@@ -268,6 +255,7 @@ def do_insert(self, args):
     if _current_graph is None:
         return
     _current_graph.insert(_ctxt.names_to_signals(get_signames(args)))
+    do_refresh(self, '')
 
 def do_remove(self, args):
     """ remove SIG [, SIG [, SIG]...]
@@ -276,16 +264,19 @@ def do_remove(self, args):
     if _current_graph is None:
         return
     _current_graph.remove(_ctxt.names_to_signals(get_signames(args)))
+    do_refresh(self, '')
 
 def do_freeze(self, args):
     """freeze SIG [, SIG [, SIG]...]
     Do not consider signal for subsequent updates"""
     _ctxt.freeze(get_signames(args))
+    _gui.freeze(args)
 
 def do_unfreeze(self, args):
     """freeze SIG [, SIG [, SIG]...]
     Consider signal for subsequent updates"""
     _ctxt.unfreeze(get_signames(args))
+    _gui.freeze(args)
 
 def do_siglist(self, args):
     """siglist
@@ -310,9 +301,9 @@ def do_math(self, args):
         _ctxt.math(args)
     except ReadError, e:
         print _("Error creating signal from math expression:"), e
+    _gui.add_file(args)
 
 def do_exec(self, file):
-    # Does (i)python already provide something similar ?
     """exec FILENAME
     execute commands from file"""
     try:
@@ -349,6 +340,44 @@ def do_factors(self, args):
             else:
                 factors[i] = abbrevs_to_factors[factor]
     _current_graph.set_scale_factors(factors[0], factors[1])
+    do_refresh(self, '')
+
+def do_refresh(self, args):
+    """refresh FIG#|on|off|current|all'
+    on|off       toggle auto refresh of current figure
+    current|all  refresh either current figure or all
+    FIG#         figure to refresh
+    without arguments refresh current figure"""
+    global _current_figure
+    global _current_graph
+    global _autorefresh
+
+    if args == 'on':
+        _autorefresh = True
+    elif args == 'off':
+        _autorefresh = False
+    elif args == 'current' or args == '':
+        if _current_figure is not None and\
+                _current_figure.canvas is not None:
+            _current_figure.canvas.draw()
+    elif args == 'all':
+        for fig in _ctxt.figures:
+            if fig.canvas is not None:
+                fig.canvas.draw()
+    elif args.isdigit():
+        fignum = int(args) - 1
+        if fignum >= 0 and fignum < len(_ctxt.figures):
+            if _ctxt.figures[fignum].canvas is not None:
+                print _('refreshing')
+                _ctxt.figures[fignum].canvas.draw()
+
+def do_gui(self, args):
+    """gui
+    Invoke the oscopy gui
+    """
+    global _gui
+    global _ctxt
+    _gui.show_all()
 
 def get_signames(args):
     """ Return the signal names list extracted from the commandline
@@ -365,28 +394,29 @@ def get_signames(args):
 
 def init():
     oscopy_magics = {'create': do_create,
-                    'destroy': do_destroy,
-                    'select': do_select,
-                    'layout': do_layout,
-                    'figlist': do_figlist,
-                    'plot': do_plot,
-                    'read': do_read,
-                    'write': do_write,
-                    'update': do_update,
-                    'add': do_add,
-                    'delete': do_delete,
-                    'mode': do_mode,
-                    'scale': do_scale,
-                    'range': do_range,
-                    'unit': do_unit,
-                    'insert': do_insert,
-                    'remove': do_remove,
-                    'freeze': do_freeze,
-                    'unfreeze': do_unfreeze,
-                    'siglist': do_siglist,
-                    'math': do_math,
-                    'exec': do_exec,
-                    'factors': do_factors}
+                     'destroy': do_destroy,
+                     'select': do_select,
+                     'layout': do_layout,
+                     'figlist': do_figlist,
+                     'read': do_read,
+                     'write': do_write,
+                     'update': do_update,
+                     'add': do_add,
+                     'delete': do_delete,
+                     'mode': do_mode,
+                     'scale': do_scale,
+                     'range': do_range,
+                     'unit': do_unit,
+                     'insert': do_insert,
+                     'remove': do_remove,
+                     'freeze': do_freeze,
+                     'unfreeze': do_unfreeze,
+                     'siglist': do_siglist,
+                     'math': do_math,
+                     'exec': do_exec,
+                     'factors': do_factors,
+                     'refresh': do_refresh,
+                     'gui': do_gui}
     
     for name, func in oscopy_magics.iteritems():
             ip.expose_magic(name, func)

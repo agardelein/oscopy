@@ -10,12 +10,13 @@ import commands
 import ConfigParser
 import dbus, dbus.service, dbus.glib
 from xdg import BaseDirectory
+import IPython
 
 import oscopy
 
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
-import oscopy_gui
+import gui
 
 # Note: for crosshair, see gtk.gdk.GC / function = gtk.gdk.XOR
 
@@ -26,66 +27,6 @@ def report_error(parent, msg):
     dlg.set_title(parent.get_title())
     dlg.run()
     dlg.destroy()
-
-class OscopyAppUI(oscopy.OscopyApp):
-    def __init__(self, context):
-        oscopy.OscopyApp.__init__(self, context)
-        self._callbacks = {}
-        self._autorefresh = True
-
-    def connect(self, event, func, data):
-        if not isinstance(event, str):
-            return
-        if hasattr(self, 'do_'+event):
-            self._callbacks[event] = {func: data}
-
-    def postcmd(self, stop, line):
-        oscopy.OscopyApp.postcmd(self, stop, line)
-        if not line.strip():
-            return
-        event = line.split()[0].strip()
-        if len(line.split()) > 1:
-            args = line.split(' ', 1)[1].strip()
-        else:
-            args = ''
-        if self._callbacks.has_key(event):
-            for func, data in self._callbacks[event].iteritems():
-                func(event, args, data)
-        if self._autorefresh and self._current_figure is not None and\
-                self._current_figure.canvas is not None:
-            self._current_figure.canvas.draw()
-
-    def help_refresh(self):
-        print 'refresh FIG#|on|off|current|all'
-        print _("""  on|off       toggle auto refresh of current figure
-  current|all  refresh either current figure or all
-  FIG#         figure to refresh
-without arguments refresh current figure""")
-    def do_refresh(self, args):
-        if args == 'on':
-            self._autorefresh = True
-        elif args == 'off':
-            self._autorefresh = False
-        elif args == 'current' or args == '':
-            if self._current_figure is not None and\
-                    self._current_figure.canvas is not None:
-                self._current_figure.canvas.draw()
-        elif args == 'all':
-            for fig in self._ctxt.figures:
-                if fig.canvas is not None:
-                    fig.canvas.draw()
-        elif args.isdigit():
-            fignum = int(args) - 1
-            if fignum >= 0 and fignum < len(self._ctxt.figures):
-                if self._ctxt.figures[fignum].canvas is not None:
-                    print _('refreshing')
-                    self._ctxt.figures[fignum].canvas.draw()
-
-    def do_pause(self, args):
-        print _("Pause command disabled in UI")
-
-    def do_plot(self, line):
-        print _("Plot command disabled in UI")
 
 class App(dbus.service.Object):
     __ui = '''<ui>
@@ -99,12 +40,11 @@ class App(dbus.service.Object):
         <menuitem action="Quit"/>
       </menu>
       <menu action="Windows">
-        <menuitem action="Show terminal"/>
       </menu>
     </menubar>
     </ui>'''
 
-    def __init__(self, bus_name, object_path='/org/freedesktop/Oscopy'):
+    def __init__(self, bus_name, object_path='/org/freedesktop/Oscopy', ctxt=None):
         dbus.service.Object.__init__(self, bus_name, object_path)
         self._scale_to_str = {'lin': _('Linear'), 'logx': _('LogX'), 'logy': _('LogY'),\
                                   'loglog': _('Loglog')}
@@ -113,7 +53,6 @@ class App(dbus.service.Object):
         self._fignum_to_merge_id = {}
         self._current_graph = None
         self._current_figure = None
-        self._term_win = None
         self._prompt = "oscopy-ui>"
         self._init_config()
         self._read_config()
@@ -124,22 +63,20 @@ class App(dbus.service.Object):
         self._to_figure = [("oscopy-signals", gtk.TARGET_SAME_APP,\
                                 self._TARGET_TYPE_SIGNAL)]
 
-        self._ctxt = oscopy.Context()
-        self._app = OscopyAppUI(self._ctxt)
-        self._app.connect('read', self._add_file, None)
-        self._app.connect('math', self._add_file, None)
-        self._app.connect('freeze', self._freeze, None)
-        self._app.connect('unfreeze', self._freeze, None)
-        self._app.connect('create', self._create, None)
-        self._app.connect('destroy', self._destroy, None)
-        self._app.connect('quit', lambda e, s, d: self._action_quit(None), None)
-        self._app.connect('exit', lambda e, s, d: self._action_quit(None), None)
+        if ctxt is None:
+            self._ctxt = oscopy.Context()
+        else:
+            self._ctxt = ctxt        
+            
         self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT,
                                     gobject.TYPE_BOOLEAN)
         self._create_widgets()
         #self._app_exec('read demo/irf540.dat')
         #self._app_exec('read demo/ac.dat')
         #self._add_file('demo/res.dat')
+
+        # From IPython/demo.py
+        self.shell = __IPYTHON__
 
     SECTION = 'oscopy_ui'
     OPT_NETLISTER_COMMANDS = 'netlister_commands'
@@ -180,15 +117,9 @@ class App(dbus.service.Object):
         resp = dlg.run()
         if resp == gtk.RESPONSE_ACCEPT:
             expr = entry.get_text()
-            self._app_exec('%s' % expr)
+            self._app_exec('math %s' % expr)
 
         dlg.destroy()
-
-    def _action_show_terminal(self, action):
-        if self._term_win.flags() & gtk.VISIBLE:
-            self._term_win.hide()
-        else:
-            self._term_win.show()
 
     def _action_execute_script(self, action):
         dlg = gtk.FileChooserDialog(_('Execute script'), parent=self._mainwindow,
@@ -201,7 +132,7 @@ class App(dbus.service.Object):
             self._app_exec("exec " + filename)
 
     def _action_netlist_and_simulate(self, action):
-        dlg = oscopy_gui.dialogs.Run_Netlister_and_Simulate_Dialog()
+        dlg = gui.dialogs.Run_Netlister_and_Simulate_Dialog()
         dlg.display(self._actions)
         actions = dlg.run()
         if actions is None:
@@ -220,14 +151,13 @@ class App(dbus.service.Object):
     def _action_quit(self, action):
         self._write_config()
         readline.write_history_file(self.hist_file)
-        main_loop.quit()
 
     def _action_figure(self, action, w, fignum):
         if not (w.flags() & gtk.VISIBLE):
             w.show()
         else:
             w.window.show()
-        self._app_exec('select %d-1' % fignum)
+        self._app_exec('%%select %d-1' % fignum)
 
     #
     # UI Creation functions
@@ -255,11 +185,6 @@ class App(dbus.service.Object):
 
         actiongroup = self._actiongroup = gtk.ActionGroup('App')
         actiongroup.add_actions(actions)
-
-        ta = gtk.ToggleAction('Show terminal', _('_Show terminal'), None, None)
-        ta.set_active(True)
-        ta.connect('activate', self._action_show_terminal)
-        actiongroup.add_action(ta)
 
         uimanager = self._uimanager = gtk.UIManager()
         uimanager.add_ui_from_string(self.__ui)
@@ -298,7 +223,6 @@ class App(dbus.service.Object):
     def _create_widgets(self):
         accel_group, self._menubar = self._create_menubar()
         self._treeview = self._create_treeview()
-        self._create_terminal_window()
 
         sw = gtk.ScrolledWindow()
         sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -312,24 +236,17 @@ class App(dbus.service.Object):
         w.set_title(_('Oscopy GUI'))
         w.add(vbox)
         w.add_accel_group(accel_group)
-        w.connect('destroy', lambda *x: self._action_quit(None))
+        w.connect('destroy', lambda w, e: w.hide() or True)
+        w.connect('delete-event', lambda w, e: w.hide() or True)
         w.set_default_size(400, 300)
         w.show_all()
 
-    def _create_terminal_window(self):
-        if self._term_win is None:
-            self._term_win = oscopy_gui.dialogs.TerminalWindow(self._prompt,
-                                                               self._app.intro,
-                                                               self.hist_file,
-                                                               self._app_exec)
-            self._term_win.create()
-            self._term_win.connect('delete-event', lambda w, e: w.hide() or True)
-        if not (self._term_win.flags() & gtk.VISIBLE):
-            self._term_win.show_all()
-
     def _create_figure_popup_menu(self, figure, graph):
-        figmenu = oscopy_gui.menus.FigureMenu()
+        figmenu = gui.menus.FigureMenu()
         return figmenu.create_menu(self._store, figure, graph, self._app_exec)
+
+    def show_all(self):
+        self._mainwindow.show()
 
     #
     # Event-triggered functions
@@ -367,7 +284,7 @@ class App(dbus.service.Object):
         self._current_graph = event.inaxes
         axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
         fig_num = self._ctxt.figures.index(self._current_figure) + 1
-        self._app_exec('select %d-%d' % (fig_num, axes_num))
+        self._app_exec('%%select %d-%d' % (fig_num, axes_num))
 
     def _axes_leave(self, event):
         # Unused for better user interaction
@@ -381,7 +298,7 @@ class App(dbus.service.Object):
         else:
             axes_num = 1
         fig_num = self._ctxt.figures.index(self._current_figure) + 1
-        self._app_exec('select %d-%d' % (fig_num, axes_num))
+        self._app_exec('%%select %d-%d' % (fig_num, axes_num))
 
     def _figure_leave(self, event):
 #        self._current_figure = None
@@ -412,7 +329,7 @@ class App(dbus.service.Object):
     #
     # Callbacks for App
     #
-    def _create(self, event, signals, data=None):
+    def create(self):
         fig = self._ctxt.figures[len(self._ctxt.figures) - 1]
         fignum = len(self._ctxt.figures)
 
@@ -453,9 +370,9 @@ class App(dbus.service.Object):
         </ui>" % fignum
         merge_id = self._uimanager.add_ui_from_string(ui)
         self._fignum_to_merge_id[fignum] = merge_id
-        self._app_exec('select %d-1' % fignum)
+        self._app_exec('%%select %d-1' % fignum)
 
-    def _destroy(self, event, num, data=None):
+    def destroy(self, num):
         if not num.isdigit() or int(num) > len(self._ctxt.figures):
             return
         else:
@@ -481,7 +398,7 @@ class App(dbus.service.Object):
             if result: return result
         return None
 
-    def _freeze(self, event, signals, data=None):
+    def freeze(self, signals):
         for signal in signals.split(','):
             match_row = self._search(self._store, self._match_func,\
                                          (0, signal.strip()))
@@ -502,7 +419,7 @@ class App(dbus.service.Object):
                     # Set reader freeze to false
                     self._store.set_value(parent, 2, False)
 
-    def _add_file(self, event, filename, data=None):
+    def add_file(self, filename):
         if filename.strip() in self._ctxt.readers:
             it = self._store.append(None, (filename.strip(), None, False))
             for name, sig in self._ctxt.readers[filename.strip()]\
@@ -619,21 +536,10 @@ class App(dbus.service.Object):
             os.chdir(old_dir)
 
     def _app_exec(self, line):
-        line = self._app.precmd(line)
-        stop = self._app.onecmd(line)
-        self._app.postcmd(stop, line)
+        self.shell.runlines(line)
     
 def usr1_handler(signum, frame):
     app.update_from_usr1()
 
 def usr2_handler(signum, frame):
     app.update_from_usr2()
-
-if __name__ == '__main__':
-    session_bus = dbus.SessionBus()
-    bus_name = dbus.service.BusName('org.freedesktop.Oscopy', bus=session_bus)
-    app = App(bus_name)
-    main_loop = gobject.MainLoop()
-    signal.signal(signal.SIGUSR1, usr1_handler)
-    signal.signal(signal.SIGUSR2, usr2_handler)
-    main_loop.run()

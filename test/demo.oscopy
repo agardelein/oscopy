@@ -45,12 +45,9 @@ freeze vo
 %select 3-1
 %insert vo
 siglist
-# Plot things
-print "*** Now plotting everything"
-%plot
 # Updating
 print "*** Now change C value in schematic and rerun gnetlist + gnucap"
-#pause
+#pause...
 print "*** Updating"
 #update
 print "*** Now look at figure 3"
