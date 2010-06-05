@@ -129,6 +129,7 @@ class Context(object):
             self._signals[sn] = sigs[sn]
             self._signal_name_to_reader[sn] = r
         self._readers[fn] = r
+        return sigs
 
     def write(self, fn, fmt, sns, opts):
         """ Write signals to file

@@ -14,6 +14,8 @@ from context import Context
 from readers.reader import ReadError
 from ui import App as OscopyGUI
 
+_globals = None
+
 _ctxt = Context()
 ip = IPython.ipapi.get()
 
@@ -104,14 +106,16 @@ def do_figlist(self, args):
 def do_read(self, arg):
     """read DATAFILE
     Read signal file"""
+    global _globals
 
     fn = arg
     if fn in _ctxt.readers.keys():
         print _("%s already read, use update to reread it") % fn
         return
     try:
-        _ctxt.read(fn)
+        sigs = _ctxt.read(fn)
         _gui.add_file(fn)
+        _globals.update(sigs)
     except ReadError, e:
         print _("Failed to read %s:") % fn, e
     except NotImplementedError:
