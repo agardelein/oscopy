@@ -1,56 +1,56 @@
 # First read data from IRF540 simulation
 print "*** Reading files and setting plots"
-read demo/irf540.dat
-%add vgs
-create
-%add iRD
-%add vgs
-%add vgs
-%add vds
+o_read demo/irf540.dat
+%o_add vgs
+o_create
+%o_add iRD
+%o_add vgs
+%o_add vgs
+%o_add vds
 print "*** Fig 2 layout to quad"
-layout quad
+o_layout quad
 print "*** Done"
 # Oops, forgot a signal in figure 2 graph 3
-%select 2-3
-%insert vds
+%o_select 2-3
+%o_insert vds
 # Plot filter response
-%read demo/ac.dat
-create
-%add vout
-scale loglog
+%o_read demo/ac.dat
+o_create
+%o_add vout
+o_scale loglog
 # Plot square signal, its FFT and a math signal
-read demo/tran.dat
-create
-%add vsqu
-%math vsqufft=fft(vsqu)
-%add vsqufft
-%range -2 2 -100 200
-unit V
-%math v1=vsqu*3+10
-%add v1
-unit V
+o_read demo/tran.dat
+o_create
+%o_add vsqu
+%o_math vsqufft=fft(vsqu)
+%o_add vsqufft
+%o_range -2 2 -100 200
+o_unit V
+%o_math v1=vsqu*3+10
+%o_add v1
+o_unit V
 print "*** Insert and remove a signal"
-%select 4-1
-%insert v1
-remove v1
+%o_select 4-1
+%o_insert v1
+o_remove v1
 # Use of Time
-%math vs=sin(Time(vsqu)*1e6)
-create vs
-unit V
+%o_math vs=sin(Time(vsqu)*1e6)
+o_create vs
+o_unit V
 print "*** List of figures"
-figlist
+o_figlist
 # Create a copy of vout and freeze it
-%math vo=vout
-freeze vo
-%select 3-1
-%insert vo
-siglist
+%o_math vo=vout
+o_freeze vo
+%o_select 3-1
+%o_insert vo
+o_siglist
 # Updating
 print "*** Now change C value in schematic and rerun gnetlist + gnucap"
 #pause...
 print "*** Updating"
-#update
+#o_update
 print "*** Now look at figure 3"
 #plot
 # Saving results
-write gnucap (ow:1) demo/res.dat v1,vsqu
+o_write gnucap (ow:1) demo/res.dat v1,vsqu

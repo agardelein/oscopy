@@ -94,7 +94,7 @@ class App(dbus.service.Object):
         resp = dlg.run()
         if resp == gtk.RESPONSE_ACCEPT:
             for filename in dlg.get_filenames():
-                self._app_exec("read " + filename)
+                self._app_exec("o_read " + filename)
         dlg.destroy()
 
     def _action_update(self, action):
@@ -117,7 +117,7 @@ class App(dbus.service.Object):
         resp = dlg.run()
         if resp == gtk.RESPONSE_ACCEPT:
             expr = entry.get_text()
-            self._app_exec('math %s' % expr)
+            self._app_exec('o_math %s' % expr)
 
         dlg.destroy()
 
@@ -129,7 +129,7 @@ class App(dbus.service.Object):
         filename = dlg.get_filename()
         dlg.destroy()
         if resp == gtk.RESPONSE_ACCEPT:
-            self._app_exec("exec " + filename)
+            self._app_exec("o_exec " + filename)
 
     def _action_netlist_and_simulate(self, action):
         dlg = gui.dialogs.Run_Netlister_and_Simulate_Dialog()
@@ -157,7 +157,7 @@ class App(dbus.service.Object):
             w.show()
         else:
             w.window.show()
-        self._app_exec('%%select %d-1' % fignum)
+        self._app_exec('%%o_select %d-1' % fignum)
 
     #
     # UI Creation functions
@@ -277,14 +277,14 @@ class App(dbus.service.Object):
             return
 
         row = self._store[path]
-        self._app_exec('create %s' % row[0])
+        self._app_exec('o_create %s' % row[0])
 
     def _axes_enter(self, event):
         self._figure_enter(event)
         self._current_graph = event.inaxes
         axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
         fig_num = self._ctxt.figures.index(self._current_figure) + 1
-        self._app_exec('%%select %d-%d' % (fig_num, axes_num))
+        self._app_exec('%%o_select %d-%d' % (fig_num, axes_num))
 
     def _axes_leave(self, event):
         # Unused for better user interaction
@@ -298,7 +298,7 @@ class App(dbus.service.Object):
         else:
             axes_num = 1
         fig_num = self._ctxt.figures.index(self._current_figure) + 1
-        self._app_exec('%%select %d-%d' % (fig_num, axes_num))
+        self._app_exec('%%o_select %d-%d' % (fig_num, axes_num))
 
     def _figure_leave(self, event):
 #        self._current_figure = None
@@ -308,18 +308,18 @@ class App(dbus.service.Object):
         if len(path) == 3:
             # Single signal
             if self._store[path][1].freeze:
-                cmd = 'unfreeze'
+                cmd = 'o_unfreeze'
             else:
-                cmd = 'freeze'
+                cmd = 'o_freeze'
             self._app_exec('%s %s' % (cmd, self._store[path][0]))
         elif len(path) == 1:
             # Whole reader
             parent = self._store.get_iter(path)
             freeze = not self._store.get_value(parent, 2)
             if self._store[path][2]:
-                cmd = 'unfreeze'
+                cmd = 'o_unfreeze'
             else:
-                cmd = 'freeze'
+                cmd = 'o_freeze'
             self._store.set_value(parent, 2, freeze)
             iter = self._store.iter_children(parent)
             while iter:
@@ -370,7 +370,7 @@ class App(dbus.service.Object):
         </ui>" % fignum
         merge_id = self._uimanager.add_ui_from_string(ui)
         self._fignum_to_merge_id[fignum] = merge_id
-        self._app_exec('%%select %d-1' % fignum)
+        self._app_exec('%%o_select %d-1' % fignum)
 
     def destroy(self, num):
         if not num.isdigit() or int(num) > len(self._ctxt.figures):
