@@ -234,6 +234,7 @@ class Context(object):
             self._signals[sn] = s
             self._signal_name_to_reader[sn] = r
         self._readers[inp] = r
+        return ss
 
     def names_to_signals(self, sns):
         """ Return a signal dict from the signal names list provided

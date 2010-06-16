@@ -301,11 +301,13 @@ def do_math(self, args):
     # Note: this function will be useless now, signals will be computed directly
     """math destsig=mathexpr"
     Define a new signal destsig using mathematical expression"""
+    global _globals
     try:
-        _ctxt.math(args)
+        sigs = _ctxt.math(args)
     except ReadError, e:
         print _("Error creating signal from math expression:"), e
     _gui.add_file(args)
+    _globals.update(sigs)
 
 def do_exec(self, file):
     """exec FILENAME
@@ -420,7 +422,8 @@ def init():
                      'exec': do_exec,
                      'factors': do_factors,
                      'refresh': do_refresh,
-                     'gui': do_gui}
+                     'gui': do_gui,
+                     'Signal': do_math}
     
     for name, func in oscopy_magics.iteritems():
             ip.expose_magic(name, func)
