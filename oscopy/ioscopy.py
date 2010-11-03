@@ -299,7 +299,7 @@ def do_siglist(self, args):
 
 def do_math(self, args):
     # Note: this function will be useless now, signals will be computed directly
-    """math destsig=mathexpr"
+    """math destsig=mathexpr
     Define a new signal destsig using mathematical expression"""
     global _globals
     try:
