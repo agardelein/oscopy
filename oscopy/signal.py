@@ -47,8 +47,8 @@ class Signal(object):
                 self._ref = name._ref
             else:
                 self._ref = Signal(name._ref)
-            self._unit = name._unit
-            self._freeze = name.frozen
+            self._unit = name._unit if unit == "" else unit
+            self._freeze = name.freeze
         else:
             self._data = []            # Data points
             self._name = name         # Identifier
@@ -143,6 +143,8 @@ class Signal(object):
             name = '(%s %s %s)' % (self.name, Signal.__op_name[op], other_name)
             s = Signal(name, None)
             s.data = op(self.data, other_data)
+            s.ref = self.ref
+            s.freeze = self.freeze
             return s
         return func
 
