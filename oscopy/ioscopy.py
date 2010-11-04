@@ -325,7 +325,7 @@ def do_exec(self, file):
         print os.getcwd()
 
 def do_factors(self, args):
-    """factors X, Y"
+    """factors X, Y
     set the scaling factor of the graph (in power of ten)
     use 'auto' for automatic scaling factor
     e.g. factor -3, 6 set the scale factor at 1e-3 and 10e6"""

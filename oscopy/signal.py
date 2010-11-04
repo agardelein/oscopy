@@ -143,6 +143,7 @@ class Signal(object):
             name = '(%s %s %s)' % (self.name, Signal.__op_name[op], other_name)
             s = Signal(name, None)
             s.data = op(self.data, other_data)
+            # The new signal has the reference of this signal
             s.ref = self.ref
             s.freeze = self.freeze
             return s
