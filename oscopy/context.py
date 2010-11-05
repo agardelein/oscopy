@@ -236,6 +236,18 @@ class Context(object):
         self._readers[inp] = r
         return ss
 
+    def import_signal(self, sig, name):
+        """ Import a signal from outside oscopy context
+        """
+        r = DetectReader(sig)
+        ss = r.read((sig, name))
+        for sn, s in ss.iteritems():
+            self._signals[sn] = s
+            self._signal_name_to_reader[sn] = r
+        rname = "%s=%s" % (name, sig.name)
+        self.readers[rname] = r
+        return ss
+
     def names_to_signals(self, sns):
         """ Return a signal dict from the signal names list provided
         If no signals are found, return {}

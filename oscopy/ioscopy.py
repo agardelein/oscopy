@@ -385,6 +385,21 @@ def do_gui(self, args):
     global _ctxt
     _gui.show_all()
 
+def do_import(self, args):
+    """import
+    Import a signal into the oscopy context.
+    This is done through the signal_reader class
+    """
+    global _globals
+    for sig in args.split(','):
+        try:
+            sigs = _ctxt.import_signal(_globals.get(sig), sig)
+        except ReadError, e:
+            print _("Error analyzing new signal:"), e
+        _gui.add_file("%s=%s" % (sig, _globals.get(sig).name))
+#    _globals.update(sigs)
+    
+
 def get_signames(args):
     """ Return the signal names list extracted from the commandline
     The list must be a coma separated list of signal names.
@@ -423,7 +438,7 @@ def init():
                      'o_factors': do_factors,
                      'o_refresh': do_refresh,
                      'o_gui': do_gui,
-                     'o_signal': do_math}
+                     'o_import': do_import}
     
     for name, func in oscopy_magics.iteritems():
             ip.expose_magic(name, func)

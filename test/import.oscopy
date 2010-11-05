@@ -4,3 +4,5 @@ o_add vds
 o_add iRD
 o_add vgs,vds
 
+pwr=oscopy.signal.Signal(vds*iRD, 'W')
+o_import pwr

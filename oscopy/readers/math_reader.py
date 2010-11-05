@@ -192,6 +192,7 @@ class MathReader(Reader):
     def detect(self, fn):
         """ If the filename contains "=", then this is managed
         """
+        if not isinstance(fn, str): return False
         if fn.find("=") >= 0:
             return True
         else:

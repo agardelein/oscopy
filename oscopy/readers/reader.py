@@ -49,7 +49,7 @@ class Reader(object):
     The derived class must redefine _read_signals() and detect()
     """
     def __init__(self):
-        self._fn = ""
+        self._fn = ""          # file name
         self._signals = {}
         self._update_num = -1  # Update number
         self._info = {}
@@ -150,6 +150,8 @@ class Reader(object):
         """
         if not fn:
             raise ReadError(_("No file specified"))
+        if not isinstance(fn, str):
+            raise ReadError(_("Not a string"))            
         if not os.path.exists(fn):
             raise ReadError(_("File do not exist"))
         if not os.path.isfile(fn):
