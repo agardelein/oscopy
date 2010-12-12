@@ -70,20 +70,20 @@ class Signal(gobject.GObject):
                  gobject.PARAM_READABLE)
         }
     
-    def __init__(self, name="", unit=""):
+    def __init__(self, value="", unit=""):
         gobject.GObject.__init__(self)
-        if isinstance(name, Signal):
-            self._data = name._data
-            self._name = name._name
-            if name.ref is None:
-                self._ref = name._ref
+        if isinstance(value, Signal):
+            self._data = value._data
+            self._name = value._name
+            if value.ref is None:
+                self._ref = value._ref
             else:
-                self._ref = Signal(name._ref)
-            self._unit = name._unit if unit == "" else unit
-            self._freeze = name.freeze
+                self._ref = Signal(value._ref)
+            self._unit = value._unit if unit == "" else unit
+            self._freeze = value.freeze
         else:
             self._data = []            # Data points
-            self._name = name         # Identifier
+            self._name = value        # Identifier
             self._ref = None          # Reference signal
             self._unit = unit         # Unit of the signal
             self._freeze = False      # Flag for update
