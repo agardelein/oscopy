@@ -36,10 +36,42 @@ Class Signal -- Contains the signal points and other information
 """
 import operator
 import numpy
+import gobject
 
 # Signals class
-class Signal(object):
+class Signal(gobject.GObject):
+    __gsignals__ = {
+        'changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ())
+        }
+
+    __gproperties__ = {
+        'ref' : (gobject.TYPE_PYOBJECT,
+                 'Reference signal',
+                 'Abcisse of the signal',
+                 gobject.PARAM_READWRITE),
+        'data': (gobject.TYPE_PYOBJECT,
+                 'Signal data',
+                 'Values of the signals',
+                 gobject.PARAM_READWRITE),
+        'freeze': (gobject.TYPE_BOOLEAN,
+                   'Freeze status',
+                   'When True signal updates are disabled',
+                   False,
+                   gobject.PARAM_READWRITE),
+        'name': (gobject.TYPE_STRING,
+                 'Signal nickname',
+                 'Name displayed to the user',
+                 '',
+                 gobject.PARAM_READABLE),
+        'unit': (gobject.TYPE_STRING,
+                 'Signal unit',
+                 'Unit in which the data is expressed',
+                 '',
+                 gobject.PARAM_READABLE)
+        }
+    
     def __init__(self, name="", unit=""):
+        gobject.GObject.__init__(self)
         if isinstance(name, Signal):
             self._data = name._data
             self._name = name._name
@@ -56,25 +88,31 @@ class Signal(object):
             self._unit = unit         # Unit of the signal
             self._freeze = False      # Flag for update
 
-    def set_data(self, data=[]):
+    def do_set_data(self, data=[]):
         """ Set the data points of the signal
         """
         if data is None:
             self._data = data
+            self.emit('changed')
         elif len(data) > 0 :
             if isinstance(data, list):
                 self._data = numpy.array(data)
+                self.emit('changed')
             elif isinstance(data, numpy.ndarray):
                 self._data = data
+                self.emit('changed')
             else:
                 assert 0, _("Data %s not handled") % type(data)
+
+    def set_data(self, value):
+        return self.set_property('data', value)
 
     def get_data(self):
         """ Return the list of point of the signal
         """
-        return self._data
+        return self.get_property('data')
 
-    def set_ref(self, ref=None):
+    def do_set_ref(self, ref=None):
         """ Set the reference signal
         If set_ to None, then signal is a reference signal (Time, Freq)
         """
@@ -83,35 +121,35 @@ class Signal(object):
         else:
             return
 
+    def set_ref(self, value):
+        return self.set_property('ref', value)
+
     def get_ref(self):
         """ Return the reference signal
         """
-        return self._ref
+        return self.get_property('ref')
 
     @property
     def name(self):
         """ Return the signal name
         """
-        return self._name
+        return self.get_property('name')
 
     @property
     def unit(self):
         """ Return the unit of the signal
         """
-        return self._unit
+        return self.get_property('unit')
 
     def get_freeze(self):
         """ Tell to update or not the signal
         """
-        return self._freeze
+        return self.get_property('freeze')
 
-    def set_freeze(self, frz=None):
+    def set_freeze(self, value):
         """ Tell to update or not the signal
         """
-        if isinstance(frz, bool):
-            self._freeze = frz
-        else:
-            assert 0, _("Bad type")
+        return self.set_property('freeze', value)
 
     def __repr__(self):
         ref_name = self.ref.name if self.ref else '(no reference)'
@@ -181,6 +219,34 @@ class Signal(object):
 
     def __iter__(self):
         return iter(self.data)
+
+    def do_get_property(self, property):
+        if property.name == 'ref':
+            return self._ref
+        elif property.name == 'data':
+            return self._data
+        elif property.name == 'freeze':
+            return self._freeze
+        elif property.name == 'name':
+            return self._name
+        elif property.name == 'unit':
+            return self._unit
+        else:
+            raise AttributeError, _('unknown property %s') % property.name
+
+    def do_set_property(self, property, value):
+        if property.name == 'ref':
+            self.do_set_ref(value)
+        elif property.name == 'data':
+            self.do_set_data(value)
+        elif property.name == 'freeze':
+            self._freeze = value
+        elif property.name == 'name':
+            self._name = value
+        elif property.name == 'unit':
+            self._unit = value
+        else:
+            raise AttributeError, _('unknown property %s') % property.name
 
     ref = property(get_ref, set_ref)
     data = property(get_data, set_data)

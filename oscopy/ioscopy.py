@@ -13,6 +13,7 @@ from graphs import factors_to_names, abbrevs_to_factors
 from context import Context
 from readers.reader import ReadError
 from ui import App as OscopyGUI
+from oscopy import Signal
 
 _globals = None
 
@@ -391,12 +392,17 @@ def do_import(self, args):
     This is done through the signal_reader class
     """
     global _globals
-    for sig in args.split(','):
+    for name in args.split(','):
         try:
-            sigs = _ctxt.import_signal(_globals.get(sig), sig)
+            sig = _globals.get(name)
+            if isinstance(sig, Signal):
+                sigs = _ctxt.import_signal(_globals.get(sig), name)
+                _gui.add_file("%s=%s" % (name, _globals.get(sig).name))
+            else:
+                print "%s isn't a Signal" % name
         except ReadError, e:
-            print _("Error analyzing new signal:"), e
-        _gui.add_file("%s=%s" % (sig, _globals.get(sig).name))
+            print _("Error: Signal not recognized (%s)") % e
+            return
 #    _globals.update(sigs)
     
 
