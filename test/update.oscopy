@@ -1,31 +1,32 @@
 # First read data from IRF540 simulation
-echo *** Reading files and setting plots
+print "*** Reading files and setting plots"
 # Plot filter response
-read demo/ac.dat
-create
-add vout
-scale loglog
+o_read demo/ac.dat
+o_create
+o_add vout
+o_scale loglog
 # Create a copy of vout and freeze it
-vo = vout
-freeze vo
-insert vo
+vo=vout
+o_import vo
+o_freeze vo
+o_insert vo
 # Signal name change
-read demo/irf540.dat
-add vgs
-siglist
+o_read demo/irf540.dat
+o_add vgs
+o_siglist
 # Plot things
-echo *** Now plotting everything
+print "*** Now plotting everything"
 #plot
 # Updating
-echo *** Now change C value in schematic and rerun gnetlist + gnucap
-pause
-echo *** Updating
-update
-siglist
-pause
-update demo/ac.dat
-siglist
-echo *** Now look at figure 3
+print "*** Now change C value in schematic and rerun gnetlist + gnucap"
+#pause
+print "*** Updating"
+o_update
+o_siglist
+#pause
+o_update demo/ac.dat
+o_siglist
+print "*** Now look at figure 3"
 #plot
 # Saving results
 #write gnucap (ow:1) demo/res.dat v1,vsqu
