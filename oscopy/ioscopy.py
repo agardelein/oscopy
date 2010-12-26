@@ -396,6 +396,8 @@ def do_import(self, args):
         try:
             sig = _globals.get(name)
             sigs = _ctxt.import_signal(sig, name)
+            for s in sigs.itervalues():
+                _globals[s.name] = s
             _gui.add_file("%s=%s" % (name, sig.name))
         except ReadError, e:
             print _("Error: Signal not recognized (%s)") % e
