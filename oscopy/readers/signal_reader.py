@@ -19,17 +19,27 @@ class SignalReader(Reader):
         """ Do not check for filename validity, and signal name is a composition
         of the name of the signal and its expression
         """
-        self._sig = args[0]
-        self._name = args[1]
+        (self._sig, self._name) = args
         self._fn = "%s=%s" % (self._name, self._sig.name)
         self._info['file'] = self._fn
         self._info['last_update'] = time.time()
-        return self._read_signals()
+        sigs = self._read_signals()
+        for s in sigs.itervalues():
+            self._sig.connect('changed', s.on_changed)
+            s.connect('recompute', s.on_recompute, (None, s, self._sig))
+            self._sig.connect('begin-transaction', s.on_begin_transaction)
+            self._sig.connect('end-transaction', s.on_end_transaction)
+        return sigs
 
     def _read_signals(self):
-        self._signals = {self._name: self._sig}
+        sig = Signal(self._name, self._sig.unit)
+        sig.data = self._sig.data
+        sig.freeze = self._sig.freeze
+        sig.ref = self._sig.ref
+        self._signals = {self._name: sig}
+        self.connect('begin-transaction', self._sig.on_begin_transaction)
+        self.connect('end-transaction', self._sig.on_end_transaction)
         return self._signals
-        pass
-
+ 
     def detect(self, name):
         return True if isinstance(name, Signal) else False

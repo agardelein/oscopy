@@ -395,15 +395,8 @@ def do_import(self, args):
     for name in args.split(','):
         try:
             sig = _globals.get(name)
-            if isinstance(sig, Signal):
-                s = Signal(name, sig.unit)
-                s.data = sig.data
-                s.ref = sig.ref
-                s.freeze = sig.freeze
-                sigs = _ctxt.import_signal(s, name)
-                _gui.add_file("%s=%s" % (name, s.name))
-            else:
-                print "%s isn't a Signal" % name
+            sigs = _ctxt.import_signal(sig, name)
+            _gui.add_file("%s=%s" % (name, sig.name))
         except ReadError, e:
             print _("Error: Signal not recognized (%s)") % e
             return

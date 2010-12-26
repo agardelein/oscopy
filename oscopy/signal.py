@@ -41,7 +41,10 @@ import gobject
 # Signals class
 class Signal(gobject.GObject):
     __gsignals__ = {
-        'changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ())
+        'changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
+        'recompute': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
+        'begin-transaction': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
+        'end-transaction': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ())
         }
 
     __gproperties__ = {
@@ -81,13 +84,17 @@ class Signal(gobject.GObject):
                 self._ref = Signal(value._ref)
             self._unit = value._unit if unit == "" else unit
             self._freeze = value.freeze
+            self._depdata = None
+            self.in_transaction = 0
         else:
             self._data = []            # Data points
             self._name = value        # Identifier
             self._ref = None          # Reference signal
             self._unit = unit         # Unit of the signal
             self._freeze = False      # Flag for update
-
+            self._depdata = None
+            self.in_transaction = 0
+            
     def do_set_data(self, data=[]):
         """ Set the data points of the signal
         """
@@ -179,11 +186,29 @@ class Signal(gobject.GObject):
             other_name = other.name if isinstance(other, Signal) else str(other)
             other_data = other.data if isinstance(other, Signal) else other
             name = '(%s %s %s)' % (self.name, Signal.__op_name[op], other_name)
+
             s = Signal(name, None)
             s.data = op(self.data, other_data)
             # The new signal has the reference of this signal
             s.ref = self.ref
             s.freeze = self.freeze
+            # Handle dependencies
+            # Here surely there will have room for memory optimisation
+            # as we keep in memory the intermediate signals:
+            # v1 = v2 + v3 + v4 becomes v1 = v2 + (v3 + v4) where the
+            # operation between parenthesis is an intermediate signal.
+            # We store the signal and the operation within the callback
+            # arguments
+            # Here again this could be optimised by identifying only the
+            # subsignals that have changed an running only the pertinent
+            # recomputations
+            self.connect('changed', s.on_changed)
+            self.connect('begin-transaction', s.on_begin_transaction)
+            self.connect('end-transaction', s.on_end_transaction)
+            other.connect('changed', s.on_changed)
+            other.connect('begin-transaction', s.on_begin_transaction)
+            other.connect('end-transaction', s.on_end_transaction)
+            self.connect('recompute', self.on_recompute, (op, s, other))
             return s
         return func
 
@@ -191,6 +216,9 @@ class Signal(gobject.GObject):
         def func(self, other):
             other_data = other.data if isinstance(other, Signal) else other
             self.data = op(self.data, other_data)
+            other.connect('changed', self.on_changed)
+            other.connect('begin-transaction', self.on_begin_transaction)
+            other.connect('end_transaction', self.on_end_transaction)
             return self
         return func
 
@@ -215,6 +243,9 @@ class Signal(gobject.GObject):
         name = '-%s' % self.name
         s = Signal(name, None)
         s.data = -self.data
+        self.connect('changed', s.on_changed)
+        self.connect('begin-transaction', s.on_begin_transaction)
+        self.connect('end-transaction', s.on_end_transaction)
         return s
 
     def __iter__(self):
@@ -251,3 +282,36 @@ class Signal(gobject.GObject):
     ref = property(get_ref, set_ref)
     data = property(get_data, set_data)
     freeze = property(get_freeze, set_freeze)
+
+    def on_begin_transaction(self, event, data=None):
+        self.in_transaction = self.in_transaction + 1
+        print "+++ begin transaction in", self.name
+        self.emit('begin-transaction')
+
+    def on_end_transaction(self, event, data=None):
+        self.in_transaction = self.in_transaction - 1
+        if self.in_transaction == 0:
+            self.emit('recompute')
+            self.emit('end-transaction')
+            print "--- end transaction in", self.name
+
+    def on_changed(self, event, data=None):
+        self.to_recompute = True
+        self._depdata = data
+        # Here we might store which signal changed
+
+    def on_recompute(self, event, args=None):
+        if not self.to_recompute or args is None:
+            return
+        if self.in_transaction > 0:
+            return
+        if not self.freeze:
+            (op, s, other) = args
+            print "Recomputing", s.name
+            if op is None:
+                # Operation is a direct assignation (i.e. v2 = v1)
+                self.data = other.data
+            else:
+                # Other operation (+, -, *, /)
+                s.data = op(self.data, other_data)
+            to_recompute = False

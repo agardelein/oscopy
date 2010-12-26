@@ -24,6 +24,7 @@ print "*** Updating"
 o_update
 o_siglist
 #pause
+print "*** Updating only demo/ac.dat"
 o_update demo/ac.dat
 o_siglist
 print "*** Now look at figure 3"

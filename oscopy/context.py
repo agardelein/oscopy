@@ -52,8 +52,9 @@ from readers.reader import ReadError
 from writers.detect_writer import DetectWriter
 from writers.writer import WriteError
 from figure import Figure
+import gobject
 
-class Context(object):
+class Context(gobject.GObject):
     """ Class Context -- Interface between signals and figures
 
     This object is the interface between the signals and the figures,
@@ -63,10 +64,15 @@ class Context(object):
     The keys for the signal dict are the signal name, as presented to the user
     The keys for the reader dict are the file name.
     """
+    __gsignals__ = {
+        'begin-transaction': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
+        'end-transaction': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ())
+        }
 
     def __init__(self):
         """ Create the instance variables
         """
+        gobject.GObject.__init__(self)
         self._readers = {}
         self._figures = []
         self._signals = {}
@@ -120,6 +126,8 @@ class Context(object):
         if r is None:
             raise NotImplementedError()
         sigs = r.read(fn)
+        self.connect('begin-transaction', r.on_begin_transaction)
+        self.connect('end-transaction', r.on_end_transaction)
 
         # Insert signals into the dict
         for sn in sigs.keys():
@@ -149,6 +157,7 @@ class Context(object):
         """        ## SUPPORT FOR UPDATE SINGLE READER
         n = {}    # New signals
         if upn == -1:
+            self.emit('begin-transaction')
             # Normal call create the new list etc etc
             self._update_num += 1
             if r is None:
@@ -157,6 +166,7 @@ class Context(object):
                     n.update(self.update(reader, self._update_num))
             else:
                 n.update(self.update(r, self._update_num))
+            self.emit('end-transaction')
         else:
             # First look at its dependencies
             if hasattr(r, "get_depends") and callable(r.get_depends):
@@ -244,6 +254,8 @@ class Context(object):
         for sn, s in ss.iteritems():
             self._signals[sn] = s
             self._signal_name_to_reader[sn] = r
+            # FIXME: Probleme, comment gerer les dependances ?
+            
         rname = "%s=%s" % (name, sig.name)
         self.readers[rname] = r
         return ss

@@ -36,6 +36,7 @@ Class Reader -- Define the common functions for reader objects
 
 import os.path
 import time
+import gobject
 
 class ReadError(Exception):
     def __init__(self, value):
@@ -44,11 +45,17 @@ class ReadError(Exception):
     def __str__(self):
         return self._value
 
-class Reader(object):
+class Reader(gobject.GObject):
     """ Reader -- Provide common function for signal file reading
     The derived class must redefine _read_signals() and detect()
     """
+    __gsignals__ = {
+        'begin-transaction': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
+        'end-transaction': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ())
+        }
+
     def __init__(self):
+        gobject.GObject.__init__(self)
         self._fn = ""          # file name
         self._signals = {}
         self._update_num = -1  # Update number
@@ -62,7 +69,10 @@ class Reader(object):
         self._fn = fn
         self._info['file'] = self._fn
         self._info['last_update'] = time.time()
-        return self._read_signals()
+        for s in self._read_signals().itervalues():
+            self.connect('begin-transaction', s.on_begin_transaction)
+            self.connect('end-transaction', s.on_end_transaction)
+        return self._signals
 
     def _read_signals(self):
         """ Read the signal list from the file, fill self.slist
@@ -84,6 +94,8 @@ class Reader(object):
         data set to None
         Return dict of new signals
         """
+        # FIXME: Hmmm... it seems the temporary signals are not deleted, i.e.
+        # the ones that are reread but already existing.
         if upn <= self._update_num:
             # Already updated
             return {}
@@ -170,3 +182,13 @@ class Reader(object):
     def info(self):
         """ Return the reader infos"""
         return self._info
+
+    def on_begin_transaction(self, event):
+        self.in_transaction = True
+        print "++ begin transaction in", self._fn
+        self.emit('begin-transaction')
+
+    def on_end_transaction(self, event):
+        self.in_transaction = False
+        self.emit('end-transaction')
+        print "-- end transaction in", self._fn
