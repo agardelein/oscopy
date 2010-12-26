@@ -14,6 +14,13 @@ o_insert vo
 o_read demo/irf540.dat
 o_add vgs
 o_siglist
+pwr = Signal(iRD * vds, 'W')
+o_import pwr
+o_add pwr
+pwr2 = pwr
+o_import pwr2
+o_freeze pwr2
+o_insert pwr2
 # Plot things
 print "*** Now plotting everything"
 #plot
