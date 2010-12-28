@@ -13,6 +13,7 @@ o_insert vo
 # Signal name change
 o_read demo/irf540.dat
 o_add vgs
+o_add iRD
 o_siglist
 pwr = Signal(iRD * vds, 'W')
 o_import pwr

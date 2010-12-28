@@ -1,4 +1,4 @@
-v 20091004 2
+v 20100214 2
 C 40000 40000 0 0 0 title-B.sym
 C 40700 49000 1 0 0 vsin-1.sym
 {
@@ -47,7 +47,7 @@ refdes=C1
 T 44600 49500 5 10 0 0 90 0 1
 symversion=0.1
 T 45600 49500 5 10 1 1 0 0 1
-value=10n
+value=.10n
 }
 C 44400 50100 1 0 0 resistor-2.sym
 {
@@ -138,7 +138,7 @@ C 50000 42500 1 0 0 vpulse-1.sym
 T 50700 43150 5 10 1 1 0 0 1
 refdes=V3
 T 50700 42950 5 10 1 1 0 0 1
-value=pulse 0 10 10n 10n 10n 1u 10u
+value=pulse 0 10 10n 10n 10n 0.5u 10u
 }
 C 53900 43700 1 0 0 12V-plus-1.sym
 C 50200 42200 1 0 0 gnd-1.sym
