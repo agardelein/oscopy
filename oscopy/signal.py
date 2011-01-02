@@ -85,6 +85,13 @@ class Signal(gobject.GObject):
             self._unit = value._unit if unit == "" else unit
             self._freeze = value.freeze
             self.in_transaction = 0
+            self.to_recompute = False
+            if self._ref is not None:
+                # Not a reference signal
+                value.connect('begin-transaction', self.on_begin_transaction)
+                value.connect('end-transaction', self.on_end_transaction)
+                value.connect('changed', self.on_changed, value)
+                self.connect('recompute', self.on_recompute, (None, None, value))
         else:
             self._data = []            # Data points
             self._name = value        # Identifier
@@ -92,6 +99,7 @@ class Signal(gobject.GObject):
             self._unit = unit         # Unit of the signal
             self._freeze = False      # Flag for update
             self.in_transaction = 0
+            self.to_recompute = False
             
     def do_set_data(self, data=[]):
         """ Set the data points of the signal
@@ -285,34 +293,35 @@ class Signal(gobject.GObject):
 
     def on_begin_transaction(self, event, data=None):
         self.in_transaction = self.in_transaction + 1
-        print "+++ begin transaction in", self.name, '0x%x' % id(self)
-        self.emit('begin-transaction')
+        if self.in_transaction < 2:
+            print "+++ begin transaction in", self.name, '[0x%x]' % id(self), '(%d)' % self.in_transaction
+            self.emit('begin-transaction')
 
     def on_end_transaction(self, event, data=None):
         self.in_transaction = self.in_transaction - 1
         if self.in_transaction == 0:
             self.emit('recompute')
             self.emit('end-transaction')
-            print "--- end transaction in", self.name
+            print "--- end transaction in", self.name, '[0x%x]' % id(self), '(%d)' % self.in_transaction
 
     def on_changed(self, event, data=None):
-        print 'on_changed in', self.name
         self.to_recompute = True
         # Here we might store which signal changed
-        print "Dep changed in %s: %s" % (self.name, data.name)
+        print "Dep changed in %s [0x%x]: %s [0x%x]" % (self.name, id(self), data.name, id(data))
         self.emit('changed')
         
     def on_recompute(self, event, args=None):
-        print 'Beginning of on_recompute for', self.name
+        print 'Beginning of on_recompute for', self.name, '[0x%x]' % id(self)
         if not self.to_recompute or args is None:
             return
         if self.in_transaction > 0:
+            print self.name, '[0x%x]' % id(self), 'still in transaction', self.in_transaction
             return
         if not self.freeze:
             (op, s, other) = args
-            print "Recomputing", self.name, self
-            print s
-            print other
+            print "Recomputing", self.name, '[0x%x]' % id(self)
+            # print s
+            # print other
             if op is None:
                 # Operation is a direct assignation (i.e. v2 = v1)
                 self.data = other.data

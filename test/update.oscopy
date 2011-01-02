@@ -16,6 +16,7 @@ o_add vgs
 o_add iRD
 o_siglist
 pwr = Signal(iRD * vds, 'W')
+print 'id(pwr): 0x%x' % id(pwr)
 o_import pwr
 o_add pwr
 pwr2 = pwr
