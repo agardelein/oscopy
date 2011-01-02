@@ -25,7 +25,6 @@ class SignalReader(Reader):
         self._info['last_update'] = time.time()
         sigs = self._read_signals()
         for s in sigs.itervalues():
-            print 'In signal_reader.read:', 's.name', s.name, 'id(s): 0x%x' % id(s), 'self._sig.name:', self._sig.name, 'id(self._sig): 0x%x' % id(self._sig)
             self._sig.connect('changed', s.on_changed, self._sig)
             s.connect('recompute', s.on_recompute, (None, s, self._sig))
             self.connect('begin-transaction', s.on_begin_transaction)
@@ -33,14 +32,12 @@ class SignalReader(Reader):
         return sigs
 
     def _read_signals(self):
-#        print 'In signal_reader._read_signals', self._name, self._signals, self._sig
         if self._signals:
             return self._signals
         sig = Signal(self._name, self._sig.unit)
         sig.data = self._sig.data
         sig.freeze = self._sig.freeze
         sig.ref = self._sig.ref
-        print sig, 'signal_reader._read_signals: 0x%x' % id(sig)
         self._signals = {self._name: sig}
         self._sig.connect('begin-transaction', self.on_begin_transaction)
         self._sig.connect('end-transaction', self.on_end_transaction)

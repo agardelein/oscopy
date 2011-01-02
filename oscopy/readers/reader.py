@@ -185,10 +185,8 @@ class Reader(gobject.GObject):
 
     def on_begin_transaction(self, event):
         self.in_transaction = True
-        print "++ begin transaction in", self._fn
         self.emit('begin-transaction')
 
     def on_end_transaction(self, event):
         self.in_transaction = False
         self.emit('end-transaction')
-        print "-- end transaction in", self._fn
