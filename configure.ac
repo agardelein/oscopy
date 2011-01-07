@@ -20,7 +20,7 @@ AC_CONFIG_FILES([
 	oscopy/graphs/Makefile
 	oscopy/readers/Makefile
 	oscopy/writers/Makefile
-	oscopy_gui/Makefile
+	oscopy/gui/Makefile
 	scheme/Makefile
 ])
 

@@ -1,4 +1,4 @@
 
-oscopy_guidir = $(pkgpythondir)_gui
+guidir = $(pkgpythondir)/gui
 
-oscopy_gui_PYTHON = __init__.py menus.py dialogs.py
+gui_PYTHON = __init__.py menus.py dialogs.py
