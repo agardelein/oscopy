@@ -24,9 +24,14 @@ _current_figure = None
 _current_graph = None
 _figcount = 0
 _autorefresh = True
+bus_name = None
 
-session_bus = dbus.SessionBus()
-bus_name = dbus.service.BusName('org.freedesktop.Oscopy', bus=session_bus)
+try:
+    session_bus = dbus.SessionBus()
+    bus_name = dbus.service.BusName('org.freedesktop.Oscopy', bus=session_bus)
+except dbus.DBusException, e:
+    print 'DBus not available:', e
+
 _gui = OscopyGUI(bus_name, ctxt=_ctxt)
 
 def do_create(self, args):

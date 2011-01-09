@@ -45,7 +45,8 @@ class App(dbus.service.Object):
     </ui>'''
 
     def __init__(self, bus_name, object_path='/org/freedesktop/Oscopy', ctxt=None):
-        dbus.service.Object.__init__(self, bus_name, object_path)
+        if bus_name is not None:
+            dbus.service.Object.__init__(self, bus_name, object_path)
         self._scale_to_str = {'lin': _('Linear'), 'logx': _('LogX'), 'logy': _('LogY'),\
                                   'loglog': _('Loglog')}
         self._windows_to_figures = {}
