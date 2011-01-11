@@ -10,8 +10,8 @@ dist_pkgdata_DATA = ipythonrc-oscopy
 
 ACLOCAL_AMFLAGS = -I m4
 
-bin_SCRIPTS = oscopy_app
+bin_SCRIPTS = ioscopy
 
-oscopy_app: ioscopy_app.py
-	cat ioscopy_app.py | sed -e 's|@datarootdir[@]|$(datarootdir)|g' > oscopy_app
-	chmod u+x oscopy_app
+ioscopy: ioscopy_app.py
+	cat ioscopy_app.py | sed -e 's|@datarootdir[@]|$(datarootdir)|g' > ioscopy
+	chmod u+x ioscopy

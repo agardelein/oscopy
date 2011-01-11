@@ -5,6 +5,7 @@ import gobject
 import gtk
 import signal
 import os
+import sys
 import readline
 import commands
 import ConfigParser
@@ -152,6 +153,8 @@ class App(dbus.service.Object):
     def _action_quit(self, action):
         self._write_config()
         readline.write_history_file(self.hist_file)
+        gtk.main_quit()
+        sys.exit()
 
     def _action_figure(self, action, w, fignum):
         if not (w.flags() & gtk.VISIBLE):
