@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 #-*-Shell-*-
 #if [[ ! -e ${HOME}/.ipython/ipythonrc-oscopy ]]; then
 #    cp @datarootdir@/oscopy/ipythonrc-oscopy ${HOME}/.ipython
