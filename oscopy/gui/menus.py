@@ -35,14 +35,14 @@ class FigureMenu(object):
 
     def _graph_menu_item_activated(self, menuitem, user_data):
         fig, app_exec = user_data
-        app_exec('add')
+        app_exec('o_add')
         fig.canvas.draw()
 
     def _delete_graph_menu_item_activated(self, menuitem, user_data):
         figure, graph, app_exec = user_data
         if graph is not None:
             idx = figure.graphs.index(graph) + 1
-            app_exec('delete %d' % idx)
+            app_exec('o_delete %d' % idx)
             if figure.canvas is not None:
                 figure.canvas.draw()
 
@@ -58,7 +58,7 @@ class FigureMenu(object):
 
     def _layout_menu_item_activated(self, menuitem, user_data):
         fig, layout, app_exec = user_data
-        app_exec('layout ' + layout)
+        app_exec('o_layout ' + layout)
         if fig.canvas is not None:
             fig.canvas.draw()
 
@@ -112,8 +112,8 @@ class GraphMenu(object):
         unitdlg.display(graph.unit, graph.axis_names, graph.scale_factors)
         units, scale_factors = unitdlg.run()
         if units and scale_factors:
-            app_exec('unit %s' % ','.join(units))
-            app_exec('factors %s,%s' % (scale_factors[0],scale_factors[1]))
+            app_exec('o_unit %s' % ','.join(units))
+            app_exec('o_factors %s,%s' % (scale_factors[0],scale_factors[1]))
             if figure.canvas is not None:
                 figure.canvas.draw()
 
@@ -129,7 +129,7 @@ class GraphMenu(object):
                          graph.scale_factors, graph.unit)
         r = rangedlg.run()
         if r:
-            app_exec('range %s' % ' '.join(r))
+            app_exec('o_range %s' % ' '.join(r))
             if figure.canvas is not None:
                 figure.canvas.draw()
 
@@ -141,10 +141,10 @@ class GraphMenu(object):
         fig, graph, parent_it, it, app_exec = user_data
         name, sig = self._store.get(it, 0, 1)
         if not fig.graphs:
-            app_exec('add %s' % name)
+            app_exec('o_add %s' % name)
         else:
             if graph is not None:
-                app_exec('insert %s' % name)
+                app_exec('o_insert %s' % name)
         if fig.canvas is not None:
             fig.canvas.draw()
 
@@ -152,7 +152,7 @@ class GraphMenu(object):
         figure, graph, scale, app_exec = user_data
         if graph is None:
             return
-        app_exec('scale %s' % scale)
+        app_exec('o_scale %s' % scale)
         if figure.canvas is not None:
             figure.canvas.draw()
 
@@ -160,7 +160,7 @@ class GraphMenu(object):
         figure, graph, signals, app_exec = user_data
         if graph is None:
             return
-        app_exec('remove %s' % ' '.join(signals.keys()))
+        app_exec('o_remove %s' % ' '.join(signals.keys()))
         if figure.canvas is not None:
             figure.canvas.draw()
 
