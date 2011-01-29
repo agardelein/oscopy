@@ -22,7 +22,7 @@
 \newcommand{\graph}{\cls{Graph}}
 \newcommand{\fig}{\cls{Figure}}
 \newcommand{\cursor}{\cls{Cursor}}
-\title{{\sc Oscopy}\\An interactive program for viewing electrical simulation results\\Manual}
+\title{{\sc [I]Oscopy}\\An interactive program for viewing electrical simulation results\\Manual}
 \author{Arnaud Gardelein}
 
 \hypersetup{
@@ -40,11 +40,24 @@ urlcolor=black,
 
 \maketitle
 \begin{abstract}
-This is oscopy, a kind of oscilloscope in python, to view 2D electrical
-simulation or measurement results.
-It is designed to easily add new data file formats and new types of plots.
+% data plotter
+% post-processing
+% result viewer
+% primarily targeted for electrical simulation results
+% can be extended beyond that
+% update and dependency tracking 
+% which aims to simplify the development workflow
+% interactive
+
+Oscopy is an interactive oscilloscope written in python designed to simplify the electrical design workflow.
+It allow to read, view and post-process signals with support for automatic dependency tracking.
+File re-reading (updates) can be triggered by external applications like gEDA suite through D-Bus messaging system, and then Oscopy can call netlist generator and electrical simulator programs automatically.
+As oscopy is built on top of IPython, post-processing include as well as simple arithmetics operation as complex functions like FFT.
+Oscopy can be easily extended to a multi-purpose viewer, as adding new data file formats and new types of plots is really easy.
+
 
 This document covers all important concepts and classes, and explain interactions between them.
+% TODO: Update the abstract including short description of ioscopy and GUI
 \end{abstract}
 
 \section{Introduction}
@@ -79,8 +92,20 @@ In this purpose, it present features like multiple plots, multiple windows, diff
 It support the gnucap file format for input and output, and has an update mechanism to reread data from files.
 New file formats and new graph types can be added by following the guidelines presented in this document.
 
-\section{Oscopy}
+\section{IOscopy: Oscopy on top of IPython}
+
+\subsection{Purpose}
+% TODO: Why using ipython: CLI already there, oscopy as a python module, power of ipython behind, flexibility
+
+\subsection{Commands}
+% TODO: Detailled description of ioscopy commands with an example for each one, assuming the demo/demo.oscopy script conditions
+
+\section{Oscopy GUI}
+% TODO: Description of the GUI interface, main window, menus, contextual menus, buttons
+
+\section{Oscopy: The API}
 \label{sec:itf}
+% TODO: Adapt the presentation to the new version, including derivation from GObject (why: dependency management), add description of new functions
 Oscopy is designed to be an interface between the user and the results that comes as well from simulation as experiment (Figure~\ref{fig:itf}).
 Thus the program interacts with two entities:
 \begin{enumerate}
@@ -616,8 +641,8 @@ The method \meth{draw} then needs to be redefined.
 
 \end{document}
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% Local IspellDict: british
 %%% mode: latex
 %%% TeX-master: t
-%%% End: 
+%%% End:
