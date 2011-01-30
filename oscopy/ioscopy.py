@@ -207,8 +207,9 @@ def do_mode(self, args):
     global _current_graph
     if _current_graph is None:
         return
+    mode = args
     idx = _current_figure.graphs.index(_current_graph)
-    _current_figure.mode = _current_graph, mode
+    _current_figure.mode = mode
     _current_graph = _current_figure.graphs[idx]
     do_refresh(self, '')
 
