@@ -1,19 +1,19 @@
-echo *** Load file
-read demo/irf540.dat
-add vgs
-add vds
-add iRD
-add vgs,vds
-figlist
-echo *** Will delete 2
-delete 2
-figlist
-echo *** Will delete 3
-delete 3
-figlist
-echo *** Will delete 1
-delete 1
-figlist
-echo *** Will delete 1
-delete 1
-figlist
+print "*** Load file"
+o_read demo/irf540.dat
+o_add vgs
+o_add vds
+o_add iRD
+o_add vgs,vds
+o_figlist
+print "*** Will delete 2"
+o_delete 2
+o_figlist
+print "*** Will delete 3"
+o_delete 3
+o_figlist
+print "*** Will delete 1"
+o_delete 1
+o_figlist
+print "*** Will delete 1"
+o_delete 1
+o_figlist

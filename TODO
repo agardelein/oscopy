@@ -2,6 +2,7 @@ To be checked :
 
 To be fixed :
 ui: destroy figure
+cursors: line not on all graph after unzoom
 
 To be added :
 Support for HDF5

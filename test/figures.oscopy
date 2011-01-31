@@ -1,47 +1,47 @@
 # Test all function, hard way; Use datafiles from demo/
-echo Read files...
+print "Read files..."
 # Read files
-read
+o_read
 # Directory
-read /dev
+o_read /dev
 # Not a file
-read /dev/tty0
+o_read /dev/tty0
 # Non-existing file
-read aaa
-read demo/tran.dat
-read demo/ac.dat
-read demo/irf540.dat
-siglist
+o_read aaa
+o_read demo/tran.dat
+o_read demo/ac.dat
+o_read demo/irf540.dat
+o_siglist
 # Create and delete figures
-echo *** Create an empty figure and destroy it
-create
-figlist
+print "*** Create an empty figure and destroy it"
+o_create
+o_figlist
 # no args should produce an error
-destroy
-figlist
-destroy 1
-figlist
+#o_destroy
+o_figlist
+o_destroy 1
+o_figlist
 # Destroying a non-existing figure does nothing
-destroy 1
-echo *** Create a figure and add signals
-create
-add vgs, vds
-figlist
+o_destroy 1
+print "*** Create a figure and add signals"
+o_create
+o_add vgs, vds
+o_figlist
 # Provide string to delete instead of int does nothing
-delete vds
-delete 1
-figlist
-destroy 1
-create vgs,vds
-create iRD
-create
-add vgs
-figlist
-echo ** Delete figure 2
-destroy 2
-figlist
-echo ** Delete figure 2 again
-destroy 2
-figlist
-echo ** Delete remaining figure
-destroy 1
+#o_delete vds
+o_delete 1
+o_figlist
+o_destroy 1
+o_create vgs,vds
+o_create iRD
+o_create
+o_add vgs
+o_figlist
+print "** Delete figure 2"
+o_destroy 2
+o_figlist
+print "** Delete figure 2 again"
+o_destroy 2
+o_figlist
+print "** Delete remaining figure"
+o_destroy 1
