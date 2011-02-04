@@ -211,9 +211,10 @@ class Signal(gobject.GObject):
             self.connect('changed', s.on_changed, self)
             self.connect('begin-transaction', s.on_begin_transaction)
             self.connect('end-transaction', s.on_end_transaction)
-            other.connect('changed', s.on_changed, other)
-            other.connect('begin-transaction', s.on_begin_transaction)
-            other.connect('end-transaction', s.on_end_transaction)
+            if isinstance(other, Signal):
+                other.connect('changed', s.on_changed, other)
+                other.connect('begin-transaction', s.on_begin_transaction)
+                other.connect('end-transaction', s.on_end_transaction)
             s.connect('recompute', s.on_recompute, (op, self, other))
             return s
         return func
@@ -222,9 +223,10 @@ class Signal(gobject.GObject):
         def func(self, other):
             other_data = other.data if isinstance(other, Signal) else other
             self.data = op(self.data, other_data)
-            other.connect('changed', self.on_changed, self)
-            other.connect('begin-transaction', self.on_begin_transaction)
-            other.connect('end_transaction', self.on_end_transaction)
+            if isinstance(other, Signal):
+                other.connect('changed', self.on_changed, self)
+                other.connect('begin-transaction', self.on_begin_transaction)
+                other.connect('end_transaction', self.on_end_transaction)
             return self
         return func
 
