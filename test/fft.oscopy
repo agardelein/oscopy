@@ -1,16 +1,20 @@
 # Load files
-read demo/tran.dat
-add vsqu
-echo *** Now doing new way...
-vsqufft = fft(vsqu)
-add vsqufft
-echo *** Diff
-vdiff = diff(vsqu)
-add vdiff
-echo *** Just check everything is fine...
-v1=vsqu*10+15
-v1v1=v1+vsqu/10
-vsquvsqu=v1v1+v1-vsqu
-add v1
-siglist
-plot
+o_exec test/basic.oscopy
+v2=sin(vgs.ref*2*3.1416*1e6)
+o_import v2
+o_create v2
+#read demo/tran.dat
+#add vsqu
+#echo *** Now doing new way...
+#vsqufft = fft(vsqu)
+#add vsqufft
+#echo *** Diff
+#vdiff = diff(vsqu)
+#add vdiff
+#echo *** Just check everything is fine...
+#v1=vsqu*10+15
+#v1v1=v1+vsqu/10
+#vsquvsqu=v1v1+v1-vsqu
+#add v1
+#siglist
+#plot

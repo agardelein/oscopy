@@ -196,7 +196,8 @@ class Signal(gobject.GObject):
             s = Signal(name, None)
             s.data = op(self.data, other_data)
             # The new signal has the reference of this signal
-            s.ref = self.ref
+            # or this signal if no reference found (e.g. v2=sin(v1.ref))
+            s.ref = self.ref if self.ref is not None else self
             s.freeze = self.freeze
             # Handle dependencies
             # Here surely there will have room for memory optimisation

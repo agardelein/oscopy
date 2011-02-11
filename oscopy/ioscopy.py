@@ -6,6 +6,7 @@ import os
 import gtk
 import re
 import dbus
+import numpy
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 from graphs import factors_to_names, abbrevs_to_factors
@@ -424,7 +425,37 @@ def get_signames(args):
             sns.append(sn.strip())
     return sns
 
+def make_ufunc_unary(ufunc_name):
+        def func(s, out=None):
+            if not isinstance(s, Signal):
+                if out is None:
+                    out = getattr(numpy, ufunc_name)(s)
+                else:
+                    out = getattr(numpy, ufunc_name)(s, out)
+                return out
+            s_name = s.name if isinstance(s, Signal) else str(s)
+            s_data = s.data if isinstance(s, Signal) else s
+            name = '%s(%s)' % (ufunc_name, s_name)
+
+            if out is None:
+                out = Signal(name, None)
+                out.data = getattr(numpy, ufunc_name)(s.data)
+            else:
+                getattr(numpy, ufunc_name)(s.data, out.data)
+            # The new signal has the reference of this signal
+            out.ref = s.ref
+            out.freeze = s.freeze
+            # Handle dependencies
+            if isinstance(s, Signal):
+                s.connect('changed', out.on_changed, s)
+                s.connect('begin-transaction', out.on_begin_transaction)
+                s.connect('end-transaction', out.on_end_transaction)
+            out.connect('recompute', out.on_recompute, (getattr(numpy, ufunc_name), s, out))
+            return out
+        return func
+
 def init():
+    global _globals
     oscopy_magics = {'o_create': do_create,
                      'o_destroy': do_destroy,
                      'o_select': do_select,
@@ -453,3 +484,9 @@ def init():
     
     for name, func in oscopy_magics.iteritems():
             ip.expose_magic(name, func)
+
+def set_ufuncs():
+    for val in dir(numpy):
+        if isinstance(getattr(numpy, val), numpy.ufunc):
+            if getattr(numpy, val).nin == 1:
+                _globals.update({val: make_ufunc_unary(val)})

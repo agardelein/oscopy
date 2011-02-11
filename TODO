@@ -7,3 +7,4 @@ cursors: line not on all graph after unzoom
 To be added :
 Support for HDF5
 Make Signal derive from numpy.array
+Support for SpanSelector
