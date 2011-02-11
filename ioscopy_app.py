@@ -20,7 +20,7 @@ def run_ipython():
         return False
 
     live = True
-    shell = IPython.Shell.IPShellMatplotlib(argv=['-pylab','-profile','oscopy','-noconfirm_exit','-nobanner'])
+    shell = IPython.Shell.IPShell(argv=['-profile','oscopy','-noconfirm_exit','-nobanner'])
     IPython.Shell.hijack_gtk()
     shell.mainloop()
     gtk.main_quit()
