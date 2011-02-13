@@ -314,11 +314,20 @@ class Signal(gobject.GObject):
         if self.in_transaction > 0:
             return
         if not self.freeze:
-            (op, s, other) = args
+            op = args[0]
             if op is None:
                 # Operation is a direct assignation (i.e. v2 = v1)
+                (op, s, other) = args
                 self.data = other.data
-            else:
+            elif len(args) == 3:
+                (op, s, other) = args
                 # Other operation (+, -, *, /)
-                self.data = op(s.data, other.data)
+                other_data = other.data if isinstance(other, Signal) else other
+                s_data = s.data if isinstance(s, Signal) else s
+                self.data = op(s_data, other_data)
+            elif len(args) == 4:
+                (op, s1, s2, out) = args
+                s1_data = s1.data if isinstance(s1, Signal) else s1
+                s2_data = s2.data if isinstance(s2, Signal) else s2
+                self.data = op(s1_data, s2_data, out.data)
             to_recompute = False

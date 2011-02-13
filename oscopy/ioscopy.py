@@ -454,6 +454,47 @@ def make_ufunc_unary(ufunc_name):
             return out
         return func
 
+def make_ufunc_binary(ufunc_name):
+        uf = getattr(numpy, ufunc_name)
+        def func(s1, s2, out=None):
+            if not isinstance(s1, Signal) and not isinstance(s2, Signal):
+                if out is None:
+                    return uf(s1, s2)
+                else:
+                    return uf(s1, s2, out)
+            s1_name = s1.name if isinstance(s1, Signal) else str(s1)
+            s1_data = s1.data if isinstance(s1, Signal) else s1
+            s2_name = s2.name if isinstance(s2, Signal) else str(s2)
+            s2_data = s2.data if isinstance(s2, Signal) else s2
+            name = '%s(%s, %s)' % (ufunc_name, s1_name, s2_name)
+
+            if out is None:
+                out = Signal(name, None)
+                out.data = uf(s1_data, s2_data)
+            else:
+                uf(s1_data, s2_data, out.data)
+            # The new signal has the reference of the s1 signal
+            if isinstance(s1, Signal):
+                out.ref = s1.ref
+                out.freeze = s1.freeze
+            elif isinstance(s2, Signal):
+                out.ref = s2.ref
+                out.freeze = s2.freeze
+                
+            # Handle dependencies
+            if isinstance(s1, Signal):
+                s1.connect('changed', out.on_changed, s1)
+                s1.connect('begin-transaction', out.on_begin_transaction)
+                s1.connect('end-transaction', out.on_end_transaction)
+            if isinstance(s2, Signal):
+                s2.connect('changed', out.on_changed, s2)
+                s2.connect('begin-transaction', out.on_begin_transaction)
+                s2.connect('end-transaction', out.on_end_transaction)
+            out.connect('recompute', out.on_recompute, (uf, s1, s2, out))
+            return out
+        return func
+
+
 def init():
     global _globals
     oscopy_magics = {'o_create': do_create,
@@ -490,3 +531,5 @@ def set_ufuncs():
         if isinstance(getattr(numpy, val), numpy.ufunc):
             if getattr(numpy, val).nin == 1:
                 _globals.update({val: make_ufunc_unary(val)})
+            if getattr(numpy, val).nin == 2:
+                _globals.update({val: make_ufunc_binary(val)})
