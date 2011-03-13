@@ -3,11 +3,13 @@ o_exec test/basic.oscopy
 v2=sin(vgs.ref*2*3.1416*1e6)
 o_import v2
 o_create v2
-#read demo/tran.dat
-#add vsqu
+o_read demo/tran.dat
+o_create vsqu
 #echo *** Now doing new way...
-#vsqufft = fft(vsqu)
-#add vsqufft
+vsqufft = fft(vsqu)
+o_import vsqufft
+o_add vsqufft
+o_range 0 15 -.010 .100
 #echo *** Diff
 #vdiff = diff(vsqu)
 #add vdiff

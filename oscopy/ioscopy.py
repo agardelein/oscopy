@@ -426,7 +426,7 @@ def get_signames(args):
     return sns
 
 def make_ufunc_unary(ufunc_name):
-        def func(s, out=None):
+        def oscopy_ufunc_unary(s, out=None):
             if not isinstance(s, Signal):
                 if out is None:
                     out = getattr(numpy, ufunc_name)(s)
@@ -452,11 +452,11 @@ def make_ufunc_unary(ufunc_name):
                 s.connect('end-transaction', out.on_end_transaction)
             out.connect('recompute', out.on_recompute, (getattr(numpy, ufunc_name), s, out))
             return out
-        return func
+        return oscopy_ufunc_unary
 
 def make_ufunc_binary(ufunc_name):
         uf = getattr(numpy, ufunc_name)
-        def func(s1, s2, out=None):
+        def oscopy_ufunc_binary(s1, s2, out=None):
             if not isinstance(s1, Signal) and not isinstance(s2, Signal):
                 if out is None:
                     return uf(s1, s2)
@@ -492,8 +492,37 @@ def make_ufunc_binary(ufunc_name):
                 s2.connect('end-transaction', out.on_end_transaction)
             out.connect('recompute', out.on_recompute, (uf, s1, s2, out))
             return out
-        return func
+        return oscopy_ufunc_binary
 
+def make_fft_func(fft_func_name):
+    ff = getattr(numpy.fft, fft_func_name)
+    def oscopy_fft_func(s, n=None, axis=-1):
+        def oscopy_fftfreq_func(s):
+            out = numpy.fft.fftfreq((len(s.data), s.data[1] - s.data[0])*2)
+            out = numpy.fft.fftshift(out)
+            return out
+        if not isinstance(s, Signal):
+            return ff(s, n, axis)
+        if s.ref.unit == "s":
+            refunit = "Hz"
+            refname = "Frequency"
+        else:
+            refunit = ""
+        name = '%s(%s)' % (fft_func_name, s.name)
+        unit = ""
+        out = Signal(name, unit)
+        out.data = ff(s.data)
+        out.ref = Signal(refname, refunit)
+        out.ref.data = numpy.fft.fftfreq(len(s.data), (s.ref.data[1] - s.ref.data[0])*2)
+        s.connect('changed', out.on_changed, s)
+        s.connect('begin-transaction', out.on_begin_transaction)
+        s.connect('end-transaction', out.on_end_transaction)
+        out.connect('recompute', out.on_recompute, (ff, s, None))
+        out.ref.connect('recompute', out.ref.on_recompute, (oscopy_fftfreq_func, s))
+        out.ref.data = numpy.fft.fftshift(out.ref.data)
+        # Shall we connect the reference signals too ?
+        return out
+    return oscopy_fft_func
 
 def init():
     global _globals
@@ -533,3 +562,9 @@ def set_ufuncs():
                 _globals.update({val: make_ufunc_unary(val)})
             if getattr(numpy, val).nin == 2:
                 _globals.update({val: make_ufunc_binary(val)})
+    for val in dir(numpy.fft):
+        if val.endswith('ifft'):
+            pass
+        elif val.endswith('fft'):
+            _globals.update({val: make_fft_func(val)})
+            
