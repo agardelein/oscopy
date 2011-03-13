@@ -33,9 +33,6 @@ Class Context: Commands callables from oscopy commandline
    signals()
    List all the signals
 
-   math(expr)
-   Create a signal from a mathematical expression
-
    names_to_signals(sns)
    Return a list of the signal names from the arguments provided by the user
    Should not be called from the command line
@@ -216,35 +213,6 @@ class Context(gobject.GObject):
         """ List loaded signals
         """
         return self._signals
-
-    def math(self, inp):
-        """ Create a signal from mathematical expression
-        """
-        sigs = {}
-
-        # Create the expression
-        r = DetectReader(inp)
-        ss = r.read(inp)
-        if not ss:
-            # Failed to read file
-            # If reader provide a missing() and set_origsigs() functions
-            # and if signal names are found pass them to reader
-            if hasattr(r, "missing") and callable(r.missing):
-                sns = r.missing()
-                if hasattr(r, "set_origsigs") and callable(r.set_origsigs):
-                    for sn in sns:
-                        if self._signals.has_key(sn):
-                            sigs[sn] = self._signals[sn]
-                        else:
-                            raise ReadError(_("What is %s") % sn)
-                    r.set_origsigs(sigs)
-                    ss = r.read(inp)
-
-        for sn, s in ss.iteritems():
-            self._signals[sn] = s
-            self._signal_name_to_reader[sn] = r
-        self._readers[inp] = r
-        return ss
 
     def import_signal(self, sig, name):
         """ Import a signal from outside oscopy context

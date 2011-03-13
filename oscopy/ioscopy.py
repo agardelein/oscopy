@@ -300,22 +300,10 @@ def do_siglist(self, args):
     for reader_name, reader in _ctxt.readers.iteritems():
         for signal_name, signal in reader.signals.iteritems():
             print SEPARATOR.join((signal_name, \
-                                      signal.unit,\
+                                      str(signal.unit),\
                                       signal.ref.name,\
                                       reader_name,\
                                       str(int(t - reader.info['last_update']))))
-
-def do_math(self, args):
-    # Note: this function will be useless now, signals will be computed directly
-    """math destsig=mathexpr
-    Define a new signal destsig using mathematical expression"""
-    global _globals
-    try:
-        sigs = _ctxt.math(args)
-    except ReadError, e:
-        print _("Error creating signal from math expression:"), e
-    _gui.add_file(args)
-    _globals.update(sigs)
 
 def do_exec(self, file):
     """exec FILENAME
@@ -410,7 +398,6 @@ def do_import(self, args):
             print _("Error: Signal not recognized (%s)") % e
             return
 #    _globals.update(sigs)
-    
 
 def get_signames(args):
     """ Return the signal names list extracted from the commandline
@@ -545,7 +532,6 @@ def init():
                      'o_freeze': do_freeze,
                      'o_unfreeze': do_unfreeze,
                      'o_siglist': do_siglist,
-                     'o_math': do_math,
                      'o_exec': do_exec,
                      'o_factors': do_factors,
                      'o_refresh': do_refresh,

@@ -22,25 +22,33 @@ o_scale loglog
 o_read demo/tran.dat
 o_create
 o_add vsqu
-o_math vsqufft=fft(vsqu)
+vsqufft=fft(vsqu)
+o_import vsqufft
 o_add vsqufft
 o_range -2 2 -100 200
 o_unit V
-o_math v1=vsqu*3+10
+v1=vsqu*3+10
+o_import v1
 o_add v1
 o_unit V
 print "*** Insert and remove a signal"
 o_select 4-1
 o_insert v1
 o_remove v1
-# Use of Time
-o_math vs=sin(Time(vsqu)*1e6)
+# Create from reference signal. Note with Signal unit can be defined
+vs=sin(vsqu.ref*1e6)
+vs.ref = vsqu.ref
+vs2=Signal(sin(vsqu.ref*1e6), 'V')
+vs2.ref = vsqu.ref
+o_import vs
+o_import vs2
 o_create vs
 o_unit V
 print "*** List of figures"
 o_figlist
 # Create a copy of vout and freeze it
-o_math vo=vout
+vo=vout
+o_import vo
 o_freeze vo
 o_select 3-1
 o_insert vo

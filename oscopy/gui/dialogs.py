@@ -1,7 +1,6 @@
 import os
 import gobject
 import gtk
-import vte
 import pty
 import sys
 import readline

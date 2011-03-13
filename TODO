@@ -8,3 +8,7 @@ To be added :
 Support for HDF5
 Make Signal derive from numpy.array
 Support for SpanSelector
+Support for Signal compatible diff()erenciacion
+Support for other graph format: Smith charts, polar plots,...
+Support for other languages (currently only en, es)
+Separate the gui from the framework: make two packages oscopy-core and oscopy-gtkgui

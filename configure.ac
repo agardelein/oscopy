@@ -40,8 +40,4 @@ PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES(PYGTK, [pygtk-2.0 >= 2.10.0], ,
   AC_MSG_ERROR([PyGTK 2.10.0 or later is required.]))
 
-PKG_CHECK_MODULES(PYVTE, [pyvte], ,
-  AC_MSG_ERROR([pyvte not found.]))
-
-
 AC_OUTPUT

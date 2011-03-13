@@ -35,11 +35,8 @@ In the latter case:
 $ ./autogen.sh && ./configure && make
 
 Dependencies:
-  * python
-  * python-numpy
-  * python-matplotlib
+  * ipython
   * python-dbus
-  * python-vte
   * python-xdg 
 
 INSTALLING

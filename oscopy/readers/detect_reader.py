@@ -9,7 +9,7 @@ from gnucap_reader import GnucapReader
 from math_reader import MathReader
 from signal_reader import SignalReader
 
-READERS = [SignalReader, MathReader, GnucapReader]
+READERS = [SignalReader, GnucapReader]
 
 def DetectReader(filename):
     """ Return a reader object
