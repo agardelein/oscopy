@@ -12,7 +12,7 @@ live = False
 try:
     os.stat(os.getenv('HOME') + '/.ipython/ipythonrc-oscopy')
 except OSError, e:
-    shutil.copy2('@datarootdir@/oscopy/ipythonrc-oscopy', os.getenv('HOME') + '/.ipython')
+    os.symlink('@datarootdir@/oscopy/ipythonrc-oscopy', os.getenv('HOME') + '/.ipython/ipythonrc-oscopy')
 
 def run_ipython():
     global live
