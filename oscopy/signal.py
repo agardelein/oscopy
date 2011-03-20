@@ -1,34 +1,43 @@
 """ Points list of a signal
 
-A signal is the common point between the reader and the graph objects,
-i.e. the file and the plot.
+A Signal is the common point between the reader and the graph objects,
+i.e. the file and the plot. Deriving from gobject, it implement support
+for basic arithmetics and support for transactions for recursive updates.
 
-A signal contains a list of points, with an identifier, a reference (abscisse) and the original reader object.
+A Signal contains a list of data points, with an identifier, a reference (abscisse) and a string representing the unit of the data.
+The Signal contains the ordinate values, while the abscisses are contained
+into the Reference Signal.
+The identifier is the Signal Name, as presented to the user.
 
-The identifier is the signal name, as presented to the user.
-The signal contains the ordinate values, while the abscisses are contained
-into the reference signal.
-The reference signal has its ref set_ to None.
+The concept of *transactions* is used to manage Signal dependencies. This is used to make the Signal aware that its data is being to be changed and to notify also its dependent Signals.
+Transactions are a way to notify Signals using the current Signal that its data is changing. Once the current Signal has finished its transaction, dependent Signal might recompute their own data.
+In this system is defined the 'Dependent' (or 'Lower') Signal, that depends on data from the 'Upper' Signal. For example in v1 = v2 + v3, v1 is the Dependent Signal and v2 and v3 are Upper Signals.
+GObject event signaling system is used for the implementation.
 
-The reader object is stored into the signal, if any use.
+Note that pertinent calls to Signal.connect() shall be performed by the user. See examples for arithmetic operations.
 
 Class Signal -- Contains the signal points and other information
-   __init(name, reader)__
-      Create an empty signal.
-      If given, set_ the name and the reader.
-
-   set_[data|ref]()
-      Set the data points of the signal and the reference signal respectively
-
-   get_[data|ref|name|unit]()
-      Return the signal data points, reference signal signal name
-      and unit respectively
-
-   update()
-      Update the signal from the reader
-
-   freeze(True|False|None)
-      Toggle updating, if None return current status
+   GObject properties (also available as object @property):
+       name     read           user-visible identifier
+       unit     read           ordinate axis text
+       data     read/write     the list of data points
+       ref      read/write     Reference Signal. None means this is a Reference.
+       freeze   read/write     Disable change Signal data if True
+   Other properties
+       in_transaction          Non-null when a transaction is ongoing
+       to_recompute            True when an Upper Signal data has changed and a
+                               recomputation is required
+   Signals
+       'begin-transaction' is received to notify that Upper Signal data is being
+           changed. Event re-emitted toward dependencies
+       'changed' is received when Upper Signal data has changed
+       'recompute' is emitted once all Upper Signals have finished their
+           Transaction
+       'end-transaction' is emitted once the Signal data is recomputed to notify
+           dependencies that they can recompute their own data
+                     
+   __init__(name, unit)
+      Instanciate an empty signal. If name is a Signal, then return a copy.
 
    __str__()
       Returns a string with the signal name, the reference name
@@ -72,8 +81,18 @@ class Signal(gobject.GObject):
                  '',
                  gobject.PARAM_READABLE)
         }
-    
+
+    __op_name = {
+        operator.add: '+',
+        operator.sub: '-',
+        operator.mul: '*',
+        operator.div: '/',
+    }
+
     def __init__(self, value="", unit=""):
+        """ Act as a copy constructor if value is a Signal and set the callbacks
+        for dependency management. Otherwise act as a usual constructor
+        """
         gobject.GObject.__init__(self)
         if isinstance(value, Signal):
             self._data = value._data
@@ -101,6 +120,25 @@ class Signal(gobject.GObject):
             self.in_transaction = 0
             self.to_recompute = False
             
+    def __repr__(self):
+        ref_name = self.ref.name if self.ref else '(no reference)'
+        if self.data is not None:
+            if len(self.data) > 4:
+                data = '[%s, %s, ..., %s, %s]' % (self.data[0],
+                                                  self.data[1],
+                                                  self.data[-2],
+                                                  self.data[-1])
+            else:
+                data = '[' + ', '.join(map(str, self.data)) + ']'
+        else:
+            data = 'None'
+        return '<%s[0x%x] %s / %s [%s] data=%s>' % (type(self).__name__, id(self),
+                                                    self.name, ref_name, self.unit,
+                                                    data)
+
+    def __iter__(self):
+        return iter(self.data)
+
     def do_set_data(self, data=[]):
         """ Set the data points of the signal
         """
@@ -164,31 +202,49 @@ class Signal(gobject.GObject):
         """
         return self.set_property('freeze', value)
 
-    def __repr__(self):
-        ref_name = self.ref.name if self.ref else '(no reference)'
-        if self.data is not None:
-            if len(self.data) > 4:
-                data = '[%s, %s, ..., %s, %s]' % (self.data[0],
-                                                  self.data[1],
-                                                  self.data[-2],
-                                                  self.data[-1])
-            else:
-                data = '[' + ', '.join(map(str, self.data)) + ']'
+    def do_get_property(self, property):
+        """ GObject method
+        """
+        if property.name == 'ref':
+            return self._ref
+        elif property.name == 'data':
+            return self._data
+        elif property.name == 'freeze':
+            return self._freeze
+        elif property.name == 'name':
+            return self._name
+        elif property.name == 'unit':
+            return self._unit
         else:
-            data = 'None'
-        return '<%s[0x%x] %s / %s [%s] data=%s>' % (type(self).__name__, id(self),
-                                                    self.name, ref_name, self.unit,
-                                                    data)
+            raise AttributeError, _('unknown property %s') % property.name
 
-    __op_name = {
-        operator.add: '+',
-        operator.sub: '-',
-        operator.mul: '*',
-        operator.div: '/',
-    }
+    def do_set_property(self, property, value):
+        """ GObject method
+        """
+        if property.name == 'ref':
+            self.do_set_ref(value)
+        elif property.name == 'data':
+            self.do_set_data(value)
+        elif property.name == 'freeze':
+            self._freeze = value
+        elif property.name == 'name':
+            self._name = value
+        elif property.name == 'unit':
+            self._unit = value
+        else:
+            raise AttributeError, _('unknown property %s') % property.name
+
+    ref = property(get_ref, set_ref)
+    data = property(get_data, set_data)
+    freeze = property(get_freeze, set_freeze)
 
     def __make_method(op):
+        """ Return a function for operator op
+        """
         def func(self, other):
+            """ Check the operand, perform the operation and set the callbacks
+            for dependency management
+            """
             other_name = other.name if isinstance(other, Signal) else str(other)
             other_data = other.data if isinstance(other, Signal) else other
             name = '(%s %s %s)' % (self.name, Signal.__op_name[op], other_name)
@@ -221,7 +277,12 @@ class Signal(gobject.GObject):
         return func
 
     def __make_method_inplace(op):
+        """ Return a function for operator op, inplace version
+        """
         def func(self, other):
+            """ Check the operand, perform the operation and set the callbacks
+            for dependency management
+            """
             other_data = other.data if isinstance(other, Signal) else other
             self.data = op(self.data, other_data)
             if isinstance(other, Signal):
@@ -257,58 +318,41 @@ class Signal(gobject.GObject):
         self.connect('end-transaction', s.on_end_transaction)
         return s
 
-    def __iter__(self):
-        return iter(self.data)
-
-    def do_get_property(self, property):
-        if property.name == 'ref':
-            return self._ref
-        elif property.name == 'data':
-            return self._data
-        elif property.name == 'freeze':
-            return self._freeze
-        elif property.name == 'name':
-            return self._name
-        elif property.name == 'unit':
-            return self._unit
-        else:
-            raise AttributeError, _('unknown property %s') % property.name
-
-    def do_set_property(self, property, value):
-        if property.name == 'ref':
-            self.do_set_ref(value)
-        elif property.name == 'data':
-            self.do_set_data(value)
-        elif property.name == 'freeze':
-            self._freeze = value
-        elif property.name == 'name':
-            self._name = value
-        elif property.name == 'unit':
-            self._unit = value
-        else:
-            raise AttributeError, _('unknown property %s') % property.name
-
-    ref = property(get_ref, set_ref)
-    data = property(get_data, set_data)
-    freeze = property(get_freeze, set_freeze)
-
     def on_begin_transaction(self, event, data=None):
+        """ Go to transaction, notify Lower Signals that this one might be
+        changed
+        """
         self.in_transaction = self.in_transaction + 1
         if self.in_transaction < 2:
+            # Prevent event being emitted twice
             self.emit('begin-transaction')
 
     def on_end_transaction(self, event, data=None):
+        """ Exit from transaction. Once all Upper Signals have completed their
+        transaction, recompute this one and notify Lower Signals
+        """
         self.in_transaction = self.in_transaction - 1
         if self.in_transaction == 0:
+            # Prevent events being emitted twice
             self.emit('recompute')
             self.emit('end-transaction')
 
     def on_changed(self, event, data=None):
+        """ An Upper Signal changed, this one will have to be recomputed
+        """
         self.to_recompute = True
-        # Here we might store which signal changed
+        # Here we might store which Signal changed
         self.emit('changed')
         
     def on_recompute(self, event, args=None):
+        """ Call again the function that was used to comoute the data of this
+        signal.
+        Args shall be a tuple containing:
+        op: operator or function to call, None for an assignation (v2 = v1)
+        s: first operand
+        other: second operand
+        out: (optional) output Signal, used for numpy.ufuncs
+        """
         if not self.to_recompute or args is None:
             return
         if self.in_transaction > 0:
