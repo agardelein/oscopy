@@ -18,9 +18,8 @@ gettext.textdomain(GETTEXT_DOMAIN)
 import __builtin__
 __builtin__._ = gettext.gettext
 
-import ioscopy
-
 gobject.type_register(signal.Signal)
 
-if __IPYTHON__:
+if hasattr(globals(), '__IPYTHON__'):
+    import ioscopy
     ioscopy.init()
