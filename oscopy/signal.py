@@ -1,20 +1,28 @@
-""" Points list of a signal
-
-A Signal is the common point between the reader and the graph objects,
-i.e. the file and the plot. Deriving from gobject, it implement support
-for basic arithmetics and support for transactions for recursive updates.
+""" Signal class definition
 
 A Signal contains a list of data points, with an identifier, a reference (abscisse) and a string representing the unit of the data.
 The Signal contains the ordinate values, while the abscisses are contained
 into the Reference Signal.
 The identifier is the Signal Name, as presented to the user.
 
-The concept of *transactions* is used to manage Signal dependencies. This is used to make the Signal aware that its data is being to be changed and to notify also its dependent Signals.
-Transactions are a way to notify Signals using the current Signal that its data is changing. Once the current Signal has finished its transaction, dependent Signal might recompute their own data.
-In this system is defined the 'Dependent' (or 'Lower') Signal, that depends on data from the 'Upper' Signal. For example in v1 = v2 + v3, v1 is the Dependent Signal and v2 and v3 are Upper Signals.
-GObject event signaling system is used for the implementation.
+Within Oscopy, a Signal is the common point between the reader and the graph
+objects, i.e. the file and the plot. Deriving from gobject, it implement support
+for basic arithmetics and support for transactions for recursive updates.
 
-Note that pertinent calls to Signal.connect() shall be performed by the user. See examples for arithmetic operations.
+The concept of *transactions* is used to manage Signal dependencies. This is
+used to make the Signal aware that its data is being to be changed and to
+notify also its dependent Signals.
+Transactions are a way to notify Signals using the current Signal that its data
+is changing. Once the current Signal has finished its transaction, dependent
+Signal might recompute their own data.
+In this system is defined the 'Result' Signal, that depends on data from the
+'Dependancy' Signal(s). For example in v1 = v2 + v3, v1 is the Result Signal and
+v2 and v3 are Dependencies Signals.
+GObject event signaling system is used for the implementation where Results
+Signals are considered as 'Listeners'.
+
+Note that pertinent calls to Signal.connect() shall be performed by the user.
+See examples for arithmetic operations.
 
 Class Signal -- Contains the signal points and other information
    GObject properties (also available as object @property):
@@ -28,26 +36,19 @@ Class Signal -- Contains the signal points and other information
        to_recompute            True when an Upper Signal data has changed and a
                                recomputation is required
    Signals
-       'begin-transaction' is received to notify that Upper Signal data is being
-           changed. Event re-emitted toward dependencies
-       'changed' is received when Upper Signal data has changed
-       'recompute' is emitted once all Upper Signals have finished their
+       'begin-transaction' is received to notify that Dependancy Signal data is
+       being changed. Event re-emitted toward Listeners
+       'changed' is received when Dependancy Signal data has changed
+       'recompute' is emitted once all Dependancy Signals have finished their
            Transaction
-       'end-transaction' is emitted once the Signal data is recomputed to notify
-           dependencies that they can recompute their own data
-                     
-   __init__(name, unit)
-      Instanciate an empty signal. If name is a Signal, then return a copy.
-
-   __str__()
-      Returns a string with the signal name, the reference name
-      and the reader name.
+       'end-transaction' is emitted once the Result Signal data is recomputed
+       to notify Listeners that they can recompute their own data
 """
 import operator
 import numpy
 import gobject
 
-# Signals class
+# Signal class
 class Signal(gobject.GObject):
     __gsignals__ = {
         'changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
@@ -92,6 +93,32 @@ class Signal(gobject.GObject):
     def __init__(self, value="", unit=""):
         """ Act as a copy constructor if value is a Signal and set the callbacks
         for dependency management. Otherwise act as a usual constructor
+
+        Parameters
+        ----------
+        value: string or Signal
+               Name of the Signal or Signal to copy
+        unit: string
+               Unit of the Signal
+        Returns
+        -------
+        Object instanciated
+
+        Examples
+        --------
+        >>> import oscopy
+        >>> v1=oscopy.Signal('v1', 'V')
+        >>> v1ref = oscopy.Signal('v1ref', 's')
+        >>> v1ref.data = [1,2,3,4]
+        >>> v1.ref = v1ref
+        >>> v1.data = [7,9,8,4]
+        >>> v1
+        <Signal[0x...] v1 / v1ref [V] data=[7, 9, 8, 4]>
+        >>> v2=oscopy.Signal(v1)
+        >>> v2.data=[1,3,4,8]
+        >>> v2
+        <Signal[0x...] v1 / v1ref [V] data=[1, 3, 4, 8]>
+
         """
         gobject.GObject.__init__(self)
         if isinstance(value, Signal):
@@ -121,6 +148,7 @@ class Signal(gobject.GObject):
             self.to_recompute = False
             
     def __repr__(self):
+        """ x.__repr__ <==> repr(x)"""
         ref_name = self.ref.name if self.ref else '(no reference)'
         if self.data is not None:
             if len(self.data) > 4:
@@ -137,10 +165,20 @@ class Signal(gobject.GObject):
                                                     data)
 
     def __iter__(self):
+        """ x.__iter__ <==> iter(x)"""
         return iter(self.data)
 
     def do_set_data(self, data=[]):
         """ Set the data points of the signal
+
+        Parameters
+        ----------
+        data: list or numpy.ndarray
+        Table containing the Signal data points
+
+        Returns
+        -------
+        Nothing
         """
         if data is None:
             self._data = data
@@ -156,16 +194,48 @@ class Signal(gobject.GObject):
                 assert 0, _("Data %s not handled") % type(data)
 
     def set_data(self, value):
+        """ Wrapper to set_property for data
+
+        Used for the property definition. Might be removed in next release.
+
+        Parameters
+        ----------
+        value: list or numpy.array
+        Table containing the Signal data points
+
+        Returns
+        -------
+        Nothing
+        """
         return self.set_property('data', value)
 
     def get_data(self):
-        """ Return the list of point of the signal
+        """ Wrapper to get_property for data
+
+        Used for the property definition. Might be removed in next release.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        numpy.array
+        Table containing the Signal data points
         """
         return self.get_property('data')
 
     def do_set_ref(self, ref=None):
         """ Set the reference signal
-        If set_ to None, then signal is a reference signal (Time, Freq)
+
+        Parameters
+        ----------
+        ref: None or Signal
+        The reference Signal or the None value
+
+        Returns
+        -------
+        Nothing
         """
         if ref is None or isinstance(ref, Signal):
             self._ref = ref
@@ -173,37 +243,111 @@ class Signal(gobject.GObject):
             return
 
     def set_ref(self, value):
+        """ Wrapper to set_property for ref (Reference Signal)
+
+        Used for the property definition. Might be removed in next release.
+
+        Parameters
+        ----------
+        value: None or Signal
+        The reference Signal or the None value
+
+        Returns
+        -------
+        Nothing
+        """
         return self.set_property('ref', value)
 
     def get_ref(self):
-        """ Return the reference signal
+        """ Wrapper to get_property for ref (Reference Signal)
+
+        Used for the property definition. Might be removed in next release.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        Signal
+        The reference Signal or the None value
         """
         return self.get_property('ref')
 
     @property
     def name(self):
-        """ Return the signal name
+        """ Wrapper to get_property for name (Name of the Signal)
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        string
+        The name of the Signal
         """
         return self.get_property('name')
 
     @property
     def unit(self):
-        """ Return the unit of the signal
+        """ Return the unit of the Signal
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        string
+        The unit of the Signal
         """
         return self.get_property('unit')
 
     def get_freeze(self):
-        """ Tell to update or not the signal
+        """ Wrapper to get_property for freeze (enable Signal updates)
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        bool
+        The status of signal update
         """
         return self.get_property('freeze')
 
     def set_freeze(self, value):
-        """ Tell to update or not the signal
+        """ Wrapper to set_property for freeze (enable Signal updates)
+
+        Parameters
+        ----------
+        bool
+        The status of signal update
+
+        Returns
+        -------
+        Nothing
         """
         return self.set_property('freeze', value)
 
     def do_get_property(self, property):
         """ GObject method
+
+        Parameters
+        ----------
+        property: string
+        Either ref, data, freeze, name or unit
+
+        Returns
+        -------
+        string, Signal or bool
+        Property value
+
+        Raises
+        ------
+        AttributeError if property is not found
         """
         if property.name == 'ref':
             return self._ref
@@ -220,6 +364,22 @@ class Signal(gobject.GObject):
 
     def do_set_property(self, property, value):
         """ GObject method
+
+        Parameters
+        ----------
+        property: string
+        Either ref, data, freeze, name or unit
+
+        value: string, Signal or bool
+        The value of the property to set
+
+        Returns
+        -------
+        Nothing
+        
+        Raises
+        ------
+        AttributeError if property is not found
         """
         if property.name == 'ref':
             self.do_set_ref(value)
@@ -239,11 +399,36 @@ class Signal(gobject.GObject):
     freeze = property(get_freeze, set_freeze)
 
     def __make_method(op):
-        """ Return a function for operator op
+        """ Return a function wrapping operator op
+
+        This function is used to prepare the return Signal, call the operator
+        and set the relevant call-backs for dependency management
+
+        Parameters
+        ----------
+        op: 2-args function
+        The operator to wrap
+
+        Returns
+        -------
+        func: function
+        A 2-args function returning the operation result
         """
         def func(self, other):
             """ Check the operand, perform the operation and set the callbacks
             for dependency management
+            The operator is fed with two operands, the first one being self
+            and the second one given in argument
+
+            Parameters
+            ----------
+            other: Signal
+            The second operand of the operation
+
+            Returns
+            -------
+            s: Signal
+            The result of the operation
             """
             other_name = other.name if isinstance(other, Signal) else str(other)
             other_data = other.data if isinstance(other, Signal) else other
@@ -277,11 +462,36 @@ class Signal(gobject.GObject):
         return func
 
     def __make_method_inplace(op):
-        """ Return a function for operator op, inplace version
+        """ Return a function wrapping operator op, inplace version
+
+        This function is used to prepare the return Signal, call the operator
+        and set the relevant call-backs for dependency management
+
+        Parameters
+        ----------
+        op: 2-args function
+        The operator to wrap
+
+        Returns
+        -------
+        func: function
+        A 2-args function returning the operation result
         """
         def func(self, other):
             """ Check the operand, perform the operation and set the callbacks
-            for dependency management
+            for dependency management, inplace version
+            The operator is fed with two operands, the first one being self
+            and the second one given in argument
+
+            Parameters
+            ----------
+            other: Signal
+            The second operand of the operation
+
+            Returns
+            -------
+            s: Signal
+            The result of the operation
             """
             other_data = other.data if isinstance(other, Signal) else other
             self.data = op(self.data, other_data)
@@ -310,6 +520,17 @@ class Signal(gobject.GObject):
     __rdiv__ = __div__
 
     def __neg__(self):
+        """ Compute the opposite s = -self
+        Instanciate a new signal with its data being the opposite of self data
+
+        Paramters
+        ---------
+        None
+
+        Returns
+        -------
+        s: opposite of self
+        """
         name = '-%s' % self.name
         s = Signal(name, None)
         s.data = -self.data
@@ -319,8 +540,18 @@ class Signal(gobject.GObject):
         return s
 
     def on_begin_transaction(self, event, data=None):
-        """ Go to transaction, notify Lower Signals that this one might be
+        """ Go to transaction, notify Listener Signals that this one might be
         changed
+        Event is emitted only once, at first notification.
+
+        Parameters
+        ----------
+        event: Not used
+        data: Not used
+
+        Returns
+        -------
+        Nothing
         """
         self.in_transaction = self.in_transaction + 1
         if self.in_transaction < 2:
@@ -328,8 +559,18 @@ class Signal(gobject.GObject):
             self.emit('begin-transaction')
 
     def on_end_transaction(self, event, data=None):
-        """ Exit from transaction. Once all Upper Signals have completed their
-        transaction, recompute this one and notify Lower Signals
+        """ Exit from transaction, recompute data and notify Listener Signals.
+        Event is emitted only once, at last notification and after data
+        recomputation.
+
+        Parameters
+        ----------
+        event: Not used
+        data: Not used
+
+        Returns
+        -------
+        Nothing
         """
         self.in_transaction = self.in_transaction - 1
         if self.in_transaction == 0:
@@ -338,20 +579,45 @@ class Signal(gobject.GObject):
             self.emit('end-transaction')
 
     def on_changed(self, event, data=None):
-        """ An Upper Signal changed, this one will have to be recomputed
+        """ Note that a Dependency Signal has changed, therefore data will
+        be recomputed.
+
+        Parameters
+        ----------
+        event: Not used
+        data: Not used
+
+        Returns
+        -------
+        Nothing
         """
         self.to_recompute = True
         # Here we might store which Signal changed
         self.emit('changed')
         
     def on_recompute(self, event, args=None):
-        """ Call again the function that was used to comoute the data of this
+        """ Replay the operation that was used to compute the data of this
         signal.
-        Args shall be a tuple containing:
-        op: operator or function to call, None for an assignation (v2 = v1)
-        s: first operand
-        other: second operand
-        out: (optional) output Signal, used for numpy.ufuncs
+        If operator is None, data is directly assigned to second operand data
+        If args contains 3 elements then operation is assumed to be arithmetics,
+        i.e. +,-,*,/
+        If args contains 4 elements, then operation is assumed to be a
+        numpy.ufunc
+
+        Parameters
+        ----------
+        event: Not used
+
+        args: tuple
+           Operator, operands and output to be used for the computation
+        [0] op: operator or function to call, None for an assignation (v2 = v1)
+        [1] s: first operand
+        [2] other: second operand
+        [3] out: (optional) output Signal, used for numpy.ufuncs
+
+        Returns
+        -------
+        Nothing
         """
         if not self.to_recompute or args is None:
             return
