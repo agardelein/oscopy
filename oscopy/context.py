@@ -1,49 +1,3 @@
-""" Interface between signals and figures
-
-Class Context: Commands callables from oscopy commandline
-
-   Methods:
-   __init__()
-   Create empty lists of figures, readers and signals
-
-   create(sns)
-   Create a new figure, and assign signals if provided
-
-   destroy(num)
-   Delete a figure
-
-   figures()
-   List of figures
-
-   read(fn)
-   Read signals from file fn
-
-   write(fn, fmt, sns, opts)
-   Write signals sns to file fn using format sns and options opts
-
-   update()
-   Reread all signals from files
-
-   freeze(sns)
-   Set the freeze flag of signals
-
-   unfreeze(sns)
-   Unset_ the freeze flag of signals
-
-   signals()
-   List all the signals
-
-   names_to_signals(sns)
-   Return a list of the signal names from the arguments provided by the user
-   Should not be called from the command line
-
-Abbreviations:
-sigs: dict of sigs
-sns : signal names
-opts: options
-fn  : filename
-"""
-
 from readers.detect_reader import DetectReader
 from readers.reader import ReadError
 from writers.detect_writer import DetectWriter
@@ -52,15 +6,35 @@ from figure import Figure
 import gobject
 
 class Context(gobject.GObject):
-    """ Class Context -- Interface between signals and figures
+    """ Class Context -- Interface between signals, files and figures
 
-    This object is the interface between the signals and the figures,
-    e.g. it handle operations on figures, signals, readers and writers.
-    It maintain a list of figures, a dict of reader and a dict of signals.
+This object is the interface between the signals, the files and the figures.
+It gathers operations on figures, signals, readers and writers and thus
+can be used for a program such ioscopy.
+It maintain a list of figures, a dict of reader and a dict of signals.
     
-    The keys for the signal dict are the signal name, as presented to the user
-    The keys for the reader dict are the file name.
-    """
+Signals are stored in a dict according to their user name (Signal.name)
+Files are stored in a dict according to their name
+
+Class Context -- Interface between signals, files and figures
+
+Properties
+   signals  read/write   Dict of Signals read
+   readers  read/write   Dict of Readers used
+   figures  read/write   Dict of Figures instanciated
+
+Signals
+   'begin-transaction' is received to notify that Dependancy Signal data is
+   being changed. Event re-emitted toward Listeners
+   'end-transaction' is emitted once the Result Signal data is recomputed
+   to notify Listeners that they can recompute their own data
+
+Abbreviations:
+   sigs: dict of sigs
+   sns : signal names
+   opts: options
+   fn  : filename
+   """
     __gsignals__ = {
         'begin-transaction': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
         'end-transaction': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ())
@@ -68,6 +42,14 @@ class Context(gobject.GObject):
 
     def __init__(self):
         """ Create the instance variables
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        Object instanciated
         """
         gobject.GObject.__init__(self)
         self._readers = {}
@@ -77,13 +59,18 @@ class Context(gobject.GObject):
         self._signal_name_to_reader = {}
         
     def create(self, sigs):
-        """ Create a new figure and set it as current
-        Can be either called from commandline or a function.
-        When called from commandline, call names_to_signals to retrieve
-        the signal list
-        When called from a function, if the argument is not a list
-        then return.
-        After those tests, the figure is created with the signal list.
+        """ Instanciate a new figure
+        No error reported if parameter type mismatches, silently does nothing
+
+        Parameters
+        ----------
+        sigs: string or list of signals
+        Contains the list of signals for the Figure instanciation
+        See also Figure.Figure()
+
+        Returns
+        -------
+        Nothing
         """
         if isinstance(sigs, list):
             # Called from commandline,
@@ -95,25 +82,49 @@ class Context(gobject.GObject):
                 sigs = {}
         elif not isinstance(sigs, dict):
             return
-        # toplot is now a list
         f = Figure(sigs)
         self._figures.append(f)
 
     def destroy(self, num):
         """ Delete a figure
-        User must provide the figure number.
-        If the number is out of range, then return
-        To avoid mixing numbers, just replace the figure by None in the list
+        If num is out of range issue an assertion.
+        Figure is replaced by None in the list to keep code simple
+        
+        Parameters
+        ----------
+        num: integer
+        The number of the figure to destroy
+
+        Returns
+        -------
+        Nothing
         """
         if num > len(self._figures) or num < 1:
             assert 0, _("Out of range figure number")
         self._figures[num - 1] = None
 
     def read(self, fn):
-        """ Read signals from file.
-        Duplicate signal names overwrite the previous one.
-        For new only gnucap files are supported.
-        Do not load the same file twice.
+        """ Read signals from file
+        Overwrite signals in case of Signal name conflict.
+        On success, Reader and Signals are added in the lists.
+
+        Parameters
+        ----------
+        fn: string
+        The file name
+
+        Returns
+        -------
+        sigs: Dict of Signals
+        List of Signals read from the file
+
+        Raises
+        ------
+        string
+        Do not read the same file twice
+
+        NotImplementedError
+        When the file type is not managed by any Reader
         """
         # File already loaded ?
         if fn in self._readers.keys():
@@ -135,6 +146,29 @@ class Context(gobject.GObject):
 
     def write(self, fn, fmt, sns, opts):
         """ Write signals to file
+
+        Parameters
+        ----------
+        fn: string
+        The file name
+
+        fmt: string
+        The file format
+
+        sns: dict of Signals
+        The Signals to record
+
+        opts: string
+        List of options to pass to the Writer
+
+        Returns
+        -------
+        Nothing
+
+        Raises
+        ------
+        NotImplementedError
+        When the file type is not managed by any Writer
         """
         # Create the object
         sigs = self.names_to_signals(sns)
@@ -149,8 +183,23 @@ class Context(gobject.GObject):
     def update(self, r=None, upn=-1):
         """ Reread signal from files.
         For each file, reread it, and for updated, new and deleted signal,
-        update the signal dict accordingly.
+        update the Signal dict accordingly.
         Act recursively.
+
+        Note: recursion is now deprecated by using GObject event system by
+        Signals, it will be removed in a future release
+
+        Parameters
+        ----------
+        r: Reader
+        Update Signals from this Reader only
+
+        upn: integer
+        Reserved for internal use (recursion) should always be the default value
+
+        Returns
+        -------
+        n: new Signals
         """        ## SUPPORT FOR UPDATE SINGLE READER
         n = {}    # New signals
         if upn == -1:
@@ -195,14 +244,32 @@ class Context(gobject.GObject):
             del self._signals[sn]
 
     def freeze(self, sns):
-        """ Set the freeze flag of signals
+        """ Set the freeze flag of signals, i.e. disable updates
+
+        Parameters
+        ----------
+        sns: dict of Signals
+        Signals list to be frozen
+
+        Returns
+        -------
+        Nothing
         """
         sigs = self.names_to_signals(sns)
         for s in sigs.itervalues():
             s.freeze = True
 
     def unfreeze(self, sns):
-        """ Unset the freeze flag of signals
+        """ Unset the freeze flag of signals, i.e. enable updates
+
+        Parameters
+        ----------
+        sns: dict of Signals
+        Signals list to be unfrozen
+
+        Returns
+        -------
+        Nothing
         """
         sigs = self.names_to_signals(sns)
         for s in sigs.itervalues():
@@ -210,12 +277,43 @@ class Context(gobject.GObject):
 
     @property
     def signals(self):
-        """ List loaded signals
+        """ Dict of loaded signals
+
+        Parameters
+        ----------
+        Nothing
+
+        Returns
+        -------
+        dict of Signals
+        List of Signals currently loaded in this Context
         """
         return self._signals
 
     def import_signal(self, sig, name):
-        """ Import a signal from outside oscopy context
+        """ Import a signal from outside this Context
+
+        Parameters
+        ----------
+        sig: Signal
+        Signal to be imported
+
+        name: string
+        Name to be assigned to the Signal in this Context
+
+        Returns
+        -------
+        ss: dict of Signals
+        Contains only one element, the Signal imported
+
+        Example
+        -------
+        >>> ctxt=oscopy.Context()
+        >>> ctxt.read('demo/tran.dat')
+        >>> ctxt.signals
+        >>> v1=oscopy.Signal('v1', 'V')
+        >>> ctxt.import_signal(v1, 'v1imported')
+        >>> ctxt.signals
         """
         r = DetectReader(sig)
         ss = r.read((sig, name))
@@ -231,6 +329,17 @@ class Context(gobject.GObject):
     def names_to_signals(self, sns):
         """ Return a signal dict from the signal names list provided
         If no signals are found, return {}
+        Use this function is reserved, will be made private in a future release
+
+        Parameters
+        ----------
+        sns: list of string
+        The list of name of Signals to retrieve
+
+        Returns
+        -------
+        sigs: dict of Signals
+        The list of Signals found in this Context
         """
         if not sns or not self._signals:
             return {}
@@ -251,10 +360,28 @@ class Context(gobject.GObject):
 
     @property
     def figures(self):
-        """ Return the figure list"""
+        """ Return the figure list
+
+        Parameters
+        ----------
+        Nothing
+
+        Returns
+        -------
+        List of Figures managed in this Context
+        """
         return self._figures
 
     @property
     def readers(self):
-        """ Return the reader list"""
+        """ Return the reader list
+
+        Parameters
+        ----------
+        Nothing
+
+        Returns
+        -------
+        List of Readers managed in this Context
+        """
         return self._readers

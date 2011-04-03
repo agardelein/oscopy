@@ -1,4 +1,10 @@
-""" Signal class definition
+import operator
+import numpy
+import gobject
+
+# Signal class
+class Signal(gobject.GObject):
+    """ Signal class definition
 
 A Signal contains a list of data points, with an identifier, a reference (abscisse) and a string representing the unit of the data.
 The Signal contains the ordinate values, while the abscisses are contained
@@ -43,13 +49,7 @@ Class Signal -- Contains the signal points and other information
            Transaction
        'end-transaction' is emitted once the Result Signal data is recomputed
        to notify Listeners that they can recompute their own data
-"""
-import operator
-import numpy
-import gobject
-
-# Signal class
-class Signal(gobject.GObject):
+       """
     __gsignals__ = {
         'changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
         'recompute': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),

@@ -1,3 +1,8 @@
+""" Definition of oscopy magic functions for ipython
+
+
+"""
+
 from __future__ import with_statement
 import IPython
 from IPython.demo import IPythonDemo
