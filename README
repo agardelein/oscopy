@@ -167,4 +167,4 @@ o_update
 o_write format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]
    Write signals to file
 
-
+numpy.ufuncs and numpy.fft functions are supported with their direct name.
