@@ -404,6 +404,13 @@ def do_import(self, args):
             return
 #    _globals.update(sigs)
 
+def do_context(self, args):
+    """context
+    Returns the context used by the module
+    """
+    global _ctxt
+    return _ctxt
+
 def get_signames(args):
     """ Return the signal names list extracted from the commandline
     The list must be a coma separated list of signal names.
@@ -541,7 +548,8 @@ def init():
                      'o_factors': do_factors,
                      'o_refresh': do_refresh,
                      'o_gui': do_gui,
-                     'o_import': do_import}
+                     'o_import': do_import,
+                     'o_context': do_context}
     
     for name, func in oscopy_magics.iteritems():
             ip.expose_magic(name, func)
