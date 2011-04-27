@@ -16,8 +16,6 @@ It maintain a list of figures, a dict of reader and a dict of signals.
 Signals are stored in a dict according to their user name (Signal.name)
 Files are stored in a dict according to their name
 
-Class Context -- Interface between signals, files and figures
-
 Properties
    signals  read/write   Dict of Signals read
    readers  read/write   Dict of Readers used
@@ -29,7 +27,7 @@ Signals
    'end-transaction' is emitted once the Result Signal data is recomputed
    to notify Listeners that they can recompute their own data
 
-Abbreviations:
+Abbreviations
    sigs: dict of sigs
    sns : signal names
    opts: options

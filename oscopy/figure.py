@@ -4,10 +4,19 @@ A figure consist of a list of up to 4 graphs, with a layout.
 Signal list are passed directly to each graph.
 Layout can be either all graphs stacked verticaly, horizontaly or in quad
 
-curgraph: alias to the current graph
-gn: graph number
-g: graph
-sn: signal name
+Properties
+   signals  read/write   Dict of Signals
+   graphs   read/write   List of Graphs
+   layout   read/write   String representing the layout
+   
+Signals
+   None
+
+Abbreviations
+   curgraph: alias to the current graph
+   gn:       graph number
+   g:        graph
+   sn:       signal name
 
 class:
 
@@ -46,18 +55,31 @@ from matplotlib.pyplot import Figure as MplFig
 from graphs import Graph, LinGraph
 
 class Figure(MplFig):
-
+    """ Manage figure and its layout
+    """
     def __init__(self, sigs={}, fig=None):
-        """ Create a Figure.
+        """ Instanciate a Figure.
         If a signal list is provided, add a graph with the signal list
-        By default, create an empty list of graph and set_ the layout to horiz
+        By default, create an empty list of graph and set the layout to horiz
+
+        Parameters
+        ----------
+        sigs: dict of Signals
+        If provided, the function instanciate the Figure with one Graph and
+        insert the Signals
+
+        fig: Not used
+
+        Returns
+        -------
+        The figure instanciated and initialized
         """
         MplFig.__init__(self)
 
         self._layout = "horiz"
         self._MODES_NAMES_TO_OBJ = {"lin":LinGraph}
         self._kid = None
-        # Slow way... Surely there exist something faster
+        # FIXME: Slow way... Surely there exist something faster
         self._OBJ_TO_MODES_NAMES = {}
         for k, v in self._MODES_NAMES_TO_OBJ.iteritems():
             self._OBJ_TO_MODES_NAMES[v] = k
@@ -74,6 +96,15 @@ class Figure(MplFig):
         Up to four graphs can be plotted on the same figure.
         Additionnal attemps are ignored.
         By default, do nothing.
+
+        Parameter
+        ---------
+        sigs: dict of Signals
+        The list of Signals to add
+
+        Returns
+        -------
+        Nothing
         """
         if len(self.axes) > 3:
             assert 0, _("Maximum graph number reached")
@@ -93,7 +124,15 @@ class Figure(MplFig):
     def delete(self, num=1):
         """ Delete a graph from the figure
         By default, delete the first graph.
-        Act as a "pop" with curgraph variable.
+
+        Parameter
+        ---------
+        num: integer
+        The position of the graph to delete
+
+        Returns
+        -------
+        Nothing
         """
         if not isinstance(num, int):
             assert 0, _("Bad graph number")
@@ -103,6 +142,22 @@ class Figure(MplFig):
         
     def update(self, u, d):
         """ Update the graphs
+        FIXME: This function is deprecated by the use of GObject event system
+        
+        For each Graph in the Figure, replace updated signals in u, and remove
+        deleted signals in d
+
+        Parameters
+        ----------
+        u: Dict of Signals
+        List of updated Signals to replace in the graphs
+        
+        d: Dict of Signals
+        List of deleted Signals to remove from the graphs
+
+        Returns
+        -------
+        Nothing
         """
         if not isinstance(u, dict):
             assert 0, _("Bad type")
@@ -121,10 +176,26 @@ class Figure(MplFig):
 
 #    def get_mode(self):
 #        """ Return the mode of the current graph"""
+#        FIXME: DISABLED AS ONLY ONE MODE CURRENTLY AVAILABLE
 #        return self._OBJ_TO_MODES_NAMES(self._current)
 
     def set_mode(self, args):
         """ Set the mode of the current graph
+        Replace the graph provided by a new one of other mode, i.e. copy the
+        Signals from it.
+        The graph is replaced in the Figure internal list of graphs
+
+        Parameters
+        ----------
+        args: tuple of (graph, gmode)
+           graph: graph
+           The graph to change
+           gmode: string
+           The new mode
+
+        Returns
+        -------
+        Nothing
         """
         # Currently this cannot be tested (only one mode available)
         old_graph = args[0]
@@ -135,15 +206,34 @@ class Figure(MplFig):
         self._graphs[self._graphs.index(old_graph)] = g
 
     def get_layout(self):
-        """ Return the figure layout"""
+        """ Return the figure layout
+
+        Parameter
+        ---------
+        Nothing
+
+        Returns
+        -------
+        string
+        The name of the current layout
+        """
         return self._layout
 
     def set_layout(self, layout="quad"):
-        """ Set the layout of the figure, default is quad
-        horiz : graphs are horizontaly aligned
-        vert  : graphs are verticaly aligned
-        quad  : graphs are 2 x 2 at maximum
+        """ Set the layout of the figure, default is 'quad'
+        'horiz' : graphs are horizontaly aligned
+        'vert'  : graphs are verticaly aligned
+        'quad'  : graphs are 2 x 2 at maximum
         Other values are ignored
+
+        Parameters
+        ----------
+        layout: string
+        One of ['horiz'|'vert'|'quad']. Default is 'quad'
+
+        Returns
+        -------
+        Nothing
         """
         # To change the layout: use ax.set_position
 
@@ -156,6 +246,18 @@ class Figure(MplFig):
             g.set_position(self._graph_position(gn))
 
     def draw(self, canvas):
+        """ Draw the Figure
+        Wrapper to parent class function. Set also the key_press_event callback
+
+        Parameter
+        ---------
+        canvas: Canvas
+        Canvas to use to draw the figure
+
+        Returns
+        -------
+        tmp: Value returned by parent class function call
+        """
         tmp = MplFig.draw(self, canvas)
         if not self._kid:
             self._kid = self.canvas.mpl_connect('key_press_event', self._key)
@@ -166,6 +268,15 @@ class Figure(MplFig):
         """ Handle key press event
         1, 2: toggle vertical cursors #0 and #1
         3, 4: toggle horizontal cursors #0 and #1
+
+        Parameter
+        ---------
+        event: Matplotlib Event
+        The event that triggered the call-back
+
+        Returns
+        -------
+        Nothing
         """
         if event.inaxes is None:
             return
@@ -192,7 +303,17 @@ class Figure(MplFig):
         event.canvas.draw()
 
     def _graph_position(self, num):
-        """ Compute the position of the graph upon its number
+        """ Compute the position of the graph upon its number and the layout
+
+        Parameter
+        ---------
+        num: integer
+        The position of the graph in the list
+
+        Returns
+        -------
+        array of 4 floats
+        The coordinates of the graph
         """
         # 1 graph: x:0->1 y:0->1   dx=1 dy=1
         # 3 graphs horiz: x:0->.333 y:0->1 dx=.333 dy=1
@@ -222,6 +343,15 @@ class Figure(MplFig):
     @property
     def signals(self):
         """ Return the list of signals in all graphs
+        Generator function.
+
+        Parameter
+        ---------
+        Nothing
+
+        Returns
+        -------
+        A list of the signals contained in all graphs
         """
         for g in self.axes:
             for sn in g.get_signals():
@@ -229,7 +359,16 @@ class Figure(MplFig):
 
     @property
     def graphs(self):
-        """ Return the graph list """
+        """ Return the graph list
+        
+        Parameter
+        ---------
+        Nothing
+
+        Returns
+        -------
+        The list of graphs
+        """
         return self.axes
 
     layout = property(get_layout, set_layout)
