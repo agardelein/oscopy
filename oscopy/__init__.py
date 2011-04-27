@@ -20,6 +20,10 @@ __builtin__._ = gettext.gettext
 
 gobject.type_register(signal.Signal)
 
-if hasattr(globals(), '__IPYTHON__'):
+try:
+    __IPYTHON__
+except NameError:
+    pass
+else:
     import ioscopy
     ioscopy.init()
