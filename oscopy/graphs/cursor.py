@@ -1,32 +1,30 @@
-""" Handle cursors in plots
-
+class Cursor(object):
+    """ Class Cursor -- Handle cursors in plots
 A cursor is an horizontal or vertical line drawn across the plot,
 depending on type, either "horiz" or "vert".
 The line position depends on the value.
 It can be visible or not.
 It contains an alias to the Line2D object in the plot.
 
-methods:
-   __init__(val, type):
-   Create the object
-
-   draw(ax, num):
-   Draw the cursor on the Axe ax with line style depending on num.
-   If num is 0 then use solid line else use dashed style.
-
-   [get_|set_]_[value|visible|type](...)
-   Accessors to the object members
-
-   __str()__
-   Return a string containing the main values of the object
-"""
-
-class Cursor(object):
-    """ Handle cursors
-    Cursor can be visible or not, type "horiz" or "vert"
+The purpose of this class is also to be derived to propose other types or
+styles of cursors e.g. the ones used on modern scopes or spectrum analysers.
     """
     def __init__(self, val, type):
-        """ Set values
+        """ Instanciate the Cursor values
+
+        Parameters
+        ----------
+        val: float
+        The position of the cursor on the Graph
+
+        type: string, one of ['horiz', 'vert']
+        The type of the Cursor. 'horiz' for an horizontal line drawn accross the
+        graph, 'vert' for a vertical line.
+
+        Returns
+        -------
+        Cursor:
+        The instanciated object
         """
         self.set_value(val)
         self.set_visible(True)
@@ -36,6 +34,18 @@ class Cursor(object):
     def draw(self, ax=None, num=0):
         """ Draw cursor on axis ax, num is the linestyle 0 for solid,
         non-zero for dashed
+
+        Parameters
+        ----------
+        ax: Graph
+        The Graph where to draw the cursor
+
+        num: integer
+        0 for solid, non-zero for dashed
+
+        Returns
+        -------
+        Nothing
         """
         # Check whether cursor is within the axis limits
         if self._type == "horiz":
@@ -83,27 +93,90 @@ class Cursor(object):
             pass
 
     def get_type(self):
+        """ Returns the type of the Cursor
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        string: one of ['horiz' or 'vert']
+        The type of the Cursor
+        """
         return self._type
 
     def get_value(self):
+        """ Returns the location of the Cursor on the Graph
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        float
+        The position of the cursor. For 'horiz' type, this is the 'Y' coordinate
+        and for 'vert' type, this is the 'X' coordinate
+        """
         return self._value
 
     def get_visible(self):
+        """ Returns whether the Cursor is displayed or not
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        bool
+        True if the cursor is displayed on the Graph
+        """
         return self._visible
 
     def set_type(self, type=""):
+        """ Set the type of the Cursor
+
+        Parameter
+        ---------
+        type: string, one of  'horiz' or 'vert'
+        The type of the Cursor
+
+        Returns
+        -------
+        Nothing
+        """
         if type == "horiz" or type == "vert":
             self._type = type
         else:
             assert 0, _("Bad type")
 
     def set_value(self, val=None):
+        """ Define the location of the Cursor
+
+        Parameter
+        ---------
+        val: float
+        The position of the cursor. For 'horiz' type, this is the 'Y' coordinate
+        and for 'vert' type, this is the 'X' coordinate
+
+        Returns
+        -------
+        Nothing
+        """
         if val is not None:
             self._value = val
 
     def set_visible(self, vis=None):
         """ Toggle status if called without argument
-        otherwise set_ to the value
+        otherwise set to the value
+
+        Parameter
+        ---------
+        vis: bool or None
+        True if the cursor shall be displayed on the Graph
+        None to toggle the status
         """ 
         if isinstance(vis, bool):
             # Set
@@ -120,5 +193,17 @@ class Cursor(object):
     visible = property(get_visible, set_visible)
 
     def __str__(self):
+        """ Representation string of the Cursor
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        string:
+        The representation of the Cursor
+        'val: XXXX type: YYYYY vis: ZZZZZ'
+        """
         return "val:" + str(self._value) + " type:" + self._type \
             + " vis:" + str(self._visible)
