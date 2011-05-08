@@ -1,53 +1,3 @@
-""" Graph Handler
-
-A graph consist of several signals that share the same abscisse,
-and plotted according a to mode, which is currently scalar.
-
-Signals are managed as a dict, where the key is the signal name.
-
-In a graph, signals with a different sampling, but with the same abscisse
-can be plotted toget_her.
-
-Handle a cursor dict, for convenience limited to two horizontal
-and two vertical, limit can be removed. 
-
-sn: signal name
-s : signal
-
-Class Graph -- Handle the representation of a list of signals
-
-   methods:
-   __init__(sigs)
-      Create a graph and fill it with the sigs
-
-   __str__()
-      Return a string with the list of signals, and abscisse name
-
-   insert(sigs)
-      Add signal list to the graph, set_ the abscisse name
-
-   remove(sigs)
-      Delete signals from the graph
-
-   plot()
-      Plot the graph
-
-   signals()
-      Return a list of the signal names
-
-   type()
-      Return a string with the type of graph, to be overloaded.
-
-   set_units()
-      Define the axis unit
-
-   set_scale()
-      Set plot axis scale (lin, logx, logy, loglog)
-
-   set_range()
-      Set plot axis range
-"""
-
 from matplotlib.pyplot import Axes as mplAxes
 from matplotlib import rc
 from cursor import Cursor
@@ -71,11 +21,54 @@ names_to_factors = {'exa':18, 'peta':15, 'tera':12, 'giga':9, 'mega':6,
 
 
 class Graph(mplAxes):
+    """Class Graph -- Handle the representation of a list of signals
+
+A graph consist of several signals that share the same abscisse,
+and plotted according a to mode, which is currently scalar.
+
+Signals are managed as a dict, where the key is the signal name.
+
+In a graph, signals with a different sampling, but with the same abscisse
+can be plotted toget_her.
+
+Handle a cursor dict, for convenience limited to two horizontal
+and two vertical, limit can be removed.
+
+Derives from matplotlib.pyplot.Axes
+
+Properties
+   scale:         axis type (linear, logx, logy, loglog)
+   range:         limits of the view area
+   unit:          axis unit
+   scale_factors: data scaling value
+
+Abbreviations
+   sn: signal name
+   s : signal
+   """
     def __init__(self, fig, rect, sigs={}, **kwargs):
         """ Create a graph
         If signals are provided, fill in the graph otherwise the graph is empty
         Signals are assumed to exist and to be valid
-        If first argument is a Graph, then copy things
+        If first argument is a Graph, then copy act as a copy constructor
+
+        Parameters
+        ----------
+        fig: matplotlib.figure.Figure
+        Figure where to build the Graph
+
+        rect: array of 4 floats
+        Coordinates of the Graph
+
+        sigs: dict of Signals
+        List of Signals to insert once the Graph instanciated
+
+        See also matplotlib.pyplot.Axes for list of keyword arguments
+
+        Returns
+        -------
+        self: Graph
+        The Graph instanciated
         """
         mplAxes.__init__(self, fig, rect, **kwargs)
         self._sigs = {}
@@ -105,7 +98,16 @@ class Graph(mplAxes):
             self.insert(sigs)
 
     def __str__(self):
-        """ Return a string with the type and the signal list of the graph
+        """ Returns a string with the type and the signal list of the graph
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        a: string
+        A string representation of the Graph
         """
         a = "(" + self.type + ") "
         for sn in self._sigs.keys():
@@ -116,7 +118,18 @@ class Graph(mplAxes):
         """ Add a list of signals into the graph
         The first signal to be added defines the abscisse.
         The remaining signals to be added must have the same abscisse name,
-        otherwise they are ignored
+        otherwise they are silently ignored.
+        Returns the list of ignored signals
+
+        Parameters
+        ----------
+        sigs: dict of Signals
+        List of Signals to be inserted in the Graph
+
+        Returns
+        -------
+        rejected: dict of Signals
+        List of Signals that where not inserted
         """
         rejected = {}
         for sn, s in sigs.iteritems():
@@ -156,6 +169,16 @@ class Graph(mplAxes):
 
     def remove(self, sigs={}):
         """ Delete signals from the graph
+
+        Parameters
+        ----------
+        sigs: dict of string
+        List of Signal names to be removed
+
+        Returns
+        -------
+        integer
+        The number of Signals remaining in the Graph
         """
         for sn in sigs.iterkeys():
             if sn in self._sigs.keys():
@@ -167,7 +190,16 @@ class Graph(mplAxes):
         return len(self._sigs)
 
     def update_signals(self):
-        """
+        """ Force the redrawing of the Graph
+        To be used after update of Signals
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        Nothing
         """
         for sn, s in self._sigs.iteritems():
             fx, l = self._find_scale_factor("X")
@@ -181,6 +213,23 @@ class Graph(mplAxes):
         """ Choose the right scale for data on axis a
         Return the scale factor (f) and a string with the label. (l)
         E.g. for data from 0.001 to 0.01 return 3 and "m" for milli-
+        If the scale factor do not have a string equivalent, then
+        the label is expressed in terms of '10ef'
+        Compute only a scale factor if the corresponding self._scale_factor
+        is None.
+
+        Parameters
+        ----------
+        a: string ('X' or 'Y')
+        The name of the axis to use
+
+        Returns
+        -------
+        tuple (f, l):
+            f: float
+            The power of ten found (e.g. 3 for 1000)
+            l: string
+            The label corresponding to the factor (e.g. 'k' for 1000)
         """
         if a == "X" and self._scale_factors[0] is not None:
             return self._scale_factors[0], factors_to_names[-self._scale_factors[0]][0]
@@ -202,6 +251,7 @@ class Graph(mplAxes):
         mx = max(mx, mn)
 
         # Find the scaling factor using the absolute maximum
+        # fct: factor step to be used during the search
         if abs(mx) > 1:
             fct = -3
         else:
@@ -210,24 +260,55 @@ class Graph(mplAxes):
         while not (abs(mx * pow(10.0, f)) < 1000.0 \
                        and abs(mx * pow(10.0, f)) >= 1.0):
             f = f + fct
+
+        # Find the label corresponding to the factor
         if factors_to_names.has_key(-f) and \
                 ((self._xunit != "" and a == "X") or \
                      (self._yunit != "" and a != "X")):
             l = factors_to_names[-f][0]
         else:
             if f == 0:
+                # No factor
                 l = ""
             else:
+                # No no label found, use 10^f
                 l = "10e" + str(-f) + " "
         return f, l
 
     def get_unit(self):
-        """ Return the graph units """
+        """ Return the graph units
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        tuple:
+           string: X unit
+           string: Y unit
+        """
         return self._xunit, self._yunit
 
     def set_unit(self, unit):
         """ Define the graph units. If only one argument is provided,
         set y axis, if both are provided, set both.
+        By default, set 'a.u.' for absolute unit.
+        Pre-appends the scale factor label to the unit.
+
+        Parameter
+        ---------
+        unit: string or tuple of 2 strings
+           string: the Y axis unit
+           tuple of 2 strings:
+               x: string
+               the X axis unit
+               y: string
+               the Y axis unit
+
+        Returns
+        -------
+        Nothing
         """
         if isinstance(unit, tuple):
             if len(unit) == 1 or (len(unit) == 2 and not unit[1]):
@@ -260,6 +341,15 @@ class Graph(mplAxes):
 
     def get_scale(self):
         """ Return the axes scale
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        string:
+        The axes scale [lin|logx|logy|loglog]
         """
 #        return self._FUNC_TO_SCALES[self._plotf]
         # Is there a better way?
@@ -276,6 +366,19 @@ class Graph(mplAxes):
 
     def set_scale(self, scale):
         """ Set axes scale, either lin, logx, logy or loglog
+        lin:    Both X and Y linear scale
+        logx:   X log scale and Y linear scale
+        logy:   X linear scale and Y log scale
+        loglog: Both X and Y log scale
+
+        Parameter
+        ---------
+        scale: string
+        One of ['lin'|'logx'|'logy'|'loglog']
+
+        Returns
+        -------
+        Nothing
         """
         SCALES_TO_STR = {"lin": ["linear", "linear"],\
                              "logx": ["log","linear"],\
@@ -286,17 +389,43 @@ class Graph(mplAxes):
 
     def get_range(self):
         """ Return the axes limits
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        tuple:
+           array of two floats: X axis limits
+           array of two floats: Y axis limits
         """
         self._xrange = mplAxes.get_xlim(self)
         self._yrange = mplAxes.get_ylim(self)
         return self._xrange, self._yrange
 
     def set_range(self, arg="reset"):
-        """ Set axis range
-        Form 1: set_range("reset")                  delete range specs
-        Form 2: set_range(("x", [xmin, xmax]))      set range for x axis
-                set_range(("y", [ymin, ymax]))      set range for y axis
+        """ Set axis range, i.e. the Graph limits
+        Form 1: set_range('reset')                  delete range specs
+        Form 2: set_range(('x', [xmin, xmax]))      set range for x axis
+                set_range(('y', [ymin, ymax]))      set range for y axis
         Form 3: set_range([xmin, xmax, ymin, ymax]) set range for both axis
+
+        Parameters
+        ----------
+        string or tuple or array of 4 floats:
+           string: 'reset'
+           tuple:
+              string: either 'x' or 'y'
+              The axis to use
+              array of two floats: [min, max]
+              The range limits
+           array of 4 floats: [xmin, xmax, ymin, ymax]
+              The range for X and Y axis respectively
+
+        Returns
+        -------
+        Nothing
         """
         if arg == "reset":
             # Delete range specs
@@ -324,7 +453,22 @@ class Graph(mplAxes):
     def toggle_cursors(self, ctype="", num=None, val=None):
         """ Toggle the cursors in the graph
         Call canvas.draw() shoud be called after to update the figure
-        cnt: cursor type
+        In case of wrong parameter, silently returns
+
+        Parameters
+        ----------
+        ctype: string, one of ['horiz', 'vert']
+        The cursor type
+
+        num: integer
+        The cursor number
+
+        val: float
+        The position of the cursor
+
+        Returns
+        -------
+        Nothing
         """
         if not ctype or num is None or val is None:
             return
@@ -342,12 +486,21 @@ class Graph(mplAxes):
             self._cursors[ctype][num].set_visible()
             self._cursors[ctype][num].draw(self)
         self._print_cursors()
+        # FIXME: What's the use of the two following lines ?
         fx, lx = self._find_scale_factor("X")
         fy, ly = self._find_scale_factor("Y")
 
     def _draw_cursors(self):
         """ Draw the cursor lines on the graph
         Called at the end of plot()
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        Nothing
         """
         fx, lx = self._find_scale_factor("X")
         fy, ly = self._find_scale_factor("Y")
@@ -360,10 +513,25 @@ class Graph(mplAxes):
 
     def _set_cursor(self, ctype, num, val):
         """ Add a cursor to the graph
+
+        Parameters
+        ----------
+        ctype: string, one of ['horiz', 'vert']
+        The cursor type
+
+        num: integer
+        The cursor number
+
+        val: float
+        The position of the cursor
+
+        Returns
+        -------
+        Nothing        
         """
         if ctype in ["horiz", "vert"]:
             if num >= 0 and num < 2:
-                # Just handle two cursor
+                # Just handle two cursors
                 self._cursors[ctype][num] = Cursor(val, ctype)
                 self._cursors[ctype][num].draw(self, num)
             else:
@@ -373,14 +541,22 @@ class Graph(mplAxes):
 
     def _print_cursors(self):
         """ Print cursors values on the graph
-        If both cursors are set_, print difference (delta)
+        For each axis, if both cursors are set then print difference (delta)
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        Nothing
         """
         fx, lx = self._find_scale_factor("X")
         fy, ly = self._find_scale_factor("Y")
         l = {"horiz": ly, "vert": lx}
         u = {"horiz": self._yunit, "vert": self._xunit}
         txt = {"horiz": "", "vert": ""}
-        # Preapre string for each cursor type (i.e. "horiz" and "vert")
+        # Prepare string for each cursor type (i.e. "horiz" and "vert")
         for t, cl in self._cursors.iteritems():
             for c in cl:
                 if c is not None and c.visible:
@@ -406,6 +582,15 @@ class Graph(mplAxes):
     @property
     def signals(self):
         """ Return a list of the signal names
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        dict of Signals
+        The Signal list contained in the Graph
         """
         return self._sigs
 
@@ -413,21 +598,62 @@ class Graph(mplAxes):
     def type(self):
         """ Return a string with the type of the graph
         To be overloaded by derived classes.
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        string:
+        The type of the graph
         """
         return
 
     @property
     def axis_names(self):
-        """Return the axis name"""
+        """Return the axis name
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        array of two strings: [Xname, Yname]
+        X and Y axis name
+        """
         return [self._xaxis, self._yaxis]
 
     def get_scale_factors(self):
-        """Return the scane factors names"""
+        """ Return the scale factors values
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        array of two floats: [Xfactor, Yfactor]
+        X and Y axis factors
+        """
         fx, lx = self._find_scale_factor('X')
         fy, ly = self._find_scale_factor('Y')
         return [-fx, -fy]
 
     def set_scale_factors(self, x_factor, y_factor):
+        """ Define the scale factor of the graph
+        Ignore parameters when set to None
+
+        Parameters
+        ----------
+        x_factor: float or None
+        y_factor: float or None
+
+        Returns
+        -------
+        Nothing
+        """
         old_fx, lx = self._find_scale_factor('X')
         old_fy, ly = self._find_scale_factor('Y')
         if x_factor is not None:
