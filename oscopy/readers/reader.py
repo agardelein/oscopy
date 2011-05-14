@@ -1,29 +1,4 @@
 """ Common file read functions
-
-Class Reader -- Define the common functions for reader objects
-
-   methods:
-   read(fi)
-      Check if the file can be opened before calling _read_signals(),
-
-   _read_signals()
-      To be defined into the derived objects
-      Read the signals from the file, fill slist
-      and return a dict of the signals, with the signame as key.
-
-   update()
-      Reread the file and return a dict of the reread signals,
-      toget_her with a list of the updated, deleted and added signals
-
-   detect(fn)
-      Return  if the object recognize the file
-
-   _check(fn)
-      Raise ReadError exception if file fn is not accessible
-
-   __str__()
-      Return the filename
-
 """
 
 import os.path
@@ -256,6 +231,20 @@ Signals
     def _check(self, fn):
         """ Check if the file is accessible
         Raise ReadError exception if not accessible
+
+        Parameter
+        ---------
+        fn: string
+        Path to the file to validate
+
+        Returns
+        -------
+        Nothing
+
+        Raises
+        ------
+        ReadError
+        In case the path does not exist or is not a regular file
         """
         if not fn:
             raise ReadError(_("No file specified"))
