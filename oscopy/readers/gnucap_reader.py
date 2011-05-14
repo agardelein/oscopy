@@ -1,5 +1,11 @@
 from __future__ import with_statement
-""" Read gnucap output files
+
+import re
+from oscopy import Signal
+from reader import Reader
+
+class GnucapReader(Reader):
+    """ Read gnucap output files
 
 Gnucap files are ordered by columns, one signal by column.
 The first column contains the abscisse values and the remainind the signals
@@ -10,24 +16,7 @@ The signal name is composed of the probe type v, i, ... and the node name
 between parenthesis.
 The signal name presented to the user is the one read from the file with the
 parenthesis stripped, e.g. v(gs) -> vgs or i(Rd) -> iRd.
-
-Class GnucapReader:
-   method:
-   _read_signals():
-   Read the signals from a file to gnucap output format.
-
-   _unit_from_probe():
-   Return the unit of the signal deduced from the probe name
-
-   detect():
-   Return true if the file is gnucap format
-"""
-
-import re
-from oscopy import Signal
-from reader import Reader
-
-class GnucapReader(Reader):
+    """
     # A dictionary mapping gnucap probe names to units.
     # For now only element probes.
     PROBE_UNITS = {"v":"V", "vout":"V", "vin":"V", "i":"A", "p":"W",
@@ -41,6 +30,21 @@ class GnucapReader(Reader):
         is the first column.
         Then read the data values, and finally, assign the abscisse and
         data to each signal.
+
+        Parameter
+        ---------
+        fn: string
+        The filename
+
+        Returns
+        -------
+        Dict of Signals
+        The list of Signals read from the file
+
+        Raises
+        ------
+        ReaderError
+        In case of invalid path or unsupported file format
         """
         units = []
         names = []
@@ -83,12 +87,32 @@ class GnucapReader(Reader):
         The unit is deduced from the probe name as described in the
         gnucap documentation:
         http://www.gnu.org/software/gnucap/gnucap-man-html/gnucap-man046.html
+
+        Parameter
+        ---------
+        probe_name: string
+        the name of the probe found in the file header
+
+        Returns
+        -------
+        string
+        The unit deduced from the probe name.
         """
         return GnucapReader.PROBE_UNITS.get(probe_name, '')
 
     def detect(self, fn):
         """ Look at the header, if it if something like
         #Name probe(name)
+
+        Parameter
+        ---------
+        fn: string
+        Path to the file to test
+
+        Returns
+        -------
+        bool
+        True if the file can be handled by this reader
         """
         self._check(fn)
         try:
@@ -97,5 +121,5 @@ class GnucapReader(Reader):
             return False
         s = f.readline()
         f.close()
-        # A regex which looks at all probe should be better !
+        # A regex which looks at all probes should be better !
         return len(re.findall('^#\w+\s+[\w\(\)]+', s)) > 0
