@@ -8,6 +8,11 @@ It contains an alias to the Line2D object in the plot.
 
 The purpose of this class is also to be derived to propose other types or
 styles of cursors e.g. the ones used on modern scopes or spectrum analysers.
+
+Properties
+    value     location of the cursor
+    visible   display the cursor when drawing its Graph
+    type      cursor orientation (horiz, vert)
     """
     def __init__(self, val, type):
         """ Instanciate the Cursor values
