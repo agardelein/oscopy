@@ -1,30 +1,27 @@
 from __future__ import with_statement
-""" Export signals to Gnucap format
-
-class GnucapWriter -- Handle gnucap format
-
-   _get_format_name()
-   Return 'gnucap'
-
-   _format_check()
-   Return True if all signals have the same reference
-
-   write_signals()
-   Write the signals to file
-
-   format_sig_name()
-   Convert signal name to gnucap format e.g. vgs -> v(gs)
-"""
 
 import itertools
 from writer import Writer
 
 class GnucapWriter(Writer):
-    """ Write signals to columns tab separated format used by Gnucap
+    """ Class GnucapWriter -- Handle gnucap format export
+
+    Write signals to columns tab separated format used by Gnucap
     Signals should have the same reference
     """
 
     def __init__(self):
+        """ Instanciate the Reader
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        GnucapWriter
+        The object instanciated
+        """
         super(GnucapWriter, self).__init__()
         self._prefixes = ['v', 'vout', 'vin', 'i', 'p', 'nv', 'ev', 'r', 'y',
                           'z', 'zraw', 'pd', 'ps', 'f', 'input', 'ioffset_',
@@ -34,11 +31,30 @@ class GnucapWriter(Writer):
 
     def _get_format_name(self):
         """ Return the format name
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        string
+        The format identifier
         """
         return 'gnucap'
 
     def _format_check(self, sigs):
         """ Check if all signals have the same reference
+
+        Parameter
+        ---------
+        sigs: dict of Signals
+        The Signal list to write
+
+        Returns
+        -------
+        bool
+        True if no issue found to write the Signal list in this format
         """
         if not sigs:
             return False
@@ -58,6 +74,14 @@ class GnucapWriter(Writer):
         1.234   1.234   1.234  1.234
         ...
 
+        Parameter
+        ---------
+        sigs: dict of Signals
+        The list of Signals to write
+
+        Returns
+        -------
+        Nothing
         """
         SEPARATOR = '\t'
         # Overwrite file or not
@@ -82,8 +106,18 @@ class GnucapWriter(Writer):
                 f.write('%s\n' % SEPARATOR.join(map(str, x)))
 
     def format_sig_name(self, name):
-        """ Add parenthesis in the signal name to be compatible
-        with gnucap format
+        """ Convert signal name to gnucap format e.g. vgs -> v(gs)
+        Add parenthesis in the signal name to be compatible with gnucap format
+
+        Parameter
+        ---------
+        name: string
+        The name of the Signal to convert
+
+        Returns
+        -------
+        name: string
+        The converted name
         """
         for p in self._prefixes:
             if name.startswith(p):
