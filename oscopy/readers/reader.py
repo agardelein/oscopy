@@ -1,13 +1,5 @@
 """ Common file read functions
 
-Class ReadError -- Errors encountered when loading file
-   methods:
-   __init__(value)
-      Assign the error message
-
-   __str__()
-      Return a string with the error message
-
 Class Reader -- Define the common functions for reader objects
 
    methods:
@@ -39,15 +31,60 @@ import time
 import gobject
 
 class ReadError(Exception):
+    """
+Class ReadError -- Errors encountered when loading file
+methods:
+    __init__(value)
+      Assign the error message
+
+    __str__()
+      Return a string with the error message
+
+    """
     def __init__(self, value):
+        """ Assign the error message
+
+        Parameter
+        ---------
+        Value: string
+        The error message
+
+        Returns
+        -------
+        ReaderError
+        The object instanciated
+        """
         self._value = value
 
     def __str__(self):
+        """ Returns the error message
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        string
+        The error message
+        """
         return self._value
 
 class Reader(gobject.GObject):
-    """ Reader -- Provide common function for signal file reading
-    The derived class must redefine _read_signals() and detect()
+    """ Reader -- Provide common function for Signal files reading
+Derives from GObject.GObject
+The purpose of this class is to provide some basic functions to read the Signals
+from files (file validation, update process) thus simplifying the definition of
+Readers for many different file formats.
+The derived class must redefine _read_signals() and detect().
+
+Properties
+    signals     The list of Signal handled by the class
+    info        Various informations on the reader (last time read...)
+
+Signals
+    begin-transation    File is being re-read from disk and Signals updated
+    end-transaction     Operation completed, Signals updated
     """
     __gsignals__ = {
         'begin-transaction': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
@@ -55,15 +92,41 @@ class Reader(gobject.GObject):
         }
 
     def __init__(self):
+        """ Instanciate the Reader
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        Reader
+        The object instanciated
+        """
         gobject.GObject.__init__(self)
         self._fn = ""          # file name
-        self._signals = {}
+        self._signals = {}     # Internal Signal list
         self._update_num = -1  # Update number
-        self._info = {}
+        self._info = {}        # Misc information (e.g. last update timestamp)
 
-    # Certify the path is valid and is a file
     def read(self, fn):
-        """ Check if the path is a valid file and call _read_signals
+        """ Validate the file and read the Signals from the file.
+        This function call _check() and _read_signals().
+
+        Parameter
+        ---------
+        fn: string
+        The filename
+
+        Returns
+        -------
+        Dict of Signals
+        The list of Signals read from the file
+
+        Raises
+        ------
+        ReaderError
+        In case of invalid path or unsupported file format
         """
         self._check(fn)
         self._fn = fn
@@ -77,22 +140,45 @@ class Reader(gobject.GObject):
     def _read_signals(self):
         """ Read the signal list from the file, fill self.slist
         and return a dict of the signals, with the signal name as a key
+        When this function is called self._fn is already initialized with the
+        filename and the filename is valid.
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        Dict of Signals
+        The list of Signals read from the file
         """
         return {}
 
     # Re-read the data file
     # Return signal list and names of updated, deleted and new signals
     def update(self, upn, keep=True):
-        """ On new update requests (upn > self._update_num), reread the file
-        and update self._signals.
-        Update signals, but if unit or reference is not found,
-        mark signal as being deleted if keep is False (see below)
-        If _read_signals returns nothing (file is deleted or whatever), all
-        signals are considered deleted
-        If signal is not found or either reference or unit changed, de
-        If keep is False, the signal is marked as being deleted, i.e. its
-        data set to None
-        Return dict of new signals
+        """ On new update requests, reread the file and update self._signals.
+        Existing Signals are marked as being deleted if 'keep' is False
+        and either:
+           * Signal not found
+           * Unit or reference of the Signal is not found
+           * Unit or reference of the Signal has changed
+           * _read_signals returns an empty dictionnary
+        
+        Parameters
+        ----------
+        upn: integer
+        Update request identifier. If upn > self._update_num then this is a new
+        request.
+
+        keep: bool
+        When True Signals marked as being deleted are removed from the interal
+        Signal list
+
+        Returns
+        -------
+        n: dict of Signals
+        The list of new Signals
         """
         # FIXME: Hmmm... it seems the temporary signals are not deleted, i.e.
         # the ones that are reread but already existing.
@@ -153,6 +239,17 @@ class Reader(gobject.GObject):
 
     def detect(self, fn):
         """ Check if the file provided can be read by this object
+        This function shall be redefined in derived class
+
+        Parameter
+        ---------
+        fn: string
+        Path to the file to test
+
+        Returns
+        -------
+        bool
+        True if the file can be handled by this reader
         """
         return False
 
@@ -168,25 +265,79 @@ class Reader(gobject.GObject):
             raise ReadError(_("File is not a file"))
 
     def __str__(self):
-        """ Return the signal name.
+        """ Return the path to the file.
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        string
+        The path to the file
         """
         return self._fn
 
     @property
     def signals(self):
-        """ Return the list of signals names
+        """ Return the list of Signals
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        dict of Signals
+        The list of Signals
         """
         return self._signals
 
     @property
     def info(self):
-        """ Return the reader infos"""
+        """ Return the reader infos
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        dict of various data where keys are strings
+        Information on file (e.g. last update timestamp)
+        """
         return self._info
 
     def on_begin_transaction(self, event):
+        """ Go to transaction, notify Listener Signals that this Reader might be
+        changed
+        Event is emitted only once, at first notification.
+
+        Parameters
+        ----------
+        event: Not used
+        data: Not used
+
+        Returns
+        -------
+        Nothing
+        """
         self.in_transaction = True
         self.emit('begin-transaction')
 
     def on_end_transaction(self, event):
+        """ Exit from transaction and notify Listener Signals.
+        Event is emitted only once, at last notification and after data
+        recomputation.
+
+        Parameters
+        ----------
+        event: Not used
+        data: Not used
+
+        Returns
+        -------
+        Nothing
+        """
         self.in_transaction = False
         self.emit('end-transaction')
