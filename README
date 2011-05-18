@@ -81,14 +81,14 @@ oadd SIG [, SIG [, SIG]...]
 ocreate [SIG [, SIG [, SIG]...]]
    Create a new figure, set_ it as current, add the signals
 
+ocontext
+   Return the Context object used within ioscopy
+
 odelete GRAPH#
    Delete a graph from the current figure
 
 odestroy FIG#
    Destroy a figure
-
-oecho [TEXT]
-   Print text
 
 oexec FILENAME
    execute commands from file
@@ -122,26 +122,19 @@ oinsert SIG [, SIG [, SIG]...]
 olayout horiz|vert|quad
    Define the layout of the current figure
 
-omath destsig=mathexpr
-   Define a new signal destsig using mathematical expression
-   destsig=mathexpr is also valid.
-
 omode MODE
    Set the type of the current graph of the current figure
    Available modes :
    lin      Linear graph
-
-opause
-   Wait for the user to press enter
-
-oplot
-   Draw and show the figures (disabled in the GUI)
 
 orange [x|y min max]|[xmin xmax ymin ymax]|[reset]
    Set the axis range of the current graph of the current figure
 
 oread DATAFILE
    Read signal file
+
+orefresh FIG#|on|off|current|all
+   Force/toggle autorefresh of current/#/all figures on update
 
 oremove SIG [, SIG [, SIG]...]
    Delete a list of signals into from current graph
