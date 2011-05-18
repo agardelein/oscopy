@@ -1,47 +1,47 @@
 # Test all function, hard way; Use datafiles from demo/
 print "Read files..."
 # Read files
-o_read
+oread
 # Directory
-o_read /dev
+oread /dev
 # Not a file
-o_read /dev/tty0
+oread /dev/tty0
 # Non-existing file
-o_read aaa
-o_read demo/tran.dat
-o_read demo/ac.dat
-o_read demo/irf540.dat
-o_siglist
+oread aaa
+oread demo/tran.dat
+oread demo/ac.dat
+oread demo/irf540.dat
+osiglist
 # Create and delete figures
 print "*** Create an empty figure and destroy it"
-o_create
-o_figlist
+ocreate
+ofiglist
 # no args should produce an error
-#o_destroy
-o_figlist
-o_destroy 1
-o_figlist
+#odestroy
+ofiglist
+odestroy 1
+ofiglist
 # Destroying a non-existing figure does nothing
-o_destroy 1
+odestroy 1
 print "*** Create a figure and add signals"
-o_create
-o_add vgs, vds
-o_figlist
+ocreate
+oadd vgs, vds
+ofiglist
 # Provide string to delete instead of int does nothing
-#o_delete vds
-o_delete 1
-o_figlist
-o_destroy 1
-o_create vgs,vds
-o_create iRD
-o_create
-o_add vgs
-o_figlist
+#odelete vds
+odelete 1
+ofiglist
+odestroy 1
+ocreate vgs,vds
+ocreate iRD
+ocreate
+oadd vgs
+ofiglist
 print "** Delete figure 2"
-o_destroy 2
-o_figlist
+odestroy 2
+ofiglist
 print "** Delete figure 2 again"
-o_destroy 2
-o_figlist
+odestroy 2
+ofiglist
 print "** Delete remaining figure"
-o_destroy 1
+odestroy 1

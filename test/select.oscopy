@@ -1,49 +1,49 @@
 # First read data from IRF540 simulation
 print "*** Reading files and setting plots"
-o_read demo/irf540.dat
-o_add vgs
-o_create
-o_add iRD
-o_add vgs
-o_add vgs,vds
-o_add vds
+oread demo/irf540.dat
+oadd vgs
+ocreate
+oadd iRD
+oadd vgs
+oadd vgs,vds
+oadd vds
 print "*** Fig 2 layout to quad"
-o_layout quad
+olayout quad
 # Plot filter response
-o_read demo/ac.dat
-o_create
-o_add vout
-o_scale loglog
+oread demo/ac.dat
+ocreate
+oadd vout
+oscale loglog
 print "*** select 1-1"
-o_select 1-1
-o_figlist
+oselect 1-1
+ofiglist
 print "*** select 1-2"
-o_select 1-2
-o_figlist
+oselect 1-2
+ofiglist
 print "*** select 2-1"
-o_select 2-1
-o_figlist
+oselect 2-1
+ofiglist
 print "*** select 2-a"
-#o_select 2-a
-o_figlist
+#oselect 2-a
+ofiglist
 print "*** select a-1"
-#o_select a-1
-o_figlist
+#oselect a-1
+ofiglist
 print "*** select aaa-sdfsfd"
-#o_select aaa-sdfsfd
-o_figlist
+#oselect aaa-sdfsfd
+ofiglist
 print "*** select 1-"
-#o_select 1-
-o_figlist
+#oselect 1-
+ofiglist
 print "*** select a-"
-#o_select a-
-o_figlist
+#oselect a-
+ofiglist
 print "*** select -"
-#o_select -
-o_figlist
+#oselect -
+ofiglist
 print "*** select 1"
-#o_select 1
-o_figlist
+#oselect 1
+ofiglist
 print "*** select"
-#o_select
-o_figlist
+#oselect
+ofiglist

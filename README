@@ -75,96 +75,96 @@ Then assuming you are in the oscopy directory:
 
 COMMAND REFERENCE
 -----------------
-o_add SIG [, SIG [, SIG]...]
+oadd SIG [, SIG [, SIG]...]
    Add a graph to the current figure
 
-o_create [SIG [, SIG [, SIG]...]]
+ocreate [SIG [, SIG [, SIG]...]]
    Create a new figure, set_ it as current, add the signals
 
-o_delete GRAPH#
+odelete GRAPH#
    Delete a graph from the current figure
 
-o_destroy FIG#
+odestroy FIG#
    Destroy a figure
 
-o_echo [TEXT]
+oecho [TEXT]
    Print text
 
-o_exec FILENAME
+oexec FILENAME
    execute commands from file
 
-o_factors X, Y
+ofactors X, Y
    set the scaling factor of the graph (in power of ten)
    use 'auto' for automatic scaling factor
    e.g. factor -3, 6 set the scale factor at 1e-3 and 10e6
 
-o_figlist
+ofiglist
    Print the list of figures
 
-o_freeze SIG [, SIG [, SIG]...]
+ofreeze SIG [, SIG [, SIG]...]
    Do not consider signal for subsequent updates
 
-o_gui
+ogui
    Show the GUI
 
-o_import SIG [, SIG [, SIG]...]
+oimport SIG [, SIG [, SIG]...]
    Import a list of signals into oscopy to handle dependencies during updates
    Example:
-     oscopy> o_read demo/trans.dat
+     oscopy> oread demo/trans.dat
      oscopy> pwr=iRD*vds
-     oscopy> o_import pwr
-     oscopy> o_add pwr
-     oscopy> o_update  #if iRD or vds changed, pwr will be automatically updated
+     oscopy> oimport pwr
+     oscopy> oadd pwr
+     oscopy> oupdate  #if iRD or vds changed, pwr will be automatically updated
 
-o_insert SIG [, SIG [, SIG]...]
+oinsert SIG [, SIG [, SIG]...]
    Insert a list of signals into the current graph
 
-o_layout horiz|vert|quad
+olayout horiz|vert|quad
    Define the layout of the current figure
 
-o_math destsig=mathexpr
+omath destsig=mathexpr
    Define a new signal destsig using mathematical expression
    destsig=mathexpr is also valid.
 
-o_mode MODE
+omode MODE
    Set the type of the current graph of the current figure
    Available modes :
    lin      Linear graph
 
-o_pause
+opause
    Wait for the user to press enter
 
-o_plot
+oplot
    Draw and show the figures (disabled in the GUI)
 
-o_range [x|y min max]|[xmin xmax ymin ymax]|[reset]
+orange [x|y min max]|[xmin xmax ymin ymax]|[reset]
    Set the axis range of the current graph of the current figure
 
-o_read DATAFILE
+oread DATAFILE
    Read signal file
 
-o_remove SIG [, SIG [, SIG]...]
+oremove SIG [, SIG [, SIG]...]
    Delete a list of signals into from current graph
 
-o_scale [lin|logx|logy|loglog]
+oscale [lin|logx|logy|loglog]
    Set the axis scale
 
-o_select FIG#-GRAPH#
+oselect FIG#-GRAPH#
    Select the current figure and the current graph
 
-o_siglist
+osiglist
    List loaded signals
 
-o_unfreeze SIG [, SIG [, SIG]...]
+ounfreeze SIG [, SIG [, SIG]...]
    Consider signal for subsequent updates
 
-o_unit [XUNIT,] YUNIT
+ounit [XUNIT,] YUNIT
    Set the unit to be displayed on graph axis
 
-o_update
+oupdate
    Reread data files
 
-o_write format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]
+owrite format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]
    Write signals to file
 
 numpy.ufuncs and numpy.fft functions are supported with their direct name.

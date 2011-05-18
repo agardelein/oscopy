@@ -1,16 +1,16 @@
 # Test destroy
-o_exec test/basic.oscopy
-o_create iRD
-o_create vgs
-o_destroy 2
-o_figlist
+oexec test/basic.oscopy
+ocreate iRD
+ocreate vgs
+odestroy 2
+ofiglist
 print "*** Destroy figure 2 once again"
-o_destroy 2
+odestroy 2
 print "*** destroy asfsasdf"
-#o_destroy asfsasdf
+#odestroy asfsasdf
 print "*** destroy -1"
-#o_destroy -1
+#odestroy -1
 print "*** destroy 6"
-#o_destroy 6
+#odestroy 6
 print "*** destroy"
-#o_destroy
+#odestroy

@@ -1,19 +1,19 @@
 print "*** Load file"
-o_read demo/irf540.dat
-o_add vgs
-o_add vds
-o_add iRD
-o_add vgs,vds
-o_figlist
+oread demo/irf540.dat
+oadd vgs
+oadd vds
+oadd iRD
+oadd vgs,vds
+ofiglist
 print "*** Will delete 2"
-o_delete 2
-o_figlist
+odelete 2
+ofiglist
 print "*** Will delete 3"
-o_delete 3
-o_figlist
+odelete 3
+ofiglist
 print "*** Will delete 1"
-o_delete 1
-o_figlist
+odelete 1
+ofiglist
 print "*** Will delete 1"
-o_delete 1
-o_figlist
+odelete 1
+ofiglist

@@ -1,26 +1,26 @@
 print "*** Reading files and setting plots"
-o_read demo/irf540.dat
-o_create
-o_add iRD
-o_add vgs
-o_add vgs,vds
-o_add vds
+oread demo/irf540.dat
+ocreate
+oadd iRD
+oadd vgs
+oadd vgs,vds
+oadd vds
 print "*** Layout horiz"
-o_layout horiz
+olayout horiz
 print "*** Reading files and setting plots"
-o_create
-o_add iRD
-o_add vgs
-o_add vgs,vds
-o_add vds
+ocreate
+oadd iRD
+oadd vgs
+oadd vgs,vds
+oadd vds
 print "*** Layout vert"
-o_layout vert
+olayout vert
 print "*** Reading files and setting plots"
-o_create
-o_add iRD
-o_add vgs
-o_add vgs,vds
-o_add vds
+ocreate
+oadd iRD
+oadd vgs
+oadd vgs,vds
+oadd vds
 print "*** Layout quad"
-o_layout quad
+olayout quad
 print "*** Done"

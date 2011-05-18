@@ -1,5 +1,5 @@
 # Load signal
-o_read demo/tran.dat
-o_add vsqu
-o_add vsqu
-o_mode lin
+oread demo/tran.dat
+oadd vsqu
+oadd vsqu
+omode lin
