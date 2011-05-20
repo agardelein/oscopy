@@ -448,6 +448,13 @@ class App(dbus.service.Object):
 
     def _drag_data_received_cb(self, widget, drag_context, x, y, selection,\
                                    target_type, time):
+        # FIXME: Event handling issue: this drag and drop callback is
+        #        processed before matplotlib callback _axes_enter. Therefore
+        #        when dropping, self._current_graph is not valid: it contains
+        #        the last graph. Workaround
+        #             leave the figure window by the destination graph
+        #             go to the Signal list window
+        #             drag and drop the signal into the destination graph
         if target_type == self._TARGET_TYPE_SIGNAL:
             if self._current_graph is not None:
                 signals = {}
