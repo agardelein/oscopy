@@ -1,4 +1,4 @@
-MASTER=manual
+MASTER=oscopy-api
 DESTDIR=../pdf
 OUTDIR=../out
 LATEX=pdflatex
