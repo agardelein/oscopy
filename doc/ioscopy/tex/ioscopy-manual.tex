@@ -6,6 +6,7 @@
 \usepackage{wasysym}
 \usepackage[font=small,labelfont=sf,textfont=sf]{caption}
 \usepackage{hyperref}
+\usepackage[sf]{titlesec}
 
 \newcommand{\att}[1]{\texttt{#1}}
 \newcommand{\meth}[1]{\texttt{#1()}}
@@ -37,7 +38,7 @@ urlcolor=black,
 }
 
 \begin{document}
-
+\sf
 \maketitle
 \begin{abstract}
 % data plotter
@@ -94,11 +95,204 @@ New file formats and new graph types can be added by following the guidelines pr
 
 \section{IOscopy: Oscopy on top of IPython}
 
-\subsection{Purpose}
+%\subsection{Purpose}
 % TODO: Why using ipython: CLI already there, oscopy as a python module, power of ipython behind, flexibility
 
 \subsection{Commands}
 % TODO: Detailled description of ioscopy commands with an example for each one, assuming the demo/demo.oscopy script conditions
+This section describes the ioscopy commands. Unless otherwise noticed, examples assume that demo/demo.oscopy has been run.
+
+\newcommand{\ocmd}[2]{\vspace{5mm}\noindent\textbf{#1} #2\\}
+
+\ocmd{oadd}{SIG [, SIG [, SIG]...]}
+   Add a graph to the current figure. Figure and graph are instanciated if not present.
+
+\begin{verbatim}
+   oscopy> oadd vgs
+\end{verbatim}
+
+\ocmd{ocreate}{[SIG [, SIG [, SIG]...]]}
+   Create a new figure, set it as current, add the signals in a first graph.
+
+\begin{verbatim}
+   oscopy> ocreate vgs,vds
+\end{verbatim}
+
+\ocmd{ocontext}{\ }
+   Return the Context object used within ioscopy. Use it only if you want to have direct access to internal ioscopy objects.
+
+\ocmd{odelete}{GRAPH\#}
+   Delete a graph from the current figure.
+
+\begin{verbatim}
+   oscopy> odelete 1
+\end{verbatim}
+
+\ocmd{odestroy}{FIG\#}
+   Destroy a figure
+
+\begin{verbatim}
+   oscopy> odestroy 3
+\end{verbatim}
+
+\ocmd{oexec}{FILENAME}
+   Execute commands from file.
+
+   This following example assume that demo/demo.oscopy has \textbf{not} been run.
+
+\begin{verbatim}
+   oscopy> oexec demo/demo.oscopy
+\end{verbatim}
+
+\ocmd{ofactors}{X, Y}
+   Set the scaling factor of the graph (in power of ten). Use \texttt{auto} for automatic scaling factor.
+
+\noindent   The following example set the scale factor at 1e-3 for X axis and 10e6 for Y axis
+\begin{verbatim}
+   oscopy> ofactor -3, 6
+\end{verbatim}
+
+\ocmd{ofiglist}{\ }
+   Print the list of figures
+
+\ocmd{ofreeze}{SIG [, SIG [, SIG]...]}
+   Do not consider signal for subsequent updates. See also \textbf{ounfreeze}.
+
+\ocmd{ogui}{\ }
+   Show the GUI window if it was closed.
+
+\ocmd{oimport}{SIG [, SIG [, SIG]...]}
+   Import a list of signals into oscopy to handle dependencies during updates
+   Example:
+\begin{verbatim}
+   oscopy> oread demo/trans.dat
+   oscopy> pwr=iRD*vds
+   oscopy> oimport pwr
+   oscopy> oadd pwr
+   oscopy> oupdate  #if iRD or vds changed, pwr will be automatically updated
+\end{verbatim}
+
+\ocmd{oinsert}{SIG [, SIG [, SIG]...]}
+   Insert a list of signals into the current graph
+\begin{verbatim}
+   oscopy> oinsert vgs
+\end{verbatim}
+
+\ocmd{olayout}{horiz$|$vert$|$quad}
+   Define the layout of the current figure
+   \begin{description}
+   \item[olayout horiz] Graphs are side by side
+   \item[olayout vert] Graphs are stacked
+   \item[olayout quad] One graph per figure corner
+   \end{description}
+\begin{verbatim}
+   oscopy> olayout horiz
+\end{verbatim}
+
+\ocmd{omode}{MODE}
+   Set the type of the current graph of the current figure\\
+   Available modes :
+   \begin{description}
+   \item[omode lin]      Linear graph
+   \end{description}
+
+\ocmd{orange}{[x$|$y min max]$|$[xmin xmax ymin ymax]$|$[reset]}
+   Set the axis range of the current graph of the current figure
+   \begin{description}
+   \item[orange x xmin xmax] set x axis range
+   \item[orange y ymin ymax] set y axis range
+   \item[orange xmin xmax ymin ymax] set both axis range
+   \item[orange reset] set automatic range on both axis
+   \end{description}
+\begin{verbatim}
+   oscopy> orange x -10 15
+   oscopy> orange -11 20 -3.2 4.2
+\end{verbatim}
+
+\ocmd{oread}{DATAFILE}
+   Read signal file
+\begin{verbatim}
+   oscopy> oread demo/tran.dat
+\end{verbatim}
+
+\ocmd{orefresh}{FIG\#$|$current$|$all$|$on$|$off}
+   Force/toggle autorefresh of current/\#/all figures on update
+   \begin{description}
+   \item[orefresh FIG\#] refresh figure \#
+   \item[orefresh current] refresh current figure
+   \item[orefresh all]  refresh all figures
+   \item[orefresh on] turn on autorefresh on Signal updates
+   \item[orefresh off] turn off autorefresh on Signal updates
+   \end{description}
+
+\begin{verbatim}
+   oscopy> orefresh 3
+   oscopy> orefresh on
+\end{verbatim}
+
+\ocmd{oremove}{SIG [, SIG [, SIG]...]}
+   Delete a list of signals into from current graph
+\begin{verbatim}
+   oscopy> oremove vds,vgs
+\end{verbatim}
+
+\ocmd{oscale}{[lin$|$logx$|$logy$|$loglog]}
+   Set the axis scale
+   \begin{description}
+   \item[oscale lin] Set linear scale on both axis
+   \item[oscale logx] Set log scale on x axis and linear scale on y axis
+   \item[oscale logy] Set linear scale on x axis and log scale on y axis
+   \item[oscale loglog] Set log scale on both axis
+   \end{description}
+
+\begin{verbatim}
+   oscopy> oscale logx
+\end{verbatim}
+
+\ocmd{oselect}{FIG\#-GRAPH\#}
+   Select the current figure and the current graph
+\begin{verbatim}
+   oscopy> oselect 2-1
+\end{verbatim}
+
+\ocmd{osiglist}{\ }
+   List loaded signals
+\begin{verbatim}
+   oscopy> siglist
+\end{verbatim}
+
+\ocmd{ounfreeze}{SIG [, SIG [, SIG]...]}
+   Consider signal for subsequent updates. See also \textbf{ofreeze}
+\begin{verbatim}
+   oscopy> ounfreeze vout,vds
+\end{verbatim}
+
+\ocmd{ounit}{[XUNIT,] YUNIT}
+   Set the unit to be displayed on graph axis
+   \begin{description}
+   \item[ounit XUNIT, YUNIT] Set both axis unit
+   \item[ounit YUNIT] Set Y axis unit
+   \end{description}
+
+\begin{verbatim}
+   oscopy> ounit V     # Set Y axis unit
+   oscopy> ounit Hz, V # Set both axis unit
+\end{verbatim}
+
+\ocmd{oupdate}{\ }
+   Reread data files.
+
+\begin{verbatim}
+   oscopy> oupdate
+\end{verbatim}
+
+\ocmd{owrite}{format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]}
+   Write signals to file.
+
+   This example write Signals v1 and vsqu in file \texttt{demo/res.dat} using format gnucap format, overwrite file if already existing.
+\begin{verbatim}
+   oscopy> owrite gnucap (ow:1) demo/res.dat v1,vsqu
+\end{verbatim}
 
 \section{Oscopy GUI}
 % TODO: Description of the GUI interface, main window, menus, contextual menus, buttons
