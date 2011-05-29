@@ -119,8 +119,8 @@ class App(dbus.service.Object):
         resp = dlg.run()
         if resp == gtk.RESPONSE_ACCEPT:
             expr = entry.get_text()
-            self._app_exec('omath %s' % expr)
-
+            self._app_exec('%s' % expr)
+            self._app_exec('oimport %s' % expr.split('=')[0].strip())
         dlg.destroy()
 
     def _action_execute_script(self, action):
