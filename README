@@ -127,7 +127,7 @@ omode MODE
    Available modes :
    lin      Linear graph
 
-orange [x|y min max]|[xmin xmax ymin ymax]|[reset]
+orange [x|y min max]|[xmin xmax ymin ymax]
    Set the axis range of the current graph of the current figure
 
 oread DATAFILE

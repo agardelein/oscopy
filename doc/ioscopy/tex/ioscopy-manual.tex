@@ -102,12 +102,13 @@ New file formats and new graph types can be added by following the guidelines pr
 % TODO: Detailled description of ioscopy commands with an example for each one, assuming the demo/demo.oscopy script conditions
 This section describes the ioscopy commands. Unless otherwise noticed, examples assume that demo/demo.oscopy has been run.
 
-\newcommand{\ocmd}[2]{\vspace{5mm}\noindent\textbf{#1} #2\\}
+\newcommand{\ocmd}[2]{{\large\vspace{5mm}\noindent\textbf{#1} #2\\}}
 
 \ocmd{oadd}{SIG [, SIG [, SIG]...]}
    Add a graph to the current figure. Figure and graph are instanciated if not present.
 
 \begin{verbatim}
+   oscopy> oselect 1-1
    oscopy> oadd vgs
 \end{verbatim}
 
@@ -149,14 +150,37 @@ This section describes the ioscopy commands. Unless otherwise noticed, examples 
 
 \noindent   The following example set the scale factor at 1e-3 for X axis and 10e6 for Y axis
 \begin{verbatim}
-   oscopy> ofactor -3, 6
+   oscopy> oselect 1-1
+   oscopy> ofactor -3, 3
 \end{verbatim}
 
 \ocmd{ofiglist}{\ }
-   Print the list of figures
+   Print the list of figures. The layout of the figure is indicated, and the graph mode as well as the Signals are shown. The current figure and graph are marked with a star.
+\begin{verbatim}
+   oscopy>ofiglist
+     Figure 1: horiz
+      Graph 1 : (linear) vgs
+      Graph 2 : (linear) vsqu
+     Figure 2: quad
+      Graph 1 : (linear) iRD
+      Graph 2 : (linear) vgs
+      Graph 3 : (linear) vds vgs
+      Graph 4 : (linear) vds
+     Figure 3: horiz
+      Graph 1 : (linear) vout vo
+     Figure 4: horiz
+      Graph 1 : (linear) vsqu
+      Graph 2 : (linear) vsqufft
+      Graph 3 : (linear) v1
+   * Figure 5: horiz
+       * Graph 1 : (linear) vs
+\end{verbatim}
 
 \ocmd{ofreeze}{SIG [, SIG [, SIG]...]}
    Do not consider signal for subsequent updates. See also \textbf{ounfreeze}.
+\begin{verbatim}
+   oscopy> ofreeze vout,vds
+\end{verbatim}
 
 \ocmd{ogui}{\ }
    Show the GUI window if it was closed.
@@ -165,28 +189,31 @@ This section describes the ioscopy commands. Unless otherwise noticed, examples 
    Import a list of signals into oscopy to handle dependencies during updates
    Example:
 \begin{verbatim}
-   oscopy> oread demo/trans.dat
    oscopy> pwr=iRD*vds
    oscopy> oimport pwr
-   oscopy> oadd pwr
+   oscopy> ocreate pwr
    oscopy> oupdate  #if iRD or vds changed, pwr will be automatically updated
 \end{verbatim}
 
 \ocmd{oinsert}{SIG [, SIG [, SIG]...]}
    Insert a list of signals into the current graph
 \begin{verbatim}
-   oscopy> oinsert vgs
+   oscopy> oselect 1-1
+   oscopy> oinsert vds
 \end{verbatim}
 
 \ocmd{olayout}{horiz$|$vert$|$quad}
    Define the layout of the current figure
    \begin{description}
-   \item[olayout horiz] Graphs are side by side
-   \item[olayout vert] Graphs are stacked
+   \item[olayout horiz] Graphs are stacked from top to bottom
+   \item[olayout vert] Graphs are side by side from left to right
    \item[olayout quad] One graph per figure corner
    \end{description}
 \begin{verbatim}
+   oscopy> oselect 2-1
    oscopy> olayout horiz
+   oscopy> olayout vert
+   oscopy> olayout quad
 \end{verbatim}
 
 \ocmd{omode}{MODE}
@@ -202,11 +229,13 @@ This section describes the ioscopy commands. Unless otherwise noticed, examples 
    \item[orange x xmin xmax] set x axis range
    \item[orange y ymin ymax] set y axis range
    \item[orange xmin xmax ymin ymax] set both axis range
-   \item[orange reset] set automatic range on both axis
+%   \item[orange reset] set automatic range on both axis
    \end{description}
 \begin{verbatim}
-   oscopy> orange x -10 15
-   oscopy> orange -11 20 -3.2 4.2
+   oscopy> oselect 1-1
+   oscopy> orange x 0 1
+   oscopy> orange y -4 12
+   oscopy> orange 0.5 0.6 -2 2
 \end{verbatim}
 
 \ocmd{oread}{DATAFILE}
@@ -233,7 +262,8 @@ This section describes the ioscopy commands. Unless otherwise noticed, examples 
 \ocmd{oremove}{SIG [, SIG [, SIG]...]}
    Delete a list of signals into from current graph
 \begin{verbatim}
-   oscopy> oremove vds,vgs
+   oscopy> oselect oselect 2-3
+   oscopy> oremove vds
 \end{verbatim}
 
 \ocmd{oscale}{[lin$|$logx$|$logy$|$loglog]}
@@ -246,7 +276,9 @@ This section describes the ioscopy commands. Unless otherwise noticed, examples 
    \end{description}
 
 \begin{verbatim}
+   oscopy> oselect 3-1
    oscopy> oscale logx
+   oscopy> oscale loglog
 \end{verbatim}
 
 \ocmd{oselect}{FIG\#-GRAPH\#}
@@ -259,6 +291,17 @@ This section describes the ioscopy commands. Unless otherwise noticed, examples 
    List loaded signals
 \begin{verbatim}
    oscopy> siglist
+   Name	Unit	Ref	Reader	Last updated (sec)
+   vds	V	Time	demo/irf540.dat	128
+   iRD	A	Time	demo/irf540.dat	128
+   vgs	V	Time	demo/irf540.dat	128
+   vsqu	V	Time	demo/tran.dat	124
+   v1	None	Time	v1=((vsqu * 3) + 10)	123
+   vout	V	Freq	demo/ac.dat	126
+   vs	None	Time	vs=sin((Time * 1000000.0))	121
+   vs2	V	Time	vs2=sin((Time * 1000000.0))	121
+   vo	V	Freq	vo=vout	121
+   vsqufft		Frequency	vsqufft=fft(vsqu)	124
 \end{verbatim}
 
 \ocmd{ounfreeze}{SIG [, SIG [, SIG]...]}
@@ -275,8 +318,10 @@ This section describes the ioscopy commands. Unless otherwise noticed, examples 
    \end{description}
 
 \begin{verbatim}
-   oscopy> ounit V     # Set Y axis unit
-   oscopy> ounit Hz, V # Set both axis unit
+   oscopy> oselect 3-1
+   oscopy> ounit W      # Set Y axis unit
+   oscopy> ounit /s,W   # Set both axis unit
+   oscopy> ounit Hz, V
 \end{verbatim}
 
 \ocmd{oupdate}{\ }
@@ -293,12 +338,77 @@ This section describes the ioscopy commands. Unless otherwise noticed, examples 
 \begin{verbatim}
    oscopy> owrite gnucap (ow:1) demo/res.dat v1,vsqu
 \end{verbatim}
-
+\newpage
 \section{Oscopy GUI}
 % TODO: Description of the GUI interface, main window, menus, contextual menus, buttons
+The Graphical User Interface of oscopy is composed of several windows (Figure \ref{fig:screenshot}):
+\begin{itemize}
+\item The command line terminal
+\item The main window
+\item The (many) figures windows
+\end{itemize}
+The next paragraphs describe the two last types.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.8\textwidth]{../png/ioscopy.png}
+  \caption{ioscopy after running \texttt{demo/demo.oscopy}}
+  \label{fig:screenshot}
+\end{figure}
+
+\subsection{The main window}
+This is the first window that you will see when starting ioscopy.
+At anytime, it can be shown again by calling the command \texttt{ogui} from the terminal if closed.
+
+It contains the list of Readers and their Signals currently handled by ioscopy.
+Double--clicking on a Signal insert it in a new Figure.
+
+Each Signal 'freeze' status can be toggled using the checkbox located in the right column.
+Toggling the checkbox for a Reader set the status for all the signals contained in the Reader.
+
+The 'File' menu:
+\begin{description}
+\item[Add file(s)...] To read Signals from file(s)
+\item[Update] To read Signals from file(s) again
+\item[Execute script...] To read ioscopy commands from file
+\item[New Math Signal] To compute a new Signal from existing ones
+\item[Run netlister and simulate] To generate the netlist, run the simulator and eventually update the Signals (Figure~\ref{fig:netnsim})
+\item[Quit] Exit ioscopy
+\end{description}
+
+The 'Windows' menu contains the list of the windows, and select one to show it.
+
+% description des menus
+% description de la liste (+ freeze fichier entier ou signal par signal)
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[scale=.5]{../png/ioscopy-gui.png}
+  \caption{The main window}
+  \label{fig:mainwin}
+  \begin{minipage}{.45\linewidth}
+    \includegraphics[scale=.5]{../png/ioscopy-file.png}
+    \caption{The 'File' menu}
+    \label{fig:filemenu}
+  \end{minipage}
+  \begin{minipage}{.45\linewidth}
+    \includegraphics[scale=.5]{../png/ioscopy-window.png}
+    \caption{The 'Window' menu}
+    \label{fig:windowmenu}    
+  \end{minipage}
+
+  \includegraphics[scale=.5]{../png/ioscopy-netnsim.png}
+  \caption{The 'Run netlister and simulate' window. Call third party programs to generate oscopy input files. Can be toggled with the checkboxes. Setting are saved in .config/oscopy/gui file}
+  \label{fig:netnsim}
+
+\end{figure}
 
 
 
+\subsection{The figure windows}
+
+% description de l'agencement de la fenêtre
+% description du menu contextuel et des sous-menus
 
 \end{document}
 

@@ -1,52 +1,64 @@
 # First read data from IRF540 simulation
-echo *** Reading files and setting plots
-read irf540.dat
-add vgs
-create
-add iRD
-add vgs
-add vgs
-add vds
-layout quad
+print "*** Reading files and setting plots"
+oread demo/irf540.dat
+oadd vgs
+ocreate
+oadd iRD
+oadd vgs
+oadd vgs
+oadd vds
+print "*** Fig 2 layout to quad"
+olayout quad
+print "*** Done"
 # Oops, forgot a signal in figure 2 graph 3
-select 2-3
-insert vds
+oselect 2-3
+oinsert vds
 # Plot filter response
-read ac.dat
-create
-add vout
-scale loglog
+oread demo/ac.dat
+ocreate
+oadd vout
+oscale loglog
 # Plot square signal, its FFT and a math signal
-read tran.dat
-create
-add vsqu
+oread demo/tran.dat
+ocreate
+oadd vsqu
 vsqufft=fft(vsqu)
-add vsqufft
-range -2 2 -100 200
-unit V
+oimport vsqufft
+oadd vsqufft
+orange 0 15 -.002 .010
+ounit V
 v1=vsqu*3+10
-add v1
-unit V
-# Use of Time
-vs = sin(Time(vsqu)*1e6)
-create vs
-unit V
-echo ** List of figures
-figlist
+oimport v1
+oadd v1
+ounit V
+print "*** Insert and remove a signal"
+oselect 4-1
+oinsert v1
+oremove v1
+# Create from reference signal. Note with Signal unit can be defined
+vs=sin(vsqu.ref*1e6)
+vs.ref = vsqu.ref
+vs2=Signal(sin(vsqu.ref*1e6), 'V')
+vs2.ref = vsqu.ref
+oimport vs
+oimport vs2
+ocreate vs
+ounit V
+print "*** List of figures"
+ofiglist
 # Create a copy of vout and freeze it
-vo = vout
-freeze vo
-select 3-1
-insert vo
-# Plot things
-echo *** Now plotting everything
-plot
+vo=vout
+oimport vo
+ofreeze vo
+oselect 3-1
+oinsert vo
+osiglist
 # Updating
-echo *** Now change C value in schematic and rerun gnetlist + gnucap
-pause
-echo *** Updating
-update
-echo *** Now look at figure 3
-plot
+print "*** Now change C value in schematic and rerun gnetlist + gnucap"
+#pause...
+print "*** Updating"
+#oupdate
+print "*** Now look at figure 3"
+#plot
 # Saving results
-write gnucap (ow:1) res.dat v1,vsqu
+owrite gnucap (ow:1) demo/res.dat v1,vsqu
