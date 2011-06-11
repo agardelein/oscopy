@@ -120,7 +120,8 @@ This section describes the ioscopy commands. Unless otherwise noticed, examples 
 \end{verbatim}
 
 \ocmd{ocontext}{\ }
-   Return the Context object used within ioscopy. Use it only if you want to have direct access to internal ioscopy objects.
+   Return the Context object used within ioscopy.
+ Use it only if you want to have direct access to internal ioscopy objects.
 
 \ocmd{odelete}{GRAPH\#}
    Delete a graph from the current figure.
@@ -405,10 +406,68 @@ The 'Windows' menu contains the list of the windows, and select one to show it.
 
 
 
-\subsection{The figure windows}
+\subsection{The Figure windows}
 
 % description de l'agencement de la fenêtre
 % description du menu contextuel et des sous-menus
+Each Figure window is composed of two parts:
+\begin{itemize}
+\item On the top part, a zone containing up to 4 graphs
+\item On the bottom part, the Matplotlib toolbar
+\end{itemize}
+A contextual menu is available for each graph, raised by a right-click on the mouse button.
+Access to most of the ioscopy functionality is possible through this menu:
+\begin{itemize}
+\item Add/delete graph
+\item Layout (Figure~\ref{fig:layout})
+\item Range settings (Figure~\ref{fig:range})
+\item Unit settings (Figure~\ref{fig:units})
+\item Scale (Figure~\ref{fig:scale})
+\item Insert Signal (Figure~\ref{fig:insert})
+\item Remove Signal (Figure~\ref{fig:remove})
+\end{itemize}
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[scale=.5]{../png/ioscopy-figure}
+  \caption{A Figure window with the contextual menu.}
+  \label{fig:fig}
+
+  \begin{minipage}{0.45\linewidth}
+    \includegraphics[scale=.5]{../png/ioscopy-layout.png}
+    \caption{Layout configuration menu}
+    \label{fig:layout}
+  \end{minipage}
+  \begin{minipage}{0.45\linewidth}
+    \includegraphics[scale=.5]{../png/ioscopy-scale.png}
+    \caption{Scale configuration menu}
+    \label{fig:scale}
+  \end{minipage}
+
+  \begin{minipage}{0.45\linewidth}
+    \includegraphics[scale=.5]{../png/ioscopy-insert.png}
+    \caption{Insert signal menu}
+    \label{fig:insert}
+  \end{minipage}
+
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[scale=.5]{../png/ioscopy-remove.png}
+  \caption{Remove signal menu}
+  \label{fig:remove}
+
+  \includegraphics[scale=.5]{../png/ioscopy-range.png}
+  \caption{Dialogue to set graph range}
+  \label{fig:range}
+
+  \includegraphics[scale=.5]{../png/ioscopy-units.png}
+  \caption{Dialogue to set graph units}
+  \label{fig:units}
+
+\end{figure}
 
 \end{document}
 
