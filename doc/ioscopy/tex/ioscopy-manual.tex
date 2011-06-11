@@ -427,6 +427,14 @@ Access to most of the ioscopy functionality is possible through this menu:
 \item Remove Signal (Figure~\ref{fig:remove})
 \end{itemize}
 
+For each Graph, cursors are available through keys (Figure~\ref{fig:cursors}):
+\begin{itemize}
+\item \texttt{'1'} for first vertical cursor
+\item \texttt{'2'} for second vertical cursor
+\item \texttt{'3'} for first horizontal cursor
+\item \texttt{'4'} for second horizontal cursor
+\end{itemize}
+The value of each cursor is displayed on the bottom part of the graph, and the difference when both cursors are activated.
 
 \begin{figure}[htbp]
   \centering
@@ -466,6 +474,10 @@ Access to most of the ioscopy functionality is possible through this menu:
   \includegraphics[scale=.5]{../png/ioscopy-units.png}
   \caption{Dialogue to set graph units}
   \label{fig:units}
+
+  \includegraphics[scale=.5]{../png/ioscopy-cursors.png}
+  \caption{Figure with cursors set (after changing capacitance value of \texttt{demo.sch} and running netlister and simulator}
+  \label{fig:cursors}
 
 \end{figure}
 
