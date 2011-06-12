@@ -79,7 +79,7 @@ oadd SIG [, SIG [, SIG]...]
    Add a graph to the current figure
 
 ocreate [SIG [, SIG [, SIG]...]]
-   Create a new figure, set_ it as current, add the signals
+   Create a new figure, set it as current, add the signals
 
 ocontext
    Return the Context object used within ioscopy
