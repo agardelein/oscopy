@@ -147,7 +147,7 @@ class Enter_Range_Dialog(object):
         self._dlg.destroy()
         return r
 
-DEFAULT_NETLISTER_COMMAND = 'gnetlist -g spice-sdb -s -o %s.net %s.sch'
+DEFAULT_NETLISTER_COMMAND = 'gnetlist -g spice-sdb -O sort_mode -o %s.net %s.sch'
 DEFAULT_SIMULATOR_COMMAND = 'gnucap -b %s.net'
 
 class Run_Netlister_and_Simulate_Dialog(object):
