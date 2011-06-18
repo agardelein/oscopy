@@ -8,12 +8,22 @@ dnl directory.
 # Set up configuration system
 #####################################################################
 
-AC_INIT([oscopy], [0.32], [agardelein@yahoo.fr])
+AC_INIT([oscopy], [0.70.0-rc1], [agardelein@yahoo.fr])
 AC_CONFIG_AUX_DIR([build-tools])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
 AC_PROG_LN_S
 AC_CONFIG_MACRO_DIR([m4])
+
+AC_ARG_WITH([doc],
+	[AC_HELP_STRING([--with-doc],
+			 [build documentation (LaTeX required)])],
+			 [with_doc=yes],
+			 [with_doc=no])
+AC_SUBST(with_doc)
+
+can_build_documentation=$with_doc
+
 AC_CONFIG_FILES([
 	Makefile
 	oscopy/Makefile
@@ -22,7 +32,19 @@ AC_CONFIG_FILES([
 	oscopy/writers/Makefile
 	oscopy/gui/Makefile
 	scheme/Makefile
+	doc/Makefile
+	doc/ioscopy/Makefile
+	doc/ioscopy/tex/Makefile
+	doc/ioscopy/pdf/Makefile
 ])
+
+#####################################################################
+# Check whether documentation can be build
+#####################################################################
+AC_MSG_CHECKING([whether documentation shall be built])
+AM_CONDITIONAL([CAN_BUILD_DOC], [test x$with_doc = xyes])
+AC_MSG_RESULT($can_build_documentation)
+AC_SUBST(can_build_documentation)
 
 #####################################################################
 # Check for compiling & linking tools

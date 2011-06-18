@@ -1,4 +1,10 @@
-SUBDIRS = oscopy scheme
+mysubdirs = oscopy scheme
+
+if CAN_BUILD_DOC
+SUBDIRS = $(mysubdirs) doc
+else
+SUBDIRS = $(mysubdirs)
+endif
 
 oscopydir = $(pkgpythondir)
 
@@ -7,6 +13,8 @@ dist_doc_DATA = README
 dist_datadir = $(datarootdir)/oscopy
 
 dist_pkgdata_DATA = ipythonrc-oscopy
+
+docdir = $(datarootdir)/doc/oscopy
 
 ACLOCAL_AMFLAGS = -I m4
 
