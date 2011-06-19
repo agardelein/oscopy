@@ -1,6 +1,8 @@
 EXTENDING OSCOPY:
 -----------------
-Oscopy is designed to be easily extendable. Support of new data file formats is done by adding new Readers/Writers, new types of Graph and Figures by deriving Graph and Figure...
+Oscopy is designed to be easily extendable. Support of new data file formats is 
+done by adding new Readers/Writers, new types of Graph and Figures by deriving
+Graph and Figure...
 
 New data file format can be added by deriving Reader and
 redefining the function readsigs(), which fills the list
@@ -14,7 +16,8 @@ redefining plot(). See FFTGraph.py for example.
 NOTE : Figure.set_mode() has to be updated when new mode are added !
 
 Vocabular:
-A figure is CREATEd or DESTROYed, a graph is ADDed to a figure or DELETEd and a signal is INSERTed or REMOVEd from a graph.
+A figure is CREATEd or DESTROYed, a graph is ADDed to a figure or DELETEd and a
+signal is INSERTed or REMOVEd from a graph.
 
 Template for new import format:
 ---

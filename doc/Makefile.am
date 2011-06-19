@@ -1,1 +1,1 @@
-SUBDIRS=ioscopy
+SUBDIRS=ioscopy oscopy-api

@@ -11,12 +11,14 @@ FIGS=../pdf/itf.pdf\
 	../pdf/writers.pdf \
 	../pdf/cursorinter.pdf
 
-pdf: $(FIGS)
+../pdf/$(MASTER).pdf: pdf-local
+
+pdf-local: $(FIGS)
 	$(LATEX) $(LATEXOPTS) $(MASTER)
 	$(LATEX) $(LATEXOPTS) $(MASTER)
 	mv $(OUTDIR)/$(MASTER).pdf $(DESTDIR)
 
-clean:
+clean-local:
 	rm $(OUTDIR)/* $(DESTDIR)/$(MASTER).pdf $(FIGS)
 
 ../pdf/%.pdf : ../dot/%.dot

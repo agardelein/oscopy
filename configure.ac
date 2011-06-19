@@ -17,7 +17,7 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AC_ARG_WITH([doc],
 	[AC_HELP_STRING([--with-doc],
-			 [build documentation (LaTeX required)])],
+			 [build documentation (LaTeX and graphviz required)])],
 			 [with_doc=yes],
 			 [with_doc=no])
 AC_SUBST(with_doc)
@@ -36,6 +36,9 @@ AC_CONFIG_FILES([
 	doc/ioscopy/Makefile
 	doc/ioscopy/tex/Makefile
 	doc/ioscopy/pdf/Makefile
+	doc/oscopy-api/Makefile
+	doc/oscopy-api/tex/Makefile
+	doc/oscopy-api/pdf/Makefile
 ])
 
 #####################################################################

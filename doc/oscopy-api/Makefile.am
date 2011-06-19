@@ -1,0 +1,1 @@
+SUBDIRS=tex pdf

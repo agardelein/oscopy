@@ -16,7 +16,8 @@ Features highlight:
 
 Support for arithmetic with signals is implemented.
 
-In each plot window, horizontal and vertical cursors can be toggled by using keys '1', '2', '3' and '4'.
+In each plot window, horizontal and vertical cursors can be toggled by using
+keys '1', '2', '3' and '4'.
 
 Support for drag'n drop from signal window to graphs is implemented.
 
@@ -39,14 +40,21 @@ Dependencies:
   * python-dbus
   * python-xdg 
 
+Documentation can be built by passing the option '--with-doc' to the configure
+script. It will build the user manual (ioscopy-manual.pdf) and the oscopy API
+manual (oscopy-api.pdf). You will need LaTeX and graphviz to be installed on
+your system.
+
 INSTALLING
 ----------
 To install oscopy on a system:
 # ./autogen.sh && ./configure && make install
-Note that you might need to update your PYTHONPATH, for example if you install it in ${HOME}/geda, to launch oscopy you might need the following line:
+Note that you might need to update your PYTHONPATH, for example if you install
+it in ${HOME}/geda, to launch oscopy you might need the following line:
 PYTHONPATH=${HOME}/geda/lib/python2.X/site-packages:$PYTHONPATH
 
-If you want to use gschem integration, you will need to use the same --prefix that you used to install gschem.
+If you want to use gschem integration, you will need to use the same --prefix
+that you used to install gschem.
 
 QUICKSTART
 ----------
@@ -57,21 +65,26 @@ To get any info on available commands, type 'help'.
 A sample circuit is provided for demonstration purposes.
 
 $ cd demo
-$ ../ioscopy &
-Just do "File>Run Netlister and simulate..." and fill in the window with the commands provided below
+$ ioscopy
+Just do "File>Run Netlister and simulate..." and fill in the window with the
+commands provided below
 then in the terminal window:
-oscopy> exec demo.oscopy
+ioscopy> oexec demo.oscopy
 
 Using gschem integration:
-If you want to use gschem integration, add (load-from-path "oscopy.scm") to your gschemrc, and you shoud see the oscopy menu on the next start of gschem. Note that you should have done ./configure --prefix="same prefix as gschem"
+If you want to use gschem integration, add (load-from-path "oscopy.scm") to your
+gschemrc, and you shoud see the oscopy menu on the next start of gschem. Note
+that you should have done ./configure --prefix="same prefix as gschem"
 Then assuming you are in the oscopy directory:
   * launch gschem
   * open demo/demo.sch
   * oscopy>Launch oscopy
   * Follow the previous instructions
-  * Once the script finished to execute, go back to gschem and change the value of a component e.g. the capacitor C.
+  * Once the script finished to execute, go back to gschem and change the value 
+of a component e.g. the capacitor C.
   * oscopy>Update oscopy
-  * once netlister and simulator ran, figures should have changes, e.g. figure 3 vout should have moved and vo not.
+  * once netlister and simulator ran, figures should have changes, e.g. figure 3
+vout should have moved and vo not.
 
 COMMAND REFERENCE
 -----------------
