@@ -41,7 +41,7 @@ except dbus.DBusException, e:
 _gui = OscopyGUI(bus_name, ctxt=_ctxt)
 
 def do_create(self, args):
-    """create [SIG [, SIG [, SIG]...]]
+    """ocreate [SIG [, SIG [, SIG]...]]
     Create a new figure, set_ it as current, add the signals"""
     global _current_figure
     global _current_graph
@@ -56,7 +56,7 @@ def do_create(self, args):
     _gui.create()
 
 def do_destroy(self, args):
-    """destroy FIG#
+    """odestroy FIG#
     Destroy a figure"""
     global _current_figure
     global _current_graph
@@ -71,7 +71,7 @@ def do_destroy(self, args):
     _current_graph = None
 
 def do_select(self, args):
-    """select FIG#-GRAPH#
+    """oselect FIG#-GRAPH#
     Select the current figure and the current graph"""
     global _current_figure
     global _current_graph
@@ -91,7 +91,7 @@ def do_select(self, args):
         _current_graph = None
 
 def do_layout(self, args):
-    """layout horiz|vert|quad
+    """olayout horiz|vert|quad
     Define the layout of the current figure"""
     global _current_figure
     if _current_figure is not None:
@@ -99,7 +99,7 @@ def do_layout(self, args):
     do_refresh(self, '')
 
 def do_figlist(self, args):
-    """figlist
+    """ofiglist
     Print the list of figures"""
     global _current_figure
     global _current_graph
@@ -116,7 +116,7 @@ def do_figlist(self, args):
                          SEPARATOR.join(g.signals.keys()))
 
 def do_read(self, arg):
-    """read DATAFILE
+    """oread DATAFILE
     Read signal file"""
     global _globals
 
@@ -134,7 +134,7 @@ def do_read(self, arg):
         print _("File format not supported")
 
 def do_write(self, args):
-    """write format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]
+    """owrite format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]
     Save signals to file"""
     # Extract format, options and signal list
     tmp = re.search(r'(?P<fmt>\w+)\s*(?P<opts>\([^\)]*\))?\s+(?P<fn>[\w\./]+)\s+(?P<sigs>\w+(\s*,\s*\w+)*)', args)
@@ -159,7 +159,7 @@ def do_write(self, args):
         print _("File format not supported")
 
 def do_update(self, args):
-    """ update
+    """oupdate
     Reread data files"""
     if not args:
         _ctxt.update()
@@ -171,7 +171,7 @@ def do_update(self, args):
     do_refresh(self, '')
 
 def do_add(self, args):
-    """add SIG [, SIG [, SIG]...]
+    """oadd SIG [, SIG [, SIG]...]
     Add a graph to the current figure.
     If no figure is selected, then create a new one"""
     global _current_figure
@@ -191,7 +191,7 @@ def do_add(self, args):
     do_refresh(self, '')
 
 def do_delete(self, args):
-    """delete GRAPH#
+    """odelete GRAPH#
     Delete a graph from the current figure"""
     global _current_figure
     global _current_graph
@@ -205,7 +205,7 @@ def do_delete(self, args):
     do_refresh(self, '')
 
 def do_mode(self, args):
-    """mode MODE
+    """omode MODE
     Set the type of the current graph of the current figure.
     Available modes :
     lin      Linear graph"""
@@ -220,7 +220,7 @@ def do_mode(self, args):
     do_refresh(self, '')
 
 def do_scale(self, args):
-    """scale [lin|logx|logy|loglog]
+    """oscale [lin|logx|logy|loglog]
     Set the axis scale"""
     global _current_graph
     if _current_graph is None:
@@ -229,7 +229,7 @@ def do_scale(self, args):
     do_refresh(self, '')
 
 def do_range(self, args):
-    """range [x|y min max]|[xmin xmax ymin ymax]|[reset]
+    """orange [x|y min max]|[xmin xmax ymin ymax]|[reset]
     Set the axis range of the current graph of the current figure
     """
     global _current_graph
@@ -250,7 +250,7 @@ def do_range(self, args):
     do_refresh(self, '')
 
 def do_unit(self, args):
-    """unit [XUNIT,] YUNIT
+    """ounit [XUNIT,] YUNIT
     Set the unit to be displayed on graph axis"""
     global _current_graph
     units = args.split(",", 1)
@@ -266,7 +266,7 @@ def do_unit(self, args):
     do_refresh(self, '')
 
 def do_insert(self, args):
-    """ insert SIG [, SIG [, SIG]...]
+    """oinsert SIG [, SIG [, SIG]...]
     Insert a list of signals into the current graph"""
     global _current_graph
     if _current_graph is None:
@@ -275,7 +275,7 @@ def do_insert(self, args):
     do_refresh(self, '')
 
 def do_remove(self, args):
-    """ remove SIG [, SIG [, SIG]...]
+    """oremove SIG [, SIG [, SIG]...]
     Delete a list of signals into from current graph"""
     global _current_graph
     if _current_graph is None:
@@ -284,19 +284,19 @@ def do_remove(self, args):
     do_refresh(self, '')
 
 def do_freeze(self, args):
-    """freeze SIG [, SIG [, SIG]...]
+    """ofreeze SIG [, SIG [, SIG]...]
     Do not consider signal for subsequent updates"""
     _ctxt.freeze(get_signames(args))
     _gui.freeze(args)
 
 def do_unfreeze(self, args):
-    """freeze SIG [, SIG [, SIG]...]
+    """ofreeze SIG [, SIG [, SIG]...]
     Consider signal for subsequent updates"""
     _ctxt.unfreeze(get_signames(args))
     _gui.freeze(args)
 
 def do_siglist(self, args):
-    """siglist
+    """osiglist
     List loaded signals"""
     SEPARATOR = "\t"
     HEADER=[_("Name"), _("Unit"), _("Ref"), _("Reader"),_("Last updated (sec)")]
@@ -311,7 +311,7 @@ def do_siglist(self, args):
                                       str(int(t - reader.info['last_update']))))
 
 def do_exec(self, file):
-    """exec FILENAME
+    """oexec FILENAME
     execute commands from file"""
     try:
         if not file.startswith('/'):
@@ -326,7 +326,7 @@ def do_exec(self, file):
         print os.getcwd()
 
 def do_factors(self, args):
-    """factors X, Y
+    """ofactors X, Y
     set the scaling factor of the graph (in power of ten)
     use 'auto' for automatic scaling factor
     e.g. factor -3, 6 set the scale factor at 1e-3 and 10e6"""
@@ -350,7 +350,7 @@ def do_factors(self, args):
     do_refresh(self, '')
 
 def do_refresh(self, args):
-    """refresh FIG#|on|off|current|all'
+    """orefresh FIG#|on|off|current|all'
     on|off       toggle auto refresh of current figure
     current|all  refresh either current figure or all
     FIG#         figure to refresh
@@ -379,7 +379,7 @@ def do_refresh(self, args):
                 _ctxt.figures[fignum].canvas.draw()
 
 def do_gui(self, args):
-    """gui
+    """ogui
     Invoke the oscopy gui
     """
     global _gui
@@ -387,7 +387,7 @@ def do_gui(self, args):
     _gui.show_all()
 
 def do_import(self, args):
-    """import
+    """oimport
     Import a signal into the oscopy context.
     This is done through the signal_reader class
     """
@@ -405,14 +405,14 @@ def do_import(self, args):
 #    _globals.update(sigs)
 
 def do_context(self, args):
-    """context
+    """ocontext
     Returns the context used by the module
     """
     global _ctxt
     return _ctxt
 
 def get_signames(args):
-    """ Return the signal names list extracted from the commandline
+    """Return the signal names list extracted from the commandline
     The list must be a coma separated list of signal names.
     If no signals are loaded of no signal are found, return []
     """
@@ -559,11 +559,17 @@ def set_ufuncs():
         if isinstance(getattr(numpy, val), numpy.ufunc):
             if getattr(numpy, val).nin == 1:
                 _globals.update({val: make_ufunc_unary(val)})
+                _globals[val].__doc__ = getattr(numpy, val).__doc__
+                _globals[val].__name__ = getattr(numpy, val).__name__
             if getattr(numpy, val).nin == 2:
                 _globals.update({val: make_ufunc_binary(val)})
+                _globals[val].__doc__ = getattr(numpy, val).__doc__
+                _globals[val].__name__ = getattr(numpy, val).__name__
     for val in dir(numpy.fft):
         if val.endswith('ifft'):
             pass
         elif val.endswith('fft'):
             _globals.update({val: make_fft_func(val)})
+            _globals[val].__doc__ = getattr(numpy.fft, val).__doc__
+            _globals[val].__name__ = getattr(numpy.fft, val).__name__
             
