@@ -11,6 +11,7 @@ import commands
 import ConfigParser
 import dbus, dbus.service, dbus.glib
 from xdg import BaseDirectory
+from matplotlib.backend_bases import LocationEvent
 import IPython
 
 import oscopy
@@ -286,6 +287,7 @@ class App(dbus.service.Object):
     def _axes_enter(self, event):
         self._figure_enter(event)
         self._current_graph = event.inaxes
+
         axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
         fig_num = self._ctxt.figures.index(self._current_figure) + 1
         self._app_exec('%%oselect %d-%d' % (fig_num, axes_num))
@@ -448,21 +450,23 @@ class App(dbus.service.Object):
 
     def _drag_data_received_cb(self, widget, drag_context, x, y, selection,\
                                    target_type, time):
-        # FIXME: Event handling issue: this drag and drop callback is
-        #        processed before matplotlib callback _axes_enter. Therefore
-        #        when dropping, self._current_graph is not valid: it contains
-        #        the last graph. Workaround
-        #             leave the figure window by the destination graph
-        #             go to the Signal list window
-        #             drag and drop the signal into the destination graph
+        # Event handling issue: this drag and drop callback is
+        # processed before matplotlib callback _axes_enter. Therefore
+        # when dropping, self._current_graph is not valid: it contains
+        # the last graph.
+        # The workaround is to retrieve the Graph by creating a Matplotlib
+        # LocationEvent considering inverse 'y' coordinates
         if target_type == self._TARGET_TYPE_SIGNAL:
-            if self._current_graph is not None:
-                signals = {}
-                for name in selection.data.split():
-                    signals[name] = self._ctxt.signals[name]
-                self._current_graph.insert(signals)
-                if self._current_figure.canvas is not None:
-                    self._current_figure.canvas.draw()
+            canvas = self._windows_to_figures[widget].canvas
+            my_y = canvas.allocation.height - y
+            event = LocationEvent('axes_enter_event', canvas, x, my_y)
+            signals = {}
+            for name in selection.data.split():
+                signals[name] = self._ctxt.signals[name]
+            if event.inaxes is not None:
+                # Graph not found
+                event.inaxes.insert(signals)
+                self._windows_to_figures[widget].canvas.draw()
 
     #
     # Configuration-file related functions
