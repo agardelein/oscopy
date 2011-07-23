@@ -534,6 +534,7 @@ Class Signal -- Contains the signal points and other information
         name = '-%s' % self.name
         s = Signal(name, None)
         s.data = -self.data
+        s.ref = self.ref if self.ref is not None else self
         self.connect('changed', s.on_changed)
         self.connect('begin-transaction', s.on_begin_transaction)
         self.connect('end-transaction', s.on_end_transaction)
