@@ -39,6 +39,7 @@ AC_CONFIG_FILES([
 	doc/oscopy-api/Makefile
 	doc/oscopy-api/tex/Makefile
 	doc/oscopy-api/pdf/Makefile
+	po/Makefile.in
 ])
 
 #####################################################################
@@ -64,5 +65,14 @@ PKG_PROG_PKG_CONFIG
 
 PKG_CHECK_MODULES(PYGTK, [pygtk-2.0 >= 2.10.0], ,
   AC_MSG_ERROR([PyGTK 2.10.0 or later is required.]))
+
+###################################
+### Internationalization
+###################################
+GETTEXT_PACKAGE=oscopy
+AC_SUBST([GETTEXT_PACKAGE])
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], "$GETTEXT_PACKAGE", [Gettext package])
+AM_GLIB_GNU_GETTEXT
+IT_PROG_INTLTOOL([0.41.0])
 
 AC_OUTPUT
