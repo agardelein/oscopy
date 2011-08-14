@@ -5,9 +5,14 @@
 #fi
 #ipython -pylab -profile oscopy -noconfirm_exit -nobanner
 
+GETTEXT_DOMAIN = 'oscopy'
+import gettext
+
 import gtk, gobject, sys, os, shutil
 import IPython.Shell
 live = False
+
+gettext.install(GETTEXT_DOMAIN,'@datarootdir@/locale',unicode=1)
 
 try:
     os.stat(os.getenv('HOME') + '/.ipython/ipythonrc-oscopy')
