@@ -1,4 +1,4 @@
-mysubdirs = oscopy scheme
+mysubdirs = oscopy scheme po
 
 if CAN_BUILD_DOC
 SUBDIRS = $(mysubdirs) doc
