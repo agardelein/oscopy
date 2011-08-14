@@ -1,0 +1,23 @@
+[encoding: UTF-8]
+oscopy/gui/menus.py
+oscopy/gui/dialogs.py
+oscopy/gui/__init__.py
+oscopy/readers/signal_reader.py
+oscopy/readers/gnucap_reader.py
+oscopy/readers/__init__.py
+oscopy/readers/reader.py
+oscopy/readers/detect_reader.py
+oscopy/ui.py
+oscopy/context.py
+oscopy/graphs/graph.py
+oscopy/graphs/lingraph.py
+oscopy/graphs/cursor.py
+oscopy/graphs/__init__.py
+oscopy/figure.py
+oscopy/ioscopy.py
+oscopy/__init__.py
+oscopy/signal.py
+oscopy/writers/writer.py
+oscopy/writers/detect_writer.py
+oscopy/writers/gnucap_writer.py
+oscopy/writers/__init__.py
