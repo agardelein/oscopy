@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: oscopy 0.32\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-05-05 12:42-0300\n"
+"POT-Creation-Date: 2011-08-13 22:51-0300\n"
 "PO-Revision-Date: 2010-05-05 11:46-0300\n"
 "Last-Translator: Adrian Pardini<pardo.bsso@gmail.com>\n"
 "Language-Team: Argentinian <translation-es-AR@lists.sourceforge.net>\n"
@@ -17,443 +17,455 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: oscopy_ui.py:60
-msgid ""
-"  on|off       toggle auto refresh of current figure\n"
-"  current|all  refresh either current figure or all\n"
-"  FIG#         figure to refresh\n"
-"without arguments refresh current figure"
-msgstr ""
-"  on|off       conmuta el redibujado automático de la figura actual\n"
-"  current|all  si redibujar la figura actual o todas\n"
-"  FIG#         figura a redibujar\n"
-"sin argumentos redibuja la figura actual"
-
-#: oscopy_ui.py:81
-msgid "refreshing"
-msgstr "redibujando"
-
-#: oscopy_ui.py:85
-msgid "Pause command disabled in UI"
-msgstr "El comando Pausa está deshablilitado en la UI"
-
-#: oscopy_ui.py:88
-msgid "Plot command disabled in UI"
-msgstr "El comando Plot está deshablilitado en la UI"
-
-#: oscopy_ui.py:109 oscopy_gui/menus.py:77
-msgid "Linear"
-msgstr "Lineal"
-
-#: oscopy_ui.py:109 oscopy_gui/menus.py:77
-msgid "LogX"
-msgstr ""
-
-#: oscopy_ui.py:109 oscopy_gui/menus.py:77
-msgid "LogY"
-msgstr ""
-
-#: oscopy_ui.py:110 oscopy_gui/menus.py:78
-msgid "Loglog"
-msgstr ""
-
-#: oscopy_ui.py:153
-msgid "Add file(s)"
-msgstr "Añadir archivo(s)"
-
-#: oscopy_ui.py:167
-msgid "New math signal"
-msgstr "Nueva señal matemática"
-
-#: oscopy_ui.py:173
-msgid "Expression:"
-msgstr "Expresión:"
-
-#: oscopy_ui.py:194
-msgid "Execute script"
-msgstr "Ejecutar script"
-
-#: oscopy_ui.py:239
-msgid "_File"
-msgstr "_Archivo"
-
-#: oscopy_ui.py:240
-msgid "_Add file(s)..."
-msgstr "_Añadir archivo(s)..."
-
-#: oscopy_ui.py:242
-msgid "_Update"
-msgstr "Actuali_zar"
-
-#: oscopy_ui.py:244
-msgid "_Execute script..."
-msgstr "_Ejecutar script"
-
-#: oscopy_ui.py:246
-msgid "_New Math Signal"
-msgstr "Nueva señal _Matemática"
-
-#: oscopy_ui.py:249
-msgid "_Run netlister and simulate..."
-msgstr "E_jecutar el netlister y simular..."
-
-#: oscopy_ui.py:251
-msgid "_Windows"
-msgstr "_Ventanas"
-
-#: oscopy_ui.py:252
-msgid "_Quit"
-msgstr "_Salir"
-
-#: oscopy_ui.py:259
-msgid "_Show terminal"
-msgstr "Mostrar la _terminal"
-
-#: oscopy_ui.py:271
-msgid "Signal"
-msgstr "Señal"
-
-#: oscopy_ui.py:285
-msgid "Freeze"
-msgstr "Congelar"
-
-#: oscopy_ui.py:312
-msgid "Oscopy GUI"
-msgstr ""
-
-#: oscopy_ui.py:422 oscopy_ui.py:444 oscopy/app.py:141
-#, python-format
-msgid "Figure %d"
-msgstr "Figura %d"
-
-#: oscopy_ui.py:615
-#, python-format
-msgid "Executing command '%s' failed."
-msgstr "Falló la ejecución del comando '%s'."
-
-#: oscopy/readers/reader.py:152
-msgid "No file specified"
-msgstr "No se especificó un archivo"
-
-#: oscopy/readers/reader.py:154
-msgid "File do not exist"
-msgstr "El archivo no existe"
-
-#: oscopy/readers/reader.py:156
-msgid "File is not a file"
-msgstr "El archivo no es un archivo"
-
-#: oscopy/context.py:109
-msgid "Out of range figure number"
-msgstr "Número de figura fuera de rango"
-
-#: oscopy/context.py:120
-msgid "File already loaded, use update to read it again"
-msgstr "El archivo ya está cargado, use 'actualizar' para leerlo nuevamente"
-
-#: oscopy/context.py:231
-#, python-format
-msgid "What is %s"
-msgstr "Qué es %s?"
-
-#: oscopy/app.py:52
-msgid "   Create a new figure, set_ it as current, add the signals"
-msgstr "   Crear una nueva figura, ponerla como actual, agrega las señales"
-
-#: oscopy/app.py:65
-msgid "   Destroy a figure"
-msgstr "   Destruye una figura"
-
-#: oscopy/app.py:86
-msgid "   Select the current figure and the current graph"
-msgstr "   Selecciona la figura y el gráfico actual"
-
-#: oscopy/app.py:107
-msgid "   Define the layout of the current figure"
-msgstr "   Define el esquema de la figura actual"
-
-#: oscopy/app.py:114
-msgid "   Print the list of figures"
-msgstr "   Muestra la lista de figuras"
-
-#: oscopy/app.py:119
-#, python-format
-msgid "%s Figure %d: %s"
-msgstr "%s Figura %d: %s"
-
-#: oscopy/app.py:123
-#, python-format
-msgid "    %s Graph %d : (%s) %s"
-msgstr "    %s Gráfico %d : (%s) %s"
-
-#: oscopy/app.py:130
-msgid "   Draw and show the figures"
-msgstr "   Dibuja y muestra las figuras"
-
-#: oscopy/app.py:162
-msgid "   Read signal file"
-msgstr "   Lee el archivo de señales"
-
-#: oscopy/app.py:166
-#, python-format
-msgid "%s already read, use update to reread it"
-msgstr "%s ya ha sido leído, use 'actualizar' para releerlo"
-
-#: oscopy/app.py:171
-#, python-format
-msgid "Failed to read %s:"
-msgstr "No se pudo leer %s:"
-
-#: oscopy/app.py:173 oscopy/app.py:200
-msgid "File format not supported"
-msgstr "El formato de archivo no está soportado"
-
-#: oscopy/app.py:177
-msgid "   Write signals to file"
-msgstr "   Escribe las señales a un archivo"
-
-#: oscopy/app.py:198
-msgid "Write error:"
-msgstr "Error al escribir:"
-
-#: oscopy/app.py:204
-msgid "   Reread data files"
-msgstr "   Relee los archivos de datos"
-
-#: oscopy/app.py:212
-#, python-format
-msgid "%s not found in readers"
-msgstr "%s no se encontró entre los lectores"
-
-#: oscopy/app.py:216
-msgid "   Add a graph to the current figure"
-msgstr "   Agrega un gráfico a la figura actual"
-
-#: oscopy/app.py:220 oscopy/figure.py:80
-msgid "Maximum graph number reached"
-msgstr "Se alcanzó el máximo número de gráficos"
-
-#: oscopy/app.py:235
-msgid "   Delete a graph from the current figure"
-msgstr "   Elimina un gráfico de la figura actual"
-
-#: oscopy/app.py:246
-msgid "   Set the type of the current graph of the current figure"
-msgstr "   Establece el tipo de gráfico de la figura actual"
-
-#: oscopy/app.py:247
-msgid ""
-"Available modes :\n"
-"   lin      Linear graph\n"
-msgstr ""
-"Modos disponibles :\n"
-"   lin      Gráfico lineal\n"
-
-#: oscopy/app.py:260
-msgid "   Set the axis scale"
-msgstr "   Establece la escala del eje"
-
-#: oscopy/app.py:268
-msgid "   Set the axis range of the current graph of the current figure"
-msgstr "   Establece el rango del eje para el gráfico actual"
-
-#: oscopy/app.py:287
-msgid "   Set the unit to be displayed on graph axis"
-msgstr "   Establece la unidad a mostrar en el eje del gráfico"
-
-#: oscopy/app.py:302
-msgid "   Insert a list of signals into the current graph"
-msgstr "   Inserta una lista de señales en el gráfico actual"
-
-#: oscopy/app.py:311
-msgid "   Delete a list of signals into from current graph"
-msgstr "   Elimina una lista de señales en el gráfico actual"
-
-#: oscopy/app.py:320
-msgid "   Do not consider signal for subsequent updates"
-msgstr "   No considera la señal para las próximas actualizaciones"
-
-#: oscopy/app.py:326
-msgid "   Consider signal for subsequent updates"
-msgstr ""
-
-#: oscopy/app.py:332
-msgid "   List loaded signals"
-msgstr "   Muestra las señales cargadas"
-
-#: oscopy/app.py:348
-msgid "   Define a new signal destsig using mathematical expression"
-msgstr "   Define una nueva señal usando una expresión matemática"
-
-#: oscopy/app.py:353
-msgid "Error creating signal from math expression:"
-msgstr "Error al crear una señal a partir de la expresión matemática:"
-
-#: oscopy/app.py:370
-msgid "   Print text"
-msgstr "   Imprime texto"
-
-#: oscopy/app.py:376
-msgid "   Wait for the user to press enter"
-msgstr "   Espera a que el usuario presione enter"
-
-#: oscopy/app.py:414
-msgid "   execute commands from file"
-msgstr "   ejecuta comandos desde un archivo"
-
-#: oscopy/app.py:426
-msgid "Script error:"
-msgstr "Error en el script:"
-
-#: oscopy/app.py:434
-msgid ""
-"   set the scaling factor of the graph (in power of ten)\n"
-"   use 'auto' for automatic scaling factor\n"
-"   e.g. factor -3, 6 set the scale factor at 1e-3 and 10e6"
-msgstr ""
-"   establece el factor de escala para el gráfico (en potencias de diez)\n"
-"   use 'auto' para calcularlo automáticamente\n"
-"   por ejemplo factor -3, 6 establece el factor de escala en 1e-3 y 10e6"
-
-#: oscopy/graphs/graph.py:128
-msgid "Signals"
-msgstr "Señales"
-
-#: oscopy/graphs/graph.py:240 oscopy/graphs/graph.py:242
-msgid "Invalid argument"
-msgstr "Argumento inválido"
-
-#: oscopy/graphs/graph.py:318
-msgid "Unrecognized argument"
-msgstr "Argumento no reconocido"
-
-#: oscopy/graphs/graph.py:371
-msgid "Invalid cursor number"
-msgstr "Número de cursor inválido"
-
-#: oscopy/graphs/graph.py:373
-msgid "Invalid cursor type"
-msgstr "Tipo de cursor inválido"
-
-#: oscopy/graphs/cursor.py:98 oscopy/figure.py:71 oscopy/figure.py:109
-#: oscopy/figure.py:111 oscopy/signal.py:113
-msgid "Bad type"
-msgstr "Tipo erróneo"
-
-#: oscopy/figure.py:100 oscopy/figure.py:102
-msgid "Bad graph number"
-msgstr "Número de gráfico erróneo"
-
-#: oscopy/figure.py:134
-msgid "No graph defined"
-msgstr "No se definió un gráfico"
-
-#: oscopy/figure.py:154 oscopy/figure.py:215
-msgid "Bad layout"
-msgstr "Esquema erróneo"
-
-#: oscopy/signal.py:69
-#, python-format
-msgid "Data %s not handled"
-msgstr "El dato %s no está soportado"
-
-#: oscopy_gui/menus.py:10
+#: ../oscopy/gui/menus.py:10
 msgid "Horizontal"
 msgstr ""
 
-#: oscopy_gui/menus.py:10
+#: ../oscopy/gui/menus.py:10
 msgid "Vertical"
 msgstr ""
 
-#: oscopy_gui/menus.py:11
+#: ../oscopy/gui/menus.py:11
 msgid "Quad"
 msgstr ""
 
-#: oscopy_gui/menus.py:22
+#: ../oscopy/gui/menus.py:22
 msgid "Add graph"
 msgstr "Añadir gráfico"
 
-#: oscopy_gui/menus.py:26
+#: ../oscopy/gui/menus.py:26
 msgid "Delete graph"
 msgstr "Elimina el gráfico"
 
-#: oscopy_gui/menus.py:31
+#: ../oscopy/gui/menus.py:31
 msgid "Layout"
 msgstr "Esquema"
 
-#: oscopy_gui/menus.py:81
+#: ../oscopy/gui/menus.py:77 ../oscopy/ui.py:51
+msgid "Linear"
+msgstr "Lineal"
+
+#: ../oscopy/gui/menus.py:77 ../oscopy/ui.py:51
+msgid "LogX"
+msgstr ""
+
+#: ../oscopy/gui/menus.py:77 ../oscopy/ui.py:51
+msgid "LogY"
+msgstr ""
+
+#: ../oscopy/gui/menus.py:78 ../oscopy/ui.py:52
+msgid "Loglog"
+msgstr ""
+
+#. menu = gtk.Menu()
+#: ../oscopy/gui/menus.py:81
 msgid "Range..."
 msgstr "Rango..."
 
-#: oscopy_gui/menus.py:86
+#: ../oscopy/gui/menus.py:86
 msgid "Units..."
 msgstr "Unidades..."
 
-#: oscopy_gui/menus.py:91
+#: ../oscopy/gui/menus.py:91
 msgid "Scale"
 msgstr "Escala"
 
-#: oscopy_gui/menus.py:96
+#: ../oscopy/gui/menus.py:96
 msgid "Insert signal"
 msgstr "Inserta señal"
 
-#: oscopy_gui/menus.py:101
+#: ../oscopy/gui/menus.py:101
 msgid "Remove signal"
 msgstr "Remueve señal"
 
-#: oscopy_gui/menus.py:184
+#: ../oscopy/gui/menus.py:184
 msgid "No graph selected"
 msgstr "No se seleccionó un gráfico"
 
-#: oscopy_gui/dialogs.py:31
+#: ../oscopy/gui/dialogs.py:29
 msgid "Enter graph units"
 msgstr "Ingrese las unidades del gráfico"
 
-#: oscopy_gui/dialogs.py:96
+#: ../oscopy/gui/dialogs.py:94
 msgid "Enter graph range"
 msgstr "Ingrese el rango del gráfico"
 
-#: oscopy_gui/dialogs.py:103
+#: ../oscopy/gui/dialogs.py:101
 msgid "From"
 msgstr "Desde"
 
-#: oscopy_gui/dialogs.py:103
+#: ../oscopy/gui/dialogs.py:101
 msgid "To"
 msgstr "Hasta"
 
-#: oscopy_gui/dialogs.py:170
+#: ../oscopy/gui/dialogs.py:168
 #, python-format
 msgid "Run %s:"
 msgstr "Ejecutar %s:"
 
-#: oscopy_gui/dialogs.py:176
+#: ../oscopy/gui/dialogs.py:174
 msgid "Run netlister and simulate"
 msgstr "Ejecutar el netlister y simular"
 
-#: oscopy_gui/dialogs.py:185
+#: ../oscopy/gui/dialogs.py:183
 msgid "netlister"
 msgstr ""
 
-#: oscopy_gui/dialogs.py:195
+#: ../oscopy/gui/dialogs.py:193
 msgid "simulator"
 msgstr "simulador"
 
-#: oscopy_gui/dialogs.py:207
+#: ../oscopy/gui/dialogs.py:205
 msgid "<b>Options</b>"
 msgstr "<b>Opciones</b>"
 
-#: oscopy_gui/dialogs.py:212
+#: ../oscopy/gui/dialogs.py:210
 msgid "Run from directory:"
 msgstr "Ejecutar desde directorio:"
 
-#: oscopy_gui/dialogs.py:214
+#: ../oscopy/gui/dialogs.py:212
 msgid "Choose directory"
 msgstr "Elegir directorio"
 
-#: oscopy_gui/dialogs.py:226
+#: ../oscopy/gui/dialogs.py:224
 msgid "Update readers once terminated"
 msgstr "Actualizar los lectores al terminar"
 
-#: oscopy_gui/dialogs.py:310
-msgid "Command:"
-msgstr "Comando:"
+#: ../oscopy/readers/reader.py:250
+msgid "No file specified"
+msgstr "No se especificó un archivo"
+
+#: ../oscopy/readers/reader.py:252
+msgid "File do not exist"
+msgstr "El archivo no existe"
+
+#: ../oscopy/readers/reader.py:254
+msgid "File is not a file"
+msgstr "El archivo no es un archivo"
+
+#: ../oscopy/ui.py:92
+msgid "Add file(s)"
+msgstr "Añadir archivo(s)"
+
+#: ../oscopy/ui.py:106
+msgid "New math signal"
+msgstr "Nueva señal matemática"
+
+#: ../oscopy/ui.py:112
+msgid "Expression:"
+msgstr "Expresión:"
+
+#: ../oscopy/ui.py:127
+msgid "Execute script"
+msgstr "Ejecutar script"
+
+#: ../oscopy/ui.py:173
+msgid "_File"
+msgstr "_Archivo"
+
+#: ../oscopy/ui.py:174
+msgid "_Add file(s)..."
+msgstr "_Añadir archivo(s)..."
+
+#: ../oscopy/ui.py:176
+msgid "_Update"
+msgstr "Actuali_zar"
+
+#: ../oscopy/ui.py:178
+msgid "_Execute script..."
+msgstr "_Ejecutar script"
+
+#: ../oscopy/ui.py:180
+msgid "_New Math Signal"
+msgstr "Nueva señal _Matemática"
+
+#: ../oscopy/ui.py:183
+msgid "_Run netlister and simulate..."
+msgstr "E_jecutar el netlister y simular..."
+
+#: ../oscopy/ui.py:185
+msgid "_Windows"
+msgstr "_Ventanas"
+
+#: ../oscopy/ui.py:186
+msgid "_Quit"
+msgstr "_Salir"
+
+#: ../oscopy/ui.py:200
+msgid "Signal"
+msgstr "Señal"
+
+#: ../oscopy/ui.py:214
+msgid "Freeze"
+msgstr "Congelar"
+
+#: ../oscopy/ui.py:240
+msgid "Oscopy GUI"
+msgstr ""
+
+#. Add it to the 'Windows' menu
+#: ../oscopy/ui.py:343 ../oscopy/ui.py:365
+#, python-format
+msgid "Figure %d"
+msgstr "Figura %d"
+
+#: ../oscopy/ui.py:543
+#, python-format
+msgid "Executing command '%s' failed."
+msgstr "Falló la ejecución del comando '%s'."
+
+#: ../oscopy/context.py:101
+msgid "Out of range figure number"
+msgstr "Número de figura fuera de rango"
+
+#: ../oscopy/context.py:129
+msgid "File already loaded, use update to read it again"
+msgstr "El archivo ya está cargado, use 'actualizar' para leerlo nuevamente"
+
+#: ../oscopy/graphs/graph.py:140
+msgid "Signals"
+msgstr "Señales"
+
+#: ../oscopy/graphs/graph.py:320 ../oscopy/graphs/graph.py:322
+msgid "Invalid argument"
+msgstr "Argumento inválido"
+
+#: ../oscopy/graphs/graph.py:446
+msgid "Unrecognized argument"
+msgstr "Argumento no reconocido"
+
+#: ../oscopy/graphs/graph.py:538
+msgid "Invalid cursor number"
+msgstr "Número de cursor inválido"
+
+#: ../oscopy/graphs/graph.py:540
+msgid "Invalid cursor type"
+msgstr "Tipo de cursor inválido"
+
+#: ../oscopy/graphs/cursor.py:158 ../oscopy/figure.py:92
+#: ../oscopy/figure.py:163 ../oscopy/figure.py:165
+msgid "Bad type"
+msgstr "Tipo erróneo"
+
+#: ../oscopy/figure.py:110 ../oscopy/ioscopy.py:182
+msgid "Maximum graph number reached"
+msgstr "Se alcanzó el máximo número de gráficos"
+
+#: ../oscopy/figure.py:138 ../oscopy/figure.py:140
+msgid "Bad graph number"
+msgstr "Número de gráfico erróneo"
+
+#: ../oscopy/figure.py:204
+msgid "No graph defined"
+msgstr "No se definió un gráfico"
+
+#: ../oscopy/figure.py:243 ../oscopy/figure.py:335
+msgid "Bad layout"
+msgstr "Esquema erróneo"
+
+#: ../oscopy/ioscopy.py:64
+msgid "do_destroy: Bad argument"
+msgstr "do_destroy: Argumento erróneo"
+
+#: ../oscopy/ioscopy.py:79
+msgid "do_select: no args"
+msgstr "do_select: faltan argumentos"
+
+#: ../oscopy/ioscopy.py:82
+msgid "do_select: bad figure or graph number"
+msgstr "do_select: figura o número de gráfico erróneos"
+
+#: ../oscopy/ioscopy.py:109
+#, python-format
+msgid "%s Figure %d: %s"
+msgstr "%s Figura %d: %s"
+
+#: ../oscopy/ioscopy.py:113
+#, python-format
+msgid "    %s Graph %d : (%s) %s"
+msgstr "    %s Gráfico %d : (%s) %s"
+
+#: ../oscopy/ioscopy.py:125
+#, python-format
+msgid "%s already read, use update to reread it"
+msgstr "%s ya ha sido leído, use 'actualizar' para releerlo"
+
+#: ../oscopy/ioscopy.py:132
+#, python-format
+msgid "Failed to read %s:"
+msgstr "No se pudo leer %s:"
+
+#: ../oscopy/ioscopy.py:134 ../oscopy/ioscopy.py:159
+msgid "File format not supported"
+msgstr "El formato de archivo no está soportado"
+
+#: ../oscopy/ioscopy.py:143
+msgid "do_write: Bad arguments"
+msgstr "do_write: Argumentos erróneos"
+
+#: ../oscopy/ioscopy.py:157
+msgid "Write error:"
+msgstr "Error al escribir:"
+
+#: ../oscopy/ioscopy.py:170
+#, python-format
+msgid "%s not found in readers"
+msgstr "%s no se encontró entre los lectores"
+
+#: ../oscopy/ioscopy.py:302
+msgid "Name"
+msgstr "Nombre"
+
+#: ../oscopy/ioscopy.py:302
+#, fuzzy
+msgid "Unit"
+msgstr "Unidades..."
+
+#: ../oscopy/ioscopy.py:302
+msgid "Ref"
+msgstr ""
+
+#: ../oscopy/ioscopy.py:302
+msgid "Reader"
+msgstr "Lector"
+
+#: ../oscopy/ioscopy.py:302
+msgid "Last updated (sec)"
+msgstr "Actualizado por última vez (segs)"
+
+#: ../oscopy/ioscopy.py:322
+msgid "Script error:"
+msgstr "Error en el script:"
+
+#: ../oscopy/ioscopy.py:378
+msgid "refreshing"
+msgstr "redibujando"
+
+#: ../oscopy/ioscopy.py:403
+#, python-format
+msgid "Error: Signal not recognized (%s)"
+msgstr "Error: Señal no reconocida (%s)"
+
+#: ../oscopy/signal.py:194
+#, python-format
+msgid "Data %s not handled"
+msgstr "El dato %s no está soportado"
+
+#: ../oscopy/signal.py:363 ../oscopy/signal.py:395
+#, python-format
+msgid "unknown property %s"
+msgstr "propiedad desconocida %s"
+
+#~ msgid ""
+#~ "  on|off       toggle auto refresh of current figure\n"
+#~ "  current|all  refresh either current figure or all\n"
+#~ "  FIG#         figure to refresh\n"
+#~ "without arguments refresh current figure"
+#~ msgstr ""
+#~ "  on|off       conmuta el redibujado automático de la figura actual\n"
+#~ "  current|all  si redibujar la figura actual o todas\n"
+#~ "  FIG#         figura a redibujar\n"
+#~ "sin argumentos redibuja la figura actual"
+
+#~ msgid "Pause command disabled in UI"
+#~ msgstr "El comando Pausa está deshablilitado en la UI"
+
+#~ msgid "Plot command disabled in UI"
+#~ msgstr "El comando Plot está deshablilitado en la UI"
+
+#~ msgid "_Show terminal"
+#~ msgstr "Mostrar la _terminal"
+
+#~ msgid "What is %s"
+#~ msgstr "Qué es %s?"
+
+#~ msgid "   Create a new figure, set_ it as current, add the signals"
+#~ msgstr "   Crear una nueva figura, ponerla como actual, agrega las señales"
+
+#~ msgid "   Destroy a figure"
+#~ msgstr "   Destruye una figura"
+
+#~ msgid "   Select the current figure and the current graph"
+#~ msgstr "   Selecciona la figura y el gráfico actual"
+
+#~ msgid "   Define the layout of the current figure"
+#~ msgstr "   Define el esquema de la figura actual"
+
+#~ msgid "   Print the list of figures"
+#~ msgstr "   Muestra la lista de figuras"
+
+#~ msgid "   Draw and show the figures"
+#~ msgstr "   Dibuja y muestra las figuras"
+
+#~ msgid "   Read signal file"
+#~ msgstr "   Lee el archivo de señales"
+
+#~ msgid "   Write signals to file"
+#~ msgstr "   Escribe las señales a un archivo"
+
+#~ msgid "   Reread data files"
+#~ msgstr "   Relee los archivos de datos"
+
+#~ msgid "   Add a graph to the current figure"
+#~ msgstr "   Agrega un gráfico a la figura actual"
+
+#~ msgid "   Delete a graph from the current figure"
+#~ msgstr "   Elimina un gráfico de la figura actual"
+
+#~ msgid "   Set the type of the current graph of the current figure"
+#~ msgstr "   Establece el tipo de gráfico de la figura actual"
+
+#~ msgid ""
+#~ "Available modes :\n"
+#~ "   lin      Linear graph\n"
+#~ msgstr ""
+#~ "Modos disponibles :\n"
+#~ "   lin      Gráfico lineal\n"
+
+#~ msgid "   Set the axis scale"
+#~ msgstr "   Establece la escala del eje"
+
+#~ msgid "   Set the axis range of the current graph of the current figure"
+#~ msgstr "   Establece el rango del eje para el gráfico actual"
+
+#~ msgid "   Set the unit to be displayed on graph axis"
+#~ msgstr "   Establece la unidad a mostrar en el eje del gráfico"
+
+#~ msgid "   Insert a list of signals into the current graph"
+#~ msgstr "   Inserta una lista de señales en el gráfico actual"
+
+#~ msgid "   Delete a list of signals into from current graph"
+#~ msgstr "   Elimina una lista de señales en el gráfico actual"
+
+#~ msgid "   Do not consider signal for subsequent updates"
+#~ msgstr "   No considera la señal para las próximas actualizaciones"
+
+#~ msgid "   List loaded signals"
+#~ msgstr "   Muestra las señales cargadas"
+
+#~ msgid "   Define a new signal destsig using mathematical expression"
+#~ msgstr "   Define una nueva señal usando una expresión matemática"
+
+#~ msgid "Error creating signal from math expression:"
+#~ msgstr "Error al crear una señal a partir de la expresión matemática:"
+
+#~ msgid "   Print text"
+#~ msgstr "   Imprime texto"
+
+#~ msgid "   Wait for the user to press enter"
+#~ msgstr "   Espera a que el usuario presione enter"
+
+#~ msgid "   execute commands from file"
+#~ msgstr "   ejecuta comandos desde un archivo"
+
+#~ msgid ""
+#~ "   set the scaling factor of the graph (in power of ten)\n"
+#~ "   use 'auto' for automatic scaling factor\n"
+#~ "   e.g. factor -3, 6 set the scale factor at 1e-3 and 10e6"
+#~ msgstr ""
+#~ "   establece el factor de escala para el gráfico (en potencias de diez)\n"
+#~ "   use 'auto' para calcularlo automáticamente\n"
+#~ "   por ejemplo factor -3, 6 establece el factor de escala en 1e-3 y 10e6"
+
+#~ msgid "Command:"
+#~ msgstr "Comando:"
