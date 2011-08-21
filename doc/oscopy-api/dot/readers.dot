@@ -9,10 +9,10 @@ digraph readers {
 		label="Reader"
 		init [label="__init__()"]
 		detect [label="detect()",style=dotted]
-		read_sigs [label="read_signals()",style=dotted]
+		read_sigs [label="_read_signals()",style=dotted]
 		read [label="read()"]
 		update [label="update()"]
-		check [label="check()"]
+		check [label="_check()"]
 		}
 	User -> read -> read_sigs
 	User -> update -> read_sigs

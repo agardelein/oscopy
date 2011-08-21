@@ -3,10 +3,10 @@ digraph cursorinter {
 	rankdir=TB;
 	User [label="Oscopy / User\n(through Figure)"];
 	togglecurs [label="toggle_cursor()"];
-	plot [label="plot()"];
-	setcurs [label="set_cursor()"] ;
-	drawcurs [label="draw_cursor()"] ;
-	printcurs [label="print_cursor()"] ;
+	plot [label="draw()"];
+	setcurs [label="_set_cursor()"] ;
+	drawcurs [label="_draw_cursor()"] ;
+	printcurs [label="_print_cursor()"] ;
 	User -> togglecurs ;
 	User -> plot ;
 	togglecurs -> setcurs ;

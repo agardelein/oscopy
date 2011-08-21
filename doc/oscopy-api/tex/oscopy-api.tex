@@ -11,6 +11,7 @@
 \newcommand{\meth}[1]{\texttt{#1()}}
 \newcommand{\cls}[1]{\textsf{#1}}
 \newcommand{\prop}[1]{\texttt{#1}}
+\newcommand{\event}[1]{\textit{#1}}
 
 \newcommand{\ctx}{\cls{Context}}
 \newcommand{\sig}{\cls{Signal}}
@@ -181,13 +182,7 @@ It present an interface that can be split into a few parts:
 \end{itemize}
 The methods of this interface are summarised in Table~\ref{tab:ctxt:meth}.
 
-The property \prop{signals} is a list of signals, each signal is represented through a dict of string containing the keys:
-\begin{description}
-\item[name] of the signal
-\item[unit] of the signal
-\item[reference] name of the signal
-\item[reader] name handling the signal
-\end{description}
+The property \prop{signals} is a dict of \cls{Signals} where keys are Signal names.
 The property \prop{figures} is a list of figures handled.
 
 \begin{table}[htbp]
@@ -203,12 +198,11 @@ The property \prop{figures} is a list of figures handled.
     update & Public & Reload data from files\\
     freeze & Public & Disable update of some signals\\
     unfreeze & Public & Enable update of some signals\\
-    math & Public & Create a signal from a math expression\\
+    import\_signal & Public & Make an existing signal visible in this Context\\
     names\_to\_signals & Private & Return a dict of signals from provided names\\
     \multicolumn{3}{l}{\textit{Figure management}} \\
     create & Public & Create a new figure\\
     destroy & Public & Destroy a figure \\
-    plot & Public & Draw the figures\\    
     \hline
   \end{tabular}
   \caption{Methods of Context}
@@ -234,7 +228,7 @@ The property \prop{figures} is a list of figures handled.
 A \sig\ is an object that basically contain the data points.
 For example this could be the Y axis data of a temporal measurement.
 
-Since generally in a simulation or experimental results many signal share the same scale, e.g. time scale or frequency scale, the \sig\ is associated to a reference signal.
+Since generally in a simulation or experimental results many signals share the same scale, e.g. time scale or frequency scale, the \sig\ is associated to a reference signal.
 To make the difference between a ``\sig'' and a ``reference \sig'', the latter has its \att{ref}\ attribute set to \att{None}.
 
 We humans give to each signal a name, e.g. V1, Iout... and associate a unit (Volts, Watts...).
@@ -284,11 +278,11 @@ The \rd\ class provide the tools to ensure the file is readable and the update m
 The Table~\ref{tab:rds:meth} show the methods of this class.
 
 The main method of this object is then \meth{read}, which is user-visible.
-However, this is \meth{read\_signals}\ that does the real work, i.e. parse the file and create the signals.
+However, this is \meth{\_read\_signals}\ that does the real work, i.e. parse the file and create the signals.
 The file format support is verified by \meth{detect}.
 Those two methods should be redefined when deriving \rd.
 
-The file access is verified by \meth{check}, and the update mechanism is handled through \meth{update}.
+The file access is verified by \meth{\_check}, and the update mechanism is handled through \meth{update}.
 
 The property \prop{signals} return the dict of signals handled by the reader.
 
@@ -303,8 +297,8 @@ The property \prop{signals} return the dict of signals handled by the reader.
     read         & Public & Read the data\\
     update       & Public & Reread the data\\
     detect       & Public & Return True if file is handled\\
-    check        & Private& Raise an exception if the file is not readable\\
-    read\_signals    & Private& Read the data \\
+    \_check        & Private& Raise an exception if the file is not readable\\
+    \_read\_signals    & Private& Read the data \\
     \hline
   \end{tabular}
   \caption{Methods of \rd}
@@ -317,6 +311,7 @@ The property \prop{signals} return the dict of signals handled by the reader.
     Property & Read & Write & Type & Summary \\
     \hline
     signals & \checked &  & dict & Signals contained in the reader\\
+    info & \checked & & dict & Various information from and about the file\\
     \hline
   \end{tabular}
   \caption{Properties of \rd.}
@@ -340,7 +335,7 @@ New back-end can be created to support new file formats, this is done by derivin
 This object provide the necessary framework so that the derived class should only redefine two methods:
 \begin{itemize}
 \item \meth{detect} that returns True if the file format is supported
-\item \meth{read\_signals} that effectively parse the file and return a dict of signals
+\item \meth{\_read\_signals} that effectively parse the file and return a dict of signals
 \end{itemize}
 Boring tasks like file access check or update management are handled by \rd.
 Note that the constructor should also call the base class one.
@@ -369,9 +364,9 @@ The Table~\ref{tab:wrts:meth} shows the methods of this class.
 Only the methods \meth{detect} and \meth{write} are user visible.
 The real work is done by \meth{write\_signals} that format the data and put them into the file.
 \meth{detect} is used to check whether the back-end class support the format.
-For now this is only a comparison between the name provided by the user and the result of the call to \meth{get\_format\_name}.
+For now this is only a comparison between the name provided by the user and the result of the call to \meth{\_get\_format\_name}.
 
-Before calling \meth{write\_signals}, \meth{write} check the file access (with \meth{check}) and do a format specific verification by calling \meth{format\_check}.
+Before calling \meth{write\_signals}, \meth{write} check the file access (with \meth{\_check}) and do a format specific verification by calling \meth{\_format\_check}.
 For example, for text columns-based formats like CSV, this could be checking that all signals share the same reference.
 This function should be redefined by the derived class.
 
@@ -384,10 +379,10 @@ This function should be redefined by the derived class.
     \_\_init\_\_ & Public & Initialise the object \\
     write        & Public & Write the data, user visible function\\
     detect       & Public & Return True if format is handled\\
-    check        & Private& Raise an exception if the file is not writable\\
+    \_check        & Private& Raise an exception if the file is not writable\\
     write\_signals  & Private& Write the data, to be defined by the back-end\\
-    get\_format\_name&Private& Return the name of the format\\
-    format\_check   & Private& Format-specific checks\\
+    \_get\_format\_name&Private& Return the name of the format\\
+    \_format\_check   & Private& Format-specific checks\\
     \hline
   \end{tabular}
   \caption{Methods of \wrt}
@@ -407,8 +402,8 @@ New formats are supported by adding a back-end to the module, by deriving the \w
 This class provide the requested framework (file access checking, detection mechanism) to make the new format adding simpler.
 Thus the new class should redefine the methods:
 \begin{itemize}
-\item \meth{get\_format\_name} that return a string identifying the format
-\item \meth{format\_check} that verifies if signals are compliant with the format
+\item \meth{\_get\_format\_name} that return a string identifying the format
+\item \meth{\_format\_check} that verifies if signals are compliant with the format
 \item \meth{write\_signals} that effectively write the data to the file
 \end{itemize}
 Note that the constructor of the new class should call the base class one.
@@ -446,6 +441,8 @@ The list of graphs contained into the figure is provided by the property \prop{g
     key & Private & Handle keystrokes when displaying plots \\
     \multicolumn{3}{l}{\textit{Data management}} \\
     update & Public & Update signal list of all graphs\\
+    \multicolumn{3}{l}{\textit{Inherited methods}} \\
+    draw & Public & Draw the figure on the canvas\\
     \hline
   \end{tabular}
   \caption{Methods of \fig}
@@ -460,7 +457,7 @@ The list of graphs contained into the figure is provided by the property \prop{g
     graphs & \checked & & list of graph & List of graphs\\
     \multicolumn{4}{l}{\textit{Graph management}}\\
     layout & \checked & \checked & str & Disposition of graphs in the figure\\
-    mode & \checked & \checked & str & Mode of the current graph\\
+%    mode & \checked & \checked & str & Mode of the current graph\\
     \multicolumn{4}{l}{\textit{Data management}}\\
     signals & \checked & & iter & Signals contained in the figure \\
     \hline
@@ -496,10 +493,10 @@ Additionally the user want a way to put references on the displayed data, thus t
 \subsection{Graph}
 \label{sec:graphs:graph}
 A \graph\ is an object that present the data to the user.
-It has mainly three types of methods:
+It has mainly two types of methods:
 \begin{description}
 \item[data management] that e.g. insert or remove data from the \graph
-\item[presentation management] that handle the viewing specific work e.g. the zoom area
+%\item[presentation management] that handle the viewing specific work e.g. the zoom area
 \item[cursors management] that handle cursors related work e.g. toggling, displaying
 \end{description}
 The method \meth{get\_type} that identify the type of the graph, \meth{get\_type} do not fit in the previous categories.
@@ -515,14 +512,15 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object, and
     \multicolumn{3}{l}{\textit{Data management}} \\
     insert & Public & Insert signals into the graph\\
     remove & Public & Take away signals from the graph\\
-    get\_signals & Public & Iterator that return the internal signal list\\
-    \multicolumn{3}{l}{\textit{Viewing management}} \\
-    plot & Public & Display the graph\\
+%    get\_signals & Public & Iterator that return the internal signal list\\
+    update\_signals & Public & Synchronize plotted data with Signal data\\
+%    \multicolumn{3}{l}{\textit{Viewing management}} \\
+%    plot & Public & Display the graph\\
     \multicolumn{3}{l}{\textit{Cursors management}} \\
     toggle\_cursor & Public & Change cursor status \\
-    draw\_cursors & Private & Display the cursors on the graph\\
-    set\_cursors & Private & Set the properties of a cursor\\
-    print\_cursors & Private & Display the numerical values of the cursors\\
+    \_draw\_cursors & Private & Display the cursors on the graph\\
+    \_set\_cursors & Private & Set the properties of a cursor\\
+    \_print\_cursors & Private & Display the numerical values of the cursors\\
     \hline
   \end{tabular}
   \caption{Methods of \graph}
@@ -539,6 +537,8 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object, and
     scale & \checked & \checked & str & Scale of the axis (one of lin,logx,logy,loglog) \\
     range & \checked & \checked & list[4] & Axis limits \\
     signals & \checked &  & iter & Signals contained in the graph\\
+    scale\_factors & \checked & \checked & float, float & Scale factors\\
+    axis\_names & \checked & & [str, str] & Name of each axis\\
     \hline
   \end{tabular}
   \caption{Properties of \graph.}
@@ -546,14 +546,14 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object, and
 \end{table}
 \subsubsection{Data management methods}
 The data is inserted into the graph with \meth{insert}, and removed with \meth{remove}.
-\meth{insert} return a dict of the signals that failed to be inserted, i.e. the reference signal name is different of the x axis name.
-When the graph is empty, the x axis name take the name if the reference signal.
+\meth{insert} return a dict of the signals that failed to be inserted, i.e. the reference signal name is different of the x axis name, the Y units do not match or signal with same name already present.
+When the graph is empty, the x axis name take the name of the reference signal.
 It can be parsed with the property \prop{signals}.
 
 \subsubsection{Viewing management}
-The central function of this object is \meth{plot}, that does the work to present the data to the user.
-A set of method is present to customise the range, scale type and units.
-The range is the zoom area, the scale type is either linear or logarithmic, and the units are a string displayed along the axis.
+%The central function of this object is \meth{draw}, that does the work to present the data to the user.
+A set of properties is present to customise the range, scale type and units.
+The range is the zoom area, the scale type is either linear or logarithmic, and the units are strings displayed along each axis.
 
 \subsubsection{Cursors management}
 From the external user perspective, cursors can only be toggled with \meth{toggle\_cursors}.
@@ -615,18 +615,80 @@ The \att{line} object is a reference to the Matplotlib.Line2D where the cursor i
 \subsection{Adding new Graphs}
 Adding new ways of plotting data is done by deriving \graph.
 At least the method \meth{get\_type} should be redefined, and the constructor of the new class should call the base class one.
-However, surely the method \meth{plot} has to be redefined to handle the new way of plotting data.
+%However, surely the method \meth{plot} has to be redefined to handle the new way of plotting data.
 
 \subsection{Adding new Cursors}
 By deriving \cursor, new way of putting references on the graph can be defined.
 The method \meth{draw} then needs to be redefined.
 
+\section{Signal Update Mechanism}
+When simulation data file change, the user can update the files already loaded using \meth{Context.update}, oscopy will automatically manage the dependencies related issues.
 
+To manage dependencies between computed signals this is performed using the GObject event system where Signals and Readers have the additional callbacks and events.
+Those are depicted respectively in Table~\ref{tab:upd:meth} and Table~\ref{tab:upd:events}.
 
-\section{Extending Oscopy API}
-\label{sec:ext}
+To define a dependency of a Signal S1 with another Signal S2 (or a Reader):
+\begin{enumerate}
+\item Connect S1 callbacks \meth{on\_begin\_transaction} and \meth{on\_end\_transaction} to the events of S2 \event{begin-transaction} and \event{end-transaction} respectively
+\item Connect S1 callback \meth{on\_changed} to the event \event{changed} of S2
+\item Connect S1 callback \meth{on\_recompute} to the event \event{recompute} of S1 (not S2)
+\end{enumerate}
+Once done, to change S2 data and make S1 be aware of it:
+\begin{description}
+\item [Make S2 emit \event{begin-transaction}] This will notify all S2 dependencies (e.g. S1) that its data might changed
+\item [Change S2 data] S2 will automatically emit \event{changed} to notify its dependencies that its data has changed
+\item[Make S2 emit \event{end-transaction}] This will notify its dependencies that S2 will not change anymore. S1 will emit \event{recompute} and then recalculate its data with update S2 one before forwarding \event{end-transaction}.
+\end{description}
+A trivial example of use:
+\begin{verbatim}
+oscopy> s1=Signal('s1', 'V')
+oscopy> s2=Signal('s2', 'V')
+oscopy> s1.data=[1,2,3,4]
+oscopy> s2.data=[1,2,3,4]
+oscopy> s3=s1+s2
+oscopy> s3
+Out[16]: <Signal[0xaad8784] (s1 + s2) / s1 [None] data=[2, 4, 6, 8]>
+oscopy> s1.emit('begin-transaction')
+oscopy> s1.data=[11,12,13,14]
+oscopy> s1.emit('end-transaction')
+oscopy> s3
+Out[20]: <Signal[0xaad8784] (s1 + s2) / s1 [None] data=[12, 14, 16, 18]>
+\end{verbatim}
 
+\begin{table}[htbp]
+  \centering\sf\small
+  \begin{tabular}{llll}
+    \hline
+    Method & Signal & Reader & Action \\
+    \hline
+    on\_begin\_transaction & \checked & \checked & Go to transaction and notify dependencies \\
+    on\_end\_transaction & \checked & \checked & Exit transaction once all dependencies did \\
+    on\_changed & \checked &  & A dep of this Signal changed \\
+    on\_recompute & \checked & & Recompute the data of this Signal \\
+    \hline
+  \end{tabular}
+  \caption{Methods of Context}
+  \label{tab:upd:meth}
+\end{table}
 
+\begin{table}[htbp]
+  \centering\sf\small
+  \begin{tabular}{lll}
+    \hline
+    Event & When emitted & Meaning \\
+    \hline
+    begin\_transaction & Before changing Signal data & Dependencies might change\\
+    changed & Right after changing Signal data & A dependency has been modified\\
+    recompute & Before ending transaction & Force recalculation of Signal data\\
+    end\_transaction & After changing Signal data & Dependencies changes finished\\
+    \hline
+  \end{tabular}
+  \caption{Methods of Context}
+  \label{tab:upd:events}
+\end{table}
+
+%\section{Extending Oscopy API}
+%\label{sec:ext}
 
 \end{document}
 
