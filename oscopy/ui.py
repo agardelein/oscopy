@@ -364,7 +364,7 @@ class App(dbus.service.Object):
         w.show_all()
 
         # Add it to the 'Windows' menu
-        actions = [(_('Figure %d') % fignum, None, _('Figure %d') % fignum,
+        actions = [('Figure %d' % fignum, None, _('Figure %d') % fignum,
                     None, None, self._action_figure)]
         self._actiongroup.add_actions(actions, (w, fignum))
         ui = "<ui>\
