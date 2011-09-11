@@ -1,0 +1,1942 @@
+2011-07-23  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/ui.py: FIXED: support for drag and drop  Use the canvas and
+  Matplotlib LocationEvent to retrieve the Graph that shall receive the Signals
+
+  * oscopy/signal.py: FIXED: reference signal setting in Signal.__neg__
+
+2011-06-26  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/ioscopy.py: ioscopy.py: inherit help of numpy.ufuncs and nump.fft
+  functions  This is performed by setting __name__ and __doc__ to the original
+  imported functions  And also correct the name of the magic functions in their
+  docstring.
+
+2011-06-19  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * ipythonrc-oscopy: ipythonrc-oscopy: add a trailing space to the prompt
+
+  * HACKING, README, configure.ac, doc/Makefile.am, doc/oscopy-api/Makefile.am,
+  doc/oscopy-api/pdf/Makefile.am, doc/oscopy-api/tex/Makefile,
+  doc/oscopy-api/tex/Makefile.am: configure.ac: include oscopy-api in the
+  documentation to be built  And make the lines of README and HACKING no longer
+  than 80 characters.
+
+2011-06-18  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * Makefile.am, configure.ac, doc/Makefile.am, doc/ioscopy/Makefile.am,
+  doc/ioscopy/pdf/Makefile.am, doc/ioscopy/tex/Makefile.am: configure.ac: add
+  --with-doc option to build ioscopy-manual  which enable "make pdf" to build
+  ioscopy-manual. There is no test to check whether LaTeX is here.
+
+2011-06-14  Ivan Stankovic <pokemon@fly.srk.fer.hr>
+
+  * doc/ioscopy/tex/ioscopy-manual.tex, oscopy/gui/dialogs.py: Update gnetlist
+  default command, fix typos in ioscopy manual  dialogs.py: The newest gnetlist
+  doesn't support the -s option (see the attached patch) ioscopy-manual.tex:
+  found some typos and reworded some places, please see the attached patch
+
+2011-06-15  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * .gitignore: .gitignore update
+
+2011-06-12  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * doc/oscopy-api/tex/oscopy-api.tex: Add API dev manual
+
+  * README: README: fix typo
+
+2011-06-11  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * demo/demo.sch, doc/ioscopy/png/ioscopy-cursors.png,
+  doc/ioscopy/tex/ioscopy-manual.tex: ioscopy-manual.tex: Add description of
+  cursors usage
+
+  * doc/ioscopy/png/ioscopy-figure.png, doc/ioscopy/png/ioscopy-insert.png,
+  doc/ioscopy/png/ioscopy-layout.png, doc/ioscopy/png/ioscopy-range.png,
+  doc/ioscopy/png/ioscopy-remove.png, doc/ioscopy/png/ioscopy-scale.png,
+  doc/ioscopy/png/ioscopy-units.png, doc/ioscopy/tex/ioscopy-manual.tex:
+  ioscopy-manual.tex:Add description of Figure window and submenus
+
+2011-05-29  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * README, TODO, demo/demo.oscopy, doc/ioscopy/png/ioscopy-file.png,
+  doc/ioscopy/png/ioscopy-gui.png, doc/ioscopy/png/ioscopy-netnsim.png,
+  doc/ioscopy/png/ioscopy-small.png, doc/ioscopy/png/ioscopy-window.png,
+  doc/ioscopy/png/ioscopy.png, doc/ioscopy/tex/ioscopy-manual.tex, oscopy.png:
+  ioscopy-manual.tex: Add description of main GUI window, update examples  and
+  remove command "orange reset" until this option is fixed.
+
+  * oscopy/ui.py: FIXED: Add new math signal from GUI
+
+2011-05-22  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * doc/ioscopy/tex/ioscopy-manual.tex: ioscopy-manual: add command description
+   Examples are rather basic
+
+  * doc/ioscopy/dot/.gitignore, doc/ioscopy/out/.gitignore,
+  doc/ioscopy/tex/ioscopy-manual.tex, doc/manual/dot/.gitignore,
+  doc/manual/dot/cursorinter.dot, doc/manual/dot/fileinter.dot,
+  doc/manual/dot/itf.dot, doc/manual/dot/readers.dot,
+  doc/manual/dot/viewinter.dot, doc/manual/dot/writers.dot,
+  doc/manual/out/.gitignore, doc/manual/tex/Makefile,
+  doc/manual/tex/auto/manual.el, doc/manual/tex/manual.tex,
+  doc/oscopy-api/dot/.gitignore, doc/oscopy-api/dot/cursorinter.dot,
+  doc/oscopy-api/dot/fileinter.dot, doc/oscopy-api/dot/itf.dot,
+  doc/oscopy-api/dot/readers.dot, doc/oscopy-api/dot/viewinter.dot,
+  doc/oscopy-api/dot/writers.dot, doc/oscopy-api/out/.gitignore,
+  doc/oscopy-api/tex/Makefile, doc/oscopy-api/tex/auto/manual.el: doc: split
+  user manual and api manual
+
+2011-05-18  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * README: README: update command list according to ioscopy.py
+
+  * oscopy/ioscopy.py: ioscopy.py: reoder commands by name
+
+  * README, oscopy/gui/menus.py, oscopy/ioscopy.py, oscopy/ui.py,
+  test/basic.oscopy, test/cursors.oscopy, test/delete.oscopy, test/demo.oscopy,
+  test/destroy.oscopy, test/fft.oscopy, test/figures.oscopy,
+  test/import.oscopy, test/layout.oscopy, test/select.oscopy,
+  test/update.oscopy: Rename ioscopy o_* commands to o*  or remove the
+  underscore in the name. This should improve the typing of the command names
+
+2011-05-14  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/writers/gnucap_writer.py, oscopy/writers/writer.py: *writer.py:
+  update comments
+
+  * oscopy/readers/reader.py: reader.py: more comment update
+
+  * demo/demo.sch, oscopy/graphs/__init__.py, oscopy/readers/detect_reader.py:
+  FIXED: removed deprecated dependencies
+
+  * oscopy/readers/gnucap_reader.py, oscopy/readers/signal_reader.py:
+  *_reader.py: update comments
+
+  * oscopy/readers/detect_reader.py: detect_reader.py: update comments
+
+  * oscopy/readers/reader.py: reader.py: update comments
+
+  * oscopy/graphs/cursor.py: cursor.py: Add description of properties
+
+2011-05-08  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/graphs/cursor.py: cursor.py: update comments
+
+  * oscopy/graphs/lingraph.py: lingraph.py: update comments
+
+  * oscopy/graphs/graph.py: graph.py: update comments
+
+2011-04-27  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/context.py, oscopy/figure.py: Figure.py: Update comments  And fix
+  some typos in context.py
+
+  * oscopy/ioscopy.py: ioscopy: Add magic function that returns the internal
+  Context object
+
+  * oscopy/__init__.py: FIXED: IPython check on oscopy import Use a exception
+  scheme as reported in
+  
+  and-aliases. This shall fixe issue introduced by 99a99809 on oscopy import
+  from IPython
+
+2011-04-12  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * README: README: Add comments on numpy.ufuncs and numpy.fft functions
+
+2011-04-03  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/context.py, oscopy/ioscopy.py, oscopy/signal.py: context.py: Update
+  comments  And also minor changes to comments to signals.py and ioscopy.py
+
+2011-04-02  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/signal.py: signals.py: more comments to the code  Define some
+  vocabulary: * Dependency signal * Result signal that depend on the former and
+  Listen for notifications  Use numpy comment style (function description,
+  parameters list, return value)
+
+  * oscopy/__init__.py: Check if __IPYTHON__ is in globals() rather than
+  testing its value  This fix a bug when oscopy is imported from python
+
+2011-03-20  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/signal.py: signal.py: update comments
+
+  * test/demo.oscopy: Tune view range for FFT graph
+
+2011-03-14  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * README, TODO, configure.ac, oscopy/context.py, oscopy/graphs/Makefile.am,
+  oscopy/graphs/fftgraph.py, oscopy/gui/dialogs.py, oscopy/ioscopy.py,
+  oscopy/readers/Makefile.am, oscopy/readers/detect_reader.py,
+  oscopy/readers/math_reader.py, test/demo.oscopy: Cleanup and random fixes 
+  Remove python-vte dependency Remove math_reader and associated code Remove
+  fftgraph and associated code Fix o_siglist in case signal unit is None Update
+  test/demo.oscopy, and add case to show the advantage to use Signal to set
+  unit of computation-based new signal
+
+2011-03-13  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * ioscopy_app.py: Use symlink to ipythonrc-oscopy
+
+  * demo/demo.sch, oscopy/ioscopy.py, test/fft.oscopy: Support for
+  Signal-compatible fft functions
+
+2011-02-13  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/ioscopy.py, oscopy/signal.py: Support for Signal-compatible numpy
+  ufunc - binary functions
+
+2011-02-11  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * TODO, ipythonrc-oscopy, oscopy/ioscopy.py, oscopy/signal.py,
+  test/fft.oscopy: Support for Signal-compatible numpy ufunc - unary functions
+
+  * ioscopy_app.py: Remove pylab support  This prepare the replacement of pylab
+  by our own Signal-compatible functions
+
+2011-02-04  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/signal.py: FIXED: operations with non-signals  Connect
+  dependency-related event only for Signal-type operands
+
+2011-01-31  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * TODO, test/cursors.oscopy, test/delete.oscopy, test/destroy.oscopy,
+  test/figures.oscopy, test/layout.oscopy, test/select.oscopy: test/: update
+  test files to new oscopy format o_*  Well, at least the easy ones, need to
+  think a bit about fft and diff examples
+
+2011-01-30  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/ioscopy.py: FIXED: figure mode change
+
+2011-01-29  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * doc/manual/tex/manual.tex: Manual: Summary update
+
+2011-01-22  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/gui/menus.py: FIXED: Commands from contextual menu
+
+2011-01-15  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * ioscopy_app.py: Support only python2
+
+  * README: README update
+
+2011-01-10  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * ipythonrc-oscopy: Remove ipythonrc-pylab inclusion from ipythonrc-oscopy 
+  As per http://mail.scipy.org/pipermail/ipython-user/2010-June/006972.html
+
+2011-01-09  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/ioscopy.py, oscopy/ui.py: FIXED: crash if DBus is not available
+
+  * Makefile.am, ioscopy_app.py: Rename executable to oscopy_app, FIXED: Put
+  ipythonrc-oscopy in /home/arnaud/.ipython if not existing.  As oscopy name is
+  already existing in the source directory, executable create from
+  ioscopy_app.py cannot be named 'oscopy' so we use the name 'oscopy_app'. 
+  IPython require the file ipythonrc-oscopy to be present in
+  /home/arnaud/.ipython. We test if this file exist to copy it if needed before
+  launching ipython. ipythonrc-oscopy is located in @datarootdir@/oscopy.
+
+  * AUTHORS: Update AUTHORS
+
+2011-01-07  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * Makefile.am, configure.ac, oscopy/Makefile.am, oscopy/__init__.py,
+  oscopy/app.py, oscopy/gui/Makefile.am: Update autotools files  As some files
+  where moves and some are not used anymore, update configure.ac and the
+  Makefile.am accordingly
+
+2011-01-02  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/readers/reader.py, oscopy/readers/signal_reader.py,
+  oscopy/signal.py: Delete debug messages  For dependencies handling
+
+  * oscopy/readers/signal_reader.py, oscopy/signal.py, test/update.oscopy:
+  Handle dependencies for simple signal operations, part 2  Signals that have
+  multiple dependencies shall emit a 'begin-transaction' only once.
+
+2010-12-28  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * demo/demo.sch, oscopy/readers/signal_reader.py, oscopy/signal.py,
+  test/update.oscopy: Handle dependencies for simple signal operations
+
+2010-12-26  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * test/update.oscopy: test/update.oscopy: add power computation signals
+
+  * ipythonrc-oscopy: Add oscopy.signal.Signal in globals  This allow to
+  directly access 'Signal(...)' instead of 'oscopy.signal.Signal(...)'. Surely
+  there exist a much better way to do it.
+
+  * oscopy/ioscopy.py: ioscopy.py: After import replace imported signals in
+  globals()
+
+  * oscopy/context.py, oscopy/ioscopy.py, oscopy/readers/reader.py,
+  oscopy/readers/signal_reader.py, oscopy/signal.py, test/update.oscopy: Handle
+  dependencies during updates for simple assignations  This is done with
+  gobject signaling system and the concept of 'transactions' thanks to Ivan.  A
+  transaction is an event where all data can change, e.g. during an o_update.
+  To avoid multiple recomputation of the same signal during a transaction,
+  Signals that have dependencies record the fact that their dependencies have
+  changed, and at the end of the transaction, once all data is updated they
+  recompute their data.  Implementation: 1. Context object emit a
+  'begin-transaction' event which is propagated in all the Readers and to the
+  Signals. 2. Once all objects know a transaction is ongoing, data is reread
+  from files and Signals are updated. 3. Then Context emit a 'end-transaction'
+  event that is propagated to Readers and to Signals 4. Each Signal that need
+  recomputation is recomputed before it propagate the 'end-transaction' event. 
+  This patch is about to handle dependencies for simple assignations, e.g.
+  assuming demo/ac.dat loaded (see also test/update.oscopy): vo=vout o_import
+  vo o_update On o_import, recomputation operation is stored as a tuple
+  (operator, destination, other_signal) in the argument of a 'recompute' event,
+  which is emitted just before the signal propagate the 'end-transaction'
+  event. For simple assignations, only the part other_signal is used. The tuple
+  is meant to have: destination.data = operator(self.data, other_signal.data)
+  But in the case of simple assignation: self.data = other_signal.data
+
+2010-12-18  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/ioscopy.py: FIXED: import signal
+
+  * test/update.oscopy: test/update.oscopy updated to ioscopy command format
+
+2010-12-12  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/signal.py: signal: rename first __init__ argument to 'value'  The
+  name 'name' was confusing as the __init__ also can accept a signal as first
+  argument to copy its properties
+
+  * oscopy/__init__.py, oscopy/ioscopy.py, oscopy/readers/reader.py,
+  oscopy/signal.py: signal: make signal subclass of gobject
+
+2010-11-05  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/context.py, oscopy/ioscopy.py, oscopy/readers/Makefile.am,
+  oscopy/readers/detect_reader.py, oscopy/readers/math_reader.py,
+  oscopy/readers/reader.py, oscopy/readers/signal_reader.py, test/basic.oscopy,
+  test/import.oscopy: Import signals instanciated from outside oscopy  This is
+  performed with a new SignalReader class, context.import_signal and o_import
+  magic function. Dependencies are not handled
+
+2010-11-04  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/ioscopy.py, oscopy/signal.py: signal.py: Comments on the reference
+  signal during math ops.
+
+2010-11-03  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/signal.py: signal: Handle reference signal and freeze in math ops 
+  And fix a typo in constructor
+
+  * test/demo.oscopy: Remove useless % in test/demo.oscopy
+
+  * oscopy/ioscopy.py: Fixed typo
+
+  * ipythonrc-oscopy: Include ipython-pylab at startup
+
+2010-06-16  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/ioscopy.py, oscopy/ui.py, test/demo.oscopy: ioscopy: prefix oscopy
+  magic function with o_
+
+  * ipythonrc-oscopy: ipythonrc-oscopy: Include ipythonrc
+
+  * oscopy/context.py, oscopy/ioscopy.py: Update globals with math signals
+
+2010-03-19  Ivan Stankovic <pokemon@fly.srk.fer.hr>
+
+  * test/arith.py: add test for arithmetic operations and iteration
+
+  * oscopy/signal.py: Signal: support arithmetic and iteration  The units are
+  currently ignored.
+
+  * oscopy/signal.py: Signal: remove __str__  Using __repr__ gives much better
+  information.
+
+  * oscopy/signal.py: Signal: show parts of data in __repr__
+
+2010-03-17  Ivan Stankovic <pokemon@fly.srk.fer.hr>
+
+  * oscopy/context.py, oscopy/figure.py, oscopy/graphs/graph.py,
+  oscopy/gui/dialogs.py: remove unnecessary imports
+
+  * configure.ac: configure.ac: add checks for pygtk and pyvte  Also remove
+  those that we really don't need.
+
+2010-03-15  Ivan Stankovic <pokemon@fly.srk.fer.hr>
+
+  * oscopy/signal.py: Signal: add meaningful __repr__
+
+2010-03-14  Ivan Stankovic <pokemon@fly.srk.fer.hr>
+
+  * oscopy/ui.py: oscopy_ui: use save_config_path instead of load_first_config 
+  save_config_path will create the path if it does not exist
+
+2010-06-05  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * ipythonrc-oscopy, oscopy/context.py, oscopy/ioscopy.py: ioscopy: update
+  globals() with loaded signals  Need to use a trick through ipythonrc-oscopy
+  to access root-level globals
+
+2010-05-30  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * demo/demo.sch, oscopy/__init__.py, oscopy/gui/Makefile.am,
+  oscopy/gui/__init__.py, oscopy/gui/dialogs.py, oscopy/gui/menus.py,
+  oscopy/ioscopy.py, oscopy/ui.py, oscopy_app.py, oscopy_gui/Makefile.am,
+  oscopy_gui/__init__.py, oscopy_gui/dialogs.py, oscopy_gui/menus.py,
+  oscopy_ui.py, test/demo.oscopy: ioscopy: include the gui  And remove
+  deprecated oscopy_ui and oscopy_app
+
+2010-05-27  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/ioscopy.py, test/demo.oscopy: ioscopy: use IPythonDemo to exec
+  oscopy scripts  Scripts shoud be modified to put '%' on some commands
+
+2010-05-26  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/ioscopy.py: ioscopy: manage everything through magic functions.  No
+  more references to oscopy.App. This might break do_math, do_exec and do_plot.
+
+2010-05-25  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/ioscopy.py: ioscopy: manage figures directly from magic functions 
+  Avoid using oscopy.App
+
+2010-05-18  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * ioscopy_app.py, oscopy/__init__.py, oscopy/ioscopy.py, test/demo.oscopy:
+  Support for oscopy magic commands
+
+2010-05-08  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * ioscopy_app.py, ipythonrc-oscopy, oscopy/__init__.py: Add profile for
+  ipython  and ioscopy_app.py to avoid typing all the command line
+
+2010-05-05  Adrian <pardo@onyx.(none)>
+
+  * i18n/es_AR.po, i18n/messages.po: i18n: updated messages.po and spanish
+  translation
+
+  * oscopy_ui.py: i18n: un-mark ui actions as candidates for translation. Added
+  missing string.
+
+  * i18n/es_AR.po: i18n: translations for Spanish
+
+  * i18n/messages.po: i18n: created messages.po
+
+  * oscopy_gui/menus.py: i18n: fixed typos and unbalanced parens.
+
+  * oscopy/app.py, oscopy/context.py, oscopy/figure.py,
+  oscopy/graphs/cursor.py, oscopy/graphs/graph.py, oscopy/readers/reader.py,
+  oscopy/signal.py, oscopy_gui/dialogs.py, oscopy_gui/menus.py, oscopy_ui.py:
+  Mark translatable strings as such. Merge of multiple prints into one where
+  needed.
+
+  * oscopy/__init__.py: Basic stuff for i18n
+
+2010-04-07  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * README, demo/demo.oscopy, demo/demo.sch, oscopy/app.py, oscopy_ui.py: Add
+  gschem integration section to README  And fix several path-related bugs to
+  make it work.
+
+2010-03-18  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * oscopy/app.py: FIXED: crash in do_exec when script is not found
+
+2010-03-13  Ivan Stankovic <pokemon@fly.srk.fer.hr>
+
+  * Makefile.am, configure.ac, scheme/Makefile.am, scheme/oscopy.scm.in:
+  install oscopy.scm into gEDA scheme dir  The script oscopy.scm adds a menu to
+  gschem that allows running/updating oscopy from within gschem. It is
+  generated from oscopy.scm.in by substituting the paths we need for oscopy to
+  run. After 'make install', the user only needs to add  (load-from-path
+  "oscopy.scm")  to her gschemrc.
+
+2010-03-10  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * README: readme update
+
+  * Makefile.am, README, autogen.sh, configure.ac: Add autogen.sh and some
+  other files
+
+  * aclocal.m4, build-tools/compile, build-tools/config.guess,
+  build-tools/config.sub, build-tools/depcomp, build-tools/install-sh,
+  build-tools/ltmain.sh, build-tools/missing, build-tools/py-compile,
+  config.guess, config.h, config.h.in, config.status, config.sub, libtool,
+  m4/libtool.m4, m4/ltoptions.m4, m4/ltsugar.m4, m4/ltversion.m4,
+  m4/lt~obsolete.m4, stamp-h1: Remove autogenerated files
+
+  * gschem-plugin/Makefile, gschem-plugin/Makefile.am,
+  gschem-plugin/Makefile.in, gschem-plugin/include/v_oscopy.h,
+  gschem-plugin/src/Makefile, gschem-plugin/src/Makefile.am,
+  gschem-plugin/src/Makefile.in, gschem-plugin/src/v_oscopy.c: Remove
+  gschem-plugin
+
+2010-03-07  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * README: readme: info on cursors activation and minor corrections
+
+2010-02-28  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * HACKING, README, oscopy/app.py: Documentation update: readme, hacking  And
+  correct help message for read function
+
+2010-02-14  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * demo/demo.sch, oscopy/app.py, test/select.oscopy: app: more tests in
+  do_select
+
+  * gschem-plugin/src/v_oscopy.c: v_oscopy: Support for update requests
+
+  * config.status, gschem-plugin/include/v_oscopy.h,
+  gschem-plugin/src/Makefile, gschem-plugin/src/Makefile.am,
+  gschem-plugin/src/Makefile.in, gschem-plugin/src/v_oscopy.c, libtool:
+  v_oscopy: Fill argv to run oscopy_ui.py
+
+2010-02-13  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * .gitignore, Makefile.am, aclocal.m4, build-tools/compile,
+  build-tools/config.guess, build-tools/config.sub, build-tools/depcomp,
+  build-tools/install-sh, build-tools/ltmain.sh, build-tools/missing,
+  build-tools/py-compile, config.h, config.h.in, config.status, configure,
+  configure.ac, gschem-plugin/Makefile, gschem-plugin/Makefile.in,
+  gschem-plugin/src/Makefile, gschem-plugin/src/Makefile.in, gui/__init__.py,
+  gui/dialogs.py, gui/menus.py, libtool, oscopy/Makefile.am,
+  oscopy/graphs/Makefile.am, oscopy/readers/Makefile.am,
+  oscopy/writers/Makefile.am, oscopy_app, oscopy_app.py,
+  oscopy_gui/Makefile.am, oscopy_gui/__init__.py, oscopy_gui/dialogs.py,
+  oscopy_gui/menus.py, oscopy_ui, oscopy_ui.py: Support for installing via
+  autotools
+
+2010-02-12  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Makefile.am, aclocal.m4, config.guess, config.sub, configure.ac,
+  gschem-plugin/Makefile, gschem-plugin/Makefile.am, gschem-plugin/Makefile.in,
+  gschem-plugin/aclocal.m4, gschem-plugin/build-tools/compile,
+  gschem-plugin/build-tools/config.guess, gschem-plugin/build-tools/config.sub,
+  gschem-plugin/build-tools/depcomp, gschem-plugin/build-tools/install-sh,
+  gschem-plugin/build-tools/ltmain.sh, gschem-plugin/build-tools/missing,
+  gschem-plugin/config.h, gschem-plugin/config.h.in,
+  gschem-plugin/config.status, gschem-plugin/configure.ac,
+  gschem-plugin/libtool, gschem-plugin/m4/libtool.m4,
+  gschem-plugin/m4/ltoptions.m4, gschem-plugin/m4/ltsugar.m4,
+  gschem-plugin/m4/ltversion.m4, gschem-plugin/m4/lt~obsolete.m4,
+  gschem-plugin/src/Makefile, gschem-plugin/src/Makefile.am,
+  gschem-plugin/src/Makefile.in, gschem-plugin/stamp-h1, libtool,
+  m4/libtool.m4, m4/ltoptions.m4, m4/ltsugar.m4, m4/ltversion.m4,
+  m4/lt~obsolete.m4, stamp-h1: Move autotools up one level into main dir
+
+  * .gitignore, test/basic.oscopy, test/cursors.oscopy, test/delete.oscopy,
+  test/destroy.oscopy, test/figures.oscopy, test/layout.oscopy: Add some oscopy
+  test cases, ignore more files
+
+2010-02-11  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * gschem-plugin/Makefile, gschem-plugin/Makefile.in,
+  gschem-plugin/build-tools/compile, gschem-plugin/build-tools/config.guess,
+  gschem-plugin/build-tools/config.sub, gschem-plugin/build-tools/depcomp,
+  gschem-plugin/build-tools/install-sh, gschem-plugin/build-tools/ltmain.sh,
+  gschem-plugin/build-tools/missing, gschem-plugin/compile,
+  gschem-plugin/config.guess, gschem-plugin/config.status,
+  gschem-plugin/config.sub, gschem-plugin/configure,
+  gschem-plugin/configure.ac, gschem-plugin/depcomp, gschem-plugin/install-sh,
+  gschem-plugin/libtool, gschem-plugin/ltmain.sh, gschem-plugin/missing,
+  gschem-plugin/src/Makefile, gschem-plugin/src/Makefile.in: Put autoconf files
+  into build-tools dir
+
+2010-02-09  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * gschem-plugin/Makefile, gschem-plugin/Makefile.in,
+  gschem-plugin/config.status, gschem-plugin/configure,
+  gschem-plugin/configure.ac, gschem-plugin/include/v_oscopy.h,
+  gschem-plugin/src/Makefile, gschem-plugin/src/Makefile.am,
+  gschem-plugin/src/Makefile.in, gschem-plugin/src/v_oscopy.c, oscopy_ui:
+  plugin: support for running checks  And add dbus_running function to
+  oscopy_ui
+
+2010-01-27  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * gschem-plugin/Makefile, gschem-plugin/Makefile.am,
+  gschem-plugin/Makefile.in, gschem-plugin/aclocal.m4, gschem-plugin/compile,
+  gschem-plugin/config.guess, gschem-plugin/config.h,
+  gschem-plugin/config.h.in, gschem-plugin/config.status,
+  gschem-plugin/config.sub, gschem-plugin/configure.ac, gschem-plugin/depcomp,
+  gschem-plugin/include/v_oscopy.h, gschem-plugin/install-sh,
+  gschem-plugin/libtool, gschem-plugin/ltmain.sh, gschem-plugin/m4/libtool.m4,
+  gschem-plugin/m4/ltoptions.m4, gschem-plugin/m4/ltsugar.m4,
+  gschem-plugin/m4/ltversion.m4, gschem-plugin/m4/lt~obsolete.m4,
+  gschem-plugin/missing, gschem-plugin/src/Makefile,
+  gschem-plugin/src/Makefile.am, gschem-plugin/src/Makefile.in,
+  gschem-plugin/src/v_oscopy.c, gschem-plugin/stamp-h1: Add viewer plugins
+  skeleton for gschem
+
+2010-01-11  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/app.py, oscopy/context.py, oscopy_ui: FIXED: destroy figures
+
+2010-01-10  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy_ui: ui: Use uimanager/actiongroup to add figure in windows menu  And
+  also raise the window on top when menuitem is activated
+
+  * oscopy/app.py: app: check arguments in destroy()
+
+2010-01-07  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy_ui: ui: initial support for updating through DBus
+
+2010-01-06  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy_ui: ui: activate 'Run net and sim' action upon USR2
+
+  * oscopy/app.py, oscopy_ui, test/select.oscopy: app: FIXED test arguments of
+  select  And add a note for crosshair cursors
+
+2009-12-21  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy_ui: ui: support to add multiple files from the ui
+
+2009-12-18  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * TODO, gui/menus.py: menus: remove one level in contextual menu  Merge
+  figure and graph submenus.
+
+2009-12-17  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy_ui: ui: code reorganisation
+
+2009-12-16  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy_ui: ui: activate quit and exit commands
+
+2009-12-15  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy_ui: ui: add each newly created figure to the windows menu
+
+2009-12-05  Ivan Stankovic <pokemon@fly.srk.fer.hr>
+
+  * oscopy_ui: make 'Show terminal' action a toggle action
+
+  * gui/dialogs.py, oscopy/app.py: correctly redirect stdout and stderr
+
+2009-12-04  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy_ui: ui: Add Windows menu and move 'Show Terminal' into
+
+  * oscopy_ui: ui: hide figure window instead of destroying it
+
+  * oscopy/app.py: app: do not read twice the same file, do not add a graph if
+  the figure is already full
+
+  * gui/dialogs.py: dialogs: use spin buttons in range dialog
+
+2009-12-03  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * gui/dialogs.py: dialogs: FIXED bad scale factor in range dialog
+
+  * oscopy_ui: ui: expand signal column
+
+2009-12-02  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * gui/menus.py: menus: use set_sensitive upon graph selection for figure menu
+
+  * gui/dialogs.py, gui/menus.py: dialogs: FIXED crash when units dialog is
+  canceled
+
+  * gui/dialogs.py: dialogs: FIXED use last item in history
+
+2009-12-01  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * gui/dialogs.py, oscopy_ui: Make TerminalWindow subclass of gtk.Window, use
+  show/hide methods
+
+2009-11-27  Ivan Stankovic <pokemon@fly.srk.fer.hr>
+
+  * gui/dialogs.py: dialogs: transfer focus from terminal to entry
+
+  * gui/dialogs.py: dialogs: get rid of tabs
+
+  * gui/dialogs.py: dialogs: don't duplicate items in the command history list
+
+2009-11-17  Ivan Stankovic <pokemon@fly.srk.fer.hr>
+
+  * gui/dialogs.py, oscopy_ui: dialogs: improve
+  Run_Netlister_and_Simulate_Dialog  Also, refactor configuration
+  loading/saving a bit.
+
+2009-11-25  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy_ui: OscopyAppUI: FIXED strip the line before testing
+
+2009-11-24  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * gui/dialogs.py, gui/menus.py, oscopy/__init__.py,
+  oscopy/graphs/__init__.py, oscopy/graphs/graph.py: ui: rework unit window 
+  And add support for setting scale factor from the the unit window
+
+  * oscopy/app.py, oscopy/graphs/graph.py: Support abbrevs for scaling factor
+  selection
+
+2009-11-22  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/app.py, oscopy/graphs/graph.py: Support for user selection of
+  scaling factor
+
+2009-11-17  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * gui/dialogs.py, gui/menus.py: ui: rework the 'Enter unit' dialog
+
+2009-11-12  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * gui/dialogs.py, gui/menus.py, oscopy/graphs/graph.py: dialogs: redesign
+  enter range dialog
+
+  * oscopy_ui: OscopyAppUI: FIXED an empty line cannot be split
+
+  * gui/dialogs.py: dialogs: use 'Run from directory'
+
+  * gui/dialogs.py: dialogs: redesign of dialog 'Run netlister and simulate'
+
+2009-11-08  Ivan Stankovic <pokemon@fly.srk.fer.hr>
+
+  * gui/dialogs.py: Oscopy gui updated  Also, attached is a patch I forgot to
+  put earlier. The patch just changes the widget packing in the 'Run netlister'
+  dialog so that the widgets don't expand vertically when the dialog is
+  resized.  -- Ivan Stankovic, pokemon@fly.srk.fer.hr  "Protect your digital
+  freedom and privacy, eliminate DRM, learn more at
+  http://www.defectivebydesign.org/what_is_drm"
+
+2009-11-03  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy_ui, ui.py: rename ui.py to oscopy_ui
+
+  * demo/demo.sch, ui.py: ui: save and read history file in the config
+  directory
+
+  * ui.py: ui: FIXED read config file only if it exists
+
+  * gui/dialogs.py, oscopy/app.py: app: read history in preloop()  this allow
+  any application like ui to read its proper history independently.
+
+  * gui/dialogs.py, ui.py: ui: move terminal window code into dialogs
+
+2009-11-02  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * ui.py: ui: disable pause command to avoid weird things  sdtin is not
+  redirected therefore pause() would wait for an input into the terminal from
+  where ui.py is launched.
+
+  * ui.py: ui: support for history in terminal
+
+  * ui.py: ui: add execute script option in file menu
+
+2009-11-01  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/__init__.py, oscopy/app.py, ui.py: ui: FIXED support for exec
+  command
+
+  * ui.py: ui: support to freeze multiple signals from the command line
+
+  * oscopy/app.py: app: add() use onecmd() to create the first figure when none
+  exist  Instead of using context object. This allow to do callbacks for figure
+  creation.
+
+  * ui.py: ui: display entered command in terminal
+
+  * ui.py: ui: support for resfresh command in OscopyAppUI
+
+2009-10-31  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * ui.py: ui: create use OscopyAppUI
+
+  * ui.py: ui: freeze use OscopyAppUI
+
+  * ui.py: ui: math use OscopyAppUI
+
+  * gui/dialogs.py, gui/menus.py: ui/menus: graph submenu items use OscopyAppUI
+  to act
+
+  * gui/menus.py: ui: use OscopyAppUI to change figure layout
+
+  * gui/menus.py, oscopy/app.py, ui.py: ui: use OscopyAppUI to add and remove
+  graph  Fix also app.select() when last graph is deleted, and app.do_delete()
+  pass an int to graph.delete()
+
+2009-10-29  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * ui.py: ui: Disable plot command
+
+  * gui/dialogs.py, gui/menus.py: FIXED: use __init__ for class contructor 
+  This is not C++!!
+
+  * ui.py: Initial support for sync between gui and command line app  Derive
+  OscopyApp to add callback capability. Application to read.
+
+2009-10-27  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * ui.py: ui: initial support for command line using OscopyApp
+
+  * oscopy/app.py, ui.py: ui: start OscopyApp from the ui
+
+  * oscopy/__init__.py, oscopy/app.py, oscopy_app: Put OscopyApp in separate
+  file
+
+  * ui.py: ui: make terminal window persistent  When user close it, it can be
+  reinvoked by menu action 'Show terminal'
+
+  * ui.py: ui: redirect standard output in a separate terminal window
+
+2009-10-25  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy_app: Support to provide context object on OscopyApp instanciation
+
+  * oscopy_app: derive OscopyApp from Cmd
+
+2009-10-23  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy_app: oscopy_app: rename Context attribute to _ctxt
+
+  * oscopy/graphs/graph.py: graph: do not insert signals twice  If a signal
+  with the same name is already in the graph, reject it.
+
+2009-10-21  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * ui.py: ui: DND support for multiple signals selections
+
+  * ui.py: ui: use treeview selection for DND data get
+
+  * ui.py: ui: reader freeze toggle all signals freeze
+
+2009-10-18  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * ui.py: ui: display reader name in bold
+
+  * ui.py: ui: remove signal list menu
+
+  * ui.py: ui: add freeze column to signals window
+
+2009-10-16  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * gui/dialogs.py, ui.py: support for directory selection for netlister and
+  simulator runs  Option saved in configuration file.
+
+  * gui/dialogs.py: dialogs: add default response
+
+  * ui.py: ui: support for basic configuration file  Save netlister and
+  simulator commandlines
+
+  * gui/dialogs.py: dialogs: remove useless trailing backslashs
+
+  * gui/dialogs.py, ui.py: ui: make the actions a class attribute  Store the
+  actions from the dialog Run netlister... as a class attribute to record last
+  entry
+
+2009-10-15  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * gui/dialogs.py: Enlarge the Run Netlister... dialog
+
+  * gui/dialogs.py, ui.py: dialogs: pass commands and checkbutton status to
+  Run_Net...display()
+
+  * gui/dialogs.py: dialogs: make entries editable depending on toggle buttons
+
+  * gui/dialogs.py, ui.py: ui: put run netlister... dialog in separate class
+
+2009-10-14  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * gui/dialogs.py: gui/dialogs: use table widget for range dialog
+
+  * gui/dialogs.py, gui/menus.py: gui/menus: put enter range dialog in a
+  separate class
+
+  * gui/dialogs.py: gui/dialogs: use table widget for enter units dialog
+
+  * gui/dialogs.py, gui/menus.py: gui/menus: move enter units dialog into
+  separate class
+
+2009-10-13  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * gui/__init__.py, gui/menus.py, ui.py: ui: move figure popup menu creation
+  into gui module
+
+  * ui.py: ui: avoid the use of self._current_graph in menus
+
+  * ui.py: ui: use matplotlib button_press_event for figure menu, pass figure
+  and graph as data to menu functions
+
+  * ui.py: ui: remove useless imports
+
+2009-10-08  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * ui.py: ui: initial support for signal drag and drop  DND from signal list
+  treeview to figures
+
+  * oscopy/context.py, oscopy_app: context.signals return the signal dict
+
+2009-10-05  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * demo/demo.sch, ui.py: ui: support for running netlister, simulate and
+  update results
+
+  * ui.py: ui: support for update on SIGUSR1
+
+2009-10-04  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * ui.py: ui: support for signal freeze/unfreeze
+
+2009-10-03  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * ui.py: ui: support for user math expressions
+
+  * demo/demo.sch, ui.py: ui: support for file update
+
+  * ui.py: ui: support for graph range user input
+
+  * oscopy/graphs/graph.py: graph: set _xlim and _ylim before returning range
+
+  * ui.py: ui: support for graph units user input
+
+2009-09-30  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * ui.py: ui: support for signals removal from graphs
+
+  * ui.py: ui: support for graph deletion
+
+  * ui.py: ui: reorganize figure popup menu and submenus
+
+  * ui.py: ui: support for figure enter/leave events
+
+2009-09-29  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/figure.py: FIXED: typo in figure.layout
+
+  * ui.py: ui: support for layout selection
+
+  * ui.py: ui: support for multiple graphs per figure
+
+  * ui.py: ui: use context to create figures
+
+  * ui.py: ui: use context to read files
+
+2009-09-28  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * ui.py: ui: use CheckMenuItem for scale menu items
+
+  * ui.py: ui: display scale names in menu instead of internal names
+
+2009-09-22  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * ui.py: ui: support for scale selection in figure popup menu
+
+  * ui.py: ui: update for use with figure deriving from matplotlib.figure
+
+  * demo/demo.oscopy: demo.oscopy: update some commands
+
+  * oscopy/context.py: context: suppress plot and show functions now useless
+
+2009-09-20  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy_app: oscopy_app: display second since reader updated in siglist
+
+  * oscopy/context.py, oscopy_app, test/update.oscopy: context, oscopy_app:
+  support for specific reader update  context.update: check canvas presence
+  before updating the figure
+
+  * oscopy/readers/math_reader.py, oscopy/readers/reader.py, oscopy_app:
+  reader, oscopy_app: support for info dict, last update time
+
+  * oscopy/graphs/graph.py: graph: insert only signals with the same Y unit
+
+  * oscopy/readers/math_reader.py, test/demo.oscopy: math_reader: deduce new
+  signal unit from its name
+
+2009-09-19  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * demo/demo.sch, oscopy/context.py, oscopy/graphs/graph.py: graph: rename
+  update to update_signals
+
+  * oscopy/context.py, oscopy_app: oscopy_app, context, reader: let the
+  application access the readers from context  change oscopy_app to use this
+  method to display signal list
+
+  * oscopy/context.py, oscopy/graphs/graph.py, test/demo.oscopy: FIXED: update
+  of graphs
+
+2009-09-16  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/context.py, oscopy_app: Move gtk code out of the framework.  This
+  make context independent from the ui.
+
+  * oscopy/figure.py, oscopy/graphs/graph.py: Derive graph from
+  matplotlib.pyplot.axes
+
+2009-09-15  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/context.py, oscopy/figure.py: context, figure: comments update
+
+2009-09-14  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/figure.py: FIXED: figure: cursors
+
+2009-09-13  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * demo/demo.sch, oscopy/context.py, oscopy/figure.py, oscopy/graphs/graph.py:
+  derive figure from matplotlib.pyplot.figure  This break cursors and the pause
+  command
+
+  * oscopy/context.py, oscopy/graphs/graph.py: context: on update, remove
+  deleted signals from all the graphs of all the figures
+
+  * doc/manual/out/.gitignore, doc/manual/tex/manual.tex: Documentation update
+
+2009-09-11  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/context.py, oscopy/figure.py, oscopy_app: figure: remove _current
+
+  * oscopy/context.py, oscopy_app: context: remove _current
+
+  * oscopy/context.py, oscopy/figure.py, oscopy_app: rename context.figs to
+  context.figures and figure.grafs to figure.graphs, beautify code
+
+  * oscopy/context.py, oscopy/figure.py: context, figure: remove the properties
+  figures and graphs  Now useless since application use direct access
+  context.figs and figure.grafs to build the list of figures and graphs.
+
+  * oscopy_app: oscopy_app: use lists provided by context.figs and figure.grafs
+   This avoid using the context.figures and figures.graphs.
+
+2009-09-10  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/context.py, oscopy/figure.py: context, figure: remove pass-through
+  properties
+
+  * oscopy_app: oscopy_app: access context figures and graphs through lists
+  properties  Avoid using pass-through to access figures and graph properties
+  (layout, mode, scale, range, unit)
+
+  * oscopy/context.py: context: make names_to_signals public
+
+2009-09-09  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy_app, test/demo.oscopy: oscopy_app: add support for current figure
+  and current graph  This prepare the use of direct access to internal list of
+  figures in context and direct access to internal list of graphs of figures
+
+  * oscopy/context.py: context: enable direct access to internal figure list
+
+  * oscopy/figure.py: figure: enable direct access to internal graph list
+
+  * oscopy_app: oscopy_app: Correct some help messages
+
+2009-09-06  Ivan Stankovic <pokemon@fly.srk.fer.hr>
+
+  * ui.py: Add simple GUI application
+
+2009-08-30  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/figure.py: figure: add draw() to update the figure
+
+  * oscopy/figure.py: figure: Optionnaly pass the matplotlib.figure when to
+  __init__
+
+  * oscopy/figure.py: figure: set only once the key event handler
+
+2009-07-30  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * matplotlibrc: Add matplotlibrc with gtk backend selection
+
+2009-07-24  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/graphs/graph.py, test/demo.oscopy: graph: remove() remove the signal
+  from the plot
+
+  * oscopy/graphs/graph.py: graph: plot the signals in insert()
+
+  * oscopy/graphs/graph.py: graph: plot the signals in insert()
+
+  * oscopy/graphs/graph.py: FIXED: call legend() in plot()
+
+  * oscopy/graphs/graph.py, test/demo.oscopy: graph: move the axis range change
+  from plot() to set_range()
+
+  * oscopy/graphs/graph.py: graph: move the axis labels change from plot() to
+  set_unit()
+
+2009-07-19  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/figure.py, oscopy/graphs/graph.py, test/demo.oscopy: graph: move the
+  scale change from plot() to set_scale()
+
+  * oscopy/figure.py, test/demo.oscopy: figure: move layout computation to
+  set_layout  Instead of computing the layout in plot() before displaying the
+  figure, the layout is computed in set_layout as soon as it is changed.
+
+2009-07-18  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/figure.py, oscopy/graphs/graph.py: figure: pass the axe to the graph
+  in add instead of plot
+
+  * oscopy/context.py, oscopy/figure.py, oscopy/graphs/graph.py, oscopy_app:
+  Call plt.figure() from Figure
+
+2009-07-12  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/context.py, oscopy/figure.py: figure: add list of axes associated
+  with graphs
+
+  * oscopy/graphs/graph.py, test/demo.oscopy: graph: associate signals to their
+  lines on the plots
+
+2009-06-30  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/context.py: FIXED: Context.math() insert the reader into dict
+  signal_name_to_reader
+
+2009-06-25  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/readers/detect_reader.py: FIXED: Try to detected first MathReader to
+  avoid file not found error when creating a math expression
+
+  * oscopy/context.py, oscopy/figure.py: FIXED: crash when deleting a graph due
+  to type mismatch in figure  Figure accept only an argument of type int and
+  context provided it with a str.
+
+2009-06-24  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/readers/detect_reader.py, oscopy_app: detect_reader: let the
+  application handle errors
+
+  * oscopy/readers/reader.py, test/update.oscopy: FIXED: remove deleted signal
+  from reader internal dict
+
+2009-06-18  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * TODO, demo/demo.sch, oscopy/figure.py, test/demo.oscopy, test/diff.oscopy,
+  test/fft.oscopy, test/update.oscopy: Add some handy test files
+
+  * oscopy/context.py, oscopy/graphs/fftgraph.py, oscopy_app: Move print
+  statement away from oscopy/, let the application display the messages
+
+  * oscopy/graphs/graph.py, oscopy_app: Move overflow error exception during
+  plot() to the application
+
+  * oscopy/graphs/graph.py, oscopy_app: insert() return the list of signal that
+  failed to insert
+
+  * doc/manual/tex/manual.tex, oscopy/context.py, oscopy/figure.py,
+  oscopy/graphs/graph.py: insert() return the list of signal that failed to
+  insert
+
+  * doc/manual/tex/auto/manual.el, doc/manual/tex/manual.tex,
+  oscopy/context.py, oscopy/figure.py, oscopy/graphs/graph.py, oscopy_app: Move
+  figure and graph list output to the application.  The application is in
+  charge of displaying the figure list, then context.figlist() is changed in
+  property context.figures, as well as figure.list which become property
+  figure.graphs. ty figure.graphs.
+
+2009-06-16  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * doc/manual/tex/manual.tex, oscopy/context.py, oscopy_app: context: move
+  siglist() to property signals
+
+2009-06-15  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * doc/manual/tex/manual.tex, oscopy/context.py, oscopy/readers/reader.py,
+  oscopy_app: siglist: move data processing to context
+
+2009-06-14  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * doc/manual/tex/auto/manual.el, doc/manual/tex/manual.tex,
+  oscopy/context.py, oscopy/readers/reader.py, oscopy_app:
+  [context|oscopy_app].siglist(): move print statements to the application
+
+2009-06-13  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * TODO, doc/manual/tex/manual.tex, oscopy/context.py, oscopy/figure.py,
+  oscopy_app: context, figure: replace 'select()' with property 'current'
+
+  * TODO, doc/manual/tex/auto/manual.el, doc/manual/tex/manual.tex,
+  oscopy/context.py, oscopy_app: context: use property() for range, scale,
+  unit, layout, mode.
+
+2009-06-11  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * TODO, doc/manual/tex/manual.tex, oscopy/context.py: context: rename private
+  elements
+
+  * oscopy/context.py: context: use assert
+
+  * oscopy/context.py: context: use _ for private elements
+
+  * doc/manual/tex/manual.tex, oscopy/context.py, oscopy/figure.py: figure: use
+  property() for mode
+
+2009-06-09  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * doc/manual/tex/manual.tex: manual: use read/write for properties access
+
+  * doc/manual/tex/manual.tex, oscopy/figure.py, oscopy/graphs/graph.py:
+  figure, graph: move properties at the end of the code
+
+  * doc/manual/tex/auto/manual.el, doc/manual/tex/manual.tex, oscopy/figure.py,
+  oscopy/graphs/graph.py: figure, graph: use property() for signals, renamed
+  get_sigs to get_signals
+
+2009-06-08  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/context.py, oscopy/figure.py: figure: Use property() for range,
+  layout and scale of the current graph
+
+2009-06-07  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy/figure.py: figure: use assert
+
+  * oscopy/figure.py: figure: use _ for private elements, add get_layout, use
+  property for layout
+
+  * oscopy/graphs/cursor.py, oscopy/signal.py: signal, cursors: use assert
+
+  * oscopy/graphs/graph.py: Graph: use assert
+
+  * oscopy/graphs/graph.py: Use dicts to convert between scales names and
+  functions
+
+2009-06-04  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * doc/manual/tex/manual.tex, oscopy/context.py, oscopy/figure.py,
+  oscopy/graphs/graph.py, oscopy_app: Graph: add get_range and use property()
+  for get/set_range
+
+  * doc/manual/tex/manual.tex: Doc: moved scale as property of Graph
+
+  * oscopy/figure.py, oscopy/graphs/graph.py: Graph: add get_scale and use
+  property() for get/set_scale
+
+2009-05-30  Ivan Stankovic <pokemon@fly.srk.fer.hr>
+
+  * oscopy/Oscopy.py, oscopy/__init__.py, oscopy/context.py, oscopy_app:
+  Renamed oscopy/Oscopy.py to oscopy/context.py  The Oscopy class is renamed to
+  Context.
+
+  * oscopy/Oscopy.py, oscopy/Writers/DetectWriter.py,
+  oscopy/Writers/GnucapWriter.py, oscopy/Writers/Writer.py,
+  oscopy/writers/detect_writer.py, oscopy/writers/gnucap_writer.py,
+  oscopy/writers/writer.py: Convert writer module names to lowercase
+
+  * oscopy/Oscopy.py, oscopy/Readers/DetectReader.py,
+  oscopy/Readers/GnucapReader.py, oscopy/Readers/MathReader.py,
+  oscopy/Readers/Reader.py, oscopy/readers/detect_reader.py,
+  oscopy/readers/gnucap_reader.py, oscopy/readers/math_reader.py,
+  oscopy/readers/reader.py, oscopy_app: Convert reader module names to
+  lowercase
+
+  * oscopy/Graphs/Cursor.py, oscopy/Graphs/FFTGraph.py, oscopy/Graphs/Graph.py,
+  oscopy/Graphs/LinGraphs.py, oscopy/figure.py, oscopy/graphs/__init__.py,
+  oscopy/graphs/cursor.py, oscopy/graphs/fftgraph.py, oscopy/graphs/graph.py,
+  oscopy/graphs/lingraph.py: Convert graph module names to lowercase
+
+  * oscopy/Figure.py, oscopy/Oscopy.py, oscopy/__init__.py, oscopy/figure.py:
+  Rename oscopy/Figure.py to oscopy/figure.py  Also, import it in __init__.
+
+  * oscopy/Graphs/FFTGraph.py, oscopy/Readers/GnucapReader.py,
+  oscopy/Readers/MathReader.py, oscopy/Signal.py, oscopy/__init__.py,
+  oscopy/signal.py: Rename oscopy/Signal.py to oscopy/signal.py  Also, import
+  it in __init__.
+
+  * Oscopy/Figure.py, Oscopy/Graphs/Cursor.py, Oscopy/Graphs/FFTGraph.py,
+  Oscopy/Graphs/Graph.py, Oscopy/Graphs/LinGraphs.py, Oscopy/Oscopy.py,
+  Oscopy/Readers/DetectReader.py, Oscopy/Readers/GnucapReader.py,
+  Oscopy/Readers/MathReader.py, Oscopy/Readers/Reader.py, Oscopy/Signal.py,
+  Oscopy/Writers/DetectWriter.py, Oscopy/Writers/GnucapWriter.py,
+  Oscopy/Writers/Writer.py, oscopy/Figure.py, oscopy/Graphs/Cursor.py,
+  oscopy/Graphs/FFTGraph.py, oscopy/Graphs/Graph.py,
+  oscopy/Graphs/LinGraphs.py, oscopy/Oscopy.py, oscopy/Readers/DetectReader.py,
+  oscopy/Readers/GnucapReader.py, oscopy/Readers/MathReader.py,
+  oscopy/Readers/Reader.py, oscopy/Signal.py, oscopy/Writers/DetectWriter.py,
+  oscopy/Writers/GnucapWriter.py, oscopy/Writers/Writer.py, oscopy_app: Rename
+  Oscopy/ to oscopy/
+
+  * oscopy, oscopy_app: Move file oscopy to oscopy_app
+
+2009-06-04  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Figure.py, Oscopy/Graphs/Graph.py, Oscopy/Oscopy.py,
+  doc/manual/tex/manual.tex, oscopy: Graph: add get_range and use property()
+  for get/set_range
+
+  * doc/manual/tex/manual.tex: Doc: moved scale as property of Graph
+
+  * Oscopy/Figure.py, Oscopy/Graphs/Graph.py: Graph: add get_scale and use
+  property() for get/set_scale
+
+  * Oscopy/Figure.py, Oscopy/Graphs/Graph.py, doc/manual/tex/auto/manual.el,
+  doc/manual/tex/manual.tex: Graph: add get_unit and use property() for
+  get/set_unit
+
+2009-05-31  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Graphs/Graph.py: Graph: move factor names (old: scnames) to a class
+  attribute
+
+  * Oscopy/Graphs/Graph.py, Oscopy/Graphs/LinGraphs.py,
+  doc/manual/tex/manual.tex: Graphs: Use property for type
+
+2009-05-30  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Graphs/Graph.py: Graph: use _ for private elements
+
+  * Oscopy/Writers/Writer.py: Writer: remove useless import
+
+  * Oscopy/Readers/MathReader.py, oscopy: MathReader: Raise ReadError instead
+  of printing message
+
+  * Oscopy/Writers/GnucapWriter.py, Oscopy/Writers/Writer.py,
+  doc/manual/dot/writers.dot, doc/manual/tex/manual.tex: Writers: rename
+  *fmt*() to *format*()  and write_sigs() to write_signals()
+
+  * Oscopy/Writers/GnucapWriter.py, Oscopy/Writers/Writer.py: Writers: use _
+  for private elements
+
+  * doc/manual/dot/readers.dot, doc/manual/tex/manual.tex: Readers: rename
+  read_sigs to read_signals in doc (py files modified in previous patch)
+
+2009-05-29  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Oscopy.py, Oscopy/Readers/GnucapReader.py,
+  Oscopy/Readers/MathReader.py, Oscopy/Readers/Reader.py: Readers: use _ for
+  private elements
+
+  * Oscopy/Readers/MathReader.py, TODO, demo/demo.sch: MathReader: Replace exec
+  by eval, simplify read_sigs
+
+2009-05-26  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Oscopy.py, Oscopy/Readers/Reader.py, Oscopy/Signal.py: Signal: use
+  property() for freeze
+
+  * Oscopy/Signal.py: Cursors: use property()
+
+  * Oscopy/Graphs/Cursor.py, Oscopy/Graphs/Graph.py: Cursors: use property()
+
+  * doc/manual/tex/auto/manual.el, doc/manual/tex/manual.tex: Doc: Added
+  Context section
+
+2009-05-23  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * doc/manual/tex/auto/manual.el, doc/manual/tex/manual.tex: Doc: updated
+  figures section
+
+  * doc/manual/dot/.gitignore, doc/manual/dot/cursorinter.dot,
+  doc/manual/out/.gitignore, doc/manual/tex/Makefile,
+  doc/manual/tex/auto/manual.el, doc/manual/tex/manual.tex: Doc: updated
+  cursors section
+
+2009-05-17  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * doc/manual/tex/auto/manual.el, doc/manual/tex/manual.tex: Doc: updated
+  Graph section
+
+  * Oscopy/Readers/GnucapReader.py: FIXED: shift in assignment of data to
+  signals
+
+2009-04-26  Ivan Stankovic <pokemon@fly.srk.fer.hr>
+
+  * Oscopy/Graphs/LinGraphs.py, Oscopy/Readers/GnucapReader.py,
+  Oscopy/Readers/MathReader.py, Oscopy/Writers/GnucapWriter.py: Remove 'object'
+  superclass where the base class already inherits from it.
+
+  * Oscopy/Readers/GnucapReader.py: GnucapReader: move probes to units mapping
+  to a class attribute  There's no need to create the same dictionary every
+  time unit_from_probe is called. It's better (and faster) to just make the
+  dictionary a class attribute.
+
+  * Oscopy/Readers/GnucapReader.py: GnucapReader: use the with statement and
+  speed up reading a bit  This patch avoids unneeded indexing in the inner loop
+  and caches append methods which should result in better performance.
+
+  * Oscopy/Signal.py: Signal.__str__: handle the case where self.ref is None
+
+  * : Remove Oscopy/Cmd.py
+
+2009-05-17  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * TODO, doc/manual/tex/auto/manual.el, doc/manual/tex/manual.tex: Doc: Added
+  Graph section
+
+2009-05-15  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * TODO, doc/manual/dot/readers.dot, doc/manual/dot/writers.dot,
+  doc/manual/tex/Makefile, doc/manual/tex/auto/manual.el,
+  doc/manual/tex/manual.tex: Doc: Added Writers section
+
+2009-05-13  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * doc/manual/dot/fileinter.dot, doc/manual/dot/itf.dot,
+  doc/manual/dot/readers.dot, doc/manual/dot/viewinter.dot,
+  doc/manual/tex/Makefile, doc/manual/tex/auto/manual.el,
+  doc/manual/tex/manual.tex: Doc: Added Reader section
+
+2009-05-11  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * TODO, doc/manual/tex/auto/manual.el, doc/manual/tex/manual.tex: Doc: Added
+  signal section
+
+2009-05-10  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * .gitignore, doc/manual/tex/Makefile, doc/manual/tex/auto/manual.el,
+  doc/manual/tex/manual.tex: Doc: added Introduction, user and data interaction
+
+2009-05-03  Ivan Stankovic <pokemon@fly.srk.fer.hr>
+
+  * Oscopy/Writers/DetectWriter.py~: Remove Oscopy/Writers/DetectWriter.py~ (a
+  backup file)
+
+  * Oscopy/Writers/DetectWriter.py: DetectWriter: avoid usage of exec
+
+  * Oscopy/Oscopy.py, Oscopy/Readers/DetectReader.py: DetectReader: avoid usage
+  of exec
+
+2009-04-26  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * doc/manual/tex/Makefile, doc/manual/tex/auto/manual.el,
+  doc/manual/tex/manual.tex: Started doc
+
+2009-04-22  Ivan Stankovic <pokemon@fly.srk.fer.hr>
+
+  * .gitignore: Add .gitignore
+
+  * Oscopy/Writers/GnucapWriter.py: GnucapWriter: move prefix list computation
+  to __init__
+
+  * Oscopy/Writers/GnucapWriter.py: GnucapWriter: simplify fmt_check by using
+  the 'all' built-in function
+
+  * Oscopy/Writers/GnucapWriter.py: GnucapWriter: simplify write_sigs
+
+  * Oscopy/Writers/DetectWriter.pyc, Oscopy/Writers/__init__.pyc: Remove .pyc
+  files
+
+2009-04-22  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Graphs/FFTGraph.py, Oscopy/Graphs/Graph.py, Oscopy/Oscopy.py,
+  Oscopy/Readers/GnucapReader.py, Oscopy/Readers/MathReader.py,
+  Oscopy/Readers/Reader.py, Oscopy/Signal.py, Oscopy/Writers/GnucapWriter.py:
+  Switched to managed attributes in Signal: name, unit, ref and data
+
+2009-04-18  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Graphs/FFTGraph.py, Oscopy/Readers/GnucapReader.py,
+  Oscopy/Readers/MathReader.py, Oscopy/Signal.py, demo/demo.sch: Removed
+  self.reader in Signal
+
+  * Oscopy/Oscopy.py, Oscopy/Readers/GnucapReader.py,
+  Oscopy/Readers/MathReader.py, Oscopy/Readers/Reader.py, Oscopy/Signal.py,
+  TODO, demo/demo.sch: Update through the readers instead through the signals.
+  Will allow removal of Signal.reader.
+
+2009-04-13  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Figure.py, Oscopy/Graphs/Cursor.py, Oscopy/Graphs/Graph.py,
+  Oscopy/Graphs/LinGraphs.py, Oscopy/Oscopy.py, Oscopy/Readers/GnucapReader.py,
+  Oscopy/Readers/MathReader.py, Oscopy/Readers/Reader.py, Oscopy/Signal.py,
+  Oscopy/Writers/DetectWriter.py, Oscopy/Writers/DetectWriter.pyc,
+  Oscopy/Writers/GnucapWriter.py, Oscopy/Writers/Writer.py, oscopy: PEP8
+  Compliance: empty sequences comparison, exception classes derived from
+  Exception, classes derived from object. Added validate_expr to MathReader
+
+  * Oscopy/Figure.py, Oscopy/Graphs/Graph.py, Oscopy/Readers/GnucapReader.py,
+  Oscopy/Readers/MathReader.py, Oscopy/Readers/Reader.py, Oscopy/Signal.py,
+  Oscopy/Writers/GnucapWriter.py, Oscopy/Writers/Writer.py, oscopy: PEP8
+  compliance: remove space around = in default args, added _ in names and made
+  MathReader.read_sigs more readable
+
+2009-04-12  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Cmd.py, Oscopy/Oscopy.py, oscopy: Separated application from
+  framework: application is OscopyApp in oscopy, framework in Oscopy/
+
+2009-04-07  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Writers/GnucapWriter.py: Made GnucapWriter.writesigs() more readable
+
+2009-04-05  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Cmd.py, Oscopy/Figure.py, Oscopy/Graphs/Graph.py, Oscopy/Oscopy.py,
+  Oscopy/Readers/DetectReader.py, Oscopy/Signal.py,
+  Oscopy/Writers/DetectWriter.py, Oscopy/Writers/DetectWriter.pyc,
+  Oscopy/Writers/Writer.py: PEP8 Compliance: use isinstance() to check args
+  type
+
+2009-03-31  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Cmd.py, Oscopy/Figure.py, Oscopy/Graphs/Cursor.py,
+  Oscopy/Graphs/Graph.py, Oscopy/Oscopy.py, Oscopy/Readers/DetectReader.py,
+  Oscopy/Readers/MathReader.py, Oscopy/Signal.py,
+  Oscopy/Writers/GnucapWriter.py, oscopy: PEP8 Compliance: use is or is not to
+  compare None
+
+2009-03-22  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * demo/demo.oscopy: Enabled pause command in demo.oscopy
+
+  * demo/demo.oscopy: Enabled pause and second plot commands in demo.oscopy:
+  demo for update command
+
+  * Oscopy/Readers/MathReader.py, README, TODO, demo/demo.oscopy: Documentation
+  update, code cleanup
+
+2009-03-20  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Readers/MathReader.py: Support for diff() in math expression
+
+2009-03-19  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Figure.py, Oscopy/Oscopy.py: Removed [I]FFT graph modes
+
+  * Oscopy/Oscopy.py, Oscopy/Readers/MathReader.py: Added support for FFT in
+  math expression. This overcome a problem with cursors scale factor in
+  FFTGraphs. The two classes FFTGraph and IFFTGraph need to be removed.
+
+2009-03-18  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Figure.py, Oscopy/Graphs/Cursor.py: FIXED: Do not draw cursor if
+  outside graph limits
+
+2009-03-15  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Cmd.py, Oscopy/Figure.py, Oscopy/Graphs/Graph.py, Oscopy/Oscopy.py,
+  demo/demo.oscopy: Renamed get_toplot in Cmds and Figure, Optimisation of
+  scaling in Graph.plot()
+
+  * Oscopy/Figure.py: FIXED: In Figure.set_mode() overwrite old graph with new
+  one
+
+  * Oscopy/Oscopy.py, oscopy: Moved main loop into Oscopy class
+
+  * Oscopy/Cmd.py, Oscopy/Graphs/FFTGraph.py, Oscopy/Graphs/Graph.py,
+  Oscopy/Readers/GnucapReader.py, Oscopy/Readers/MathReader.py,
+  Oscopy/Readers/Reader.py, Oscopy/Signal.py, Oscopy/Writers/DetectWriter.pyc,
+  Oscopy/Writers/GnucapWriter.py, Oscopy/Writers/__init__.pyc: Signal.py:
+  Renamed pts to data
+
+  * Oscopy/Cmd.py, Oscopy/Figure.py, Oscopy/Graphs/Cursor.py,
+  Oscopy/Graphs/FFTGraph.py, Oscopy/Graphs/Graph.py,
+  Oscopy/Graphs/LinGraphs.py, Oscopy/Oscopy.py, Oscopy/Readers/GnucapReader.py,
+  Oscopy/Readers/MathReader.py, Oscopy/Readers/Reader.py, Oscopy/Signal.py,
+  Oscopy/Writers/DetectWriter.pyc, Oscopy/Writers/GnucapWriter.py,
+  Oscopy/Writers/Writer.py, Oscopy/Writers/__init__.pyc: Renamed getxxx and
+  setxxx to get_xxx and set_xxx, renamed findscalefact find_scale_factor
+
+2009-03-13  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Graphs/Cursor.py, Oscopy/Graphs/Graph.py: Put Cursor class in
+  separate file
+
+  * Oscopy/Cmd.py, Oscopy/Figure.py, Oscopy/Graphs/FFTGraph.py,
+  Oscopy/Graphs/Graph.py, Oscopy/Oscopy.py, TODO, demo/demo.oscopy: Support for
+  cursors: keys 1, 2, 3 and 4 to toggle during plot.
+
+2009-02-24  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Oscopy/Cmd.py, Oscopy/Figure.py, Oscopy/Readers/MathReader.py, README,
+  demo/demo.oscopy: Doc update
+
+  * Cmd.py, Figure.py, Graphs/FFTGraph.py, Graphs/Graph.py,
+  Graphs/LinGraphs.py, Oscopy/Cmd.py, Oscopy/Figure.py,
+  Oscopy/Graphs/FFTGraph.py, Oscopy/Graphs/Graph.py,
+  Oscopy/Graphs/LinGraphs.py, Oscopy/Oscopy.py, Oscopy/Readers/DetectReader.py,
+  Oscopy/Readers/GnucapReader.py, Oscopy/Readers/MathReader.py,
+  Oscopy/Readers/Reader.py, Oscopy/Signal.py, Oscopy/Writers/DetectWriter.py,
+  Oscopy/Writers/DetectWriter.pyc, Oscopy/Writers/DetectWriter.py~,
+  Oscopy/Writers/GnucapWriter.py, Oscopy/Writers/Writer.py,
+  Oscopy/Writers/__init__.pyc, Readers/DetectReader.py,
+  Readers/GnucapReader.py, Readers/MathReader.py, Readers/Reader.py, Signal.py,
+  TODO, Writers/DetectWriter.py, Writers/DetectWriter.pyc,
+  Writers/DetectWriter.py~, Writers/GnucapWriter.py, Writers/__init__.pyc,
+  demo.sch, demo/demo.oscopy, demo/demo.sch, demo/irf540n.sub, irf540n.sub,
+  oscopy, test/nofig.oscopy: Files cleanup: moved source files in Oscopy/,
+  example files in demo/, test files in test/. FIXED: Check permissions before
+  writing file
+
+2009-02-20  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py, Figure.py: Code cleanup: use alias for curfig in Cmd and curgraph
+  in Figure instead of counter
+
+2009-02-19  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py, demo.sch, oscopy: Support for pause command, cosmetic changes
+
+2009-02-18  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy: Support for batch mode i.e. read commands from file, support for
+  command line arguments
+
+2009-02-17  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * oscopy: Support for echo command, support for comments lines beginning with
+  '#'
+
+2009-02-16  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py, oscopy: Moved command line interface analysis away from Cmd, now in
+  separate application class
+
+2009-02-15  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * README: Documentation update
+
+2009-02-14  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py, Writers/DetectWriter.py, Writers/DetectWriter.pyc,
+  Writers/GnucapWriter.py: Put GnucapWriter in distinct file
+
+2009-02-13  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py, Figure.py, Graphs/Graph.py: Support for changing axis range
+
+2009-02-11  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py: Support for options in Write
+
+2009-02-09  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py, Graphs/LinGraphs.py, Readers/DetectReader.py,
+  Readers/GnucapReader.py, Readers/MathReader.py, Readers/Reader.py, TODO,
+  Writers/DetectWriter.py, Writers/DetectWriter.pyc, Writers/DetectWriter.py~,
+  Writers/__init__.pyc: Support for data export, support for gnucap format
+
+2009-02-01  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py, Figure.py, Graphs/FFTGraph.py, Graphs/Graph.py,
+  Graphs/LinGraphs.py, Graphs/LogGraphs.py, Signal.py, TODO: Support for scale
+  command which deprecate ...Log... classes. Removed those classes
+
+  * Cmd.py, Figure.py, Graphs/Graph.py: Support for scale command: set the axis
+  scale (lin, logx, logy, loglog). Replacement for definitions of Logx...,
+  Logy... and LogLog... graphs
+
+  * Axe.py, Examples.py, FFTGraph.py, Figure.py, Graph.py, Graphs/FFTGraph.py,
+  Graphs/Graph.py, Graphs/LinGraphs.py, Graphs/LogGraphs.py, LinGraphs.py,
+  LogGraphs.py: Moved all graphs into single module
+
+  * Cmd.py: Command load renamed to read
+
+  * Cmd.py, Figure.py, Graph.py, Readers/MathReader.py, TODO: Support for
+  setting graph units
+
+2009-01-31  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Readers/MathReader.py: Support for floating point numbers in math
+  expressions
+
+  * Readers/MathReader.py: Support for Time and Freq in math expressions, e.g.
+  v1=cos(Time(vsqu)*1000000)
+
+  * Readers/MathReader.py, Signal.py: Store points of signals in numpy.array
+  instead of list. Updated MathReader in this way
+
+  * Cmd.py, Readers/GnucapReader.py, Readers/MathReader.py, demo.sch: Use
+  setpts/getpts in MathReader, small bugfixes
+
+2009-01-28  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Readers/MathReader.py, oscopy: FIXED crash when entering unknown command
+
+  * Readers/MathReader.py: FIXED use of math functions in MathReader.
+
+2009-01-25  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Readers/MathReader.py, Readers/Reader.py, TODO: Doc update update
+
+  * Cmd.py, Readers/MathReader.py, Readers/Reader.py: MathReader: support for
+  update, support for calling existing math signals
+
+  * Readers/MathReader.py: Can get a list of unknown names in MathReader
+
+2009-01-24  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py, Signal.py, demo.sch: Support for freezing signal, i.e. update or
+  not
+
+  * Cmd.py, Figure.py, README, Readers/Reader.py, Signal.py, TODO, demo.sch:
+  Changed update mechanism: update from signal list instead of reader list in
+  Cmd
+
+2009-01-14  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py: FIXED: typo preventing use of maths
+
+2009-01-13  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py, FFTGraph.py, Graph.py, Readers/GnucapReader.py, Signal.py, TODO:
+  Use methods to access attributes of Signal
+
+2009-01-11  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py, Readers/DetectReader.py, Readers/MathReader.py, TODO, oscopy: Use
+  hasattr/callable instead of isinstance
+
+  * Figure.py: FIXED insert/remove in first graph of figures
+
+  * Cmd.py, FFTGraph.py, Figure.py, Graph.py, LinGraphs.py, LogGraphs.py,
+  Readers/GnucapReader.py, Readers/MathReader.py, Signal.py, TODO, oscopy:
+  Replaced from ... import * by import ...
+
+  * DetectReader.py, Readers/DetectReader.py: Replaced from ... import * by
+  import ...
+
+2009-01-10  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py, DetectReader.py, GnucapReader.py, MathReader.py, Reader.py,
+  Readers/GnucapReader.py, Readers/MathReader.py, Readers/Reader.py, demo.sch,
+  oscopy: Support for autodetection of file format via ReaderDetect()
+
+2009-01-06  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * GnucapReader.py, MathReader.py, Reader.py, TODO: Added TODO, comment update
+
+  * : Added TODO, comment update
+
+  * GnucapReader.py, Reader.py, demo.sch: Delete signals if file is not found
+  anymore when updating
+
+2009-01-04  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py: Remove old name reference
+
+  * Cmd.py: Help message update
+
+  * oscopy: Fixed bug when no hist file exist
+
+2009-01-03  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * FFTGraph.py, MathReader.py: Added some important untracked files, and usage
+  warning
+
+  * README, Reader.py, demo.sch, irf540n.sub, oscopy, oscopy.png: Documentation
+  update, screenshot, code cleanup, demo for irf540
+
+  * Cmd.py, Figure.py, Graph.py: Display a * in figlist for current fig/graph.
+  Some code clean up, replace None by {} for sigs
+
+  * Graph.py, README, demo.sch: Support for absolute unit, documentation update
+
+2009-01-02  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * BaseGraph.py, Figure.py, Graph.py, LinGraph.py, LinGraphs.py, LogGraphs.py:
+  Name change: BaseGraph->Graph
+
+  * Cmd.py, GnucapReader.py, Reader.py, oscopy: Name changes: scope->oscopy,
+  ReaderBase->Reader, loadfile->read, getsiglist->readsigs
+
+  * Reader.py, ReaderBase.py, oscopy, scope.py: Name changes: scope->oscopy,
+  ReaderBase->Reader, loadfile->read, getsiglist->readsigs
+
+2009-01-01  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * BaseGraph.py, GnucapReader.py, Signal.py: Support for units
+
+  * BaseGraph.py, Cmd.py, Figure.py, LinGraph.py, LogGraphs.py, Signal.py:
+  Moved support for fft and ifft in separate classes than BaseGraph.
+
+2008-12-31  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * BaseGraph.py: Support for scale factors : from atto to Exa
+
+2008-12-29  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * BaseGraph.py, Figure.py, README: Documentation update, code clean up,
+  bugfix for xlabel when fft or ifft mode enable
+
+  * Figure.py: Select graph# now start from 1 instead of 0 to keep coherence
+  with figures#, i.e. 'select 4,2' to select the second graph of the fourth
+  figure
+
+2008-12-28  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * BaseGraph.py, Cmd.py, Figure.py, ReaderBase.py: Code cleanup in update
+  functions, bugfix in Figure.__init__(), remove Cmd.setplot()
+
+2008-12-27  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * BaseGraph.py: Support for overflow exception in plot
+
+  * Cmd.py: In add, call create when no figure exist
+
+2008-12-26  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * BaseGraph.py: Support for legend in graphs
+
+  * Cmd.py: Fixed: update all readers
+
+  * Cmd.py: Support for graph selection
+
+  * Cmd.py, Figure.py, LogGraphs.py, LogxGraph.py: Support for logy and loglog
+  graph. All log graphs gathered in LogGraphs.py
+
+  * BaseGraph.py, Cmd.py, Figure.py, scope.py: Support for basic mathematical
+  expressions (MathReader), support for fft/ifft mode for graphs
+
+2008-12-22  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py, GnucapReader.py, ReaderBase.py, Signal.py, scope.py: Support for
+  mathematical expressions, basics
+
+2008-12-21  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * GnucapReader.py, ReaderBase.py: Doc update
+
+2008-12-20  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * BaseGraph.py, Cmd.py, Figure.py: Sort the function into the classes
+
+  * BaseGraph.py, Cmd.py, Figure.py, README: Naming convention change: type to
+  mode fro graphs
+
+  * BaseGraph.py, Cmd.py, Figure.py, README: Updated to mach vocabular (See
+  README). Signals can be inserted into and removed from Graphs
+
+2008-12-16  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * BaseGraph.py, Cmd.py, Figure.py, Graph.py, LinGraph.py, LogxGraph.py,
+  README: Added possibility to change type of graph, here linear and logx
+
+2008-12-14  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py: Renamed delfromfig to remove, to meet inverse of 'add'
+
+  * AUTHORS, LICENSE, README: Added README, AUTHORS, LICENSE
+
+2008-12-13  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py: Added help command
+
+  * Cmd.py: Help support for user commands
+
+2008-12-12  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py, Figure.py, Graph.py, ReaderBase.py: Handle the update command
+
+2008-12-08  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py, Figure.py: Comments in Cmd, figlist more verbose
+
+  * : Deleted ExceptError.py
+
+  * ExceptErrors.py, GnucapReader.py, ReaderBase.py: More comments, moved
+  FileLoadError into ReaderBase
+
+2008-12-07  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * GnucapReader.py, ReaderBase.py, Signal.py: Commented more files
+
+  * Signal.py: More comments, again
+
+  * Figure.py, Graph.py: More comments
+
+  * Figure.py, Graph.py: Moved calls to plot from Figure into Graph
+
+  * Cmd.py, Figure.py: Renamed mode to layout
+
+  * Figure.py: setgraph to select
+
+  * Figure.py: Added a bunch of comment
+
+2008-12-04  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Figure.py: Figure.delete() handle self.curgraph
+
+2008-12-03  Arnaud Gardelein <agard@nostalgia-for-infinity.(none)>
+
+  * Cmd.py: Cosmetic change
+
+  * Cmd.py: Cmd.delete: handle self.curfig
+
+  * Cmd.py, Figure.py: Cmd.new(): handle calls from either command line or
+  function
+
+2008-12-01  arnaud <arnaud@32bf8dbd-83d1-42db-b63b-6d92709ef060>
+
+  * Cmd.py, Figure.py, Graph.py: Before git migratio
+
+2008-11-26  arnaud <arnaud@32bf8dbd-83d1-42db-b63b-6d92709ef060>
+
+  * Cmd.py, Figure.py: Can now remove graph from a figure
+
+  * Cmd.py, Figure.py: Added figure mode selection (horiz, vert, quad)
+
+2008-11-23  arnaud <arnaud@32bf8dbd-83d1-42db-b63b-6d92709ef060>
+
+  * Signal.py: Avoid nasty bug: remove Signal attributes from class declaration
+
+  * Graph.py: Corrected bug in Graph.__str__()
+
+  * Cmd.py, Figure.py, Graph.py, Signal.py: Plot 1, 2 or 4 subplots
+
+2008-11-22  arnaud <arnaud@32bf8dbd-83d1-42db-b63b-6d92709ef060>
+
+  * Cmd.py, Figure.py, Signal.py: Added basic plot functionality
+
+  * GnucapReader.py, Signal.py: Signal.__str__ display first point now, avoid
+  mixing readline and 'for in f' for reading files
+
+  * Cmd.py, ReaderBase.py: Use reader dict in cmd, code clean up
+
+  * Cmd.py, GnucapReader.py, ReaderBase.py, Signal.py: Added update command
+
+  * BaseFileType.py, Cmd.py, GnucapReader.py, ReaderBase.py, Signal.py: Moved
+  to Reader-style objects, code cleanup
+
+2008-11-20  arnaud <arnaud@32bf8dbd-83d1-42db-b63b-6d92709ef060>
+
+  * Cmd.py, Gnucap.py, GnucapReader.py: Renamed Gnucap to GnucapReader
+
+2008-11-19  arnaud <arnaud@32bf8dbd-83d1-42db-b63b-6d92709ef060>
+
+  * BaseFileType.py, Cmd.py, Figure.py, Gnucap.py, Graph.py, Signal.py,
+  scope.py: Can now fill Signals from file at Gnucap format
+
+2008-11-16  arnaud <arnaud@32bf8dbd-83d1-42db-b63b-6d92709ef060>
+
+  * Axe.py, Figure.py, Graph.py: Added Axe, Figure and Graph
+
+  * scope.py: Adapted for class mode of Cmd
+
+  * Cmd.py: Switch to class, added list, new, siglist
+
+  * Signal.py: Added __str__ capability
+
+2008-11-12  arnaud <arnaud@32bf8dbd-83d1-42db-b63b-6d92709ef060>
+
+  * Examples.py, scope.py: Evaluate the commands directly
+
+  * BaseFileType.py, Gnucap.py: Added a BaseFileType class for stuff common to
+  all file formats
+
+  * ExceptErrors.py, Gnucap.py: ExceptErrors in separate module
+
+  * Gnucap.py, scope.py: Added file error handling in Gnucap module
+
+  * Cmd.py, Examples.py, Gnucap.py, Signal.py, scope.py: Splitted main file
+  into modules
+
+  * scope.py: Added some examples
+
+2008-11-09  arnaud <arnaud@32bf8dbd-83d1-42db-b63b-6d92709ef060>
+
+  * scope.py: Added history capabilities, ctrl-d handling, loadfile and
+  getsiglist
+
+2008-11-08  arnaud <arnaud@32bf8dbd-83d1-42db-b63b-6d92709ef060>
+
+  * scope.py: Initial import
