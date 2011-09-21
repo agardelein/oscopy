@@ -1,3 +1,46 @@
+2011-09-11  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * ipythonrc-oscopy: Update copyright year
+
+2011-08-21  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * demo/demo-ngspice.sch: FIXED: ngspice AC simulation
+
+2011-08-22  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * doc/oscopy-api/dot/cursorinter.dot, doc/oscopy-api/dot/readers.dot,
+  doc/oscopy-api/tex/oscopy-api.tex: API documentation update  Update
+  information on classes, add section on signal update mechanism
+
+2011-09-11  Arnaud Gardelein <agardelein@yahoo.fr>
+
+  * ChangeLog: Add ChangeLog
+
+  * oscopy/ui.py: Remove _() for Figure action name in windows menu
+
+2011-08-13  Adrian Pardini <publico@tangopardo.com.ar>
+
+  * Makefile.am: Add po to SUBDIRS in Makefile.am
+
+  * configure.ac: Add intltool and gettext support in configure.ac
+
+  * po/es.po: updated es.po run "make update-po" and then translated new
+  strings.
+
+  * ioscopy_app.py, oscopy/__init__.py: Move gettext initialization from
+  __init__.py to ioscopy_app.py
+
+  * po/es.po, po/es_AR.po: Rename es_AR.po to es.po
+
+  * po/LINGUAS: Add po/LINGUAS
+
+  * po/POTFILES.in: Add POTFILES.in
+
+  * m4/intltool.m4, po/Makefile.in.in: Add files created by intltoolize -c
+
+  * i18n/es_AR.po, i18n/messages.po, po/es_AR.po, po/messages.po: Rename i18n
+  to po so it matches most of other packages
+
 2011-07-23  Arnaud Gardelein <agardelein@yahoo.fr>
 
   * oscopy/ui.py: FIXED: support for drag and drop  Use the canvas and

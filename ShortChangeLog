@@ -1,0 +1,23 @@
+v0.70.0
+      * Update API documentation
+      * Update spanish translation 
+      * Add long ChangeLog
+      * Bugfix: translation
+
+v0.70.0-rc2
+  * Bugfixes:
+      * Signals drag and drop
+      * help for inherited numpy.[ufuncs|fft] functions
+  * Include oscopy API manual in the documentation building process
+  * Add trailing space to the prompt
+
+v0.70.0-rc1
+  * Use ipython interpreter
+  * Use GObject event mechanism for Signals update process
+  * Rewrite support for computed Signals based on numpy.[ufuncs|fft]
+  * New commands: oimport, ogui, ocontext
+  * Support for spanish translations
+  * Add user manual
+  * Update help for commands
+  * Add comments to the code
+  * Rename commands to o*
