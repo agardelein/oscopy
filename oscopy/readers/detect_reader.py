@@ -4,8 +4,9 @@ import os.path
 from reader import ReadError
 from gnucap_reader import GnucapReader
 from signal_reader import SignalReader
+from cazm_reader import CazmReader
 
-READERS = [SignalReader, GnucapReader]
+READERS = [SignalReader, GnucapReader, CazmReader]
 
 def DetectReader(filename):
     """ Find which Reader can handle the filename
