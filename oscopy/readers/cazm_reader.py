@@ -5,10 +5,28 @@ from oscopy import Signal
 from reader import Reader, ReadError
 
 class CazmReader(Reader):
+    """ Read CaZM output files
+
+The header contains a signature, a blank line and then the analysis type (TRANSIENT, AC, TRANSFER), and finally the space separated variable names.
+Afterwards follow the data in text format ordered by columns.
+    """
     _CAZM_ID_STRING = '* CAZM-format output'
     _names_to_units = {'Time': 's', 'time': 's'}
     
     def detect(self, fn):
+        """ Look at the header, if it contains the signature in
+        self._CAZM_ID_STRING
+
+        Parameter
+        ---------
+        fn: string
+        Path to the file to test
+
+        Returns
+        -------
+        bool
+        True if the file can be handled by this reader
+        """
         self._check(fn)
         try:
             f = open(fn)
@@ -19,6 +37,28 @@ class CazmReader(Reader):
         return s.startswith(self._CAZM_ID_STRING)
 
     def _read_signals(self):
+        """ Read the signals from the file
+        First pass the file format signature
+        Then get the signal names from the first line, the abscisse
+        is the first column.
+        Finally read the data values, and finally, assign the abscisse and
+        data to each signal.
+
+        Parameter
+        ---------
+        fn: string
+        The filename
+
+        Returns
+        -------
+        Dict of Signals
+        The list of Signals read from the file
+
+        Raises
+        ------
+        ReaderError
+        In case of invalid path or unsupported file format
+        """
         units = []
         names = []
         signals = []
