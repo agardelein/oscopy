@@ -6,4 +6,5 @@ readers_PYTHON = __init__.py\
 	gnucap_reader.py\
 	signal_reader.py\
 	cazm_reader.py\
-	nsout_reader.py
+	nsout_reader.py\
+	spice2raw_reader.py
