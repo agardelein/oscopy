@@ -5,4 +5,5 @@ readers_PYTHON = __init__.py\
 	detect_reader.py\
 	gnucap_reader.py\
 	signal_reader.py\
-	cazm_reader.py
+	cazm_reader.py\
+	nsout_reader.py
