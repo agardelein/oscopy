@@ -143,8 +143,8 @@ Abbreviations
                 self.set_unit((self._xunit, self._yunit))
                 fx, l = self._find_scale_factor("X")
                 fy, l = self._find_scale_factor("Y")
-                x = s.ref.data * pow(10, fx)
-                y = s.data * pow(10, fy)
+                x = s.ref.data.real * pow(10, fx)
+                y = s.data.real * pow(10, fy)
                 line, = self.plot(x, y, label=sn)
                 self._signals2lines[sn] = line
                 self._draw_cursors()
@@ -157,8 +157,8 @@ Abbreviations
                     self._sigs[sn] = s
                     fx, l = self._find_scale_factor("X")
                     fy, l = self._find_scale_factor("Y")
-                    x = s.ref.data * pow(10, fx)
-                    y = s.data * pow(10, fy)
+                    x = s.ref.data.real * pow(10, fx)
+                    y = s.data.real * pow(10, fy)
                     line, = self.plot(x, y, label=sn)
                     self._signals2lines[sn] = line
                     self.legend()
@@ -204,8 +204,8 @@ Abbreviations
         for sn, s in self._sigs.iteritems():
             fx, l = self._find_scale_factor("X")
             fy, l = self._find_scale_factor("Y")
-            x = s.ref.data * pow(10, fx)
-            y = s.data * pow(10, fy)
+            x = s.ref.data.real * pow(10, fx)
+            y = s.data.real * pow(10, fy)
             self._signals2lines[sn].set_xdata(x)
             self._signals2lines[sn].set_ydata(y)            
     
@@ -241,11 +241,11 @@ Abbreviations
 
         for s in self._sigs.itervalues():
             if a == "X":
-                mxs.append(max(s.ref.data))
-                mns.append(min(s.ref.data))
+                mxs.append(max(s.ref.data.real))
+                mns.append(min(s.ref.data.real))
             else:
-                mxs.append(max(s.data))
-                mns.append(min(s.data))
+                mxs.append(max(s.data.real))
+                mns.append(min(s.data.real))
         mx = abs(max(mxs))
         mn = abs(min(mns))
         mx = max(mx, mn)
