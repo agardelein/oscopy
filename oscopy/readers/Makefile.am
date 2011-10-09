@@ -7,4 +7,5 @@ readers_PYTHON = __init__.py\
 	signal_reader.py\
 	cazm_reader.py\
 	nsout_reader.py\
-	spice2raw_reader.py
+	spice2raw_reader.py\
+	spice3raw_reader.py
