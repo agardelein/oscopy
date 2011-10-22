@@ -51,7 +51,7 @@ Figure -- Handle a list of graphs
       Handle keystrokes during plot
 """
 
-from matplotlib.pyplot import Figure as MplFig
+from matplotlib.pyplot import Figure as MplFig, Axes
 from graphs import Graph, LinGraph
 
 class Figure(MplFig):
@@ -112,11 +112,13 @@ class Figure(MplFig):
         # _graph_position use the current length of self.axes to compute
         # the graph coordinates. So we add a fake element into the list
         # and we remove it once the size is computed
-        self.axes.append(None)
+        key = 'Nothing'
+        a = Axes(self, (0, 0, 1, 1))
+        self._axstack.add(key, a)
         gr = LinGraph(self, self._graph_position(len(self.axes) - 1),\
                           sigs, label=str(len(self.axes)))
-        del self.axes[len(self.axes) - 1]
-        ax = self.add_axes(gr)
+        self._axstack.remove(a)
+        ax = self._axstack.add(len(self.axes), gr)
 
         # Force layout refresh
         self.set_layout(self._layout)
@@ -138,7 +140,7 @@ class Figure(MplFig):
             assert 0, _("Bad graph number")
         if len(self.axes) < 1 or num < 1 or num > len(self.axes):
             assert 0, _("Bad graph number")
-        del self.axes[num - 1]
+        self._axstack.remove(self._axstack.get(num - 1))
         
     def update(self, u, d):
         """ Update the graphs
