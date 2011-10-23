@@ -8,4 +8,6 @@ readers_PYTHON = __init__.py\
 	cazm_reader.py\
 	nsout_reader.py\
 	spice2raw_reader.py\
-	spice3raw_reader.py
+	spice3raw_reader.py\
+	hspice_reader.py
+

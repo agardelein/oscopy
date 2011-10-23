@@ -8,9 +8,10 @@ from cazm_reader import CazmReader
 from nsout_reader import NsoutReader
 from spice2raw_reader import Spice2rawReader
 from spice3raw_reader import Spice3rawReader
+from hspice_reader import HspiceReader
 
 READERS = [SignalReader, GnucapReader, CazmReader, NsoutReader,
-           Spice2rawReader, Spice3rawReader]
+           Spice2rawReader, Spice3rawReader, HspiceReader]
 
 def DetectReader(filename):
     """ Find which Reader can handle the filename
