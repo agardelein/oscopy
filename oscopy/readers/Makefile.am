@@ -9,5 +9,7 @@ readers_PYTHON = __init__.py\
 	nsout_reader.py\
 	spice2raw_reader.py\
 	spice3raw_reader.py\
-	hspice_reader.py
+	hspice_reader.py\
+	touchstone_reader.py
+
 

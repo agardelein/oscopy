@@ -9,9 +9,11 @@ from nsout_reader import NsoutReader
 from spice2raw_reader import Spice2rawReader
 from spice3raw_reader import Spice3rawReader
 from hspice_reader import HspiceReader
+from touchstone_reader import TouchstoneReader
 
 READERS = [SignalReader, GnucapReader, CazmReader, NsoutReader,
-           Spice2rawReader, Spice3rawReader, HspiceReader]
+           Spice2rawReader, Spice3rawReader, HspiceReader,
+           TouchstoneReader]
 
 def DetectReader(filename):
     """ Find which Reader can handle the filename

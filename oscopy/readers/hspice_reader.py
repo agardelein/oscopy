@@ -42,7 +42,7 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
                 # Maybe a binary hpsice file ?
                 f.seek(0, os.SEEK_SET)
                 x = f.read(16)
-                (h1, h2, h3, nbs) = struct.unpack('>4i', x)
+                (h1, h2, h3, nbs) = struct.unpack('>4i', x) if len(x) == 16 else (0, 0, 0, 0)
                 nauto = f.read(4)
             nprobe = f.read(4)
             nsweepparam = f.read(4)
