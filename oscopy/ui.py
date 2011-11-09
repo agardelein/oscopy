@@ -65,6 +65,19 @@ class App(dbus.service.Object):
                                        self._TARGET_TYPE_SIGNAL)]
         self._to_figure = [("oscopy-signals", gtk.TARGET_SAME_APP,\
                                 self._TARGET_TYPE_SIGNAL)]
+        self._to_main_win = [("text/plain", 0,
+                                self._TARGET_TYPE_SIGNAL),
+                             ('STRING', 0,
+                              self._TARGET_TYPE_SIGNAL),
+                             ('application/octet-stream', 0,
+                              self._TARGET_TYPE_SIGNAL),
+                             # For '*.raw' formats
+                             ('application/x-panasonic-raw', 0,
+                              self._TARGET_TYPE_SIGNAL),
+                             # For '*.ts' formats
+                             ('video/mp2t', 0,
+                              self._TARGET_TYPE_SIGNAL),
+                             ]
 
         if ctxt is None:
             self._ctxt = oscopy.Context()
@@ -245,6 +258,11 @@ class App(dbus.service.Object):
         w.connect('delete-event', lambda w, e: w.hide() or True)
         w.set_default_size(400, 300)
         w.show_all()
+        w.drag_dest_set(gtk.DEST_DEFAULT_MOTION |\
+                        gtk.DEST_DEFAULT_HIGHLIGHT |\
+                        gtk.DEST_DEFAULT_DROP,
+                        self._to_main_win, gtk.gdk.ACTION_COPY)
+        w.connect('drag_data_received', self._drag_data_received_main_cb)
 
     def _create_figure_popup_menu(self, figure, graph):
         figmenu = gui.menus.FigureMenu()
@@ -435,6 +453,15 @@ class App(dbus.service.Object):
     #
     # Callbacks for drag and drop
     #
+    def _drag_data_received_main_cb(self, widget, drag_context, x, y, selection,
+                                    target_type, time):
+        name = selection.data
+        if type(name) == str and name.startswith('file://'):
+            print name[7:].strip()
+            self._app_exec('%%oread %s' % name[7:].strip())
+        else:
+            print selection.data
+        
     def _drag_data_get_cb(self, widget, drag_context, selection, target_type,\
                               time):
         if target_type == self._TARGET_TYPE_SIGNAL:
