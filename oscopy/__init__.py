@@ -9,7 +9,7 @@ import gobject
 gobject.type_register(signal.Signal)
 
 try:
-    __IPYTHON__
+    get_ipython()
 except NameError:
     pass
 else:

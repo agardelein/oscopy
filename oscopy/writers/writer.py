@@ -122,7 +122,7 @@ write_signals.
         In case no file is specified, file exist and overwrite is not allowed
         or file access issue
         """
-        if not isinstance(fn, str):
+        if not (isinstance(fn, str) or isinstance(fn, unicode)):
             raise WriteError("No string specified")
         if not fn:
             raise WriteError("No file specified")
@@ -181,7 +181,8 @@ write_signals.
         bool
         True if this Writer manage this format
         """
-        if isinstance(format, str) and format == self._get_format_name():
+        if (isinstance(format, str) or isinstance(format, unicode))\
+                and format == self._get_format_name():
             return True
         else:
             return False

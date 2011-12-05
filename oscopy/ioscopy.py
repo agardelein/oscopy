@@ -5,7 +5,7 @@
 
 from __future__ import with_statement
 import IPython
-from IPython.demo import IPythonDemo
+from IPython.lib.demo import IPythonLineDemo
 import time
 import os
 import gtk
@@ -18,13 +18,14 @@ from graphs import factors_to_names, abbrevs_to_factors
 
 from context import Context
 from readers.reader import ReadError
+from writers.writer import WriteError
 from ui import App as OscopyGUI
 from oscopy import Signal
 
 _globals = None
 
 _ctxt = Context()
-ip = IPython.ipapi.get()
+ip = get_ipython()
 
 _current_figure = None
 _current_graph = None
@@ -316,8 +317,10 @@ def do_exec(self, file):
     try:
         if not file.startswith('/'):
             file = "/".join((os.getcwd(), file))
-        mydemo = IPythonDemo(file)
-        mydemo()
+        mydemo = IPythonLineDemo(file)
+        mydemo.show_all = False
+        while not mydemo.finished:
+            mydemo()
     except IOError, e:
         print _("Script error:"), e
         if hasattr(self, "f") and hasattr(f, "close")\
@@ -552,7 +555,7 @@ def init():
                      'owrite': do_write}
     
     for name, func in oscopy_magics.iteritems():
-            ip.expose_magic(name, func)
+            ip.define_magic(name, func)
 
 def set_ufuncs():
     for val in dir(numpy):

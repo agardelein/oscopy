@@ -12,6 +12,7 @@ import ConfigParser
 import dbus, dbus.service, dbus.glib
 from xdg import BaseDirectory
 from matplotlib.backend_bases import LocationEvent
+#from matplotlib.widgets import SpanSelector
 import IPython
 
 import oscopy
@@ -92,7 +93,7 @@ class App(dbus.service.Object):
         #self._add_file('demo/res.dat')
 
         # From IPython/demo.py
-        self.shell = __IPYTHON__
+        self.shell = get_ipython()
 
     SECTION = 'oscopy_ui'
     OPT_NETLISTER_COMMANDS = 'netlister_commands'
@@ -354,6 +355,13 @@ class App(dbus.service.Object):
     # Callbacks for App
     #
     def create(self):
+        """ Instanciate the window widget with the figure inside, set the
+        relevant events and add it to the 'Windows' menu.
+        Finally, select the first graph of this figure.
+
+        The figure has been instanciated by the application
+        and is assumed to be the last one in Context's figure list
+        """
         fig = self._ctxt.figures[len(self._ctxt.figures) - 1]
         fignum = len(self._ctxt.figures)
 
@@ -378,8 +386,23 @@ class App(dbus.service.Object):
         vbox.pack_start(canvas)
         toolbar = NavigationToolbar(canvas, w)
         vbox.pack_start(toolbar, False, False)
-        w.resize(400, 300)
+
+#        hscale = gtk.HScrollbar()
+##        hscale.set_range(0, 10)
+#        #hscale.set_draw_value(False)
+##        hscale.set_value(5)
+#        adj = gtk.Adjustment(50, 0, 100, 1, 10, 20)
+#        hscale.set_adjustment(adj)
+#        #hscale.set_slider_size_fixed(False)
+#        vbox.pack_start(hscale, False, False)
+
+        w.resize(640, 480)
         w.show_all()
+
+#        # Update canvas for SpanSelector of Graphs
+#        for gr in fig.graphs:
+#            if hasattr(gr, 'span'):
+#                gr.span.new_axes(gr)
 
         # Add it to the 'Windows' menu
         actions = [('Figure %d' % fignum, None, _('Figure %d') % fignum,
@@ -459,8 +482,6 @@ class App(dbus.service.Object):
         if type(name) == str and name.startswith('file://'):
             print name[7:].strip()
             self._app_exec('%%oread %s' % name[7:].strip())
-        else:
-            print selection.data
         
     def _drag_data_get_cb(self, widget, drag_context, selection, target_type,\
                               time):
@@ -578,7 +599,11 @@ class App(dbus.service.Object):
             os.chdir(old_dir)
 
     def _app_exec(self, line):
-        self.shell.runlines(line)
+        first = line.split()[0]
+        if first.startswith('%') or first.split()[0] in self.shell.lsmagic():
+            self.shell.magic(line)
+        else:
+            self.shell.ex(line)
     
 def usr1_handler(signum, frame):
     app.update_from_usr1()
