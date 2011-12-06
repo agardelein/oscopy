@@ -12,7 +12,7 @@ dist_doc_DATA = README
 
 dist_datadir = $(datarootdir)/oscopy
 
-dist_pkgdata_DATA = ipythonrc-oscopy
+dist_pkgdata_DATA = ipython_config.py
 
 docdir = $(datarootdir)/doc/oscopy
 
@@ -20,6 +20,6 @@ ACLOCAL_AMFLAGS = -I m4
 
 bin_SCRIPTS = ioscopy
 
-ioscopy: ioscopy_app.py
-	cat ioscopy_app.py | sed -e 's|@datarootdir[@]|$(datarootdir)|g' > ioscopy
+ioscopy: ioscopy_app.sh
+	cat ioscopy_app.sh | sed -e 's|@datarootdir[@]|$(datarootdir)|g' > ioscopy
 	chmod u+x ioscopy
