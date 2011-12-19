@@ -10,6 +10,7 @@ import readline
 import commands
 import ConfigParser
 import dbus, dbus.service, dbus.glib
+from math import log10, sqrt
 from xdg import BaseDirectory
 from matplotlib.backend_bases import LocationEvent
 #from matplotlib.widgets import SpanSelector
@@ -20,6 +21,10 @@ import oscopy
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 import gui
+
+IOSCOPY_COL_TEXT = 0
+IOSCOPY_COL_X10 = 1
+IOSCOPY_COL_VIS = 2 # Text in graphs combobox visible
 
 # Note: for crosshair, see gtk.gdk.GC / function = gtk.gdk.XOR
 
@@ -60,6 +65,11 @@ class App(dbus.service.Object):
         self._prompt = "oscopy-ui>"
         self._init_config()
         self._read_config()
+
+        # Might be moved to a dedicated app_figure class one day...
+        self._btns = {}
+        self._cbxs = {}
+        self._cbx_stores = {}
 
         self._TARGET_TYPE_SIGNAL = 10354
         self._from_signal_list = [("oscopy-signals", gtk.TARGET_SAME_APP,\
@@ -362,15 +372,17 @@ class App(dbus.service.Object):
         The figure has been instanciated by the application
         and is assumed to be the last one in Context's figure list
         """
-        fig = self._ctxt.figures[len(self._ctxt.figures) - 1]
+        fig = self._ctxt.figures[-1]
         fignum = len(self._ctxt.figures)
 
         w = gtk.Window()
         self._windows_to_figures[w] = fig
         self._fignum_to_windows[fignum] = w
         w.set_title(_('Figure %d') % fignum)
-        vbox = gtk.VBox()
-        w.add(vbox)
+        hbox1 = gtk.HBox() # The window
+        vbox1 = gtk.VBox() # The Graphs
+        hbox1.pack_start(vbox1)
+        w.add(hbox1)
         canvas = FigureCanvas(fig)
         canvas.mpl_connect('button_press_event', self._button_press)
         canvas.mpl_connect('axes_enter_event', self._axes_enter)
@@ -383,26 +395,101 @@ class App(dbus.service.Object):
                                  gtk.DEST_DEFAULT_HIGHLIGHT |\
                                  gtk.DEST_DEFAULT_DROP,
                              self._to_figure, gtk.gdk.ACTION_COPY)
-        vbox.pack_start(canvas)
-        toolbar = NavigationToolbar(canvas, w)
-        vbox.pack_start(toolbar, False, False)
 
 #        hscale = gtk.HScrollbar()
-##        hscale.set_range(0, 10)
-#        #hscale.set_draw_value(False)
-##        hscale.set_value(5)
+#       # hscale.set_range(0, 10)
+        #hscale.set_draw_value(False)
+#       # hscale.set_value(5)
 #        adj = gtk.Adjustment(50, 0, 100, 1, 10, 20)
 #        hscale.set_adjustment(adj)
-#        #hscale.set_slider_size_fixed(False)
-#        vbox.pack_start(hscale, False, False)
+        #hscale.set_slider_size_fixed(False)
+#        vbox1.pack_start(hscale, False, False)
+        vbox1.pack_start(canvas)
+
+        toolbar = NavigationToolbar(canvas, w)
+        vbox1.pack_start(toolbar, False, False)
+
+
+        vbox2 = gtk.VBox() # The right-side menu
+        #lbl = gtk.Label('Yo')
+        store = gtk.ListStore(gobject.TYPE_STRING, # String displayed
+                              gobject.TYPE_BOOLEAN, # x10 active
+                              gobject.TYPE_BOOLEAN
+                              )
+        iter = store.append([_('All Graphs'), False, True])
+        for i in xrange(4):
+            iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(fig.graphs) else False])
+        graphs_cbx = gtk.ComboBox(store)
+        cell = gtk.CellRendererText()
+        graphs_cbx.pack_start(cell, True)
+        graphs_cbx.add_attribute(cell, 'text', IOSCOPY_COL_TEXT)
+        graphs_cbx.add_attribute(cell, 'sensitive', IOSCOPY_COL_VIS)
+        graphs_cbx.set_active(0)
+        self._cbx_stores[fig] = store
+
+        vbox2.pack_start(graphs_cbx, False, False)
+
+        x10_toggle_btn = gtk.ToggleButton('x10 mode')
+        x10_toggle_btn.set_mode(True)
+
+        def graphs_cbx_changed(graphs_cbx, x10_toggle_btn, store):
+            iter = graphs_cbx.get_active_iter()
+            if store.get_string_from_iter(iter) == '0':
+                # Do all the graphs have same state?
+                store.iter_next(iter)
+                val = store.get_value(iter, IOSCOPY_COL_X10)
+                while iter is not None:
+                    if val != store.get_value(iter, IOSCOPY_COL_X10):
+                        # Yes, set the button into inconsistent state
+                        x10_toggle_btn.set_inconsistent(True)
+                        break
+                    iter = store.iter_next(iter)
+            else:
+                x10_toggle_btn.set_inconsistent(False)
+                x10_toggle_btn.set_active(store.get_value(iter, IOSCOPY_COL_X10))
+            
+        def x10_toggle_btn_toggled(x10_toggle_btn, graphs_cbx, store):
+            iter = graphs_cbx.get_active_iter()
+            a = x10_toggle_btn.get_active()
+            x10_toggle_btn.set_inconsistent(False)
+            if iter is not None:
+                store.set_value(iter, IOSCOPY_COL_X10, a)
+                fig = self._windows_to_figures[x10_toggle_btn.get_toplevel()]
+                grnum = int(store.get_string_from_iter(iter))
+                if store.get_string_from_iter(iter) == '0':
+                    # Set the value for all graphs
+                    iter = store.iter_next(iter)
+                    while iter is not None:
+                        store.set_value(iter, IOSCOPY_COL_X10, a)
+                        grnum = int(store.get_string_from_iter(iter))
+                        if grnum > len(fig.graphs):
+                            break
+                        self._zoom_x10(a, fig, grnum)
+                        iter = store.iter_next(iter)
+                else:
+                    self._zoom_x10(a, fig, grnum)
+                fig.canvas.draw()
+
+        graphs_cbx.connect('changed', graphs_cbx_changed, x10_toggle_btn, store)
+        x10_toggle_btn.connect('toggled', x10_toggle_btn_toggled,
+                               graphs_cbx, store)
+
+        # We need to keep those objects alive otherwise they will be destroyed
+        # end of this function and won't be initialized at callback time
+        self._cbxs[fig] = graphs_cbx
+        self._btns[fig] = x10_toggle_btn
+
+        vbox2.pack_start(x10_toggle_btn, False, False)
+
+        hbox1.pack_start(vbox2, False, False)
 
         w.resize(640, 480)
         w.show_all()
 
 #        # Update canvas for SpanSelector of Graphs
-#        for gr in fig.graphs:
-#            if hasattr(gr, 'span'):
-#                gr.span.new_axes(gr)
+        for gr in fig.graphs:
+            if hasattr(gr, 'span'):
+                gr.span.new_axes(gr)
 
         # Add it to the 'Windows' menu
         actions = [('Figure %d' % fignum, None, _('Figure %d') % fignum,
@@ -419,6 +506,30 @@ class App(dbus.service.Object):
         self._fignum_to_merge_id[fignum] = merge_id
         self._app_exec('%%oselect %d-1' % fignum)
 
+    def add(self, fig, args):
+        store = self._cbx_stores[fig]
+        iter = store.get_iter_first()
+        iter = store.iter_next(iter)  # First item always sensitive
+        while iter is not None:
+            grnum = int(store.get_string_from_iter(iter))
+            if grnum > len(fig.graphs):
+                store.set_value(iter, IOSCOPY_COL_VIS, False)
+            else:
+                store.set_value(iter, IOSCOPY_COL_VIS, True)
+            iter = store.iter_next(iter)       
+
+    def delete(self, fig, args):
+        store = self._cbx_stores[fig]
+        iter = store.get_iter_first()
+        iter = store.iter_next(iter)  # First item always sensitive
+        while iter is not None:
+            grnum = int(store.get_string_from_iter(iter))
+            if grnum > len(fig.graphs):
+                store.set_value(iter, IOSCOPY_COL_VIS, False)
+            else:
+                store.set_value(iter, IOSCOPY_COL_VIS, True)
+            iter = store.iter_next(iter)       
+
     def destroy(self, num):
         if not num.isdigit() or int(num) > len(self._ctxt.figures):
             return
@@ -430,6 +541,79 @@ class App(dbus.service.Object):
             self._actiongroup.remove_action(action)
             self._uimanager.remove_ui(self._fignum_to_merge_id[fignum])
             self._fignum_to_windows[fignum].destroy()
+
+    def _zoom_x10(self, x10, fig, grnum):
+        # In which layout are we (horiz, vert, quad ?)
+        layout = fig.layout
+        gr = fig.graphs[grnum - 1]
+        [xmin, xmax, ymin, ymax] = [None for x in xrange(4)]
+        [(xmin_cur, xmax_cur), (ymin_cur, ymax_cur)] = gr.range
+        [(xmin_new, xmax_new), (ymin_new, ymax_new)] = gr.range
+
+        # Get the bounds of the data (min, max)
+        if layout == 'horiz' or layout == 'quad':
+            for line in gr.get_lines():
+                data = line.get_data()[0]
+                (mini, maxi) = (min(data), max(data))
+                if xmin is None or xmin < mini:
+                    xmin = mini
+                if xmax is None or xmax > maxi:
+                    xmax = maxi
+
+        if layout == 'vert' or layout == 'quad':
+            for line in gr.get_lines():
+                data = line.get_data()[1]
+                (mini, maxi) = (min(data), max(data))
+                if ymin is None or ymin < mini:
+                    ymin = mini
+                if ymax is None or ymax > maxi:
+                    ymax = maxi
+
+        # Calculate the x10 (linear or log scale ?) and set it
+        sc = gr.scale
+        logx = True if sc == 'logx' or sc == 'loglog' else False
+        logy = True if sc == 'logy' or sc == 'loglog' else False
+        if xmin is not None and xmax is not None:
+            if not x10:
+                xmin_new = xmin
+                xmax_new = xmax
+            elif logx:
+                 (xmin_new, xmax_new) = self._compute_x10_range(log10(xmin_cur),
+                                                                log10(xmax_cur),
+                                                                log10(xmin),
+                                                                log10(xmax))
+                 xmin_new = pow(10, xmin_new)
+                 xmax_new = pow(10, xmax_new)
+            else:
+                (xmin_new, xmax_new) = self._compute_x10_range(xmin_cur,
+                                                               xmax_cur,
+                                                               xmin, xmax)
+            gr.set_xlim(xmin_new, xmax_new)
+
+        if ymin is not None and ymax is not None:
+            if not x10:
+                ymin_new = ymin
+                ymax_new = ymax
+            elif logy:
+                 (ymin_new, ymax_new) = self._compute_x10_range(log10(ymin_cur),
+                                                                log10(ymax_cur),
+                                                                log10(ymin),
+                                                                log10(ymax))
+                 ymin_new = pow(10, ymin_new)
+                 ymax_new = pow(10, ymax_new)
+            else:
+                (ymin_new, ymax_new) = self._compute_x10_range(ymin_cur,
+                                                               ymax_cur,
+                                                               ymin, ymax)
+            gr.set_ylim(ymin_new, ymax_new)
+
+    def _compute_x10_range(self, min_cur, max_cur, data_min, data_max):
+        center = (abs(max_cur) - abs(min_cur)) / 2
+        min_new = center - (data_max - data_min) / 20
+        max_new = center + (data_max - data_min) / 20
+        if min_new > max_new:
+            (min_new, max_new) = (max_new, min_new)
+        return (min_new, max_new)
 
     # Search algorithm from pygtk tutorial
     def _match_func(self, row, data):

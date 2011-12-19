@@ -1,9 +1,9 @@
 To be checked :
+ioscopy user manual screen captures
 
 To be fixed :
 ui: destroy figure
 cursors: line not on all graph after unzoom
-support for drag and drop
 support for command 'orange reset' reseting the graph range
 
 To be added :

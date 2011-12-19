@@ -190,6 +190,7 @@ def do_add(self, args):
     else:
         do_create(self, args)
     do_refresh(self, '')
+    _gui.add(_current_figure, args)
 
 def do_delete(self, args):
     """odelete GRAPH#
@@ -204,6 +205,7 @@ def do_delete(self, args):
         else:
             _current_graph = None
     do_refresh(self, '')
+    _gui.delete(_current_figure, args)
 
 def do_mode(self, args):
     """omode MODE

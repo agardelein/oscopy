@@ -414,6 +414,7 @@ Each Figure window is composed of two parts:
 \begin{itemize}
 \item On the top part, a zone containing up to 4 graphs
 \item On the bottom part, the Matplotlib toolbar
+\item On the right part, the Operation bar
 \end{itemize}
 A contextual menu is available for each graph, raised by a right-click on the mouse button.
 Access to most of the ioscopy functionality is possible through this menu:
@@ -435,6 +436,14 @@ For each Graph, cursors are available through keys (Figure~\ref{fig:cursors}):
 \item \texttt{'4'} for second horizontal cursor
 \end{itemize}
 The value of each cursor is displayed on the bottom part of the graph, and the difference when both cursors are activated.
+
+\subsubsection{The Operation Bar}
+
+This bar is used to set options for all the Graphs at the same time or for a particular Graph.
+The target Graph is selected through the top-most combo-box.
+\begin{description}
+\item[Zoom x10] When enabled, the graph range is expanded at a x10 scale, keeping the center of the view. When disabled, return to full range. E.g. if the initial range is [6 .. 11] and the data range is [0 .. 20], the x10 range will be [7.5 .. 9.5] and will be [0 .. 20] on disabling.
+\end{description}
 
 \begin{figure}[htbp]
   \centering
