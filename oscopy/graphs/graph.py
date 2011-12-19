@@ -678,3 +678,7 @@ Abbreviations
     scale = property(get_scale, set_scale)
     range = property(get_range, set_range)
     scale_factors = property(get_scale_factors, set_scale_factors)
+
+    def onselect(self, vmin, vmax):
+        self.set_xlim(vmin, vmax)
+        self.figure.canvas.draw()

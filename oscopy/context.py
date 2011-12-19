@@ -56,13 +56,13 @@ Abbreviations
         self._update_num = -1
         self._signal_name_to_reader = {}
         
-    def create(self, sigs):
+    def create(self, args):
         """ Instanciate a new figure
         No error reported if parameter type mismatches, silently does nothing
 
         Parameters
         ----------
-        sigs: string or list of signals
+        args: string or list of signals or Figure or dict of Signals
         Contains the list of signals for the Figure instanciation
         See also Figure.Figure()
 
@@ -70,18 +70,25 @@ Abbreviations
         -------
         Nothing
         """
-        if isinstance(sigs, list):
+        f = None
+        if isinstance(args, list):
             # Called from commandline,
             # Get the signal list from args
-            if not sigs == "":
-                sigs = self.names_to_signals(sigs)
+            if not args == "":
+                sigs = self.names_to_signals(args)
             else:
                 # No signal list provided
                 sigs = {}
-        elif not isinstance(sigs, dict):
-            return
-        f = Figure(sigs)
-        self._figures.append(f)
+            f = Figure(sigs)
+        elif isinstance(args, Figure):
+            # Already initialized figure provided
+            f = args
+        elif isinstance(args, dict):
+            # Dict of Signals provided
+            sigs = args
+            f = Figure(sigs)
+        if f is not None:
+            self._figures.append(f)
 
     def destroy(self, num):
         """ Delete a figure

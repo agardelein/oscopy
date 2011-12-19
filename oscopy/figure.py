@@ -53,6 +53,7 @@ Figure -- Handle a list of graphs
 
 from matplotlib.pyplot import Figure as MplFig, Axes
 from graphs import Graph, LinGraph
+from matplotlib.widgets import SpanSelector
 
 class Figure(MplFig):
     """ Manage figure and its layout
@@ -119,6 +120,9 @@ class Figure(MplFig):
                           sigs, label=str(len(self.axes)))
         self._axstack.remove(a)
         ax = self._axstack.add(len(self.axes), gr)
+
+        gr.span = SpanSelector(gr, gr.onselect, 'horizontal',
+                               useblit=True)
 
         # Force layout refresh
         self.set_layout(self._layout)
