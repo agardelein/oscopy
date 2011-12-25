@@ -389,7 +389,7 @@ class App(dbus.service.Object):
         canvas.mpl_connect('axes_leave_event', self._axes_leave)
         canvas.mpl_connect('figure_enter_event', self._figure_enter)
         canvas.mpl_connect('figure_leave_event', self._figure_leave)
-        w.connect("drag_data_received", self._drag_data_received_cb)
+        w.connect("drag_data_received", self._drag_data_received_cb, self._ctxt.signals)
         w.connect('delete-event', lambda w, e: w.hide() or True)
         w.drag_dest_set(gtk.DEST_DEFAULT_MOTION |\
                                  gtk.DEST_DEFAULT_HIGHLIGHT |\
@@ -679,9 +679,10 @@ class App(dbus.service.Object):
             # The multiple selection do work, but how to select signals
             # that are not neighbours in the list? Ctrl+left do not do
             # anything, neither alt+left or shift+left!
+                                  
 
     def _drag_data_received_cb(self, widget, drag_context, x, y, selection,\
-                                   target_type, time):
+                                   target_type, time, ctxtsignals):
         # Event handling issue: this drag and drop callback is
         # processed before matplotlib callback _axes_enter. Therefore
         # when dropping, self._current_graph is not valid: it contains
@@ -694,7 +695,7 @@ class App(dbus.service.Object):
             event = LocationEvent('axes_enter_event', canvas, x, my_y)
             signals = {}
             for name in selection.data.split():
-                signals[name] = self._ctxt.signals[name]
+                signals[name] = ctxtsignals[name]
             if event.inaxes is not None:
                 # Graph not found
                 event.inaxes.insert(signals)
