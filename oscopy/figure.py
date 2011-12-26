@@ -90,6 +90,7 @@ class Figure(MplFig):
         elif isinstance(sigs, dict):
             self.add(sigs)
         else:
+            print sigs
             assert 0, _("Bad type")
 
     def add(self, sigs={}):

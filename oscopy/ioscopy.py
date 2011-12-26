@@ -21,6 +21,7 @@ from readers.reader import ReadError
 from writers.writer import WriteError
 from ui import App as OscopyGUI
 from oscopy import Signal
+from gtk_figure import IOscopy_GTK_Figure
 
 _globals = None
 
@@ -46,12 +47,14 @@ def do_create(self, args):
     Create a new figure, set_ it as current, add the signals"""
     global _current_figure
     global _current_graph
-    _ctxt.create(get_signames(args))
-    _current_figure = _ctxt.figures[len(_ctxt.figures) - 1]
+    sigs = _ctxt.names_to_signals(get_signames(args))
+    fig = IOscopy_GTK_Figure(sigs, None,
+                             _('Figure %d') % (len(_ctxt.figures) + 1))
+#    _ctxt.create(get_signames(args))
+    _ctxt.create(fig)
+    _current_figure = _ctxt.figures[-1]
     if _current_figure.graphs:
-        _current_graph =\
-            _current_figure.graphs[len(\
-                _current_figure.graphs) - 1]
+        _current_graph = _current_figure.graphs[-1]
     else:
         _current_graph = None
     _gui.create()
@@ -184,13 +187,11 @@ def do_add(self, args):
             return
         _current_figure.add(_ctxt.names_to_signals(\
                 get_signames(args)))
-        _current_graph =\
-            _current_figure.graphs[len(\
-                _current_figure.graphs) - 1]
+        _current_graph = _current_figure.graphs[-1]
     else:
         do_create(self, args)
     do_refresh(self, '')
-    _gui.add(_current_figure, args)
+#    _gui.add(_current_figure, args)
 
 def do_delete(self, args):
     """odelete GRAPH#
@@ -205,7 +206,7 @@ def do_delete(self, args):
         else:
             _current_graph = None
     do_refresh(self, '')
-    _gui.delete(_current_figure, args)
+#    _gui.delete(_current_figure, args)
 
 def do_mode(self, args):
     """omode MODE

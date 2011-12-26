@@ -7,4 +7,5 @@ oscopy_PYTHON = __init__.py\
 	signal.py \
 	figure.py \
 	ioscopy.py \
-	ui.py
+	ui.py \
+	gtk_figure.py
