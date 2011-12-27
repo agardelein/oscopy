@@ -230,6 +230,7 @@ class App(dbus.service.Object):
         tv.set_model(self._store)
         tv.connect('row-activated', self._row_activated)
         tv.connect('drag_data_get', self._drag_data_get_cb)
+        tv.connect('button-press-event', self._treeview_button_press)
         tv.drag_source_set(gtk.gdk.BUTTON1_MASK,\
                                self._from_signal_list,\
                                gtk.gdk.ACTION_COPY)
@@ -291,15 +292,17 @@ class App(dbus.service.Object):
             path, tvc, x, y = tv.get_path_at_pos(int(event.x), int(event.y))
             if len(path) == 1:
                 return
-            tv.set_cursor(path)
-            row = self._store[path]
-            signals = {row[0]: row[1]}
-            menu = self._create_treeview_popup_menu(signals, path)
+            sel = tv.get_selection()
+            signals = {}
+            def add_sig_func(tm, p, iter):
+                name = tm.get_value(iter, 0)
+                signals[name] = self._ctxt.signals[name]
+            sel.selected_foreach(add_sig_func)
+            tvmenu = gui.menus.TreeviewMenu()
+            menu = tvmenu.create_menu(self._ctxt.figures, signals)
             menu.show_all()
             menu.popup(None, None, None, event.button, event.time)
 
-    #TODO: _windows_to_figures consistency...
-    # think of a better way to map events to Figure objects
     def _row_activated(self, widget, path, col):
         if len(path) == 1:
             return

@@ -579,3 +579,8 @@ def set_ufuncs():
             _globals[val].__doc__ = getattr(numpy.fft, val).__doc__
             _globals[val].__name__ = getattr(numpy.fft, val).__name__
             
+def update_current_figure_graph(figure=None, graph=None):
+    global _current_figure
+    global _current_graph
+    _current_figure = figure
+    _current_graph = graph

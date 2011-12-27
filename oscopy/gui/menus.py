@@ -179,6 +179,47 @@ class TreeviewMenu:
         # item_add.set_sensitive(graph is not None)
         # menu.append(item_add)
 
+    def __init__(self):
+        # Ajouter le store ici
+        self._signals = None
+
+    def create_menu(self, figures, signals):
+        self._signals = signals
+        menu = gtk.Menu()
+        item = gtk.MenuItem(_('Insert Signal...'))
+        item.set_submenu(self._create_figure_menu(figures))
+        menu.append(item)
+        return menu
+
+    def _create_figure_menu(self, figures):
+        menu = gtk.Menu()
+        item = gtk.MenuItem(_('New figure'))
+        item.connect('activate', self._create_figure_menu_item_activated)
+        for f in figures:
+            item = gtk.MenuItem(f.window.get_title())
+            item.set_submenu(self._create_graph_menu(f))
+            menu.append(item)
+        return menu
+
+    def _create_graph_menu(self, figure):
+        menu = gtk.Menu()
+        for i, g in enumerate(figure.graphs):
+            name = _('Graph %d') % (i + 1)
+            item = gtk.MenuItem(name)
+            item.connect('activate',
+                         self._insert_signals_to_graph_menu_item_activated,
+                         g, figure)
+            menu.append(item)
+        return menu
+
+    def _create_figure_menu_item_activated(self, menuitem):
+        pass
+
+    def _insert_signals_to_graph_menu_item_activated(self, menuitem, graph,
+                                                     figure):
+        graph.insert(self._signals)
+        figure.canvas.draw()
+
     def _signals_menu_item_activated(self, menuitem, user_data):
         fig, graph, parent_it, it, app_exec = user_data
         name, sig = self._store.get(it, 0, 1)
