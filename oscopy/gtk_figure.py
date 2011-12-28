@@ -79,7 +79,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         w.resize(640, 480)
         w.show_all()
         self.window = w
-        self.add(sigs)
+        if sigs:
+            self.add(sigs)
 #        # Update canvas for SpanSelector of Graphs
         for gr in self.graphs:
             if hasattr(gr, 'span'):

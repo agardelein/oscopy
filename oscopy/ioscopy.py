@@ -21,6 +21,8 @@ from readers.reader import ReadError
 from writers.writer import WriteError
 from ui import App as OscopyGUI
 from oscopy import Signal
+from oscopy import MAX_GRAPHS_PER_FIGURE
+
 
 _globals = None
 
@@ -172,7 +174,7 @@ def do_add(self, args):
     global _current_graph
 
     if _current_figure is not None:
-        if len(_current_figure.graphs) == 4:
+        if len(_current_figure.graphs) == MAX_GRAPHS_PER_FIGURE:
             print _("Maximum graph number reached")
             return
         _current_figure.add(_ctxt.names_to_signals(\
