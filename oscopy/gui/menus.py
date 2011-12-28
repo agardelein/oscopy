@@ -1,6 +1,7 @@
 import gtk
 import dialogs
 from oscopy.graphs import factors_to_names, abbrevs_to_factors
+from oscopy import MAX_GRAPHS_PER_FIGURE
 
 class FigureMenu(object):
 
@@ -173,35 +174,30 @@ class GraphMenu(object):
         return menu
 
 class TreeviewMenu:
-        # item_add = gtk.MenuItem(_('Insert signal'))
-        # item_add.set_submenu(self._create_filename_menu((figure, graph,
-        #                                                  app_exec)))
-        # item_add.set_sensitive(graph is not None)
-        # menu.append(item_add)
-
-    def __init__(self):
-        # Ajouter le store ici
+    def __init__(self, create_func):
         self._signals = None
+        self._create = create_func
 
-    def create_menu(self, figures, signals):
+    def make_menu(self, figures, signals):
         self._signals = signals
         menu = gtk.Menu()
         item = gtk.MenuItem(_('Insert Signal...'))
-        item.set_submenu(self._create_figure_menu(figures))
+        item.set_submenu(self._make_figure_menu(figures))
         menu.append(item)
         return menu
 
-    def _create_figure_menu(self, figures):
+    def _make_figure_menu(self, figures):
         menu = gtk.Menu()
-        item = gtk.MenuItem(_('New figure'))
-        item.connect('activate', self._create_figure_menu_item_activated)
         for f in figures:
             item = gtk.MenuItem(f.window.get_title())
-            item.set_submenu(self._create_graph_menu(f))
+            item.set_submenu(self._make_graph_menu(f))
             menu.append(item)
+        item = gtk.MenuItem(_('In new figure'))
+        item.connect('activate', self._make_figure_menu_item_activated)
+        menu.append(item)
         return menu
 
-    def _create_graph_menu(self, figure):
+    def _make_graph_menu(self, figure):
         menu = gtk.Menu()
         for i, g in enumerate(figure.graphs):
             name = _('Graph %d') % (i + 1)
@@ -210,52 +206,20 @@ class TreeviewMenu:
                          self._insert_signals_to_graph_menu_item_activated,
                          g, figure)
             menu.append(item)
+        item = gtk.MenuItem(_('In new graph'))
+        item.connect('activate', self._add_graph_menu_item_activated, figure)
+        item.set_sensitive(len(figure.graphs) < MAX_GRAPHS_PER_FIGURE)
+        menu.append(item)
         return menu
 
-    def _create_figure_menu_item_activated(self, menuitem):
-        pass
+    def _add_graph_menu_item_activated(self, menuitem, figure):
+        figure.add(self._signals)
+        figure.canvas.draw()
+
+    def _make_figure_menu_item_activated(self, menuitem):
+        self._create(self._signals)
 
     def _insert_signals_to_graph_menu_item_activated(self, menuitem, graph,
                                                      figure):
         graph.insert(self._signals)
         figure.canvas.draw()
-
-    def _signals_menu_item_activated(self, menuitem, user_data):
-        fig, graph, parent_it, it, app_exec = user_data
-        name, sig = self._store.get(it, 0, 1)
-        if not fig.graphs:
-            app_exec('oadd %s' % name)
-        else:
-            if graph is not None:
-                app_exec('oinsert %s' % name)
-        if fig.canvas is not None:
-            fig.canvas.draw()
-
-    def _create_signals_menu(self, fig, graph, parent_it, app_exec):
-        menu = gtk.Menu()
-        it = self._store.iter_children(parent_it)
-        while it is not None:
-            name = self._store.get_value(it, 0)
-            item = gtk.MenuItem(name)
-            item.connect('activate', self._signals_menu_item_activated,
-                         (fig, graph, parent_it, it, app_exec))
-            menu.append(item)
-            it = self._store.iter_next(it)
-        return menu
-
-    def _create_filename_menu(self, data):
-        figure, graph, app_exec = data
-        it = self._store.get_iter_root()
-        if it is None:
-            return gtk.Menu()
-
-        menu = gtk.Menu()
-        while it is not None:
-            filename = self._store.get_value(it, 0)
-            item = gtk.MenuItem(filename)
-            item.set_submenu(self._create_signals_menu(figure, graph, it,
-                                                       app_exec))
-            menu.append(item)
-            it = self._store.iter_next(it)
-        return menu
-

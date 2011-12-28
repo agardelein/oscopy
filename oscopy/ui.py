@@ -21,6 +21,7 @@ import oscopy
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 import gui
+from gtk_figure import IOscopy_GTK_Figure
 
 IOSCOPY_COL_TEXT = 0
 IOSCOPY_COL_X10 = 1
@@ -298,8 +299,8 @@ class App(dbus.service.Object):
                 name = tm.get_value(iter, 0)
                 signals[name] = self._ctxt.signals[name]
             sel.selected_foreach(add_sig_func)
-            tvmenu = gui.menus.TreeviewMenu()
-            menu = tvmenu.create_menu(self._ctxt.figures, signals)
+            tvmenu = gui.menus.TreeviewMenu(self.create)
+            menu = tvmenu.make_menu(self._ctxt.figures, signals)
             menu.show_all()
             menu.popup(None, None, None, event.button, event.time)
 
@@ -361,7 +362,7 @@ class App(dbus.service.Object):
     #
     # Callbacks for App
     #
-    def create(self):
+    def create(self, sigs):
         """ Instanciate the window widget with the figure inside, set the
         relevant events and add it to the 'Windows' menu.
         Finally, select the first graph of this figure.
@@ -370,8 +371,10 @@ class App(dbus.service.Object):
         and is assumed to be the last one in Context's figure list
         """
 
-        fig = self._ctxt.figures[-1]
-        fignum = len(self._ctxt.figures)
+        fignum = len(self._ctxt.figures) + 1
+        fig = IOscopy_GTK_Figure(sigs, None,
+                                 _('Figure %d') % fignum)
+        self._ctxt.create(fig)
 
         fig.canvas.mpl_connect('axes_enter_event', self._axes_enter)
         fig.canvas.mpl_connect('axes_leave_event', self._axes_leave)

@@ -55,6 +55,8 @@ from matplotlib.pyplot import Figure as MplFig, Axes
 from graphs import Graph, LinGraph
 from matplotlib.widgets import SpanSelector
 
+MAX_GRAPHS_PER_FIGURE = 4
+
 class Figure(MplFig):
     """ Manage figure and its layout
     """
@@ -108,7 +110,7 @@ class Figure(MplFig):
         -------
         Nothing
         """
-        if len(self.axes) > 3:
+        if len(self.axes) > (MAX_GRAPHS_PER_FIGURE - 1):
             assert 0, _("Maximum graph number reached")
 
         # _graph_position use the current length of self.axes to compute

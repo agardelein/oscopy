@@ -21,7 +21,6 @@ from readers.reader import ReadError
 from writers.writer import WriteError
 from ui import App as OscopyGUI
 from oscopy import Signal
-from gtk_figure import IOscopy_GTK_Figure
 
 _globals = None
 
@@ -45,19 +44,10 @@ _gui = OscopyGUI(bus_name, ctxt=_ctxt)
 def do_create(self, args):
     """ocreate [SIG [, SIG [, SIG]...]]
     Create a new figure, set_ it as current, add the signals"""
-    global _current_figure
-    global _current_graph
     sigs = _ctxt.names_to_signals(get_signames(args))
-    fig = IOscopy_GTK_Figure(sigs, None,
-                             _('Figure %d') % (len(_ctxt.figures) + 1))
-#    _ctxt.create(get_signames(args))
-    _ctxt.create(fig)
-    _current_figure = _ctxt.figures[-1]
-    if _current_figure.graphs:
-        _current_graph = _current_figure.graphs[-1]
-    else:
-        _current_graph = None
-    _gui.create()
+    # Delegate the call to Context.create() to the GUI
+    # Finally it does %oselect for the _current_figure and _current_graph
+    fig = _gui.create(sigs)
 
 def do_destroy(self, args):
     """odestroy FIG#
