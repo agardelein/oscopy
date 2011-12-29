@@ -292,8 +292,13 @@ class App(dbus.service.Object):
             tv = widget
             path, tvc, x, y = tv.get_path_at_pos(int(event.x), int(event.y))
             if len(path) == 1:
-                return
+                # Not supported to add a full file
+                return True
             sel = tv.get_selection()
+            if path not in sel.get_selected_rows()[1]:
+                # Click in another path than the one selected
+                sel.unselect_all()
+                sel.select_path(path)
             signals = {}
             def add_sig_func(tm, p, iter):
                 name = tm.get_value(iter, 0)
@@ -303,6 +308,7 @@ class App(dbus.service.Object):
             menu = tvmenu.make_menu(self._ctxt.figures, signals)
             menu.show_all()
             menu.popup(None, None, None, event.button, event.time)
+            return True
 
     def _row_activated(self, widget, path, col):
         if len(path) == 1:
