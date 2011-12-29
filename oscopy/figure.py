@@ -122,7 +122,13 @@ class Figure(MplFig):
         gr = LinGraph(self, self._graph_position(len(self.axes) - 1),\
                           sigs, label=str(len(self.axes)))
         self._axstack.remove(a)
-        ax = self._axstack.add(len(self.axes), gr)
+        # Allocate a free number up to MAX_GRAPH_PER_FIGURE
+        num = 0
+        while num < MAX_GRAPHS_PER_FIGURE:
+            if self._axstack.get(num) is None:
+                break
+            num = num + 1
+        ax = self._axstack.add(num, gr)
 
         gr.span = SpanSelector(gr, gr.onselect, 'horizontal',
                                useblit=True)
@@ -147,7 +153,9 @@ class Figure(MplFig):
             assert 0, _("Bad graph number")
         if len(self.axes) < 1 or num < 1 or num > len(self.axes):
             assert 0, _("Bad graph number")
-        self._axstack.remove(self._axstack.get(num - 1))
+        self._axstack.remove(self._axstack[num - 1][1][1])
+        # Force layout refresh
+        self.set_layout(self._layout)
         
     def update(self, u, d):
         """ Update the graphs
