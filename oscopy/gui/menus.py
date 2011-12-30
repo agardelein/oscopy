@@ -23,6 +23,7 @@ class FigureMenu(object):
         item_add = gtk.MenuItem(_('Add graph'))
         item_add.connect('activate', self._add_graph_menu_item_activated,
                          (fig))
+        item_add.set_sensitive(len(fig.graphs) < MAX_GRAPHS_PER_FIGURE)
         menu.append(item_add)
         item_delete = gtk.MenuItem(_('Delete graph'))
         item_delete.connect('activate', self._delete_graph_menu_item_activated,
