@@ -12,7 +12,6 @@ import ConfigParser
 import dbus, dbus.service, dbus.glib
 from math import log10, sqrt
 from xdg import BaseDirectory
-from matplotlib.backend_bases import LocationEvent
 #from matplotlib.widgets import SpanSelector
 import IPython
 
@@ -290,7 +289,9 @@ class App(dbus.service.Object):
     def _treeview_button_press(self, widget, event):
         if event.button == 3:
             tv = widget
-            path, tvc, x, y = tv.get_path_at_pos(int(event.x), int(event.y))
+            ret = tv.get_path_at_pos(int(event.x), int(event.y))
+            if ret is None: return True
+            path, tvc, x, y = ret
             if len(path) == 1:
                 # Not supported to add a full file
                 return True
@@ -309,6 +310,16 @@ class App(dbus.service.Object):
             menu.show_all()
             menu.popup(None, None, None, event.button, event.time)
             return True
+        if event.button == 1:
+            # It is not _that_ trivial to keep the selection when user start
+            # to drag. The default handler reset the selection when button 1
+            # is pressed. So we use this handler to store the selection
+            # until drag has been recognized.
+            tv = widget
+            sel = tv.get_selection()
+            rows = sel.get_selected_rows()[1]
+            self._rows_for_drag = rows
+            return False
 
     def _row_activated(self, widget, path, col):
         if len(path) == 1:
@@ -382,6 +393,8 @@ class App(dbus.service.Object):
                                  _('Figure %d') % fignum)
         self._ctxt.create(fig)
 
+        fig.window.connect('drag_data_received', fig.drag_data_received_cb,
+                           self._ctxt.signals)
         fig.canvas.mpl_connect('axes_enter_event', self._axes_enter)
         fig.canvas.mpl_connect('axes_leave_event', self._axes_leave)
         fig.canvas.mpl_connect('figure_enter_event', self._figure_enter)
@@ -465,7 +478,7 @@ class App(dbus.service.Object):
         if type(name) == str and name.startswith('file://'):
             print name[7:].strip()
             self._app_exec('%%oread %s' % name[7:].strip())
-        
+                
     def _drag_data_get_cb(self, widget, drag_context, selection, target_type,\
                               time):
         if target_type == self._TARGET_TYPE_SIGNAL:
@@ -473,12 +486,11 @@ class App(dbus.service.Object):
             sel = tv.get_selection()
             (model, pathlist) = sel.get_selected_rows()
             iter = self._store.get_iter(pathlist[0])
-            data = " ".join(map(lambda x:self._store[x][1].name, pathlist))
+            # Use the path list stored while button 1 has been pressed
+            # See self._treeview_button_press()
+            data = ' '.join(map(lambda x:self._store[x][1].name, self._rows_for_drag))
             selection.set(selection.target, 8, data)
-            # The multiple selection do work, but how to select signals
-            # that are not neighbours in the list? Ctrl+left do not do
-            # anything, neither alt+left or shift+left!
-
+            return True
     #
     # Configuration-file related functions
     #

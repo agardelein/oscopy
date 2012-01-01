@@ -4,6 +4,7 @@ import gtk
 import gobject
 import gui
 from math import log10, sqrt
+from matplotlib.backend_bases import LocationEvent
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 
@@ -31,7 +32,6 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         canvas.mpl_connect('axes_leave_event', self._axes_leave)
         canvas.mpl_connect('figure_enter_event', self._figure_enter)
         canvas.mpl_connect('figure_leave_event', self._figure_leave)
-#        w.connect("drag_data_received", self.drag_data_received_cb)
         w.connect('delete-event', lambda w, e: w.hide() or True)
         w.drag_dest_set(gtk.DEST_DEFAULT_MOTION |\
                                  gtk.DEST_DEFAULT_HIGHLIGHT |\
