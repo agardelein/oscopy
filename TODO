@@ -1,5 +1,6 @@
 To be checked :
 ioscopy user manual screen captures
+warn user about usage of drag and drop for multiple signals selected from the main window (on click the selection disappear but all previously selected signals are dropped in the Figure)
 
 To be fixed :
 ui: destroy figure
