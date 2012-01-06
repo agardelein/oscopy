@@ -53,7 +53,6 @@ Figure -- Handle a list of graphs
 
 from matplotlib.pyplot import Figure as MplFig, Axes
 from graphs import Graph, LinGraph
-from matplotlib.widgets import SpanSelector
 
 MAX_GRAPHS_PER_FIGURE = 4
 
@@ -129,9 +128,6 @@ class Figure(MplFig):
                 break
             num = num + 1
         ax = self._axstack.add(num, gr)
-
-        gr.span = SpanSelector(gr, gr.onselect, 'horizontal',
-                               useblit=True)
 
         # Force layout refresh
         self.set_layout(self._layout)

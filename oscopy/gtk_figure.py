@@ -7,10 +7,58 @@ from math import log10, sqrt
 from matplotlib.backend_bases import LocationEvent
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
+from matplotlib.widgets import SpanSelector, RectangleSelector
 
-IOSCOPY_COL_TEXT = 0
-IOSCOPY_COL_X10 = 1
-IOSCOPY_COL_VIS = 2 # Text in graphs combobox visible
+IOSCOPY_COL_TEXT = 0 # Combo box text
+IOSCOPY_COL_X10 = 1 # x10 mode status
+IOSCOPY_COL_VIS = 2 # Combobox items sensitive
+IOSCOPY_COL_SPAN = 3 # Span mode status
+
+class MyRectangleSelector(RectangleSelector):
+    """ FIXME: To be removed once upstream has merged PR #658
+    https://github.com/matplotlib/matplotlib/pull/658
+    """ 
+
+    def ignore(self, event):
+        'return ``True`` if *event* should be ignored'
+        # If RectangleSelector is not active :
+        if not self.active:
+            return True
+
+        # If canvas was locked
+        if not self.canvas.widgetlock.available(self):
+            return True
+
+        # Only do rectangle selection if event was triggered
+        # with a desired button
+        if self.validButtons is not None:
+            if not event.button in self.validButtons:
+                return True
+
+        # If no button was pressed yet ignore the event if it was out
+        # of the axes
+        if self.eventpress == None:
+            return event.inaxes!= self.ax
+
+        # If a button was pressed, check if the release-button is the
+        # same. If event is out of axis, limit the data coordinates to axes
+        # boundaries.
+        if event.button == self.eventpress.button and event.inaxes != self.ax:
+            (xdata, ydata) = self.ax.transData.inverted().transform_point((event.x, event.y))
+            xlim = self.ax.get_xlim()
+            ylim = self.ax.get_ylim()
+            if xdata < xlim[0]: xdata = xlim[0]
+            if xdata > xlim[1]: xdata = xlim[1]
+            if ydata < ylim[0]: ydata = ylim[0]
+            if ydata > ylim[1]: ydata = ylim[1]
+            event.xdata = xdata
+            event.ydata = ydata
+            return False
+
+        # If a button was pressed, check if the release-button is the
+        # same.
+        return (event.inaxes!=self.ax or
+                event.button != self.eventpress.button)
 
 class IOscopy_GTK_Figure(oscopy.Figure):
     def __init__(self, sigs={}, fig=None, title=''):
@@ -45,12 +93,13 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
         vbox2 = gtk.VBox() # The right-side menu
         store = gtk.ListStore(gobject.TYPE_STRING, # String displayed
-                              gobject.TYPE_BOOLEAN, # x10 active
-                              gobject.TYPE_BOOLEAN
+                              gobject.TYPE_BOOLEAN, # x10 mode status
+                              gobject.TYPE_BOOLEAN, # Combobox item sensitive
+                              gobject.TYPE_BOOLEAN, # Span mode status
                               )
-        iter = store.append([_('All Graphs'), False, True])
+        iter = store.append([_('All Graphs'), False, True, False])
         for i in xrange(4):
-            iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False])
+            iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False, False])
         self._cbx_store = store
 
         graphs_cbx = gtk.ComboBox(store)
@@ -63,16 +112,21 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
         x10_toggle_btn = gtk.ToggleButton('x10 mode')
         x10_toggle_btn.set_mode(True)
-
-        graphs_cbx.connect('changed', self.graphs_cbx_changed, x10_toggle_btn,
-                           store)
         x10_toggle_btn.connect('toggled', self.x10_toggle_btn_toggled,
+                               graphs_cbx, store)
+
+        span_toggle_btn = gtk.ToggleButton(_('Span'))
+        span_toggle_btn.set_mode(True)
+        span_toggle_btn.connect('toggled', self.span_toggle_btn_toggled,
                                graphs_cbx, store)
 
         self._cbx = graphs_cbx
         self._btn = x10_toggle_btn
 
+        graphs_cbx.connect('changed', self.graphs_cbx_changed, x10_toggle_btn,
+                           span_toggle_btn, store)
         vbox2.pack_start(x10_toggle_btn, False, False)
+        vbox2.pack_start(span_toggle_btn, False, False)
 
         hbox1.pack_start(vbox2, False, False)
 
@@ -86,8 +140,25 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             if hasattr(gr, 'span'):
                 gr.span.new_axes(gr)
 
+    def set_layout(self, layout='quad'):
+        oscopy.Figure.set_layout(self, layout)
+        iter = self._cbx_store.get_iter_first()
+        for g in self.graphs:
+            iter = self._cbx_store.iter_next(iter)
+            if self._layout == 'horiz':
+                g.span = SpanSelector(g, g.onselect, 'horizontal',
+                                       useblit=True)
+                g.span.visible = self._cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
+            elif self._layout == 'vert':
+                g.span = SpanSelector(g, g.onselect, 'vertical',
+                                       useblit=True)
+                g.span.visible = self._cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
+            elif self._layout == 'quad':
+                g.span = MyRectangleSelector(g, g.onselect, rectprops=dict(facecolor='red', edgecolor = 'black', alpha=0.5, fill=True),
+                                            useblit=True)
+                g.span.active = self._cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
 
-    def graphs_cbx_changed(self, graphs_cbx, x10_toggle_btn, store):
+    def graphs_cbx_changed(self, graphs_cbx, x10_toggle_btn, span_toggle_btn, store):
         iter = graphs_cbx.get_active_iter()
         if store.get_string_from_iter(iter) == '0':
             # Do all the graphs have same state?
@@ -99,9 +170,20 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                     x10_toggle_btn.set_inconsistent(True)
                     break
                 iter = store.iter_next(iter)
+            iter = store.get_iter_first()
+            store.iter_next(iter)
+            val = store.get_value(iter, IOSCOPY_COL_SPAN)
+            while iter is not None:
+                if val != store.get_value(iter, IOSCOPY_COL_SPAN):
+                    # Yes, set the button into inconsistent state
+                    span_toggle_btn.set_inconsistent(True)
+                    break
+                iter = store.iter_next(iter)
         else:
             x10_toggle_btn.set_inconsistent(False)
             x10_toggle_btn.set_active(store.get_value(iter, IOSCOPY_COL_X10))
+            span_toggle_btn.set_inconsistent(False)
+            span_toggle_btn.set_active(store.get_value(iter, IOSCOPY_COL_SPAN))
             
     def x10_toggle_btn_toggled(self, x10_toggle_btn, graphs_cbx, store):
         iter = graphs_cbx.get_active_iter()
@@ -122,6 +204,33 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                     iter = store.iter_next(iter)
             else:
                 self._zoom_x10(a, grnum)
+            self.canvas.draw()
+
+    def span_toggle_btn_toggled(self, span_toggle_btn, graphs_cbx, store):
+        iter = graphs_cbx.get_active_iter()
+        a = span_toggle_btn.get_active()
+        span_toggle_btn.set_inconsistent(False)
+        if iter is not None:
+            store.set_value(iter, IOSCOPY_COL_SPAN, a)
+            grnum = int(store.get_string_from_iter(iter))
+            if store.get_string_from_iter(iter) == '0':
+                # Set the value for all graphs
+                iter = store.iter_next(iter)
+                while iter is not None:
+                    store.set_value(iter, IOSCOPY_COL_SPAN, a)
+                    grnum = int(store.get_string_from_iter(iter))
+                    if grnum > len(self.graphs):
+                        break
+                    if hasattr(self.graphs[grnum - 1].span, 'active'):
+                        self.graphs[grnum - 1].span.active = a
+                    elif hasattr(self.graphs[grnum - 1].span, 'visible'):
+                        self.graphs[grnum - 1].span.visible = a
+                    iter = store.iter_next(iter)
+            else:
+                if hasattr(self.graphs[grnum - 1].span, 'active'):
+                    self.graphs[grnum - 1].span.active = a
+                elif hasattr(self.graphs[grnum - 1].span, 'visible'):
+                    self.graphs[grnum - 1].span.visible = a
             self.canvas.draw()
 
     def _zoom_x10(self, x10, grnum):
@@ -282,3 +391,5 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         figmenu = gui.menus.FigureMenu()
         return figmenu.create_menu(figure, graph)
 
+
+    layout = property(oscopy.Figure.get_layout, set_layout)

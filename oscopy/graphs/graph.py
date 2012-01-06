@@ -1,4 +1,5 @@
 from matplotlib.pyplot import Axes as mplAxes
+from matplotlib.widgets import SpanSelector, RectangleSelector
 from matplotlib import rc
 from cursor import Cursor
 
@@ -679,6 +680,23 @@ Abbreviations
     range = property(get_range, set_range)
     scale_factors = property(get_scale_factors, set_scale_factors)
 
-    def onselect(self, vmin, vmax):
-        self.set_xlim(vmin, vmax)
+    def onselect(self, eclick, erelease):
+        if isinstance(self.span, SpanSelector):
+            vmin = min(eclick, erelease)
+            vmax = max(eclick, erelease)
+            if self.span.direction == 'horizontal':
+                self.set_xlim(vmin, vmax)
+            elif self.span.direction == 'vertical':
+                self.set_ylim(vmin, vmax)
+            else:
+                raise NotImplementedError(_('SpanSelector direction %s') % self.span.direction)
+        elif isinstance(self.span, RectangleSelector):
+            xmin = min(eclick.xdata, erelease.xdata)
+            ymin = min(eclick.ydata, erelease.ydata)
+            xmax = max(eclick.xdata, erelease.xdata)
+            ymax = max(eclick.ydata, erelease.ydata)
+            self.set_xlim(xmin, xmax)
+            self.set_ylim(ymin, ymax)
+        else:
+            raise NotImplementedError(_('Span %s not supported') % type(self.span))
         self.figure.canvas.draw()
