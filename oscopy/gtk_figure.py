@@ -381,6 +381,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 #            axes_num = 1
 #        fig_num = self._ctxt.figures.index(self._current_figure) + 1
 #        self._app_exec('%%oselect %d-%d' % (fig_num, axes_num))
+        self.canvas.grab_focus()
         pass
 
     def _figure_leave(self, event):
