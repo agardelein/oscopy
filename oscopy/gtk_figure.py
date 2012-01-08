@@ -45,12 +45,12 @@ class MyRectangleSelector(RectangleSelector):
         # boundaries.
         if event.button == self.eventpress.button and event.inaxes != self.ax:
             (xdata, ydata) = self.ax.transData.inverted().transform_point((event.x, event.y))
-            xlim = self.ax.get_xlim()
-            ylim = self.ax.get_ylim()
-            if xdata < xlim[0]: xdata = xlim[0]
-            if xdata > xlim[1]: xdata = xlim[1]
-            if ydata < ylim[0]: ydata = ylim[0]
-            if ydata > ylim[1]: ydata = ylim[1]
+            x0, x1 = self.ax.get_xbound()
+            y0, y1 = self.ax.get_ybound()
+            xdata = max(x0, xdata)
+            xdata = min(x1, xdata)
+            ydata = max(y0, ydata)
+            ydata = min(y1, ydata)
             event.xdata = xdata
             event.ydata = ydata
             return False
@@ -279,7 +279,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 (xmin_new, xmax_new) = self._compute_x10_range(xmin_cur,
                                                                xmax_cur,
                                                                xmin, xmax)
-            gr.set_xlim(xmin_new, xmax_new)
+            gr.set_xbound(xmin_new, xmax_new)
 
         if ymin is not None and ymax is not None:
             if not x10:
@@ -296,7 +296,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 (ymin_new, ymax_new) = self._compute_x10_range(ymin_cur,
                                                                ymax_cur,
                                                                ymin, ymax)
-            gr.set_ylim(ymin_new, ymax_new)
+            gr.set_ybound(ymin_new, ymax_new)
 
     def _compute_x10_range(self, min_cur, max_cur, data_min, data_max):
         center = (abs(max_cur) - abs(min_cur)) / 2

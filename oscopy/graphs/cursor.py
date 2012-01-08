@@ -54,9 +54,9 @@ Properties
         """
         # Check whether cursor is within the axis limits
         if self._type == "horiz":
-            lim = ax.get_ylim()
+            lim = ax.get_ybound()
         elif self._type == "vert":
-            lim = ax.get_xlim()
+            lim = ax.get_xbound()
         else:
             return
         if self._value < lim[0] or self._value > lim[1]:
@@ -69,11 +69,11 @@ Properties
             # Cursor do not exist on the graph, plot it
             ax.hold(True)
             if self._type == "horiz":
-                x = ax.get_xlim()
+                x = ax.get_xbound()
                 y = [self._value, self._value]
             elif self._type == "vert":
                 x = [self._value, self._value]
-                y = ax.get_ylim()
+                y = ax.get_ybound()
             else:
                 return
             if num == 0:
@@ -86,11 +86,11 @@ Properties
         elif ax == self._line.get_axes():
             # Cursor already exist, just update visibility
             if self._type == "horiz":
-                x = ax.get_xlim()
+                x = ax.get_xbound()
                 y = [self._value, self._value]
             elif self._type == "vert":
                 x = [self._value, self._value]
-                y = ax.get_ylim()
+                y = ax.get_ybound()
             self._line.set_data(x, y)
             self._line.set_visible(self._visible)
         else:

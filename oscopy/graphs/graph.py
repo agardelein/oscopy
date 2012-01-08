@@ -401,8 +401,8 @@ Abbreviations
            array of two floats: X axis limits
            array of two floats: Y axis limits
         """
-        self._xrange = mplAxes.get_xlim(self)
-        self._yrange = mplAxes.get_ylim(self)
+        self._xrange = mplAxes.get_xbound(self)
+        self._yrange = mplAxes.get_ybound(self)
         return self._xrange, self._yrange
 
     def set_range(self, arg="reset"):
@@ -447,9 +447,9 @@ Abbreviations
             assert 0, _("Unrecognized argument")
 
         if len(self._xrange) == 2:
-            mplAxes.set_xlim(self, self._xrange[0], self._xrange[1])
+            mplAxes.set_xbound(self, self._xrange[0], self._xrange[1])
         if len(self._yrange) == 2:
-            mplAxes.set_ylim(self, self._yrange[0], self._yrange[1])
+            mplAxes.set_ybound(self, self._yrange[0], self._yrange[1])
         
     def toggle_cursors(self, ctype="", num=None, val=None):
         """ Toggle the cursors in the graph
@@ -685,9 +685,9 @@ Abbreviations
             vmin = min(eclick, erelease)
             vmax = max(eclick, erelease)
             if self.span.direction == 'horizontal':
-                self.set_xlim(vmin, vmax)
+                self.set_xbound(vmin, vmax)
             elif self.span.direction == 'vertical':
-                self.set_ylim(vmin, vmax)
+                self.set_ybound(vmin, vmax)
             else:
                 raise NotImplementedError(_('SpanSelector direction %s') % self.span.direction)
         elif isinstance(self.span, RectangleSelector):
@@ -695,8 +695,8 @@ Abbreviations
             ymin = min(eclick.ydata, erelease.ydata)
             xmax = max(eclick.xdata, erelease.xdata)
             ymax = max(eclick.ydata, erelease.ydata)
-            self.set_xlim(xmin, xmax)
-            self.set_ylim(ymin, ymax)
+            self.set_xbound(xmin, xmax)
+            self.set_ybound(ymin, ymax)
         else:
             raise NotImplementedError(_('Span %s not supported') % type(self.span))
         self.figure.canvas.draw()
