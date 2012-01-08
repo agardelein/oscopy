@@ -200,10 +200,10 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                     grnum = int(store.get_string_from_iter(iter))
                     if grnum > len(self.graphs):
                         break
-                    self._zoom_x10(a, grnum)
+                    self._zoom(grnum, self._compute_x10_range, a)
                     iter = store.iter_next(iter)
             else:
-                self._zoom_x10(a, grnum)
+                self._zoom(grnum, self._compute_x10_range, a)
             self.canvas.draw()
 
     def span_toggle_btn_toggled(self, span_toggle_btn, graphs_cbx, store):
@@ -233,7 +233,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                     self.graphs[grnum - 1].span.visible = a
             self.canvas.draw()
 
-    def _zoom_x10(self, x10, grnum):
+    def _zoom(self, grnum, compute_zoom_fun, fun_data):
         # In which layout are we (horiz, vert, quad ?)
         layout = self.layout
         gr = self.graphs[grnum - 1]
@@ -265,40 +265,40 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         logx = True if sc == 'logx' or sc == 'loglog' else False
         logy = True if sc == 'logy' or sc == 'loglog' else False
         if xmin is not None and xmax is not None:
-            if not x10:
-                xmin_new = xmin
-                xmax_new = xmax
-            elif logx:
-                 (xmin_new, xmax_new) = self._compute_x10_range(log10(xmin_cur),
-                                                                log10(xmax_cur),
-                                                                log10(xmin),
-                                                                log10(xmax))
-                 xmin_new = pow(10, xmin_new)
-                 xmax_new = pow(10, xmax_new)
+            if logx:
+                (xmin_new, xmax_new) = compute_zoom_fun(log10(xmin_cur),
+                                                         log10(xmax_cur),
+                                                         log10(xmin),
+                                                         log10(xmax),
+                                                         fun_data)
+                xmin_new = pow(10, xmin_new)
+                xmax_new = pow(10, xmax_new)
             else:
-                (xmin_new, xmax_new) = self._compute_x10_range(xmin_cur,
-                                                               xmax_cur,
-                                                               xmin, xmax)
+                (xmin_new, xmax_new) = compute_zoom_fun(xmin_cur,
+                                                         xmax_cur,
+                                                         xmin, xmax,
+                                                         fun_data)
             gr.set_xbound(xmin_new, xmax_new)
 
         if ymin is not None and ymax is not None:
-            if not x10:
-                ymin_new = ymin
-                ymax_new = ymax
-            elif logy:
-                 (ymin_new, ymax_new) = self._compute_x10_range(log10(ymin_cur),
-                                                                log10(ymax_cur),
-                                                                log10(ymin),
-                                                                log10(ymax))
-                 ymin_new = pow(10, ymin_new)
-                 ymax_new = pow(10, ymax_new)
+            if logy:
+                (ymin_new, ymax_new) = compute_zoom_fun(log10(ymin_cur),
+                                                          log10(ymax_cur),
+                                                          log10(ymin),
+                                                          log10(ymax),
+                                                          fun_data)
+                ymin_new = pow(10, ymin_new)
+                ymax_new = pow(10, ymax_new)
             else:
-                (ymin_new, ymax_new) = self._compute_x10_range(ymin_cur,
-                                                               ymax_cur,
-                                                               ymin, ymax)
+                (ymin_new, ymax_new) = compute_zoom_fun(ymin_cur,
+                                                         ymax_cur,
+                                                         ymin, ymax,
+                                                         fun_data)
             gr.set_ybound(ymin_new, ymax_new)
 
-    def _compute_x10_range(self, min_cur, max_cur, data_min, data_max):
+    def _compute_x10_range(self, min_cur, max_cur, data_min, data_max, x10):
+        if not x10:
+            return (data_min, data_max)
         center = (abs(max_cur) - abs(min_cur)) / 2
         min_new = center - (data_max - data_min) / 20
         max_new = center + (data_max - data_min) / 20
