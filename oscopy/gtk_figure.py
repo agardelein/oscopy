@@ -13,6 +13,7 @@ IOSCOPY_COL_TEXT = 0 # Combo box text
 IOSCOPY_COL_X10 = 1 # x10 mode status
 IOSCOPY_COL_VIS = 2 # Combobox items sensitive
 IOSCOPY_COL_SPAN = 3 # Span mode status
+IOSCOPY_COL_ZOOM_FCT = 4 # Current zoom factor
 
 class MyRectangleSelector(RectangleSelector):
     """ FIXME: To be removed once upstream has merged PR #658
@@ -80,6 +81,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         canvas.mpl_connect('axes_leave_event', self._axes_leave)
         canvas.mpl_connect('figure_enter_event', self._figure_enter)
         canvas.mpl_connect('figure_leave_event', self._figure_leave)
+        canvas.mpl_connect('key_press_event', self._key_press)
         w.connect('delete-event', lambda w, e: w.hide() or True)
         w.drag_dest_set(gtk.DEST_DEFAULT_MOTION |\
                                  gtk.DEST_DEFAULT_HIGHLIGHT |\
@@ -96,10 +98,11 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                               gobject.TYPE_BOOLEAN, # x10 mode status
                               gobject.TYPE_BOOLEAN, # Combobox item sensitive
                               gobject.TYPE_BOOLEAN, # Span mode status
+                              gobject.TYPE_FLOAT, # Zoom factor
                               )
-        iter = store.append([_('All Graphs'), False, True, False])
+        iter = store.append([_('All Graphs'), False, True, False, 1])
         for i in xrange(4):
-            iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False, False])
+            iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False, False, 1])
         self._cbx_store = store
 
         graphs_cbx = gtk.ComboBox(store)
@@ -233,6 +236,23 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                     self.graphs[grnum - 1].span.visible = a
             self.canvas.draw()
 
+    def _key_press(self, event):
+        if event.inaxes is not None:
+            g = event.inaxes
+            grnum = self.graphs.index(g) + 1
+            curzoom = self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT]
+            if event.key == 'z':
+                curzoom = curzoom * 0.8
+                self._zoom(grnum, self._compute_zoom_range, curzoom)
+                self.canvas.draw()
+                self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
+            elif event.key == 'Z':
+                curzoom = curzoom / 0.8
+                self._zoom(grnum, self._compute_zoom_range, curzoom)
+                self.canvas.draw()
+                self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
+        return True
+
     def _zoom(self, grnum, compute_zoom_fun, fun_data):
         # In which layout are we (horiz, vert, quad ?)
         layout = self.layout
@@ -303,9 +323,18 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         min_new = center - (data_max - data_min) / 20
         max_new = center + (data_max - data_min) / 20
         if min_new > max_new:
-            (min_new, max_new) = (max_new, min_new)
-        return (min_new, max_new)
+            return (max_new, min_new)
+        else:
+            return (min_new, max_new)
 
+    def _compute_zoom_range(self, min_cur, max_cur, data_min, data_max, factor):
+        center = (max_cur + min_cur) / 2
+        min_new = center - (data_max - data_min) * (factor / 2)
+        max_new = center + (data_max - data_min) * (factor / 2)
+        if min_new > max_new:
+            return (max_new, min_new)
+        else:
+            return (min_new, max_new)
 
     def drag_data_received_cb(self, widget, drag_context, x, y, selection,\
                                    target_type, time, ctxtsignals):
