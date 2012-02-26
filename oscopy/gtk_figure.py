@@ -15,6 +15,8 @@ IOSCOPY_COL_VIS = 2 # Combobox items sensitive
 IOSCOPY_COL_SPAN = 3 # Span mode status
 IOSCOPY_COL_ZOOM_FCT = 4 # Current zoom factor
 
+DEFAULT_ZOOM_FACTOR = 0.8
+
 class Center(object):
     # Stupid class to store center coordinates when zooming
     def __init__(self):
@@ -83,6 +85,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         w.add(hbox1)
         canvas = FigureCanvas(self)
         canvas.mpl_connect('button_press_event', self._button_press)
+        canvas.mpl_connect('scroll_event', self._mouse_scroll)
         canvas.mpl_connect('axes_enter_event', self._axes_enter)
         canvas.mpl_connect('axes_leave_event', self._axes_leave)
         canvas.mpl_connect('figure_enter_event', self._figure_enter)
@@ -198,7 +201,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         center = None
         iter = graphs_cbx.get_active_iter()
         a = x10_toggle_btn.get_active()
-        val = .1 if a else 1
+        val = .1 if a else 1           # x10 zoom
         x10_toggle_btn.set_inconsistent(False)
         if iter is not None:
             store.set_value(iter, IOSCOPY_COL_X10, a)
@@ -255,12 +258,12 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             center.x = event.xdata
             center.y = event.ydata
             if event.key == 'z':
-                curzoom = curzoom * 0.8
+                curzoom = curzoom * DEFAULT_ZOOM_FACTOR
                 self._zoom(grnum, center, curzoom)
                 self.canvas.draw()
                 self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
             elif event.key == 'Z':
-                curzoom = curzoom / 0.8
+                curzoom = curzoom / DEFAULT_ZOOM_FACTOR
                 self._zoom(grnum, center, curzoom)
                 self.canvas.draw()
                 self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
@@ -397,6 +400,35 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             menu = self._create_figure_popup_menu(event.canvas.figure, event.inaxes)
             menu.show_all()
             menu.popup(None, None, None, event.button, event.guiEvent.time)
+
+    def _mouse_scroll(self, event):
+        if event.button == 'up':
+            if event.inaxes is None:
+                return False
+            g = event.inaxes
+            grnum = self.graphs.index(g) + 1
+            curzoom = self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT]
+            center = Center()
+            center.x = event.xdata
+            center.y = event.ydata
+            curzoom = curzoom * DEFAULT_ZOOM_FACTOR
+            self._zoom(grnum, center, curzoom)
+            self.canvas.draw()
+            self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
+        elif event.button == 'down':
+            if event.inaxes is None:
+                return False
+            g = event.inaxes
+            grnum = self.graphs.index(g) + 1
+            curzoom = self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT]
+            center = Center()
+            center.x = event.xdata
+            center.y = event.ydata
+            curzoom = curzoom / DEFAULT_ZOOM_FACTOR
+            self._zoom(grnum, center, curzoom)
+            self.canvas.draw()
+            self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
+        return True
 
     def _axes_enter(self, event):
 #        self._figure_enter(event)
