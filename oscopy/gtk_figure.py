@@ -15,6 +15,12 @@ IOSCOPY_COL_VIS = 2 # Combobox items sensitive
 IOSCOPY_COL_SPAN = 3 # Span mode status
 IOSCOPY_COL_ZOOM_FCT = 4 # Current zoom factor
 
+class Center(object):
+    # Stupid class to store center coordinates when zooming
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+
 class MyRectangleSelector(RectangleSelector):
     """ FIXME: To be removed once upstream has merged PR #658
     https://github.com/matplotlib/matplotlib/pull/658
@@ -189,6 +195,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             span_toggle_btn.set_active(store.get_value(iter, IOSCOPY_COL_SPAN))
             
     def x10_toggle_btn_toggled(self, x10_toggle_btn, graphs_cbx, store):
+        center = None
         iter = graphs_cbx.get_active_iter()
         a = x10_toggle_btn.get_active()
         val = .1 if a else 1
@@ -206,10 +213,10 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                     grnum = int(store.get_string_from_iter(iter))
                     if grnum > len(self.graphs):
                         break
-                    self._zoom(grnum, val)
+                    self._zoom(grnum, center, val)
                     iter = store.iter_next(iter)
             else:
-                self._zoom(grnum, val)
+                self._zoom(grnum, center, val)
             self.canvas.draw()
 
     def span_toggle_btn_toggled(self, span_toggle_btn, graphs_cbx, store):
@@ -244,19 +251,22 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             g = event.inaxes
             grnum = self.graphs.index(g) + 1
             curzoom = self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT]
+            center = Center()
+            center.x = event.xdata
+            center.y = event.ydata
             if event.key == 'z':
                 curzoom = curzoom * 0.8
-                self._zoom(grnum, curzoom)
+                self._zoom(grnum, center, curzoom)
                 self.canvas.draw()
                 self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
             elif event.key == 'Z':
                 curzoom = curzoom / 0.8
-                self._zoom(grnum, curzoom)
+                self._zoom(grnum, center, curzoom)
                 self.canvas.draw()
                 self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
         return True
 
-    def _zoom(self, grnum, factor):
+    def _zoom(self, grnum, center=None, factor=1):
         # In which layout are we (horiz, vert, quad ?)
         layout = self.layout
         gr = self.graphs[grnum - 1]
@@ -289,42 +299,48 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         logy = True if sc == 'logy' or sc == 'loglog' else False
         if xmin is not None and xmax is not None:
             if logx:
-                (xmin_new, xmax_new) = self._compute_zoom_range(log10(xmin_cur),
-                                                         log10(xmax_cur),
-                                                         log10(xmin),
-                                                         log10(xmax),
-                                                         factor)
+                cx = log10(center.x) if center is not None else None
+                curb = (log10(xmin_cur), log10(xmax_cur)) # Current bounds
+                datab = (log10(xmin), log10(xmax))        # Data bounds
+                newb = self._compute_zoom_range(curb, datab, cx, factor)
+                (xmin_new, xmax_new) = newb               # New bounds
                 xmin_new = pow(10, xmin_new)
                 xmax_new = pow(10, xmax_new)
             else:
-                (xmin_new, xmax_new) = self._compute_zoom_range(xmin_cur,
-                                                         xmax_cur,
-                                                         xmin, xmax,
-                                                         factor)
+                cx = center.x if center is not None else None
+                curb = (xmin_cur, xmax_cur) # Current bounds
+                datab = (xmin, xmax)        # Data bounds
+                newb = self._compute_zoom_range(curb, datab, cx, factor)
+                (xmin_new, xmax_new) = newb # New bounds
             gr.set_xbound(xmin_new, xmax_new)
 
         if ymin is not None and ymax is not None:
             if logy:
-                (ymin_new, ymax_new) = self._compute_zoom_range(log10(ymin_cur),
-                                                          log10(ymax_cur),
-                                                          log10(ymin),
-                                                          log10(ymax),
-                                                          factor)
+                cy = log10(center.y) if center is not None else None
+                curb = (log10(ymin_cur), log10(ymax_cur)) # Current bounds
+                datab = (log10(ymin), log10(ymax))        # Data bounds
+                newb = self._compute_zoom_range(curb, datab, cy, factor)
+                (ymin_new, ymax_new) = newb               # New bounds
                 ymin_new = pow(10, ymin_new)
                 ymax_new = pow(10, ymax_new)
             else:
-                (ymin_new, ymax_new) = self._compute_zoom_range(ymin_cur,
-                                                         ymax_cur,
-                                                         ymin, ymax,
-                                                         factor)
+                cy = center.y if center is not None else None
+                curb = (ymin_cur, ymax_cur) # Current bounds
+                datab = (ymin, ymax)        # Data bounds
+                newb = self._compute_zoom_range(curb, datab, cy, factor)
+                (ymin_new, ymax_new) = newb # New bounds
             gr.set_ybound(ymin_new, ymax_new)
 
-    def _compute_zoom_range(self, min_cur, max_cur, data_min, data_max, factor):
+    def _compute_zoom_range(self, curb, datab, center=None, factor=1):
+        (min_cur, max_cur) = curb
+        (data_min, data_max) = datab
         if factor == 1:
             return (data_min, data_max)
-        center = (max_cur + min_cur) / 2
-        min_new = center - (data_max - data_min) * (factor / 2)
-        max_new = center + (data_max - data_min) * (factor / 2)
+        if center is None:
+            center = (max_cur + min_cur) / 2
+        pos = (center - min_cur) / (max_cur - min_cur)
+        min_new = center - (data_max - data_min) * (factor * pos)
+        max_new = center + (data_max - data_min) * (factor * (1 - pos))
         if min_new > max_new:
             return (max_new, min_new)
         else:
