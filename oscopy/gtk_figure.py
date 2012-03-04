@@ -16,6 +16,7 @@ IOSCOPY_COL_SPAN = 3 # Span mode status
 IOSCOPY_COL_ZOOM_FCT = 4 # Current zoom factor
 
 DEFAULT_ZOOM_FACTOR = 0.8
+DEFAULT_PAN_FACTOR = 10
 
 class Center(object):
     # Stupid class to store center coordinates when zooming
@@ -260,13 +261,23 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             if event.key == 'z':
                 curzoom = curzoom * DEFAULT_ZOOM_FACTOR
                 self._zoom(grnum, center, curzoom)
-                self.canvas.draw()
+                self.canvas.draw_idle()
                 self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
             elif event.key == 'Z':
                 curzoom = curzoom / DEFAULT_ZOOM_FACTOR
                 self._zoom(grnum, center, curzoom)
-                self.canvas.draw()
+                self.canvas.draw_idle()
                 self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
+            elif event.key == 'l':
+                result = g.bbox.translated(-DEFAULT_PAN_FACTOR, 0).transformed(g.transData.inverted())
+                g.set_xlim(*result.intervalx)
+                g.set_ylim(*result.intervaly)
+                self.canvas.draw_idle()
+            elif event.key == 'r':
+                result = g.bbox.translated(DEFAULT_PAN_FACTOR, 0).transformed(g.transData.inverted())
+                g.set_xlim(*result.intervalx)
+                g.set_ylim(*result.intervaly)
+                self.canvas.draw_idle()
         return True
 
     def _zoom(self, grnum, center=None, factor=1):
@@ -413,7 +424,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             center.y = event.ydata
             curzoom = curzoom * DEFAULT_ZOOM_FACTOR
             self._zoom(grnum, center, curzoom)
-            self.canvas.draw()
+            self.canvas.draw_idle()
             self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
         elif event.button == 'down':
             if event.inaxes is None:
@@ -426,7 +437,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             center.y = event.ydata
             curzoom = curzoom / DEFAULT_ZOOM_FACTOR
             self._zoom(grnum, center, curzoom)
-            self.canvas.draw()
+            self.canvas.draw_idle()
             self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
         return True
 
