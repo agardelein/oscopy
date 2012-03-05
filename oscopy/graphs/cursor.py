@@ -68,30 +68,25 @@ Properties
         if self._line is None or not self._line.get_axes() == ax:
             # Cursor do not exist on the graph, plot it
             ax.hold(True)
-            if self._type == "horiz":
-                x = ax.get_xbound()
-                y = [self._value, self._value]
-            elif self._type == "vert":
-                x = [self._value, self._value]
-                y = ax.get_ybound()
-            else:
+            if self._type not in ['horiz', 'vert']:
                 return
             if num == 0:
-                lt = ""
+                lt = "-"
             else:
                 lt = "--"
-            self._line, = ax.plot(x, y, lt + "k")
+            #self._line, = ax.plot(x, y, lt + "k")
+            if self._type == 'horiz':
+                self._line = ax.axhline(y=self._value, ls=lt, c='k')
+            elif self._type == 'vert':
+                self._line = ax.axvline(x=self._value, ls=lt, c='k')
             self._line.set_visible(self._visible)
             ax.hold(False)
         elif ax == self._line.get_axes():
             # Cursor already exist, just update visibility
-            if self._type == "horiz":
-                x = ax.get_xbound()
-                y = [self._value, self._value]
-            elif self._type == "vert":
-                x = [self._value, self._value]
-                y = ax.get_ybound()
-            self._line.set_data(x, y)
+            if self._type == 'horiz':
+                self._line.set_ydata([self._value, self._value])
+            elif self._type == 'vert':
+                self._line.set_xdata([self._value, self._value])
             self._line.set_visible(self._visible)
         else:
             # Cursor exist already in this graph, nothing to do
