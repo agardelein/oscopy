@@ -626,6 +626,14 @@ Abbreviations
         """
         return [self._xaxis, self._yaxis]
 
+    def cursors_as_list(self):
+        cs = []
+        for ctype in ['horiz', 'vert']:
+            for c in self._cursors[ctype]:
+                if c is not None:
+                    cs.append(c)
+        return cs
+
     def get_scale_factors(self):
         """ Return the scale factors values
 

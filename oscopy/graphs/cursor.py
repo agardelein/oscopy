@@ -192,6 +192,9 @@ Properties
     type = property(get_type, set_type)
     visible = property(get_visible, set_visible)
 
+    def get_line(self):
+        return self._line
+
     def __str__(self):
         """ Representation string of the Cursor
 
