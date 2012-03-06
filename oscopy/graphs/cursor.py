@@ -193,6 +193,17 @@ Properties
     visible = property(get_visible, set_visible)
 
     def get_line(self):
+        """ Returns whether the Cursor is displayed or not
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        matplotlib.lines.Line2D
+        The object used to represent the Cursor on the Graph
+        """
         return self._line
 
     def __str__(self):

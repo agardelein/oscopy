@@ -627,6 +627,17 @@ Abbreviations
         return [self._xaxis, self._yaxis]
 
     def cursors_as_list(self):
+        """Return the list of all Cursors
+
+        Parameter
+        ---------
+        None
+
+        Returns
+        -------
+        list of Cursors
+        The Cursors contained in the Graph
+        """
         cs = []
         for ctype in ['horiz', 'vert']:
             for c in self._cursors[ctype]:

@@ -518,6 +518,7 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object, and
 %    plot & Public & Display the graph\\
     \multicolumn{3}{l}{\textit{Cursors management}} \\
     toggle\_cursor & Public & Change cursor status \\
+    cursors\_as\_list & Public & Get a list of Cursors\\
     \_draw\_cursors & Private & Display the cursors on the graph\\
     \_set\_cursors & Private & Set the properties of a cursor\\
     \_print\_cursors & Private & Display the numerical values of the cursors\\
@@ -579,7 +580,7 @@ Apart from the constructor and the string representation, it contains one method
 
 The main attribute is \att{value}, or the location on the graph of the reference.
 The cursor can be \att{visible}, i.e. printed on the graph or not, and can be either horizontal or vertical, as defined by \att{type}.
-The \att{line} object is a reference to the Matplotlib.Line2D where the cursor is drawn.
+The \att{line} object is a reference to the matplotlib.lines.Line2D where the cursor is drawn.
 
 \begin{table}[htbp]
   \centering\sf\small
@@ -590,6 +591,7 @@ The \att{line} object is a reference to the Matplotlib.Line2D where the cursor i
     \_\_init\_\_ & Public & Initialise the object \\
     draw & Public & Draw the cursor on the graph \\
     \_\_str\_\_ & Public & Print value, type and visible \\
+    get\_line & Public & Get the matplotlib.lines.Line2D object\\
     \hline
   \end{tabular}
   \caption{Methods of \cursor}
