@@ -288,33 +288,12 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         [(xmin_cur, xmax_cur), (ymin_cur, ymax_cur)] = gr.range
         [(xmin_new, xmax_new), (ymin_new, ymax_new)] = gr.range
 
-        # Get cursors lines
-        cs = gr.cursors_as_list()
-        cl = []
-        for c in cs:
-            cl.append(c.get_line())
         # Get the bounds of the data (min, max)
         if layout == 'horiz' or layout == 'quad':
-            for line in gr.get_lines():
-                if line in cl:
-                    continue
-                data = line.get_data()[0]
-                (mini, maxi) = (min(data), max(data))
-                if xmin is None or xmin < mini:
-                    xmin = mini
-                if xmax is None or xmax > maxi:
-                    xmax = maxi
+            (xmin, xmax) = (gr.dataLim.xmin, gr.dataLim.xmax)
 
         if layout == 'vert' or layout == 'quad':
-            for line in gr.get_lines():
-                if line in cl:
-                    continue
-                data = line.get_data()[1]
-                (mini, maxi) = (min(data), max(data))
-                if ymin is None or ymin < mini:
-                    ymin = mini
-                if ymax is None or ymax > maxi:
-                    ymax = maxi
+            (ymin, ymax) = (gr.dataLim.ymin, gr.dataLim.ymax)
 
         # Calculate the x10 (linear or log scale ?) and set it
         sc = gr.scale
@@ -355,6 +334,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             gr.set_ybound(ymin_new, ymax_new)
 
     def _compute_zoom_range(self, curb, datab, center=None, factor=1):
+        if not factor:
+            return curb
         (min_cur, max_cur) = curb
         (data_min, data_max) = datab
         if factor == 1:
