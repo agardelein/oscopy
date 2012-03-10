@@ -13,7 +13,6 @@ IOSCOPY_COL_TEXT = 0 # Combo box text
 IOSCOPY_COL_X10 = 1 # x10 mode status
 IOSCOPY_COL_VIS = 2 # Combobox items sensitive
 IOSCOPY_COL_SPAN = 3 # Span mode status
-IOSCOPY_COL_ZOOM_FCT = 4 # Current zoom factor
 
 DEFAULT_ZOOM_FACTOR = 0.8
 DEFAULT_PAN_FACTOR = 10
@@ -108,11 +107,11 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                               gobject.TYPE_BOOLEAN, # x10 mode status
                               gobject.TYPE_BOOLEAN, # Combobox item sensitive
                               gobject.TYPE_BOOLEAN, # Span mode status
-                              gobject.TYPE_FLOAT, # Zoom factor
+#                              gobject.TYPE_FLOAT, # Zoom factor
                               )
-        iter = store.append([_('All Graphs'), False, True, False, 1])
+        iter = store.append([_('All Graphs'), False, True, False])
         for i in xrange(4):
-            iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False, False, 1])
+            iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False, False])
         self._cbx_store = store
 
         graphs_cbx = gtk.ComboBox(store)
@@ -202,18 +201,16 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         center = None
         iter = graphs_cbx.get_active_iter()
         a = x10_toggle_btn.get_active()
-        val = .1 if a else 1           # x10 zoom
+        val = -.1 if a else -1           # x10 zoom
         x10_toggle_btn.set_inconsistent(False)
         if iter is not None:
             store.set_value(iter, IOSCOPY_COL_X10, a)
-            store.set_value(iter, IOSCOPY_COL_ZOOM_FCT, val)
             grnum = int(store.get_string_from_iter(iter))
             if store.get_string_from_iter(iter) == '0':
                 # Set the value for all graphs
                 iter = store.iter_next(iter)
                 while iter is not None:
                     store.set_value(iter, IOSCOPY_COL_X10, a)
-                    store.set_value(iter, IOSCOPY_COL_ZOOM_FCT, val)
                     grnum = int(store.get_string_from_iter(iter))
                     if grnum > len(self.graphs):
                         break
@@ -254,20 +251,15 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         if event.inaxes is not None:
             g = event.inaxes
             grnum = self.graphs.index(g) + 1
-            curzoom = self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT]
             center = Center()
             center.x = event.xdata
             center.y = event.ydata
             if event.key == 'z':
-                curzoom = curzoom * DEFAULT_ZOOM_FACTOR
-                self._zoom(grnum, center, curzoom)
+                self._zoom(grnum, center, DEFAULT_ZOOM_FACTOR)
                 self.canvas.draw_idle()
-                self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
             elif event.key == 'Z':
-                curzoom = curzoom / DEFAULT_ZOOM_FACTOR
-                self._zoom(grnum, center, curzoom)
+                self._zoom(grnum, center, 1 / DEFAULT_ZOOM_FACTOR)
                 self.canvas.draw_idle()
-                self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
             elif event.key == 'l':
                 result = g.bbox.translated(-DEFAULT_PAN_FACTOR, 0).transformed(g.transData.inverted())
                 g.set_xlim(*result.intervalx)
@@ -333,18 +325,22 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 (ymin_new, ymax_new) = newb # New bounds
             gr.set_ybound(ymin_new, ymax_new)
 
-    def _compute_zoom_range(self, curb, datab, center=None, factor=1):
+    def _compute_zoom_range(self, curb, datab, center=None, factor=-1):
+        # Zoom is relative to current bounds when factor > 0
+        # otherwise is relative to data bounds
         if not factor:
             return curb
-        (min_cur, max_cur) = curb
         (data_min, data_max) = datab
-        if factor == 1:
+        (min_cur, max_cur) = curb if factor > 0 else datab
+        if factor == -1:
             return (data_min, data_max)
+        curf = (max_cur - min_cur) / (data_max - data_min)
+        factor = factor * curf
         if center is None:
             center = (max_cur + min_cur) / 2
         pos = (center - min_cur) / (max_cur - min_cur)
-        min_new = center - (data_max - data_min) * (factor * pos)
-        max_new = center + (data_max - data_min) * (factor * (1 - pos))
+        min_new = center - (data_max - data_min) * (abs(factor) * pos)
+        max_new = center + (data_max - data_min) * (abs(factor) * (1 - pos))
         if min_new > max_new:
             return (max_new, min_new)
         else:
@@ -408,27 +404,21 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 return False
             g = event.inaxes
             grnum = self.graphs.index(g) + 1
-            curzoom = self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT]
             center = Center()
             center.x = event.xdata
             center.y = event.ydata
-            curzoom = curzoom * DEFAULT_ZOOM_FACTOR
-            self._zoom(grnum, center, curzoom)
+            self._zoom(grnum, center, DEFAULT_ZOOM_FACTOR)
             self.canvas.draw_idle()
-            self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
         elif event.button == 'down':
             if event.inaxes is None:
                 return False
             g = event.inaxes
             grnum = self.graphs.index(g) + 1
-            curzoom = self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT]
             center = Center()
             center.x = event.xdata
             center.y = event.ydata
-            curzoom = curzoom / DEFAULT_ZOOM_FACTOR
-            self._zoom(grnum, center, curzoom)
+            self._zoom(grnum, center, 1. / DEFAULT_ZOOM_FACTOR)
             self.canvas.draw_idle()
-            self._cbx_store[grnum][IOSCOPY_COL_ZOOM_FCT] = curzoom
         return True
 
     def _axes_enter(self, event):
