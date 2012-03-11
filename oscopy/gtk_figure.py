@@ -13,6 +13,8 @@ IOSCOPY_COL_TEXT = 0 # Combo box text
 IOSCOPY_COL_X10 = 1 # x10 mode status
 IOSCOPY_COL_VIS = 2 # Combobox items sensitive
 IOSCOPY_COL_SPAN = 3 # Span mode status
+IOSCOPY_COL_HADJ = 4 # Horizontal scrollbar adjustment
+IOSCOPY_COL_VADJ = 5 # Vertical scrollbar adjustment
 
 DEFAULT_ZOOM_FACTOR = 0.8
 DEFAULT_PAN_FACTOR = 10
@@ -77,8 +79,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                                 self._TARGET_TYPE_SIGNAL)]
 
         w = gtk.Window()
-
         w.set_title(title)
+
         hbox1 = gtk.HBox() # The window
         vbox1 = gtk.VBox() # The Graphs
         hbox1.pack_start(vbox1)
@@ -97,6 +99,15 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                                  gtk.DEST_DEFAULT_DROP,
                              self._to_figure, gtk.gdk.ACTION_COPY)
 
+        hbar = gtk.HScrollbar()
+        hbar.set_sensitive(False)
+        self.hbar = hbar
+        vbox1.pack_start(hbar, False, False)
+        vbar = gtk.VScrollbar()
+        vbar.set_sensitive(False)
+        self.vbar = vbar
+        hbox1.pack_start(vbar, False, False)
+
         vbox1.pack_start(canvas)
 
         toolbar = NavigationToolbar(canvas, w)
@@ -107,11 +118,12 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                               gobject.TYPE_BOOLEAN, # x10 mode status
                               gobject.TYPE_BOOLEAN, # Combobox item sensitive
                               gobject.TYPE_BOOLEAN, # Span mode status
-#                              gobject.TYPE_FLOAT, # Zoom factor
+                              gobject.TYPE_PYOBJECT, # Horizontal Adjustment
+                              gobject.TYPE_PYOBJECT, # Vertical Adjustment
                               )
-        iter = store.append([_('All Graphs'), False, True, False])
+        iter = store.append([_('All Graphs'), False, True, False, gtk.Adjustment(), gtk.Adjustment()])
         for i in xrange(4):
-            iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False, False])
+            iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False, False, gtk.Adjustment(), gtk.Adjustment()])
         self._cbx_store = store
 
         graphs_cbx = gtk.ComboBox(store)
@@ -161,14 +173,20 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 g.span = SpanSelector(g, g.onselect, 'horizontal',
                                        useblit=True)
                 g.span.visible = self._cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
+                self.hbar.set_sensitive = True
+                self.vbar.set_sensitive = False                
             elif self._layout == 'vert':
                 g.span = SpanSelector(g, g.onselect, 'vertical',
                                        useblit=True)
                 g.span.visible = self._cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
+                self.hbar.set_sensitive = False
+                self.vbar.set_sensitive = True                
             elif self._layout == 'quad':
                 g.span = MyRectangleSelector(g, g.onselect, rectprops=dict(facecolor='red', edgecolor = 'black', alpha=0.5, fill=True),
                                             useblit=True)
                 g.span.active = self._cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
+                self.hbar.set_sensitive = True
+                self.vbar.set_sensitive = True                
 
     def graphs_cbx_changed(self, graphs_cbx, x10_toggle_btn, span_toggle_btn, store):
         iter = graphs_cbx.get_active_iter()
@@ -191,11 +209,15 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                     span_toggle_btn.set_inconsistent(True)
                     break
                 iter = store.iter_next(iter)
+            self.hbar.set_adjustment(store.get_value(iter, IOSCOPY_COL_HADJ))
+            self.vbar.set_adjustment(store.get_value(iter, IOSCOPY_COL_VADJ))
         else:
             x10_toggle_btn.set_inconsistent(False)
             x10_toggle_btn.set_active(store.get_value(iter, IOSCOPY_COL_X10))
             span_toggle_btn.set_inconsistent(False)
             span_toggle_btn.set_active(store.get_value(iter, IOSCOPY_COL_SPAN))
+            self.hbar.set_adjustment(store.get_value(iter, IOSCOPY_COL_HADJ))
+            self.vbar.set_adjustment(store.get_value(iter, IOSCOPY_COL_VADJ))
             
     def x10_toggle_btn_toggled(self, x10_toggle_btn, graphs_cbx, store):
         center = None
