@@ -175,19 +175,25 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                                        useblit=True)
                 g.span.visible = self._cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
                 self.hbar.set_sensitive = True
-                self.vbar.set_sensitive = False                
+                self.hbar.show()
+                self.vbar.set_sensitive = False
+                self.vbar.hide()
             elif self._layout == 'vert':
                 g.span = SpanSelector(g, g.onselect, 'vertical',
                                        useblit=True)
                 g.span.visible = self._cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
                 self.hbar.set_sensitive = False
-                self.vbar.set_sensitive = True                
+                self.hbar.hide()
+                self.vbar.set_sensitive = True
+                self.vbar.show()
             elif self._layout == 'quad':
                 g.span = MyRectangleSelector(g, g.onselect, rectprops=dict(facecolor='red', edgecolor = 'black', alpha=0.5, fill=True),
                                             useblit=True)
                 g.span.active = self._cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
                 self.hbar.set_sensitive = True
+                self.hbar.show()
                 self.vbar.set_sensitive = True                
+                self.vbar.show()
 
     def graphs_cbx_changed(self, graphs_cbx, x10_toggle_btn, span_toggle_btn, store):
         iter = graphs_cbx.get_active_iter()
