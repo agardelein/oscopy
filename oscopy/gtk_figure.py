@@ -531,12 +531,10 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         (lower, upper) = datab
         (cmin, cmax) = curb
         value = (cmin + cmax) / 2
-        page_size = (cmax - cmin) / (upper - lower)
+        page_size = (cmax - cmin)
         step_increment = page_size / 10
         page_increment = page_size
         adj.configure(value, lower, upper, step_increment, page_increment,
-                      page_size)
-        print (value, lower, upper, step_increment, page_increment,
                       page_size)
 
     layout = property(oscopy.Figure.get_layout, set_layout)
