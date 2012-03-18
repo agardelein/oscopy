@@ -93,6 +93,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         canvas.mpl_connect('figure_enter_event', self._figure_enter)
         canvas.mpl_connect('figure_leave_event', self._figure_leave)
         canvas.mpl_connect('key_press_event', self._key_press)
+        canvas.mpl_connect('draw_event', self._update_scrollbars)
         w.connect('delete-event', lambda w, e: w.hide() or True)
         w.drag_dest_set(gtk.DEST_DEFAULT_MOTION |\
                                  gtk.DEST_DEFAULT_HIGHLIGHT |\
@@ -476,5 +477,58 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         figmenu = gui.menus.FigureMenu()
         return figmenu.create_menu(figure, graph)
 
+    def _update_scrollbars(self, event):
+        for grnum, gr in enumerate(self.graphs):
+            self._update_graph_adj(grnum + 1, gr)
+        # Then for all graphs...
+
+    def _update_graph_adj(self, grnum, gr):
+        layout = self.layout
+        [xmin, xmax, ymin, ymax] = [None for x in xrange(4)]
+        [(xmin_cur, xmax_cur), (ymin_cur, ymax_cur)] = gr.range
+        [(xmin_new, xmax_new), (ymin_new, ymax_new)] = gr.range
+
+        # Get the bounds of the data (min, max)
+        if layout == 'horiz' or layout == 'quad':
+            (xmin, xmax) = (gr.dataLim.xmin, gr.dataLim.xmax)
+
+        if layout == 'vert' or layout == 'quad':
+            (ymin, ymax) = (gr.dataLim.ymin, gr.dataLim.ymax)
+
+        # Calculate the x10 (linear or log scale ?) and set it
+        sc = gr.scale
+        logx = True if sc == 'logx' or sc == 'loglog' else False
+        logy = True if sc == 'logy' or sc == 'loglog' else False
+        if xmin is not None and xmax is not None:
+            if logx:
+                curb = (log10(xmin_cur), log10(xmax_cur)) # Current bounds
+                datab = (log10(xmin), log10(xmax))        # Data bounds
+            else:
+                curb = (xmin_cur, xmax_cur) # Current bounds
+                datab = (xmin, xmax)        # Data bounds
+            adj = self._cbx_store[grnum][IOSCOPY_COL_HADJ]
+            self._update_adjustment(adj, curb, datab)
+
+        if ymin is not None and ymax is not None:
+            if logy:
+                curb = (log10(ymin_cur), log10(ymax_cur)) # Current bounds
+                datab = (log10(ymin), log10(ymax))        # Data bounds
+            else:
+                curb = (ymin_cur, ymax_cur) # Current bounds
+                datab = (ymin, ymax)        # Data bounds
+            adj = self._cbx_store[grnum][IOSCOPY_COL_VADJ]
+            self._update_adjustment(adj, curb, datab)
+
+    def _update_adjustment(self, adj, curb, datab):
+        (lower, upper) = datab
+        (cmin, cmax) = curb
+        value = (cmin + cmax) / 2
+        page_size = (cmax - cmin) / (upper - lower)
+        step_increment = page_size / 10
+        page_increment = page_size
+        adj.configure(value, lower, upper, step_increment, page_increment,
+                      page_size)
+        print (value, lower, upper, step_increment, page_increment,
+                      page_size)
 
     layout = property(oscopy.Figure.get_layout, set_layout)
