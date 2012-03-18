@@ -359,11 +359,19 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             return (data_min, data_max)
         curf = (max_cur - min_cur) / (data_max - data_min)
         factor = factor * curf
+        if factor > 1:
+            return (data_min, data_max)
         if center is None:
             center = (max_cur + min_cur) / 2
         pos = (center - min_cur) / (max_cur - min_cur)
         min_new = center - (data_max - data_min) * (abs(factor) * pos)
         max_new = center + (data_max - data_min) * (abs(factor) * (1 - pos))
+        if min_new < data_min:
+            max_new = max_new + (data_min - min_new)
+            min_new = data_min
+        if max_new > data_max:
+            min_new = min_new + (data_max - max_new)
+            max_new = data_max
         if min_new > max_new:
             return (max_new, min_new)
         else:
