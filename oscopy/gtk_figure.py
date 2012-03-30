@@ -19,12 +19,6 @@ IOSCOPY_COL_VADJ = 5 # Vertical scrollbar adjustment
 DEFAULT_ZOOM_FACTOR = 0.8
 DEFAULT_PAN_FACTOR = 10
 
-class Center(object):
-    # Stupid class to store center coordinates when zooming
-    def __init__(self):
-        self.x = 0
-        self.y = 0
-
 class MyRectangleSelector(RectangleSelector):
     """ FIXME: To be removed once upstream has merged PR #658
     https://github.com/matplotlib/matplotlib/pull/658
@@ -232,6 +226,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         a = x10_toggle_btn.get_active()
         val = -.1 if a else -1           # x10 zoom
         x10_toggle_btn.set_inconsistent(False)
+        layout = self.layout
         if iter is not None:
             store.set_value(iter, IOSCOPY_COL_X10, a)
             grnum = int(store.get_string_from_iter(iter))
@@ -243,11 +238,27 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                     grnum = int(store.get_string_from_iter(iter))
                     if grnum > len(self.graphs):
                         break
-                    self._zoom(grnum, center, val)
+                    g = self.graphs[grnum - 1]
+                    self._zoom_x10(g, a)
                     iter = store.iter_next(iter)
             else:
-                self._zoom(grnum, center, val)
-            self.canvas.draw()
+                g = self.graphs[grnum - 1]
+                self._zoom_x10(g, a)
+            self.canvas.draw_idle()
+
+    def _zoom_x10(self, g, a):
+        layout = self._layout
+        result = g.dataLim.frozen()
+        if layout == 'horiz' or layout == 'quad':
+            g.set_xlim(*result.intervalx)
+        if layout == 'vert' or layout == 'quad':
+            g.set_ylim(*result.intervaly)
+        if a:
+            result = g.bbox.expanded(0.1, 0.1).transformed(g.transData.inverted())
+            if layout == 'horiz' or layout == 'quad':
+                g.set_xlim(*result.intervalx)
+            if layout == 'vert' or layout == 'quad':
+                g.set_ylim(*result.intervaly)
 
     def span_toggle_btn_toggled(self, span_toggle_btn, graphs_cbx, store):
         iter = graphs_cbx.get_active_iter()
@@ -279,15 +290,11 @@ class IOscopy_GTK_Figure(oscopy.Figure):
     def _key_press(self, event):
         if event.inaxes is not None:
             g = event.inaxes
-            grnum = self.graphs.index(g) + 1
-            center = Center()
-            center.x = event.xdata
-            center.y = event.ydata
             if event.key == 'z':
-                self._zoom(grnum, center, DEFAULT_ZOOM_FACTOR)
+                self._zoom_on_event(event, DEFAULT_ZOOM_FACTOR)
                 self.canvas.draw_idle()
             elif event.key == 'Z':
-                self._zoom(grnum, center, 1 / DEFAULT_ZOOM_FACTOR)
+                self._zoom_on_event(event, 1. / DEFAULT_ZOOM_FACTOR)
                 self.canvas.draw_idle()
             elif event.key == 'l':
                 result = g.bbox.translated(-DEFAULT_PAN_FACTOR, 0).transformed(g.transData.inverted())
@@ -301,87 +308,31 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 self.canvas.draw_idle()
         return True
 
-    def _zoom(self, grnum, center=None, factor=1):
-        # In which layout are we (horiz, vert, quad ?)
+    def _zoom_on_event(self, event, factor):
+        g = event.inaxes
+        if g is None or factor == 1:
+            return
         layout = self.layout
-        gr = self.graphs[grnum - 1]
-        [xmin, xmax, ymin, ymax] = [None for x in xrange(4)]
-        [(xmin_cur, xmax_cur), (ymin_cur, ymax_cur)] = gr.range
-        [(xmin_new, xmax_new), (ymin_new, ymax_new)] = gr.range
-
-        # Get the bounds of the data (min, max)
+        result = g.bbox.expanded(factor, factor).transformed(g.transData.inverted())
+        # Localisation of event.xdata in the new transform
         if layout == 'horiz' or layout == 'quad':
-            (xmin, xmax) = (gr.dataLim.xmin, gr.dataLim.xmax)
-
+            g.set_xlim(*result.intervalx)
         if layout == 'vert' or layout == 'quad':
-            (ymin, ymax) = (gr.dataLim.ymin, gr.dataLim.ymax)
-
-        # Calculate the x10 (linear or log scale ?) and set it
-        sc = gr.scale
-        logx = True if sc == 'logx' or sc == 'loglog' else False
-        logy = True if sc == 'logy' or sc == 'loglog' else False
-        if xmin is not None and xmax is not None:
-            if logx:
-                cx = log10(center.x) if center is not None else None
-                curb = (log10(xmin_cur), log10(xmax_cur)) # Current bounds
-                datab = (log10(xmin), log10(xmax))        # Data bounds
-                newb = self._compute_zoom_range(curb, datab, cx, factor)
-                (xmin_new, xmax_new) = newb               # New bounds
-                xmin_new = pow(10, xmin_new)
-                xmax_new = pow(10, xmax_new)
-            else:
-                cx = center.x if center is not None else None
-                curb = (xmin_cur, xmax_cur) # Current bounds
-                datab = (xmin, xmax)        # Data bounds
-                newb = self._compute_zoom_range(curb, datab, cx, factor)
-                (xmin_new, xmax_new) = newb # New bounds
-            gr.set_xbound(xmin_new, xmax_new)
-
-        if ymin is not None and ymax is not None:
-            if logy:
-                cy = log10(center.y) if center is not None else None
-                curb = (log10(ymin_cur), log10(ymax_cur)) # Current bounds
-                datab = (log10(ymin), log10(ymax))        # Data bounds
-                newb = self._compute_zoom_range(curb, datab, cy, factor)
-                (ymin_new, ymax_new) = newb               # New bounds
-                ymin_new = pow(10, ymin_new)
-                ymax_new = pow(10, ymax_new)
-            else:
-                cy = center.y if center is not None else None
-                curb = (ymin_cur, ymax_cur) # Current bounds
-                datab = (ymin, ymax)        # Data bounds
-                newb = self._compute_zoom_range(curb, datab, cy, factor)
-                (ymin_new, ymax_new) = newb # New bounds
-            gr.set_ybound(ymin_new, ymax_new)
-
-    def _compute_zoom_range(self, curb, datab, center=None, factor=-1):
-        # Zoom is relative to current bounds when factor > 0
-        # otherwise is relative to data bounds
-        if not factor:
-            return curb
-        (data_min, data_max) = datab
-        (min_cur, max_cur) = curb if factor > 0 else datab
-        if factor == -1:
-            return (data_min, data_max)
-        curf = (max_cur - min_cur) / (data_max - data_min)
-        factor = factor * curf
-        if factor > 1:
-            return (data_min, data_max)
-        if center is None:
-            center = (max_cur + min_cur) / 2
-        pos = (center - min_cur) / (max_cur - min_cur)
-        min_new = center - (data_max - data_min) * (abs(factor) * pos)
-        max_new = center + (data_max - data_min) * (abs(factor) * (1 - pos))
-        if min_new < data_min:
-            max_new = max_new + (data_min - min_new)
-            min_new = data_min
-        if max_new > data_max:
-            min_new = min_new + (data_max - max_new)
-            max_new = data_max
-        if min_new > max_new:
-            return (max_new, min_new)
-        else:
-            return (min_new, max_new)
+            g.set_ylim(*result.intervaly)
+        # Then place it under cursor
+        b = g.transData.transform_point([event.xdata, event.ydata])
+        result = g.bbox.translated(-(event.x - b[0]), -(event.y - b[1])).transformed(g.transData.inverted())
+        if layout == 'horiz' or layout == 'quad':
+            g.set_xlim(*result.intervalx)
+        if layout == 'vert' or layout == 'quad':
+            g.set_ylim(*result.intervaly)
+        # Limit to data boundaries
+        (dxmin, dxmax) = (g.dataLim.xmin, g.dataLim.xmax)
+        (xmin, xmax) = g.get_xbound()
+        g.set_xbound(max(dxmin, xmin), min(dxmax, xmax))
+        (dymin, dymax) = (g.dataLim.ymin, g.dataLim.ymax)
+        (ymin, ymax) = g.get_ybound()
+        g.set_ybound(max(dymin, ymin), min(dymax, ymax))
 
     def drag_data_received_cb(self, widget, drag_context, x, y, selection,\
                                    target_type, time, ctxtsignals):
@@ -439,22 +390,12 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         if event.button == 'up':
             if event.inaxes is None:
                 return False
-            g = event.inaxes
-            grnum = self.graphs.index(g) + 1
-            center = Center()
-            center.x = event.xdata
-            center.y = event.ydata
-            self._zoom(grnum, center, DEFAULT_ZOOM_FACTOR)
+            self._zoom_on_event(event, DEFAULT_ZOOM_FACTOR)
             self.canvas.draw_idle()
         elif event.button == 'down':
             if event.inaxes is None:
                 return False
-            g = event.inaxes
-            grnum = self.graphs.index(g) + 1
-            center = Center()
-            center.x = event.xdata
-            center.y = event.ydata
-            self._zoom(grnum, center, 1. / DEFAULT_ZOOM_FACTOR)
+            self._zoom_on_event(event, 1. / DEFAULT_ZOOM_FACTOR)
             self.canvas.draw_idle()
         return True
 
