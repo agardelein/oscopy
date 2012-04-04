@@ -8,6 +8,7 @@ from matplotlib.backend_bases import LocationEvent
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 from matplotlib.widgets import SpanSelector, RectangleSelector
+from matplotlib.transforms import Bbox
 
 IOSCOPY_COL_TEXT = 0 # Combo box text
 IOSCOPY_COL_X10 = 1 # x10 mode status
@@ -87,7 +88,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         canvas.mpl_connect('figure_enter_event', self._figure_enter)
         canvas.mpl_connect('figure_leave_event', self._figure_leave)
         canvas.mpl_connect('key_press_event', self._key_press)
-        canvas.mpl_connect('draw_event', self._update_scrollbars)
+        self._draw_hid = canvas.mpl_connect('draw_event', self._update_scrollbars)
         w.connect('delete-event', lambda w, e: w.hide() or True)
         w.drag_dest_set(gtk.DEST_DEFAULT_MOTION |\
                                  gtk.DEST_DEFAULT_HIGHLIGHT |\
@@ -144,6 +145,14 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
         graphs_cbx.connect('changed', self.graphs_cbx_changed, x10_toggle_btn,
                            span_toggle_btn, store)
+        hbar.connect('change-value', self.hscroll_change_value, graphs_cbx,
+                     store)
+        hbar.connect('enter-notify-event', self.disable_adj_update_on_draw)
+        hbar.connect('leave-notify-event', self.enable_adj_update_on_draw)
+        vbar.connect('change-value', self.vscroll_change_value, graphs_cbx,
+                     store)
+        vbar.connect('enter-notify-event', self.disable_adj_update_on_draw)
+        vbar.connect('leave-notify-event', self.enable_adj_update_on_draw)
         vbox2.pack_start(x10_toggle_btn, False, False)
         vbox2.pack_start(span_toggle_btn, False, False)
 
@@ -443,20 +452,15 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         hadj = self._cbx_store[grnum + 1][IOSCOPY_COL_HADJ]
         vadj = self._cbx_store[grnum + 1][IOSCOPY_COL_VADJ]
 
-        (xdmin, xdmax) = (g.dataLim.xmin, g.dataLim.xmax)
-        (ydmin, ydmax) = (g.dataLim.ymin, g.dataLim.ymax)
-        b0 = g.transData.transform_point([xdmin, ydmin])
-        b1 = g.transData.transform_point([xdmax, ydmax])
+        # Get data Bbox and view Bbox in pixels
+        (x0data, y0data, wdata, hdata) = g.dataLim.transformed(g.transData).bounds
+        (xvmin, yvmin, wv, hv) = g.bbox.bounds
 
-        # Get view bounds in pixels
-        (xvmin, xvmax) = (g.bbox.xmin, g.bbox.xmax)
-        (yvmin, yvmax) = (g.bbox.ymin, g.bbox.ymax)
-
-        xpage_size = (xvmax - xvmin) / (b1[0] - b0[0])        
-        ypage_size = (yvmax - yvmin) / (b1[1] - b0[1])        
-
-        xvalue = (xvmin - b0[0]) / (b1[0] - b0[0])
-        yvalue = (yvmin - b0[1]) / (b1[1] - b0[1])
+        # Compute page_size and value relatively to data bounds
+        xpage_size = wv / wdata
+        ypage_size = hv / hdata
+        xvalue = (xvmin - x0data) / wdata
+        yvalue = (yvmin - y0data + hv) / hdata
 
         xstep_increment = xpage_size / 10
         xpage_increment = xpage_size
@@ -464,7 +468,87 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                       xstep_increment, xpage_increment, xpage_size)
         ystep_increment = ypage_size / 10
         ypage_increment = ypage_size
-        vadj.configure(yvalue, lower, upper,
+        # Need to revert scroll bar to have minimum on bottom
+        vadj.configure(-yvalue, -upper, lower,
                       ystep_increment, ypage_increment, ypage_size)
+
+    def hscroll_change_value(self, widget, scroll, value, cbx, store):
+        if self.layout == 'vert':
+            return False
+        iter = cbx.get_active_iter()
+        layout = self.layout
+        if iter is not None:
+            grnum = int(store.get_string_from_iter(iter))
+            if store.get_string_from_iter(iter) == '0':
+                # Set the value for all graphs
+                iter = store.iter_next(iter)
+                while iter is not None:
+                    grnum = int(store.get_string_from_iter(iter))
+                    if grnum > len(self.graphs):
+                        break
+                    g = self.graphs[grnum - 1]
+                    # Pan
+                    iter = store.iter_next(iter)
+            else:
+                g = self.graphs[grnum - 1]
+                # Pan
+                self._translate_to(g, widget.get_value(), None)
+            self.canvas.draw_idle()
+        return False
+
+    def vscroll_change_value(self, widget, scroll, value, cbx, store):
+        if self.layout == 'horiz':
+            return False
+        iter = cbx.get_active_iter()
+        layout = self.layout
+        if iter is not None:
+            grnum = int(store.get_string_from_iter(iter))
+            if store.get_string_from_iter(iter) == '0':
+                # Set the value for all graphs
+                iter = store.iter_next(iter)
+                while iter is not None:
+                    grnum = int(store.get_string_from_iter(iter))
+                    if grnum > len(self.graphs):
+                        break
+                    g = self.graphs[grnum - 1]
+                    # Pan
+                    iter = store.iter_next(iter)
+            else:
+                g = self.graphs[grnum - 1]
+                # Pan
+                self._translate_to(g, None, widget.get_value())
+            self.canvas.draw_idle()
+        return False
+
+    def _translate_to(self, g, xvalue, yvalue):
+        layout = self.layout
+
+        (x0data, y0data, wdata, hdata) = g.dataLim.transformed(g.transData).bounds
+        x0, y0, w, h = g.bbox.bounds
+        x0_new = (xvalue * wdata + x0data) if xvalue is not None else x0
+        # Need to revert scroll bar to have minimum on bottom
+        y0_new = (-yvalue * hdata + y0data - h) if yvalue is not None else y0
+        result = Bbox.from_bounds(x0_new, y0_new, w, h).transformed(g.transData.inverted())
+        g.set_xlim(*result.intervalx)
+        g.set_ylim(*result.intervaly)
+
+    def disable_adj_update_on_draw(self, widget, event):
+        layout = self.layout
+        if widget == self.hbar and layout not in ['horiz', 'quad']:
+            return
+        if widget == self.vbar and layout not in ['vert', 'quad']:
+            return
+        if self._draw_hid is not None:
+            self.canvas.mpl_disconnect(self._draw_hid)
+            self._draw_hid = None
+
+    def enable_adj_update_on_draw(self, widget, event):
+        layout = self.layout
+        if widget == self.hbar and layout not in ['horiz', 'quad']:
+            return
+        if widget == self.vbar and layout not in ['vert', 'quad']:
+            return
+        if self._draw_hid is None and not event.state & gtk.gdk.BUTTON1_MASK:
+            self._draw_hid = self.canvas.mpl_connect('draw_event', self._update_scrollbars)
 
     layout = property(oscopy.Figure.get_layout, set_layout)
