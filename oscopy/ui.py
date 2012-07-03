@@ -52,7 +52,7 @@ class App(dbus.service.Object):
     </menubar>
     </ui>'''
 
-    def __init__(self, bus_name, object_path='/org/freedesktop/Oscopy', ctxt=None):
+    def __init__(self, bus_name, object_path='/org/freedesktop/Oscopy', ctxt=None, ip=None):
         if bus_name is not None:
             dbus.service.Object.__init__(self, bus_name, object_path)
         self._scale_to_str = {'lin': _('Linear'), 'logx': _('LogX'), 'logy': _('LogY'),\
@@ -103,7 +103,7 @@ class App(dbus.service.Object):
         #self._add_file('demo/res.dat')
 
         # From IPython/demo.py
-        self.shell = get_ipython()
+        self.shell = ip
 
     SECTION = 'oscopy_ui'
     OPT_NETLISTER_COMMANDS = 'netlister_commands'
@@ -414,6 +414,7 @@ class App(dbus.service.Object):
         merge_id = self._uimanager.add_ui_from_string(ui)
         self._fignum_to_merge_id[fignum] = merge_id
         self._app_exec('%%oselect %d-1' % fignum)
+        return fig
 
     def destroy(self, num):
         if not num.isdigit() or int(num) > len(self._ctxt.figures):

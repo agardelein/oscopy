@@ -9,10 +9,10 @@ from figure import MAX_GRAPHS_PER_FIGURE
 
 gobject.type_register(signal.Signal)
 
-try:
-    get_ipython()
-except NameError:
-    pass
-else:
-    import ioscopy
-    ioscopy.init()
+#try:
+#    __IPYTHON__
+#except NameError:
+#    pass
+#else:
+#    import ioscopy
+#    ioscopy.init()

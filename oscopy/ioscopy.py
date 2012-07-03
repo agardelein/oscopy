@@ -16,32 +16,25 @@ from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanva
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 from graphs import factors_to_names, abbrevs_to_factors
 
+from oscopy import Signal
+from oscopy import MAX_GRAPHS_PER_FIGURE
 from context import Context
 from readers.reader import ReadError
 from writers.writer import WriteError
 from ui import App as OscopyGUI
-from oscopy import Signal
-from oscopy import MAX_GRAPHS_PER_FIGURE
 
+GETTEXT_DOMAIN = 'oscopy'
+import gettext
+gettext.install(GETTEXT_DOMAIN, '@datarootdir@/locale', unicode=1)
 
-_globals = None
-
-_ctxt = Context()
-ip = get_ipython()
-
+_globals = globals()
+_globals['Signal'] = Signal
 _current_figure = None
 _current_graph = None
 _figcount = 0
 _autorefresh = True
 bus_name = None
-
-try:
-    session_bus = dbus.SessionBus()
-    bus_name = dbus.service.BusName('org.freedesktop.Oscopy', bus=session_bus)
-except dbus.DBusException, e:
-    print 'DBus not available:', e
-
-_gui = OscopyGUI(bus_name, ctxt=_ctxt)
+_ctxt = Context()
 
 def do_create(self, args):
     """ocreate [SIG [, SIG [, SIG]...]]
@@ -521,7 +514,7 @@ def make_fft_func(fft_func_name):
         return out
     return oscopy_fft_func
 
-def init():
+def init(ip):
     global _globals
     oscopy_magics = {'oadd': do_add,
                      'ocreate': do_create,
@@ -576,3 +569,15 @@ def update_current_figure_graph(figure=None, graph=None):
     global _current_graph
     _current_figure = figure
     _current_graph = graph
+
+
+try:
+    session_bus = dbus.SessionBus()
+    bus_name = dbus.service.BusName('org.freedesktop.Oscopy', bus=session_bus)
+except dbus.DBusException, e:
+    print 'DBus not available:', e
+
+ip = get_ipython()
+init(ip)
+_gui = OscopyGUI(bus_name, ctxt=_ctxt, ip=ip)
+set_ufuncs()

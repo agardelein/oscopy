@@ -99,7 +99,7 @@ c.TerminalIPythonApp.display_banner = True
 # c.TerminalIPythonApp.extra_extension = ''
 
 # List of files to run at IPython startup.
-# c.TerminalIPythonApp.exec_files = ['ioscopy.py']
+c.TerminalIPythonApp.exec_files = ['oscopy/ioscopy.py']
 
 # Whether to overwrite existing config files when copying
 # c.TerminalIPythonApp.overwrite = False

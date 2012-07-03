@@ -5,7 +5,7 @@ IPYTHON=ipython
 IOSCOPY=ioscopy
 
 getprofd () {
-    profd=`$IPYTHON --profile=ioscopy  --no-banner --quiet --no-confirm-exit --classic<< EOF| grep /
+    profd=`$IPYTHON --quick  --no-banner --quiet --no-confirm-exit --classic<< EOF| grep /
 ip=get_ipython()
 print "\n" + ip.profile_dir.location + "\n"
 EOF`;
@@ -38,6 +38,5 @@ else
     fi
 fi
 args=$*
-args=`echo $* | sed -e 's/-\bb\b/--IOscopy.batch=True/; s/-i/--IOscopy.interactive=True/ ; s/-h/--IOscopy.help=True/ ; s/-H/-h/; s/-q/--IOscopy.quiet=True/'`
-
-$IPYTHON --profile=$IOSCOPY --automagic $args
+args=`echo $* | sed -e 's/-b[[:space:]]*/--IOscopy.batch=True --IOscopy.file=/; s/-i/--IOscopy.interactive=True/ ; s/-h/--IOscopy.help=True/ ; s/-H/-h/; s/-q/--IOscopy.quiet=True/'`
+$IPYTHON --profile=$IOSCOPY $args
