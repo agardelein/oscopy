@@ -14,14 +14,13 @@ import dbus
 import numpy
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
-from graphs import factors_to_names, abbrevs_to_factors
 
 from oscopy import Signal
-from oscopy import MAX_GRAPHS_PER_FIGURE
-from context import Context
-from readers.reader import ReadError
-from writers.writer import WriteError
-from ui import App as OscopyGUI
+from oscopy import Context
+from oscopy import ReadError
+from oscopy import WriteError
+from oscopy import MAX_GRAPHS_PER_FIGURE, factors_to_names, abbrevs_to_factors
+from oscopy_ipython import OscopyGUI
 
 GETTEXT_DOMAIN = 'oscopy'
 import gettext

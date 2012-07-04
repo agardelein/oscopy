@@ -26,11 +26,13 @@ can_build_documentation=$with_doc
 
 AC_CONFIG_FILES([
 	Makefile
-	oscopy/Makefile
-	oscopy/graphs/Makefile
-	oscopy/readers/Makefile
-	oscopy/writers/Makefile
-	oscopy/gui/Makefile
+	src/oscopy_ipython/Makefile
+	src/oscopy_ipython/gui/Makefile
+	src/Makefile
+	src/oscopy/Makefile
+	src/oscopy/graphs/Makefile
+	src/oscopy/readers/Makefile
+	src/oscopy/writers/Makefile
 	scheme/Makefile
 	doc/Makefile
 	doc/ioscopy/Makefile

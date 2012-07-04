@@ -1,0 +1,1 @@
+SUBDIRS=oscopy oscopy_ipython
