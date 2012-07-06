@@ -5,7 +5,7 @@ IPYTHON=ipython
 IOSCOPY=ioscopy
 
 getprofd () {
-    profd=`$IPYTHON --quick  --no-banner --quiet --no-confirm-exit --classic<< EOF| grep /
+    profd=`$IPYTHON --quick --profile=$IOSCOPY --no-banner --quiet --no-confirm-exit --classic<< EOF| grep /
 ip=get_ipython()
 print "\n" + ip.profile_dir.location + "\n"
 EOF`;
