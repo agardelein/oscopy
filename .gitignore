@@ -15,3 +15,10 @@ gschem-plugin/src/*.l[ao]
 *Makefile
 *Makefile.in
 spicefile/*
+old/*
+config.h.in
+config.status
+configure
+*.rej
+po/*.gmo
+i18n/*
