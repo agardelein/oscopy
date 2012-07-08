@@ -490,12 +490,14 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         for i, get_act in enumerate(self._mpsel_get_act):
             if get_act():
                 break
-        hadj = self._cbx_store[0][IOSCOPY_COL_HADJ]
-        hadj.configure(xvs[i], lower, upper,
-                       xpgs_min / 10.0, xpgs_min, xpgs_min)
-        vadj = self._cbx_store[0][IOSCOPY_COL_VADJ]
-        vadj.configure(-yvs[i], -upper, lower,
-                       ypgs_min / 10.0, ypgs_min, ypgs_min)
+        if xvs:
+            hadj = self._cbx_store[0][IOSCOPY_COL_HADJ]
+            hadj.configure(xvs[i], lower, upper,
+                           xpgs_min / 10.0, xpgs_min, xpgs_min)
+        if yvs:
+            vadj = self._cbx_store[0][IOSCOPY_COL_VADJ]
+            vadj.configure(-yvs[i], -upper, lower,
+                            ypgs_min / 10.0, ypgs_min, ypgs_min)
 
     def _update_graph_adj(self, grnum, g):
         (lower, upper) = (0, 1)
