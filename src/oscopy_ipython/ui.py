@@ -575,9 +575,10 @@ class App(dbus.service.Object):
             os.chdir(old_dir)
 
     def _app_exec(self, line):
-        first = line.split()[0]
-        if first.startswith('%') or first.split()[0] in self.shell.lsmagic():
-            self.shell.magic(line)
+        (first, last) = line.split(' ', 1)
+        if first.startswith('%') or self.shell.find_magic(first.split()[0]) is not None:
+            name = first.lstrip('%')
+            self.shell.run_line_magic(name, last.strip())
         else:
             self.shell.ex(line)
     
