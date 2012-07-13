@@ -2,8 +2,13 @@
 
 
 """
+#from __future__ import with_statement
+GETTEXT_DOMAIN = 'oscopy'
+import gettext
+gettext.install(GETTEXT_DOMAIN, '@datarootdir@/locale', unicode=1)
+t = gettext.translation(GETTEXT_DOMAIN, '@datarootdir@/locale')
+_ = t.ugettext
 
-from __future__ import with_statement
 import IPython
 from IPython.lib.demo import IPythonLineDemo
 import time
@@ -21,10 +26,6 @@ from oscopy import ReadError
 from oscopy import WriteError
 from oscopy import MAX_GRAPHS_PER_FIGURE, factors_to_names, abbrevs_to_factors
 from oscopy_ipython import OscopyGUI
-
-GETTEXT_DOMAIN = 'oscopy'
-import gettext
-gettext.install(GETTEXT_DOMAIN, '@datarootdir@/locale', unicode=1)
 
 _globals = globals()
 _globals['Signal'] = Signal
@@ -117,7 +118,7 @@ def do_read(self, arg):
         _gui.add_file(fn)
         _globals.update(sigs)
     except ReadError, e:
-        print _("Failed to read %s:") % fn, e
+        print _('Failed to read %s:') % fn, e
     except NotImplementedError:
         print _("File format not supported")
 
