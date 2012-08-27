@@ -10,7 +10,7 @@ dnl directory.
 
 AC_INIT([oscopy], [0.71.0-rc1], [arnaud@oscopy.org])
 AC_CONFIG_AUX_DIR([build-tools])
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_INIT_AUTOMAKE([-Wall foreign])
 
 AC_PROG_LN_S
 AC_CONFIG_MACRO_DIR([m4])
