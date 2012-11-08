@@ -11,6 +11,8 @@ _ = t.ugettext
 
 import IPython
 from IPython.lib.demo import IPythonLineDemo
+from IPython.config.configurable import Configurable
+from IPython.utils.traitlets import Bool, Unicode
 import time
 import os
 import gtk
@@ -35,6 +37,14 @@ _figcount = 0
 _autorefresh = True
 bus_name = None
 _ctxt = Context()
+
+class IOscopyConfig(Configurable):
+    h = Bool(False, config=True, help=_('Show this help message'))
+    q = Bool(False, config=True, help=_('Disable banner printing'))
+    b = Bool(False, config=True, help=_('Execute an oscopy command file'))
+    i = Bool(False, config=True, help=_('Resume to command line executing after batch file'))
+    f = Unicode('', config=True, help='')
+    
 
 def do_create(self, args):
     """ocreate [SIG [, SIG [, SIG]...]]
@@ -578,6 +588,26 @@ except dbus.DBusException, e:
     print 'DBus not available:', e
 
 ip = get_ipython()
+c = ip.config
+ioscopycfg = IOscopyConfig(config=c)
 init(ip)
 _gui = OscopyGUI(bus_name, ctxt=_ctxt, ip=ip)
 set_ufuncs()
+
+# Process command line arguments
+if ioscopycfg.h:
+    # Help message
+    print
+    msg=[]
+    for name, trait in ioscopycfg.traits().iteritems():
+        if trait.get_metadata('help'):
+            msg.append('   -%s\t%s' % (name, trait.get_metadata('help')))
+    msg.sort()
+    print '\n'.join(msg)
+    exit()
+if ioscopycfg.b:
+    # Batch mode and interactive mode
+    ip.run_line_magic("oexec", ioscopycfg.f)
+    if not ioscopycfg.i:
+        exit()
+

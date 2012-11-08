@@ -3,6 +3,13 @@
 
 IPYTHON=ipython
 IOSCOPY=ioscopy
+PYTHON=python
+IOCFG=--IOscopyConfig
+REPS="'-b': '$IOCFG.b=True $IOCFG.f=',\
+'-i': '$IOCFG.i=True',\
+'-h': '$IOCFG.h=True',\
+'-H': '-h',\
+'-q': '--no-banner --IOscopyConfig.quiet=True'"
 
 getprofd () {
     profd=`$IPYTHON --quick --profile=$IOSCOPY --no-banner --quiet --no-confirm-exit --classic<< EOF| grep /
@@ -37,6 +44,13 @@ else
 	fi
     fi
 fi
-args=$*
-args=`echo $* | sed -e 's/-b[[:space:]]*/--IOscopy.batch=True --IOscopy.file=/; s/-i/--IOscopy.interactive=True/ ; s/-h/--IOscopy.help=True/ ; s/-H/-h/; s/-q/--IOscopy.quiet=True/'`
+
+# Replace short args with their equivalent, and delete space between = and
+# file name when needed
+args=`$PYTHON <<EOF
+reps={$REPS}
+argout=[reps.get(s, s) for s in "$*".split()]
+print " ".join(argout).replace(".f= ", ".f=")
+EOF`
+echo ///// $args +++++++++++++++++++++++
 $IPYTHON --profile=$IOSCOPY $args
