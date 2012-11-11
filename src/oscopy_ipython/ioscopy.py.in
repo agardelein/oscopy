@@ -167,6 +167,7 @@ def do_update(self, args):
             _ctxt.update(_ctxt.readers[args])
         else:
             print _("%s not found in readers") % args
+    _gui.update_readers()
     do_refresh(self, '')
 
 def do_add(self, args):

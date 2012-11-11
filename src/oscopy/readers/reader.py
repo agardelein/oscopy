@@ -343,6 +343,7 @@ Signals
         ns = Signal(newname, os.unit)
         ns.ref = os.ref
         ns.data = os.data
+        ns.freeze = os.freeze
 
         del self._signals[oldname]
         self._signals[newname] = ns

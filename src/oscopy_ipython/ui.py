@@ -470,6 +470,35 @@ class App(dbus.service.Object):
                     .signals.iteritems():
                 self._store.append(it, (name, sig, sig.freeze))
 
+    def update_readers(self):
+        print 'Updating readers'
+        iter = self._store.get_iter_root()
+        while iter:
+            print iter, self._store.get_value(iter, 0)
+            rname = self._store.get_value(iter, 0)
+            # Check for deleted signals
+            citer = self._store.iter_children(iter)
+            while citer:
+                print citer, self._store.get_value(citer, 1)
+                s = self._store.get_value(citer, 1)
+                if s.name not in self._ctxt.readers[rname].signals.keys():
+                    print s.name + ' not anymore in ' + rname
+                    self._store.remove(citer)
+                    if not self._store.iter_is_valid(citer):
+                        citer = None
+                else:
+                    citer = self._store.iter_next(citer)
+            # Add new signals
+            for sn, s in self._ctxt.readers[rname].signals.iteritems():
+                citer = self._store.iter_children(iter)
+                while citer:
+                    if self._store.get_value(citer, 1).name == sn:
+                        break
+                    citer = self._store.iter_next(citer)
+                if not citer:
+                    self._store.append(iter, (sn, s, s.freeze))
+            iter = self._store.iter_next(iter)
+
     #
     # Callbacks for drag and drop
     #
