@@ -4,6 +4,7 @@
 import os.path
 import time
 import gobject
+from oscopy import Signal
 
 class ReadError(Exception):
     """
@@ -83,6 +84,7 @@ Signals
         self._signals = {}     # Internal Signal list
         self._update_num = -1  # Update number
         self._info = {}        # Misc information (e.g. last update timestamp)
+        self._renamed = {}     # Translation of renamed signals
 
     def read(self, fn):
         """ Validate the file and read the Signals from the file.
@@ -330,3 +332,18 @@ Signals
         """
         self.in_transaction = False
         self.emit('end-transaction')
+
+    def rename_signal(self, oldname, newname):
+        if oldname not in self._signals.keys():
+            return
+
+        self._renamed[oldname] = newname
+        
+        os = self._signals[oldname]
+        ns = Signal(newname, os.unit)
+        ns.ref = os.ref
+        ns.data = os.data
+
+        del self._signals[oldname]
+        self._signals[newname] = ns
+        return ns

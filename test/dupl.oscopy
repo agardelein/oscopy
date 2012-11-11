@@ -1,0 +1,7 @@
+oread demo/irf540.dat
+oadd vgs
+oadd vds
+oadd iRD
+oadd vgs,vds
+oread demo/irf540-2.dat
+oread demo/irf540-3.dat
