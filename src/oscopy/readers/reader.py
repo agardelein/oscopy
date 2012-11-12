@@ -173,6 +173,7 @@ Signals
         n = {}
         for sn, s in sigs.iteritems():
             if sn in self._renamed:
+                # Renamed signal
                 s = self.rename_signal(sn, self._renamed[sn])
                 sn = self._renamed[sn]
             if sn not in oldsigs:
@@ -337,8 +338,29 @@ Signals
         self.emit('end-transaction')
 
     def rename_signal(self, oldname, newname):
-        if oldname not in self._signals.keys():
-            return
+        """ Rename a Signal in the reader from oldname to newname.
+        All old signal attributes are copied into a new one except the
+        name which is changed according to newname. Old signal is deleted
+        from self._signals
+        If oldname is not in self._signals returns None.
+
+        Parameters
+        ----------
+        oldname: str
+        The name of the signal to rename
+
+        newname: str
+        The name to use for renaming
+
+        Returns
+        -------
+        None or ns
+           None: oldname was not found in self._signals
+           ns: Signal
+           The copied Signal with new name
+        """
+        if oldname not in self._signals:
+            return None
 
         self._renamed[oldname] = newname
         

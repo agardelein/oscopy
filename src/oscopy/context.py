@@ -153,7 +153,6 @@ Abbreviations
                 while newname in self._signals.keys():
                     i = i + 1
                     newname = sn + '_%04d' % i
-                print newname
                 newsig = r.rename_signal(sn, newname)
                 self._signals[newname] = newsig
                 self._signal_name_to_reader[newname] = r

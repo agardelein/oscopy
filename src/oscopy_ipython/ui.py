@@ -471,18 +471,16 @@ class App(dbus.service.Object):
                 self._store.append(it, (name, sig, sig.freeze))
 
     def update_readers(self):
-        print 'Updating readers'
+        # Parse self._store to find deleted or new signals.
+        # Shall be called subsequently to an update of reasers.
         iter = self._store.get_iter_root()
         while iter:
-            print iter, self._store.get_value(iter, 0)
             rname = self._store.get_value(iter, 0)
             # Check for deleted signals
             citer = self._store.iter_children(iter)
             while citer:
-                print citer, self._store.get_value(citer, 1)
                 s = self._store.get_value(citer, 1)
                 if s.name not in self._ctxt.readers[rname].signals.keys():
-                    print s.name + ' not anymore in ' + rname
                     self._store.remove(citer)
                     if not self._store.iter_is_valid(citer):
                         citer = None
