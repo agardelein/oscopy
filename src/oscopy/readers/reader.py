@@ -172,6 +172,9 @@ Signals
         # has changed
         n = {}
         for sn, s in sigs.iteritems():
+            if sn in self._renamed:
+                s = self.rename_signal(sn, self._renamed[sn])
+                sn = self._renamed[sn]
             if sn not in oldsigs:
                 # New signal
                 n[sn] = s
