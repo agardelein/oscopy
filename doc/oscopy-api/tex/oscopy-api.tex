@@ -174,7 +174,7 @@ They both use \module{Matplotlib} to plot the data.
 \end{figure}
 
 \subsection{Context}
-The user and data interaction are gathered into the object \ctx, which handle the creation of readers, writers and figures objects.
+The user and data interaction are gathered into the object \ctx, which handle the instanciation of readers, writers and figures objects.
 It present an interface that can be split into a few parts:
 \begin{itemize}
 \item Data management
@@ -227,6 +227,7 @@ The property \prop{figures} is a list of figures handled.
 
 A \sig\ is an object that basically contain the data points.
 For example this could be the Y axis data of a temporal measurement.
+Properties and methods are reported in Tab.~\ref{tab:sigs:props} and \ref{tab:sigs:meth} respectively.
 
 Since generally in a simulation or experimental results many signals share the same scale, e.g. time scale or frequency scale, the \sig\ is associated to a reference signal.
 To make the difference between a ``\sig'' and a ``reference \sig'', the latter has its \att{ref}\ attribute set to \att{None}.
@@ -234,9 +235,11 @@ To make the difference between a ``\sig'' and a ``reference \sig'', the latter h
 We humans give to each signal a name, e.g. V1, Iout... and associate a unit (Volts, Watts...).
 The \sig\ thus possess those two attributes.
 
-And finally, when rereading the data from file, one want not always update each Signal, for instance to compare two simulations with different component values.
+And finally, when rereading the data from file, one want not always update each \sig, for instance to compare two simulations with different component values.
 When the attribute \att{frozen} is set, the \sig\ is not updated.
-For now this attribute is not accessed as a property but through the method \meth{freeze}.
+
+All those properties are implemented as \textsf{GObject} properties.
+
 \begin{table}[htbp]
   \centering\small\sf
   \begin{tabular}{lcccl}
@@ -253,7 +256,26 @@ For now this attribute is not accessed as a property but through the method \met
   \caption{Properties of \sig s.}
   \label{tab:sigs:props}
 \end{table}
-
+\begin{table}[htbp]
+  \centering\small\sf
+  \begin{tabular}{*3l}
+    \hline
+    Method & Access & Action\\
+    \hline
+    \textit{Update mechanism}\\
+    on\_begin\_transaction & Public & Go to transaction and notify dependencies \\
+    on\_end\_transaction & Public & Exit transaction once all dependencies did \\
+    on\_changed & Public  & A dep of this Signal changed \\
+    on\_recompute & Public & Recompute the data of this Signal \\
+    \textit{Operator overloading}\\
+    \_\_make\_method & Private & Wrap operator\\
+    \_\_make\_method\_inplace & Private & Wrap operator, inplace version\\
+    \_\_neg\_\_ & Public & Compute opposite signal \\
+    \hline
+  \end{tabular}
+  \caption{Methods of \sig s. Getters and setters are not reported here}
+  \label{tab:sigs:meth}
+\end{table}
 \section{Readers}
 \label{sec:readers}
 The module \module{Readers}\ is used to load signals, mainly from files.
@@ -286,6 +308,8 @@ The file access is verified by \meth{\_check}, and the update mechanism is handl
 
 The property \prop{signals} return the dict of signals handled by the reader.
 
+The method \meth{rename\_signal}\ set a new name for a \sig, which is kept across subsequent calls to \meth{updates}.
+
 \begin{table}[htbp]
   \centering\sf\small
   \begin{tabular}{lll}
@@ -299,6 +323,10 @@ The property \prop{signals} return the dict of signals handled by the reader.
     detect       & Public & Return True if file is handled\\
     \_check        & Private& Raise an exception if the file is not readable\\
     \_read\_signals    & Private& Read the data \\
+    rename\_signal & Public & Rename a \sig\\
+    \textit{Update mechanism}\\
+    on\_begin\_transaction & Public & Go to transaction and notify dependencies \\
+    on\_end\_transaction & Public & Exit transaction once all dependencies did \\
     \hline
   \end{tabular}
   \caption{Methods of \rd}
@@ -433,7 +461,6 @@ The list of graphs contained into the figure is provided by the property \prop{g
     Method & Access & Action \\
     \hline
     \_\_init\_\_ & Public & Initialise the object \\
-    plot & Public & Draw the graphs\\
     \multicolumn{3}{l}{\textit{Graph management}} \\
     add & Public & Add a graph into the figure \\
     delete & Public & Delete a graph from the figure \\
@@ -522,6 +549,8 @@ The Table~\ref{tab:graphs:meth} summarise the methods of the \graph\ object, and
     \_draw\_cursors & Private & Display the cursors on the graph\\
     \_set\_cursors & Private & Set the properties of a cursor\\
     \_print\_cursors & Private & Display the numerical values of the cursors\\
+    \multicolumn{3}{l}{\textit{Zoom and span management}} \\
+    on\_select & Public & Callback for spanning\\
     \hline
   \end{tabular}
   \caption{Methods of \graph}
@@ -688,6 +717,22 @@ Out[20]: <Signal[0xaad8784] (s1 + s2) / s1 [None] data=[12, 14, 16, 18]>
   \caption{Methods of Context}
   \label{tab:upd:events}
 \end{table}
+
+% \subsection{Recursive updating of Signals}
+% The concept of \textit{transactions} is used to manage \sig\ dependencies.
+% This is used to make the \sig\ aware that its data is being to be changed and to
+% notify also its dependent \sig s.
+% Transactions are a way to notify Signals using the current \sig\ that its data
+% is changing.
+% Once the current \sig\ has finished its transaction, dependent \sig s might recompute their own data.
+
+% In this system is defined the \textit{Result} \sig, that depends on data from the \textit{Dependancy} \sig(s).
+% For example in \texttt{v1 = v2 + v3}, \texttt{v1} is the Result Signal and \texttt{v2} and \texttt{v3} are Dependencies Signals.
+% \textsf{GObject} event signaling system is used for the implementation where Results \sig s are considered as \textit{Listeners}.
+
+% Note that relevant calls to \texttt{Signal.connect()} shall be performed by the user.
+% See examples for arithmetic operations.
+
 
 %\section{Extending Oscopy API}
 %\label{sec:ext}
