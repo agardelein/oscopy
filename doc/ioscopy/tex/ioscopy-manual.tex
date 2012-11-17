@@ -7,6 +7,7 @@
 \usepackage[font=small,labelfont=sf,textfont=sf]{caption}
 \usepackage{hyperref}
 \usepackage[sf]{titlesec}
+\usepackage{lscape}
 
 \newcommand{\att}[1]{\texttt{#1}}
 \newcommand{\meth}[1]{\texttt{#1()}}
@@ -71,6 +72,7 @@ This document covers the user interface and command description.
 % code just follows naturally.
 In the electrical system design workflow, viewing results from analog simulation or experi\-ment is not a trivial task: there exist numerous different program with even more different file formats, the user interface has to be friendly and functional, and the program should be memory efficient due to the number of data points per file that can quickly grow.
 
+\subsection{Rationale}
 The gEDA suite contains mainly all tools required to design electrical boards, from scheme drawings to PCB routing.
 There already exist several programs to view analog simulation results: gwave, GSpiceUI, dataplot.
 
@@ -93,14 +95,163 @@ In this purpose, it has features such as multiple plots, multiple windows, diffe
 It supports the gnucap file format for input and output, and has an update mechanism to reread data from files.
 New file formats and new graph types can be added by following the guidelines presented in this document.
 
+\subsection{Oscopy and IOscopy: the core and the app}
+To enable reuse and make it flexible, Oscopy has two main components:
+\begin{description}
+\item[Oscopy] the core of it which gather all the framework API about file operations, signals management, figures and graph handling
+\item[IOscopy] the application based on top of IPython which provide the command line interface
+\end{description}
+This means that IOscopy is just an application of using Oscopy core.
+As of today the term \textsl{Oscopy} means either Oscopy or IOscopy and when differentiation is needed \textsl{oscopy-core} for the framework and either \textsl{oscopy-ipython} or \textsl{IOscopy} for the IPython application.
+
+The framework API oscopy-core is described in oscopy-api.pdf that is usually installed at the same place of the this manual; typically \texttt{/usr/share/doc/oscopy}.
+The present document is only about the application IOscopy.
+
 \section{IOscopy: Oscopy on top of IPython}
 
 %\subsection{Purpose}
 % TODO: Why using ipython: CLI already there, oscopy as a python module, power of ipython behind, flexibility
+\subsection{First steps}
+\subsubsection{Build and install}
+The source can be downloaded from repo.cz: \href{http://repo.or.cz/w/oscopy.git}{http://repo.or.cz/w/oscopy.git}
 
-\subsection{Commands}
+To download it:
+\begin{verbatim}
+$ git clone git://repo.or.cz/oscopy.git
+\end{verbatim}
+
+IOscopy shall be compiled and installed on the system:
+\begin{verbatim}
+$ ./autogen.sh && ./configure && make install
+\end{verbatim}
+Requested dependencies:
+\begin{itemize}
+\item    ipython
+\item    python-numpy
+\item    python-matplotlib
+\item    python-dbus
+\item    python-xdg
+\item python-gtk (pygtk)
+\end{itemize}
+Once installed, \texttt{PYTHONPATH} might need some update, for example if you install it in \texttt{\$\{HOME\}/geda}, to launch oscopy you might need the following line:
+\begin{verbatim}
+PYTHONPATH=${HOME}/geda/lib/python2.X/site-packages:$PYTHONPATH
+\end{verbatim}
+To use gschem integration, you will need to use the same \texttt{--prefix} that you used to install gschem. 
+
+\subsubsection{Getting Started}
+To run the program, just do 
+\begin{verbatim}
+ioscopy
+\end{verbatim}
+This assume that ioscopy is in your \texttt{PATH}.
+
+A sample circuit is provided for demonstration purposes. 
+\begin{verbatim}
+$ cd demo
+$ ioscopy
+\end{verbatim}
+Just select ``File>Run Netlister and simulate...'' and fill in the window with the commands provided below: 
+\begin{verbatim}
+For netlister: gnetlist -g spice-sdb -s -o demo.net demo.sch
+For simulator: gnucap -b demo.net
+\end{verbatim}
+then in the terminal window:
+\begin{verbatim}
+oscopy> oexec demo.oscopy
+\end{verbatim}
+
+\subsubsection{Integration with gschem}
+\label{sec:gschemint}
+To use gschem integration, add the following line to your gschemrc:
+\begin{verbatim}
+(load-from-path "oscopy.scm")
+\end{verbatim}
+On the next start of gschem, you should see the oscopy menu. Note that you should have done \texttt{./configure --prefix=''same prefix as gschem''} Then assuming you are in the oscopy directory: 
+\begin{itemize}
+\item     launch gschem
+\item    open demo/demo.sch
+\item    oscopy$> >$Launch oscopy
+\item    Follow the instruction in ``Using the GUI''.
+\item    Once the script finished to execute, go back to gschem and change the value of a component e.g. the capacitor C.
+\item    oscopy$> >$Update oscopy
+\item    once netlister and simulator ran, figures should have changed, e.g. figure 3 \texttt{vout} should have moved and \texttt{vo} not.
+\end{itemize}
+
+\subsection{IOscopy interfaces}
+IOscopy has three main interfaces:
+\begin{description}
+\item[The command line] which is used to enter commands
+\item[The Main Window] includes general file I/O, windows list and signal tree
+\item[The figures] when instantiated
+\end{description}
+The two former are specific to IOscopy while the latter is a specialisation of Oscopy Figure.
+The command line is an IPython application with customisation for Signal management.
+All IOscopy commands are implemented as magic functions.
+
+The Main Window and the figures form the IOscopy GUI and are implemented using GTK libraries.
+
+\subsection{Command line options}
+Command line options are reported in Tab.~\ref{tab:clio}.
+\begin{table}[htbp]
+  \centering\sf
+  \begin{tabular}{ll}
+    \hline
+   -b&	Execute an oscopy command file\\
+   -h&	Show this help message\\
+   -i&	Resume to command line executing after batch file\\
+   -q&	Disable banner printing\\
+   \hline
+  \end{tabular}
+  \caption{Command line options}
+  \label{tab:clio}
+\end{table}
+\subsection{IOscopy Commands}
 % TODO: Detailled description of ioscopy commands with an example for each one, assuming the demo/demo.oscopy script conditions
-This section describes the ioscopy commands. Unless otherwise noticed, examples assume that demo/demo.oscopy has been run.
+This section describes the IOscopy commands. Unless otherwise noticed, examples assume that \texttt{demo/demo.oscopy} has been run.
+
+\begin{landscape}
+  \begin{table}[htbp]
+    \centering\sf
+    \begin{tabular}{lll}
+      \hline
+      Command & Arguments & Description \\
+      \hline
+      oadd & SIG [, SIG [, SIG]...] &Add a graph to the current figure\\
+      ocontext& & Return the Context object used within ioscopy.\\
+      & &Use it only if you want to have direct access to internal ioscopy objects.\\
+      ocreate & [SIG [, SIG [, SIG]...] ]&Create a new figure, set it as current, add the signals\\
+      odelete & GRAPH\# &Delete a graph from the current figure\\
+      odestroy & FIG\# &Destroy a figure\\
+      oexec & FILENAME &execute commands from file\\
+      ofactors & X, Y &set the scaling factor of the graph (in power of ten)   use 'auto' for automatic scaling factor\\
+      & & e.g. factor -3, 6 set the scale factor at 1e-3 and 10e6\\
+      ofiglist & &Print the list of figures\\
+      ofreeze & SIG [, SIG [, SIG]...] &Do not consider signal for subsequent updates\\
+      ogui & & Show the GUI\\
+      oimport& SIG [, SIG [, SIG]...] & Import a list of signals into oscopy to handle dependencies during updates\\
+      oinsert & SIG [, SIG [, SIG]...] &Insert a list of signals into the current graph\\
+      olayout & horiz | vert | quad&Define the layout of the current figure\\
+      omode & MODE &Set the type of the current graph of the current figure\\
+      & &Available modes :\\
+      & & lin      Linear graph\\
+      orange & [x | y min max] | [xmin xmax ymin ymax] &Set the axis range of the current graph of the current figure\\
+      oread & DATAFILE &read signal file\\
+      orefresh &  FIG\# | on | off | current | all& Force/toggle autorefresh of current/\#/all figures on update\\
+      oremove & SIG [, SIG [, SIG]...] &Delete a list of signals into from current graph\\
+      oscale & [lin | logx | logy | loglog] &Set the axis scale\\
+      oselect & FIG\#-GRAPH\# &Select the current figure and the current graph\\
+      osiglist & &List loaded signals\\
+      ounfreeze & SIG [, SIG [, SIG]...] &Consider signal for subsequent updates\\
+      ounit & [XUNIT,] YUNIT &Set the unit to be displayed on graph axis\\
+      oupdate & &Reread data files\\
+      owrite & format [(OPTIONS)] FILE SIG [, SIG [, SIG]...] &Write signals to file\\
+      \hline
+    \end{tabular}
+    \caption{Summary of IOscopy commands}
+    \label{tab:cmds:summary}
+  \end{table}
+\end{landscape}
 
 \newcommand{\ocmd}[2]{{\large\vspace{5mm}\noindent\textbf{#1} #2\\}}
 
