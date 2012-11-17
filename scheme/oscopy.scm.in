@@ -2,7 +2,7 @@
 ;;
 ;; $Id$
 ;;
-;; Copyright (C) 2010 Arnaud Gardelein
+;; Copyright (C) 2010 - 2012 Arnaud Gardelein
 ;;
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 (define oscopy:oscopy-cmd
         (string-append "PATH=" oscopy:bindir ":$PATH "
                        "PYTHONPATH=" oscopy:pythonpath
-                       " oscopy_ui.py &"))
+                       " $COLORTERM -e 'sh ioscopy'"))
 
 (define oscopy:dbus-oscopy-is-running-cmd "dbus-send --print-reply --session --dest=org.freedesktop.Oscopy /org/freedesktop/Oscopy org.freedesktop.OscopyIFace.dbus_running")
 (define oscopy:dbus-oscopy-update-cmd "dbus-send --print-reply --session --dest=org.freedesktop.Oscopy /org/freedesktop/Oscopy org.freedesktop.OscopyIFace.dbus_update")
