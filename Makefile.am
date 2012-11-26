@@ -1,4 +1,4 @@
-mysubdirs = scheme src
+mysubdirs = scheme src po
 
 if CAN_BUILD_DOC
 SUBDIRS = $(mysubdirs) doc
