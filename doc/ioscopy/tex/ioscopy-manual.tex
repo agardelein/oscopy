@@ -528,7 +528,7 @@ The 'File' menu:
 \item[Quit] Exit ioscopy
 \end{description}
 
-The 'Windows' menu contains the list of the windows, and select one to show it.
+\noindent The 'Windows' menu contains the list of the windows, and select one to show it.
 
 % description des menus
 % description de la liste (+ freeze fichier entier ou signal par signal)
@@ -555,7 +555,12 @@ The 'Windows' menu contains the list of the windows, and select one to show it.
 
 \end{figure}
 
-
+\noindent Available mouse operations:
+\begin{description}
+\item[left] Select signal
+\item[double left] Insert signal in new Figure
+\item[right] Show 'Insert signal' menu
+\end{description}
 
 \subsection{The Figure windows}
 
@@ -575,7 +580,10 @@ Access to most of the ioscopy functionality is possible through this menu:
 \item Range settings (Figure~\ref{fig:range})
 \item Unit settings (Figure~\ref{fig:units})
 \item Scale (Figure~\ref{fig:scale})
-\item Insert Signal (Figure~\ref{fig:insert})
+% Insert Signal not available anymore as per commit 084a6d87:
+% the call to Context.create is delegated to UI. Furthermore, the Graph is
+% not anymore aware of Context's Signals.
+%\item Insert Signal (Figure~\ref{fig:insert})
 \item Remove Signal (Figure~\ref{fig:remove})
 \end{itemize}
 
@@ -588,12 +596,28 @@ For each Graph, cursors are available through keys (Figure~\ref{fig:cursors}):
 \end{itemize}
 The value of each cursor is displayed on the bottom part of the graph, and the difference when both cursors are activated.
 
+\noindent Available mouse operations:
+\begin{description}
+\item[left] In a graph and when 'span' is selected, define region for zooming
+\item[roll] In a graph, Zoom in / Zoom out
+%\item[double left] Insert signal in new Figure
+\item[right] Show 'Contextual signal' menu. Sensitive to position, e.g. Graph-related items are only available when mouse is over a Graph.
+\end{description}
+
+
 \subsubsection{The Operation Bar}
 
 This bar is used to set options for all the Graphs at the same time or for a particular Graph.
 The target Graph is selected through the top-most combo-box.
 \begin{description}
+\item[Master pan] When scroll bars are moved, move also all Graphs with same X unit than selected.
 \item[Zoom x10] When enabled, the graph range is expanded at a x10 scale, keeping the center of the view. When disabled, return to full range. E.g. if the initial range is [6 .. 11] and the data range is [0 .. 20], the x10 range will be [7.5 .. 9.5] and will be [0 .. 20] on disabling.
+\item[Span] When enabled, use mouse--left to zoom in a region of a Graph (Figure~\ref{fig:span}). Region selection is made upon the Figure layout configuration:
+  \begin{description}
+  \item[horizontal] Region is selected on X axis
+  \item[vertical] Region is selected on Y axis
+  \item[quad] Region is selected on both axis
+  \end{description}
 \end{description}
 
 \begin{figure}[htbp]
@@ -613,7 +637,7 @@ The target Graph is selected through the top-most combo-box.
     \label{fig:scale}
   \end{minipage}
 
-  \begin{minipage}{0.45\linewidth}
+  \begin{minipage}{0.95\linewidth}
     \includegraphics[scale=.5]{../png/ioscopy-insert.png}
     \caption{Insert signal menu}
     \label{fig:insert}
@@ -639,6 +663,13 @@ The target Graph is selected through the top-most combo-box.
   \caption{Figure with cursors set (after changing capacitance value of \texttt{demo.sch} and running netlister and simulator}
   \label{fig:cursors}
 
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[scale=.5]{../png/ioscopy-span.png}
+  \caption{Select region for zooming. Here with horizontal layout.}
+  \label{fig:span}
 \end{figure}
 
 \end{document}
