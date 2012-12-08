@@ -6,7 +6,7 @@
 GETTEXT_DOMAIN = 'oscopy'
 import gettext
 gettext.install(GETTEXT_DOMAIN, '@datarootdir@/locale', unicode=1)
-t = gettext.translation(GETTEXT_DOMAIN, '@datarootdir@/locale')
+t = gettext.translation(GETTEXT_DOMAIN, '@datarootdir@/locale', fallback=True)
 _ = t.ugettext
 
 import IPython
