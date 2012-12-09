@@ -52,5 +52,5 @@ reps={$REPS}
 argout=[reps.get(s, s) for s in "$*".split()]
 print " ".join(argout).replace(".f= ", ".f=")
 EOF`
-echo ///// $args +++++++++++++++++++++++
+#echo ///// $args +++++++++++++++++++++++
 $IPYTHON --profile=$IOSCOPY $args

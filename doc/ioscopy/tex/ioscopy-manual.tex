@@ -1,4 +1,4 @@
-\documentclass[a4paper,11pt]{article}
+\documentclass[a4paper,11pt]{report}
 
 \usepackage[english]{babel}
 \usepackage{a4wide}
@@ -8,6 +8,11 @@
 \usepackage{hyperref}
 \usepackage[sf]{titlesec}
 \usepackage{lscape}
+\usepackage{listings}
+\usepackage{fancybox}
+\usepackage{mdwlist}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
 
 \newcommand{\att}[1]{\texttt{#1}}
 \newcommand{\meth}[1]{\texttt{#1()}}
@@ -24,7 +29,7 @@
 \newcommand{\graph}{\cls{Graph}}
 \newcommand{\fig}{\cls{Figure}}
 \newcommand{\cursor}{\cls{Cursor}}
-\title{{\sc ioscopy}\\An interactive program for viewing electrical simulation results\\User Manual}
+\title{{\sc ioscopy}\\A viewer for plotting electrical simulation results\\User Manual}
 \author{Arnaud Gardelein}
 
 \hypersetup{
@@ -36,6 +41,15 @@ filecolor=black,
 menucolor=black,
 pagecolor=black,
 urlcolor=black,
+}
+
+% From mdwlist
+\renewenvironment{description}{%
+\begin{basedescript}{%
+\renewcommand{\makelabel}[1]{\bfseries##1}%
+}%
+}{%
+\end{basedescript}%
 }
 
 \begin{document}
@@ -62,7 +76,13 @@ This document covers the user interface and command description.
 % TODO: Update the abstract including short description of ioscopy and GUI
 \end{abstract}
 
-\section{Introduction}
+\lstset{basicstyle=\ttfamily,backgroundcolor=\color{gray!10},basewidth=0.5em,fontadjust=true}
+\pagestyle{fancy}
+\lhead{}
+\cfoot{}
+\rhead{\textsf{\leftmark}}
+\rfoot{\textsf\thepage}
+\chapter{Introduction}
 \label{sec:intro}
 % >       * create a central design document that lists all important
 % >         concepts/classes (Signal, Figure, ...) and explains interactions
@@ -72,7 +92,7 @@ This document covers the user interface and command description.
 % code just follows naturally.
 In the electrical system design workflow, viewing results from analog simulation or experi\-ment is not a trivial task: there exist numerous different program with even more different file formats, the user interface has to be friendly and functional, and the program should be memory efficient due to the number of data points per file that can quickly grow.
 
-\subsection{Rationale}
+\section{Rationale}
 The gEDA suite contains mainly all tools required to design electrical boards, from scheme drawings to PCB routing.
 There already exist several programs to view analog simulation results: gwave, GSpiceUI, dataplot.
 
@@ -95,7 +115,7 @@ In this purpose, it has features such as multiple plots, multiple windows, diffe
 It supports the gnucap file format for input and output, and has an update mechanism to reread data from files.
 New file formats and new graph types can be added by following the guidelines presented in this document.
 
-\subsection{Oscopy and IOscopy: the core and the app}
+\section{Oscopy and IOscopy: the core and the app}
 To enable reuse and make it flexible, Oscopy has two main components:
 \begin{description}
 \item[Oscopy] the core of it which gather all the framework API about file operations, signals management, figures and graph handling
@@ -107,23 +127,37 @@ As of today the term \textsl{Oscopy} means either Oscopy or IOscopy and when dif
 The framework API oscopy-core is described in oscopy-api.pdf that is usually installed at the same place of the this manual; typically \texttt{/usr/share/doc/oscopy}.
 The present document is only about the application IOscopy.
 
-\section{IOscopy: Oscopy on top of IPython}
+\section{Supported input data formats}
+Reading data files is performed using Oscopy. Supported formats are:
+\begin{description}
+\item[Gnucap] Text format from Gnucap
+\item[Cazm] Text format from CaZM
+\item[Nsout] NanoSim format from Synopsis; \textit{Independent variable assumed to be \texttt{Time}}
+\item[Spice2raw] Berkeley Spice2G6 raw format; \textit{Only one dataset per file, \texttt{Date} and \texttt{Time} fields not processed}
+\item[Spice3raw] Berkeley Spice3 format; \textit{\textbf{ascii} and \textbf{binary} formats supported, real and complex numbers supported. Only one simulation per file.}
+\item[Hspice] Hspice format; \textit{\textbf{ascii} and \textbf{binary} formats supported. Only one sweep per file. Auto signals are note returned, only probe signals are. Endianness is not managed in binary mode.}
+\item[Touchstone] Touchstone s2p and co. from IBIS Open Forum; \textit{Version 1 and 2.0 supported. for version 1 uses the file extension to determine the number of ports ('.snp' where n is 1-4). Noise parameter data is read and stored in self.info['noise\_param']. Mixed mode parameters of version 2.0 not supported.}
+\end{description}
 
-%\subsection{Purpose}
+\section{Supported output format}
+Writing data files is performed using Oscopy. Supported formats are:
+\begin{description}
+\item[gnucap] Text format from Gnucap
+\end{description}
+
+\section{Supported plots}
+Available Graphs are:
+\begin{description}
+\item[linear] Standard 2D plot with X and Y axis being either linear or logarithmic
+\end{description}
+
+
+\chapter{IOscopy: Oscopy on top of IPython}
+
+%\section{Purpose}
 % TODO: Why using ipython: CLI already there, oscopy as a python module, power of ipython behind, flexibility
-\subsection{First steps}
-\subsubsection{Build and install}
-The source can be downloaded from repo.cz: \href{http://repo.or.cz/w/oscopy.git}{http://repo.or.cz/w/oscopy.git}
-
-To download it:
-\begin{verbatim}
-$ git clone git://repo.or.cz/oscopy.git
-\end{verbatim}
-
-IOscopy shall be compiled and installed on the system:
-\begin{verbatim}
-$ ./autogen.sh && ./configure && make install
-\end{verbatim}
+\section{First steps}
+\subsection{Dependencies for install}
 Requested dependencies:
 \begin{itemize}
 \item    ipython
@@ -133,52 +167,65 @@ Requested dependencies:
 \item    python-xdg
 \item python-gtk (pygtk)
 \end{itemize}
+
+\subsection{Build and install}
+The source can be downloaded from repo.cz: \href{http://repo.or.cz/w/oscopy.git}{http://repo.or.cz/w/oscopy.git}
+
+To download it:
+\begin{lstlisting}
+$ git clone git://repo.or.cz/oscopy.git
+\end{lstlisting}
+
+IOscopy shall be compiled and installed on the system:
+\begin{lstlisting}
+$ ./autogen.sh && ./configure && make install
+\end{lstlisting}
 Once installed, \texttt{PYTHONPATH} might need some update, for example if you install it in \texttt{\$\{HOME\}/geda}, to launch oscopy you might need the following line:
-\begin{verbatim}
+\begin{lstlisting}
 PYTHONPATH=${HOME}/geda/lib/python2.X/site-packages:$PYTHONPATH
-\end{verbatim}
+\end{lstlisting}
 To use gschem integration, you will need to use the same \texttt{--prefix} that you used to install gschem. 
 
-\subsubsection{Getting Started}
+\subsection{Getting Started}
 To run the program, just do 
-\begin{verbatim}
+\begin{lstlisting}
 ioscopy
-\end{verbatim}
+\end{lstlisting}
 This assume that ioscopy is in your \texttt{PATH}.
 
 A sample circuit is provided for demonstration purposes. 
-\begin{verbatim}
+\begin{lstlisting}
 $ cd demo
 $ ioscopy
-\end{verbatim}
+\end{lstlisting}
 Just select ``File>Run Netlister and simulate...'' and fill in the window with the commands provided below: 
-\begin{verbatim}
-For netlister: gnetlist -g spice-sdb -s -o demo.net demo.sch
-For simulator: gnucap -b demo.net
-\end{verbatim}
+\begin{itemize}
+\item For netlister: \lstinline!gnetlist -g spice-sdb -s -o demo.net demo.sch!
+\item For simulator: \lstinline!gnucap -b demo.net!
+\end{itemize}
 then in the terminal window:
-\begin{verbatim}
+\begin{lstlisting}
 oscopy> oexec demo.oscopy
-\end{verbatim}
+\end{lstlisting}
 
-\subsubsection{Integration with gschem}
+\subsection{Integration with gschem}
 \label{sec:gschemint}
 To use gschem integration, add the following line to your gschemrc:
-\begin{verbatim}
+\begin{lstlisting}
 (load-from-path "oscopy.scm")
-\end{verbatim}
+\end{lstlisting}
 On the next start of gschem, you should see the oscopy menu. Note that you should have done \texttt{./configure --prefix=''same prefix as gschem''} Then assuming you are in the oscopy directory: 
 \begin{itemize}
 \item     launch gschem
 \item    open demo/demo.sch
 \item    oscopy$> >$Launch oscopy
-\item    Follow the instruction in ``Using the GUI''.
+\item    \lstinline!oscopy> oexec demo.oscopy!
 \item    Once the script finished to execute, go back to gschem and change the value of a component e.g. the capacitor C.
 \item    oscopy$> >$Update oscopy
 \item    once netlister and simulator ran, figures should have changed, e.g. figure 3 \texttt{vout} should have moved and \texttt{vo} not.
 \end{itemize}
 
-\subsection{IOscopy interfaces}
+\section{IOscopy interfaces}
 IOscopy has three main interfaces:
 \begin{description}
 \item[The command line] which is used to enter commands
@@ -191,7 +238,7 @@ All IOscopy commands are implemented as magic functions.
 
 The Main Window and the figures form the IOscopy GUI and are implemented using GTK libraries.
 
-\subsection{Command line options}
+\section{Command line options}
 Command line options are reported in Tab.~\ref{tab:clio}.
 \begin{table}[htbp]
   \centering\sf
@@ -206,69 +253,26 @@ Command line options are reported in Tab.~\ref{tab:clio}.
   \caption{Command line options}
   \label{tab:clio}
 \end{table}
-\subsection{IOscopy Commands}
+\section{IOscopy Commands Reference}
 % TODO: Detailled description of ioscopy commands with an example for each one, assuming the demo/demo.oscopy script conditions
 This section describes the IOscopy commands. Unless otherwise noticed, examples assume that \texttt{demo/demo.oscopy} has been run.
 
-\begin{landscape}
-  \begin{table}[htbp]
-    \centering\sf
-    \begin{tabular}{lll}
-      \hline
-      Command & Arguments & Description \\
-      \hline
-      oadd & SIG [, SIG [, SIG]...] &Add a graph to the current figure\\
-      ocontext& & Return the Context object used within ioscopy.\\
-      & &Use it only if you want to have direct access to internal ioscopy objects.\\
-      ocreate & [SIG [, SIG [, SIG]...] ]&Create a new figure, set it as current, add the signals\\
-      odelete & GRAPH\# &Delete a graph from the current figure\\
-      odestroy & FIG\# &Destroy a figure\\
-      oexec & FILENAME &execute commands from file\\
-      ofactors & X, Y &set the scaling factor of the graph (in power of ten)   use 'auto' for automatic scaling factor\\
-      & & e.g. factor -3, 6 set the scale factor at 1e-3 and 10e6\\
-      ofiglist & &Print the list of figures\\
-      ofreeze & SIG [, SIG [, SIG]...] &Do not consider signal for subsequent updates\\
-      ogui & & Show the GUI\\
-      oimport& SIG [, SIG [, SIG]...] & Import a list of signals into oscopy to handle dependencies during updates\\
-      oinsert & SIG [, SIG [, SIG]...] &Insert a list of signals into the current graph\\
-      olayout & horiz | vert | quad&Define the layout of the current figure\\
-      omode & MODE &Set the type of the current graph of the current figure\\
-      & &Available modes :\\
-      & & lin      Linear graph\\
-      orange & [x | y min max] | [xmin xmax ymin ymax] &Set the axis range of the current graph of the current figure\\
-      oread & DATAFILE &read signal file\\
-      orefresh &  FIG\# | on | off | current | all& Force/toggle autorefresh of current/\#/all figures on update\\
-      oremove & SIG [, SIG [, SIG]...] &Delete a list of signals into from current graph\\
-      oscale & [lin | logx | logy | loglog] &Set the axis scale\\
-      oselect & FIG\#-GRAPH\# &Select the current figure and the current graph\\
-      osiglist & &List loaded signals\\
-      ounfreeze & SIG [, SIG [, SIG]...] &Consider signal for subsequent updates\\
-      ounit & [XUNIT,] YUNIT &Set the unit to be displayed on graph axis\\
-      oupdate & &Reread data files\\
-      owrite & format [(OPTIONS)] FILE SIG [, SIG [, SIG]...] &Write signals to file\\
-      \hline
-    \end{tabular}
-    \caption{Summary of IOscopy commands}
-    \label{tab:cmds:summary}
-  \end{table}
-\end{landscape}
-
-\newcommand{\ocmd}[2]{{\large\vspace{5mm}\noindent\textbf{#1} #2\\}}
+\newcommand{\ocmd}[2]{\vspace{3eX}\noindent\fbox{\begin{minipage}{\linewidth}\large\noindent\textbf{#1} #2\end{minipage}}\vspace{1eX}}
 
 \ocmd{oadd}{SIG [, SIG [, SIG]...]}
    Add a graph to the current figure. Figure and graph are instanciated if not present.
 
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> oselect 1-1
    oscopy> oadd vgs
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{ocreate}{[SIG [, SIG [, SIG]...]]}
    Create a new figure, set it as current, add the signals in a first graph.
 
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> ocreate vgs,vds
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{ocontext}{\ }
    Return the Context object used within ioscopy.
@@ -277,38 +281,38 @@ This section describes the IOscopy commands. Unless otherwise noticed, examples 
 \ocmd{odelete}{GRAPH\#}
    Delete a graph from the current figure.
 
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> odelete 1
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{odestroy}{FIG\#}
    Destroy a figure
 
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> odestroy 3
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{oexec}{FILENAME}
    Execute commands from file.
 
    This following example assumes that demo/demo.oscopy has \textbf{not} been run.
 
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> oexec demo/demo.oscopy
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{ofactors}{X, Y}
    Set the scaling factor of the graph (in powers of ten). Use \texttt{auto} for automatic scaling factor.
 
 \noindent   The following example sets the scale factor at 1e-3 for X axis and 10e6 for Y axis
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> oselect 1-1
    oscopy> ofactor -3, 3
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{ofiglist}{\ }
    Print the list of figures. The layout of the figure is indicated, and the graph mode as well as the Signals are shown. The current figure and graph are marked with a star.
-\begin{verbatim}
+\begin{lstlisting}
    oscopy>ofiglist
      Figure 1: horiz
       Graph 1 : (linear) vgs
@@ -326,32 +330,32 @@ This section describes the IOscopy commands. Unless otherwise noticed, examples 
       Graph 3 : (linear) v1
    * Figure 5: horiz
        * Graph 1 : (linear) vs
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{ofreeze}{SIG [, SIG [, SIG]...]}
    Do not consider signal for subsequent updates. See also \textbf{ounfreeze}.
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> ofreeze vout,vds
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{ogui}{\ }
    Show the GUI window if it was closed.
 
 \ocmd{oimport}{SIG [, SIG [, SIG]...]}
    Import a list of signals into oscopy to handle dependencies during updates
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> pwr=iRD*vds
    oscopy> oimport pwr
    oscopy> ocreate pwr
    oscopy> oupdate  #if iRD or vds changed, pwr will be automatically updated
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{oinsert}{SIG [, SIG [, SIG]...]}
    Insert a list of signals into the current graph
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> oselect 1-1
    oscopy> oinsert vds
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{olayout}{horiz$|$vert$|$quad}
    Define the layout of the current figure
@@ -360,12 +364,12 @@ This section describes the IOscopy commands. Unless otherwise noticed, examples 
    \item[olayout vert] Graphs are side by side from left to right
    \item[olayout quad] One graph per figure corner
    \end{description}
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> oselect 2-1
    oscopy> olayout horiz
    oscopy> olayout vert
    oscopy> olayout quad
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{omode}{MODE}
    Set the type of the current graph of the current figure\\
@@ -382,18 +386,18 @@ This section describes the IOscopy commands. Unless otherwise noticed, examples 
    \item[orange xmin xmax ymin ymax] set both axis range
 %   \item[orange reset] set automatic range on both axis
    \end{description}
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> oselect 1-1
    oscopy> orange x 0 1
    oscopy> orange y -4 12
    oscopy> orange 0.5 0.6 -2 2
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{oread}{DATAFILE}
    Read signal file
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> oread demo/tran.dat
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{orefresh}{FIG\#$|$current$|$all$|$on$|$off}
    Force/toggle autorefresh of current/\#/all figures on update
@@ -405,17 +409,17 @@ This section describes the IOscopy commands. Unless otherwise noticed, examples 
    \item[orefresh off] turn off autorefresh on Signal updates
    \end{description}
 
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> orefresh 3
    oscopy> orefresh on
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{oremove}{SIG [, SIG [, SIG]...]}
    Delete a list of signals into from current graph
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> oselect oselect 2-3
    oscopy> oremove vds
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{oscale}{[lin$|$logx$|$logy$|$loglog]}
    Set the axis scale
@@ -426,21 +430,21 @@ This section describes the IOscopy commands. Unless otherwise noticed, examples 
    \item[oscale loglog] Set log scale on both axis
    \end{description}
 
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> oselect 3-1
    oscopy> oscale logx
    oscopy> oscale loglog
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{oselect}{FIG\#-GRAPH\#}
    Select the current figure and the current graph
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> oselect 2-1
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{osiglist}{\ }
    List loaded signals
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> siglist
    Name	Unit	Ref	Reader	Last updated (sec)
    vds	V	Time	demo/irf540.dat	128
@@ -453,13 +457,13 @@ This section describes the IOscopy commands. Unless otherwise noticed, examples 
    vs2	V	Time	vs2=sin((Time * 1000000.0))	121
    vo	V	Freq	vo=vout	121
    vsqufft		Frequency	vsqufft=fft(vsqu)	124
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{ounfreeze}{SIG [, SIG [, SIG]...]}
    Consider signal for subsequent updates. See also \textbf{ofreeze}
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> ounfreeze vout,vds
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{ounit}{[XUNIT,] YUNIT}
    Set the unit to be displayed on graph axis
@@ -468,30 +472,34 @@ This section describes the IOscopy commands. Unless otherwise noticed, examples 
    \item[ounit YUNIT] Set Y axis unit
    \end{description}
 
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> oselect 3-1
    oscopy> ounit W      # Set Y axis unit
    oscopy> ounit /s,W   # Set both axis unit
    oscopy> ounit Hz, V
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{oupdate}{\ }
    Reread data files.
 
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> oupdate
-\end{verbatim}
+\end{lstlisting}
 
 \ocmd{owrite}{format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]}
    Write signals to file.
+Options common to all formats are:
+\begin{description}
+\item[ow] If \texttt{True} or 1 overwrite existing file
+\end{description}
 
-   This example writes signals v1 and vsqu to the file \texttt{demo/res.dat} using format gnucap format,
+\noindent This example writes signals v1 and vsqu to the file \texttt{demo/res.dat} using format gnucap format,
    overwriting the file if it already exists.
-\begin{verbatim}
+\begin{lstlisting}
    oscopy> owrite gnucap (ow:1) demo/res.dat v1,vsqu
-\end{verbatim}
+\end{lstlisting}
 \newpage
-\section{Oscopy GUI}
+\chapter{Oscopy GUI}
 % TODO: Description of the GUI interface, main window, menus, contextual menus, buttons
 The Graphical User Interface of oscopy is composed of several windows (Figure \ref{fig:screenshot}):
 \begin{itemize}
@@ -508,7 +516,7 @@ The next paragraphs describe the two last types.
   \label{fig:screenshot}
 \end{figure}
 
-\subsection{The main window}
+\section{The main window}
 This is the first window that you will see when starting ioscopy.
 At anytime, it can be shown again by calling the command \texttt{ogui} from the terminal if closed.
 
@@ -562,7 +570,7 @@ The 'File' menu:
 \item[right] Show 'Insert signal' menu
 \end{description}
 
-\subsection{The Figure windows}
+\section{The Figure windows}
 
 % description de l'agencement de la fenêtre
 % description du menu contextuel et des sous-menus
@@ -605,7 +613,7 @@ The value of each cursor is displayed on the bottom part of the graph, and the d
 \end{description}
 
 
-\subsubsection{The Operation Bar}
+\subsection{The Operation Bar}
 
 This bar is used to set options for all the Graphs at the same time or for a particular Graph.
 The target Graph is selected through the top-most combo-box.
@@ -671,6 +679,52 @@ The target Graph is selected through the top-most combo-box.
   \caption{Select region for zooming. Here with horizontal layout.}
   \label{fig:span}
 \end{figure}
+
+\appendix
+\chapter{IOscopy commands quick reference guide}
+\begin{landscape}
+  \begin{table}[htbp]
+    \centering\sf
+    \begin{tabular}{lll}
+      \hline
+      Command & Arguments & Description \\
+      \hline
+      oadd & SIG [, SIG [, SIG]...] &Add a graph to the current figure\\
+      ocontext& & Return the Context object used within ioscopy.\\
+      & &Use it only if you want to have direct access to internal ioscopy objects.\\
+      ocreate & [SIG [, SIG [, SIG]...] ]&Create a new figure, set it as current, add the signals\\
+      odelete & GRAPH\# &Delete a graph from the current figure\\
+      odestroy & FIG\# &Destroy a figure\\
+      oexec & FILENAME &execute commands from file\\
+      ofactors & X, Y &set the scaling factor of the graph (in power of ten)   use 'auto' for automatic\\
+      & & scaling factor e.g. factor -3, 6 set the scale factor at 1e-3 and 10e6\\
+      ofiglist & &Print the list of figures\\
+      ofreeze & SIG [, SIG [, SIG]...] &Do not consider signal for subsequent updates\\
+      ogui & & Show the GUI\\
+      oimport& SIG [, SIG [, SIG]...] & Import a list of signals into oscopy to handle dependencies during updates\\
+      oinsert & SIG [, SIG [, SIG]...] &Insert a list of signals into the current graph\\
+      olayout & horiz | vert | quad&Define the layout of the current figure\\
+      omode & MODE &Set the type of the current graph of the current figure\\
+      & &Available modes :\\
+      & & lin      Linear graph\\
+      orange & [x | y min max] | [xmin xmax ymin ymax] &Set the axis range of the current graph of the current figure\\
+      oread & DATAFILE &read signal file\\
+      orefresh &  FIG\# | on | off | current | all& Force/toggle autorefresh of current/\#/all figures on update\\
+      oremove & SIG [, SIG [, SIG]...] &Delete a list of signals into from current graph\\
+      oscale & [lin | logx | logy | loglog] &Set the axis scale\\
+      oselect & FIG\#-GRAPH\# &Select the current figure and the current graph\\
+      osiglist & &List loaded signals\\
+      ounfreeze & SIG [, SIG [, SIG]...] &Consider signal for subsequent updates\\
+      ounit & [XUNIT,] YUNIT &Set the unit to be displayed on graph axis\\
+      oupdate & &Reread data files\\
+      owrite & format [(OPTIONS)] FILE SIG [, SIG [, SIG]...] &Write signals to file\\
+      \hline
+    \end{tabular}
+    \caption{Summary of IOscopy commands}
+    \label{tab:cmds:summary}
+  \end{table}
+\end{landscape}
+
 
 \end{document}
 
