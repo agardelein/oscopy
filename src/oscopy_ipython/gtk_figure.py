@@ -7,6 +7,7 @@ from math import log10, sqrt
 from matplotlib.backend_bases import LocationEvent
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
+from matplotlib.backends.backend_gtk import FileChooserDialog
 from matplotlib.widgets import SpanSelector, RectangleSelector
 from matplotlib.transforms import Bbox
 
@@ -164,6 +165,9 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         span_toggle_btn.connect('toggled', self.span_toggle_btn_toggled,
                                graphs_cbx, store)
 
+        save_fig_btn = gtk.Button(_('Export'))
+        save_fig_btn.connect('clicked', self.save_fig_btn_clicked)
+
         self._cbx = graphs_cbx
         self._btn = x10_toggle_btn
 
@@ -183,6 +187,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         vbar.connect('button-release-event', self.vadj_released)
         vbox2.pack_start(x10_toggle_btn, False, False)
         vbox2.pack_start(span_toggle_btn, False, False)
+        vbox2.pack_start(save_fig_btn, False, False)
 
         hbox1.pack_start(vbox2, False, False)
 
@@ -323,6 +328,22 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 elif hasattr(self.graphs[grnum - 1].span, 'visible'):
                     self.graphs[grnum - 1].span.visible = a
             self.canvas.draw()
+
+    def save_fig_btn_clicked(self, save_fig_btn):
+        fname, format = self.get_filechooser().get_filename_from_user()
+        if fname:
+            try:
+                self.canvas.print_figure(fname, format=format)
+            except Exception, e:
+                error_msg_gtk(str(e), parent=self)
+
+    def get_filechooser(self):
+        # From matplotlib/backends/backend_gtk.py
+        return FileChooserDialog(
+            title=_('Save the figure'),
+            parent=self.window,
+            filetypes=self.canvas.get_supported_filetypes(),
+            default_filetype=self.canvas.get_default_filetype())
 
     def _key_press(self, event):
         if event.inaxes is not None:
@@ -650,3 +671,21 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         self._vadjpreval = None
 
     layout = property(oscopy.Figure.get_layout, set_layout)
+
+def error_msg_gtk(msg, parent=None):
+    # From matplotlib/backends/backend_gtk.py
+    if parent is not None: # find the toplevel gtk.Window
+        parent = parent.get_toplevel()
+        if parent.flags() & gtk.TOPLEVEL == 0:
+            parent = None
+
+    if not is_string_like(msg):
+        msg = ','.join(map(str,msg))
+
+    dialog = gtk.MessageDialog(
+        parent         = parent,
+        type           = gtk.MESSAGE_ERROR,
+        buttons        = gtk.BUTTONS_OK,
+        message_format = msg)
+    dialog.run()
+    dialog.destroy()
