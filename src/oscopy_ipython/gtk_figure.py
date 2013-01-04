@@ -91,6 +91,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         canvas.mpl_connect('figure_enter_event', self._figure_enter)
         canvas.mpl_connect('figure_leave_event', self._figure_leave)
         canvas.mpl_connect('key_press_event', self._key_press)
+        canvas.mpl_connect('motion_notify_event', self._show_coords)
         self._draw_hid = canvas.mpl_connect('draw_event', self._update_scrollbars)
         w.connect('delete-event', lambda w, e: w.hide() or True)
         w.drag_dest_set(gtk.DEST_DEFAULT_MOTION |\
@@ -168,8 +169,15 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         save_fig_btn = gtk.Button(_('Export'))
         save_fig_btn.connect('clicked', self.save_fig_btn_clicked)
 
+        coords_lbl1 = gtk.Label('')
+        coords_lbl1.set_alignment(0.1, 0.5)
+        coords_lbl2 = gtk.Label('')
+        coords_lbl2.set_alignment(0.1, 0.5)
+
         self._cbx = graphs_cbx
         self._btn = x10_toggle_btn
+        self._coords_lbl1 = coords_lbl1
+        self._coords_lbl2 = coords_lbl2
 
         graphs_cbx.connect('changed', self.graphs_cbx_changed, x10_toggle_btn,
                            span_toggle_btn, store)
@@ -188,6 +196,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         vbox2.pack_start(x10_toggle_btn, False, False)
         vbox2.pack_start(span_toggle_btn, False, False)
         vbox2.pack_start(save_fig_btn, False, False)
+        vbox2.pack_end(coords_lbl1, False, False)
+        vbox2.pack_end(coords_lbl2, False, False)
 
         hbox1.pack_start(vbox2, False, False)
 
@@ -491,6 +501,22 @@ class IOscopy_GTK_Figure(oscopy.Figure):
     def _figure_leave(self, event):
 #        self._current_figure = None
         pass
+
+    def _show_coords(self, event):
+        a = event.inaxes
+        if a is not None:
+            x = '%.3f %s%s' % (event.xdata,
+                             oscopy.factors_to_names[a.scale_factors[0]][0],
+                             a.unit[0])
+            y = '%.3f %s%s' % (event.ydata,
+                             oscopy.factors_to_names[a.scale_factors[1]][0],
+                             a.unit[1])
+            self._coords_lbl1.set_text(x)
+            self._coords_lbl2.set_text(y)
+        else:
+            self._coords_lbl1.set_text('')
+            self._coords_lbl2.set_text('')
+            
 
     def _create_figure_popup_menu(self, figure, graph):
         figmenu = gui.menus.FigureMenu()
