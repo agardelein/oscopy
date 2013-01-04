@@ -6,7 +6,6 @@ import gui
 from math import log10, sqrt
 from matplotlib.backend_bases import LocationEvent
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
-from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 from matplotlib.backends.backend_gtk import FileChooserDialog
 from matplotlib.widgets import SpanSelector, RectangleSelector
 from matplotlib.transforms import Bbox
@@ -109,9 +108,6 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         hbox1.pack_start(vbar, False, False)
 
         vbox1.pack_start(canvas)
-
-        toolbar = NavigationToolbar(canvas, w)
-        vbox1.pack_start(toolbar, False, False)
 
         vbox2 = gtk.VBox() # The right-side menu
         store = gtk.ListStore(gobject.TYPE_STRING, # String displayed
