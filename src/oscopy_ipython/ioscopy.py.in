@@ -10,9 +10,9 @@ t = gettext.translation(GETTEXT_DOMAIN, '@datarootdir@/locale', fallback=True)
 _ = t.ugettext
 
 import IPython
-from IPython.lib.demo import IPythonLineDemo
 from IPython.config.configurable import Configurable
 from IPython.utils.traitlets import Bool, Unicode
+from IPython.utils.syspathcontext import prepended_to_syspath
 import time
 import os
 import gtk
@@ -119,7 +119,7 @@ def do_read(self, arg):
     Read signal file"""
     global _globals
 
-    fn = arg
+    fn = os.path.abspath(os.path.expanduser(arg))
     if fn in _ctxt.readers.keys():
         print _("%s already read, use update to reread it") % fn
         return
@@ -310,22 +310,36 @@ def do_siglist(self, args):
                                       reader_name,\
                                       str(int(t - reader.info['last_update']))))
 
-def do_exec(self, file):
+def do_exec(self, fname):
     """oexec FILENAME
     execute commands from file"""
+    # Inspired from IPython's InteractiveShellApp._execfile()
+    fname = os.path.abspath(os.path.expanduser(fname))
     try:
-        if not file.startswith('/'):
-            file = "/".join((os.getcwd(), file))
-        mydemo = IPythonLineDemo(file)
-        mydemo.show_all = False
-        while not mydemo.finished:
-            mydemo()
-    except IOError, e:
-        print _("Script error:"), e
-        if hasattr(self, "f") and hasattr(f, "close")\
-                and callable(f.close):
-            f.close()
-        print os.getcwd()
+        with open(fname) as thefile:
+            pass
+    except:
+        print _('Could not open file <%s> for execution.') % fname
+        return
+
+    # Find things also in current directory.  This is needed to mimic the
+    # behavior of running a script from the system command line, where
+    # Python inserts the script's directory into sys.path
+    dname = os.path.dirname(fname)
+    ip = get_ipython()
+    with prepended_to_syspath(dname):
+        try:
+            with open(fname) as thefile:
+                for line in thefile:
+                    r = line.split(None, 1)
+                    if r and ip.find_magic(r[0]):
+                        r = [r[0], r[1] if len(r) > 1 else '']
+                        ip.run_line_magic(r[0], r[1].strip())
+                    else:
+                        ip.ex(line)
+        except:
+            ip.showtraceback()
+            print _('Unknown failure executing file: <%s>') % fname
 
 def do_factors(self, args):
     """ofactors X, Y
