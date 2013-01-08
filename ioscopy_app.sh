@@ -12,10 +12,12 @@ REPS="'-b': '$IOCFG.b=True $IOCFG.f=',\
 '-q': '--no-banner --IOscopyConfig.quiet=True'"
 
 getprofd () {
-    profd=`$IPYTHON --quick --profile=$IOSCOPY --no-banner --quiet --no-confirm-exit --classic<< EOF| grep /
+    tmpf=tmpfile
+    profd=`$IPYTHON --quick --profile=$IOSCOPY --no-banner --quiet --no-confirm-exit --classic --HistoryManager.hist_file=$tmpf<< EOF| grep /
 ip=get_ipython()
 print "\n" + ip.profile_dir.location + "\n"
 EOF`;
+    rm $tmpf
 }
 
 $IPYTHON profile list --log-level=40 | grep $IOSCOPY > /dev/null
