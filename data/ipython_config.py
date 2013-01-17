@@ -188,7 +188,7 @@ c.TerminalIPythonApp.exec_files = ['@bindir@/ioscopy.py']
 
 # The part of the banner to be printed after the profile
 # c.TerminalInteractiveShell.banner2 = ''
-c.TerminalInteractiveShell.banner2 = """This is oscopy, a program to view electrical simulation results on top of IPython\nCopyright (C) 2008 - 2012 Arnaud Gardelein and others.\nThis is free software, you are invited to redistribute it \nunder certain conditions.\nThere is ABSOLUTELY NO WARRANTY; not even for MERCHANTIBILITY or\nFITNESS FOR A PARTICULAR PURPOSE."""
+c.TerminalInteractiveShell.banner2 = """This is oscopy, a program to view electrical simulation results on top of IPython\nCopyright (C) 2008 - 2012 Arnaud Gardelein and others.\nThis is free software, you are invited to redistribute it \nunder certain conditions.\nThere is ABSOLUTELY NO WARRANTY; not even for MERCHANTIBILITY or\nFITNESS FOR A PARTICULAR PURPOSE.\n"""
 # 
 # c.TerminalInteractiveShell.separate_out2 = ''
 
