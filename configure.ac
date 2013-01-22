@@ -8,7 +8,7 @@ dnl directory.
 # Set up configuration system
 #####################################################################
 
-AC_INIT([oscopy], [0.71.0-rc1], [arnaud@oscopy.org])
+AC_INIT([oscopy], [0.71.0-rc2], [arnaud@oscopy.org])
 AC_CONFIG_AUX_DIR([build-tools])
 AM_INIT_AUTOMAKE([-Wall foreign])
 
