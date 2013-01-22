@@ -42,6 +42,7 @@ AC_CONFIG_FILES([
 	doc/oscopy-api/tex/Makefile
 	doc/oscopy-api/pdf/Makefile
 	po/Makefile.in
+	data/Makefile
 ])
 
 #####################################################################

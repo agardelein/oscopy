@@ -1,4 +1,4 @@
-mysubdirs = scheme src po
+mysubdirs = scheme src po data
 
 if CAN_BUILD_DOC
 SUBDIRS = $(mysubdirs) doc
@@ -11,8 +11,6 @@ oscopydir = $(pkgpythondir)
 dist_doc_DATA = README
 
 dist_datadir = $(datarootdir)/oscopy
-
-dist_pkgdata_DATA = ipython_config.py
 
 docdir = $(datarootdir)/doc/oscopy
 
