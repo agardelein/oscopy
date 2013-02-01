@@ -20,6 +20,12 @@ EOF`;
     rm $tmpf
 }
 
+which $IPYTHON
+if [ $? -ne 0]; then
+    echo IPython not found
+    exit
+fi
+
 $IPYTHON profile list --log-level=40 | grep $IOSCOPY > /dev/null
 if [ $? -ne 0 ]; then
     echo IPython $IOSCOPY profile not found, creating it.
