@@ -20,17 +20,31 @@ EOF`;
     rm $tmpf
 }
 
-which $IPYTHON
+# Is IPython there ?
+which $IPYTHON > /dev/null
 if [ $? -ne 0 ]; then
     echo IPython not found
     exit
 fi
 
+# Validate version of IPython. Option name changed between 0.10 and 0.13.
+if [ `$IPYTHON --version | tr -d . | cut -c 1-3` -lt "013" ]; then
+    echo IPython > 0.13 needed to run IOscopy
+    exit
+elif [ `$IPYTHON --version | tr -d . | cut -c 1-3` -lt "013" ]; then
+    echo IPython > 0.13 needed to run IOscopy
+    exit
+fi
+
+# Now IPython version is validated, let's look for ioscopy profile
 $IPYTHON profile list --log-level=40 | grep $IOSCOPY > /dev/null
 if [ $? -ne 0 ]; then
     echo IPython $IOSCOPY profile not found, creating it.
     $IPYTHON profile create $IOSCOPY
     getprofd
+    if [ ! -d $profd  ]; then
+	mkdir -p $profd
+    fi
     cp @datarootdir@/oscopy/ipython_config.py $profd
 else
     getprofd
