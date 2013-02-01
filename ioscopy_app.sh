@@ -21,7 +21,7 @@ EOF`;
 }
 
 which $IPYTHON
-if [ $? -ne 0]; then
+if [ $? -ne 0 ]; then
     echo IPython not found
     exit
 fi
