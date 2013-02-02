@@ -60,6 +60,8 @@ AC_SUBST(can_build_documentation)
 AC_PATH_PROGS([M4], [gm4 m4], [m4])
 AM_PATH_PYTHON([2.5])
 
+AM_PATH_IPYTHON([0.13])
+
 #####################################################################
 # Check for libraries that use pkg-config
 #####################################################################
