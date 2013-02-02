@@ -28,11 +28,11 @@ if [ $? -ne 0 ]; then
 fi
 
 # Validate version of IPython. Option name changed between 0.10 and 0.13.
-if [ `$IPYTHON --version | tr -d . | cut -c 1-3` -lt "013" ]; then
-    echo IPython > 0.13 needed to run IOscopy
+if [ "0`$IPYTHON --version | tr -d . | cut -c 1-3`" -lt "0013" ]; then
+    echo IPython '>' 0.13 needed to run IOscopy
     exit
-elif [ `$IPYTHON --version | tr -d . | cut -c 1-3` -lt "013" ]; then
-    echo IPython > 0.13 needed to run IOscopy
+elif [ "0`$IPYTHON --Version | tr -d . | cut -c 1-3`" -lt "0013" ]; then
+    echo IPython '>' 0.13 needed to run IOscopy
     exit
 fi
 
