@@ -79,9 +79,9 @@ AC_DEFUN([AM_PATH_IPYTHON],
 
   dnl Query IPYTHON for its version number.
 
-  AC_CACHE_CHECK([for $am_display_IPYTHON version], [am_cv_IPYTHON_version],
-    [am_cv_IPYTHON_version=`$IPYTHON -c "import IPython,sys; sys.stdout.write(IPython.release.version)"`])
-  AC_SUBST([IPYTHON_VERSION], [$am_cv_IPYTHON_version])
+  AC_CACHE_CHECK([for $am_display_IPYTHON version], [am_cv_ipython_version],
+    [am_cv_ipython_version=`$IPYTHON -c "import IPython,sys; sys.stdout.write(IPython.release.version if hasattr(IPython, 'release') else IPython.Release.version)"`])
+  AC_SUBST([IPYTHON_VERSION], [$am_cv_ipython_version])
 
   dnl Use the values of $prefix and $exec_prefix for the corresponding
   dnl values of IPYTHON_PREFIX and IPYTHON_EXEC_PREFIX.  These are made
@@ -109,16 +109,16 @@ AC_DEFUN([AM_PATH_IPYTHON],
 # Run ACTION-IF-TRUE if the IPYTHON interpreter PROG has version >= VERSION.
 # Run ACTION-IF-FALSE otherwise.
 AC_DEFUN([AM_IPYTHON_CHECK_VERSION],
- [prog="import sys, IPython
-# split strings by '.' and convert to numeric.  Append some zeros
-# because we need at least 4 digits for the hex conversion.
-# map returns an iterator in IPYTHON 3.0 and a list in 2.x
-minver = list(map(int, '$2'.split('.'))) + [[0, 0, 0]]
-minverhex = 0
-ver = list(map(int, IPython.release.version.split('.'))) + [[0, 0, 0]]
-verhex = 0
-# xrange is not present in IPYTHON 3.0 and range returns an iterator
-for i in list(range(0, 4)): minverhex = (minverhex << 8) + minver[[i]]
-for i in list(range(0, 4)): verhex = (verhex << 8) + ver[[i]]
-sys.exit(verhex < minverhex)"
-  AS_IF([AM_RUN_LOG([$1 -c "$prog"])], [$3], [$4])])
+ [prog="import sys, IPython;minver = list(map(int, '$2'.split('.'))) + [[0, 0, 0]];ver = list(map(int, (IPython.release.version if hasattr(IPython, 'release') else IPython.Release.version).split('.'))) + [[0, 0, 0]];minverhex = sum([[minver[i]<<((4-i)*8) for i in range(0, 4)]]);verhex = sum([[ver[i]<<((4-i)*8) for i in range(0, 4)]]);sys.stdout.write('1' if verhex < minverhex else '0');"
+  AS_IF([AM_RUN_LOG_IPYTHON([$1 -c "$prog"])], [$3], [$4])])
+
+# AM_RUN_LOG_IPYTHON(COMMAND)
+# -------------------
+# Run COMMAND, save the output in ac_status, and log it.
+# (This has been adapted from Python's AM_RUN_LOG macro.)
+AC_DEFUN([AM_RUN_LOG_IPYTHON],
+[{ echo "$as_me:$LINENO: $1" >&AS_MESSAGE_LOG_FD
+#   ($1) >&AS_MESSAGE_LOG_FD 2>&AS_MESSAGE_LOG_FD
+   ac_status=`$*`
+   echo "$as_me:$LINENO: \$? = $ac_status" >&AS_MESSAGE_LOG_FD
+   (exit $ac_status); }])
