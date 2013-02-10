@@ -119,6 +119,11 @@ AC_DEFUN([AM_IPYTHON_CHECK_VERSION],
 AC_DEFUN([AM_RUN_LOG_IPYTHON],
 [{ echo "$as_me:$LINENO: $1" >&AS_MESSAGE_LOG_FD
 #   ($1) >&AS_MESSAGE_LOG_FD 2>&AS_MESSAGE_LOG_FD
-   ac_status=`$*`
-   echo "$as_me:$LINENO: \$? = $ac_status" >&AS_MESSAGE_LOG_FD
-   (exit $ac_status); }])
+   which $1
+   if test "$?" = 1; then
+      (exit 1);
+   else
+      ac_status=`$*`
+      echo "$as_me:$LINENO: \$? = $ac_status" >&AS_MESSAGE_LOG_FD
+      (exit $ac_status);
+   fi }])
