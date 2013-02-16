@@ -29,6 +29,8 @@
 # cause an error if the version of IPYTHON installed on the system
 # doesn't meet the requirement.  MINIMUM-VERSION should consist of
 # numbers and dots only.
+
+# check also matplotlib, numpy, dbus, xdg, gtk
 AC_DEFUN([AM_PATH_IPYTHON],
  [
   dnl Find a IPYTHON interpreter.
@@ -100,8 +102,6 @@ AC_DEFUN([AM_PATH_IPYTHON],
   dnl Run any user-specified action.
   $2
   fi
-
-
 ])
 
 # AM_IPYTHON_CHECK_VERSION(PROG, VERSION, [ACTION-IF-TRUE], [ACTION-IF-FALSE])
@@ -119,11 +119,15 @@ AC_DEFUN([AM_IPYTHON_CHECK_VERSION],
 AC_DEFUN([AM_RUN_LOG_IPYTHON],
 [{ echo "$as_me:$LINENO: $1" >&AS_MESSAGE_LOG_FD
 #   ($1) >&AS_MESSAGE_LOG_FD 2>&AS_MESSAGE_LOG_FD
-   which $1
+    # First check whether the program exists
+    # Probably /dev/null is not portable ouside linux systems...
+   which `echo $1 | cut -d ' ' -f 1` > /dev/null
    if test "$?" = 1; then
-      (exit 1);
+      ac_status=1
+      (exit $ac_status);
    else
       ac_status=`$*`
       echo "$as_me:$LINENO: \$? = $ac_status" >&AS_MESSAGE_LOG_FD
       (exit $ac_status);
-   fi }])
+   fi
+ }])
