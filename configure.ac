@@ -62,6 +62,7 @@ AM_PATH_PYTHON([2.5])
 
 AM_PATH_IPYTHON([0.13])
 AM_PATH_MATPLOTLIB([1.1])
+AM_PATH_NUMPY([1.6])
 
 #####################################################################
 # Check for libraries that use pkg-config
