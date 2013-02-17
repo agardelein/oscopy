@@ -1,6 +1,6 @@
-## ipython.m4 - Check for IPython version on a system. -*-Autoconf-*-
+## numpy.m4 - Check for numpy version on a system. -*-Autoconf-*-
 ## Copyright (C) 2013 Arnaud Gardelein.
-## Author: Arnaud Gardelein <arnaud@oscopy.org
+## Author: Arnaud Gardelein <arnaud@oscopy.org>
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 # doesn't meet the requirement.  MINIMUM-VERSION should consist of
 # numbers and dots only.
 
-AC_DEFUN([AM_PATH_NUMPY],
+AC_DEFUN([AM_CHECK_NUMPY],
  [
   AC_CACHE_CHECK([for Numpy version], [am_cv_numpy_version],
     [am_cv_numpy_version=`$IPYTHON -c "import numpy,sys; sys.stdout.write(numpy.version.version)"`])

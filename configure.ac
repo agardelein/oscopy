@@ -61,8 +61,8 @@ AC_PATH_PROGS([M4], [gm4 m4], [m4])
 AM_PATH_PYTHON([2.5])
 
 AM_PATH_IPYTHON([0.13])
-AM_PATH_MATPLOTLIB([1.1])
-AM_PATH_NUMPY([1.6])
+AM_CHECK_MATPLOTLIB([1.1])
+AM_CHECK_NUMPY([1.6])
 
 #####################################################################
 # Check for libraries that use pkg-config
@@ -72,6 +72,9 @@ PKG_PROG_PKG_CONFIG
 
 PKG_CHECK_MODULES(PYGTK, [pygtk-2.0 >= 2.10.0], ,
   AC_MSG_ERROR([PyGTK 2.10.0 or later is required.]))
+
+AC_MSG_CHECKING([for DBus-python])
+PKG_CHECK_EXISTS(dbus-python, [echo yes], [AC_MSG_ERROR([dbus-python is required.])])
 
 ###################################
 ### Internationalization

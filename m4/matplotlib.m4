@@ -1,6 +1,6 @@
-## ipython.m4 - Check for IPython version on a system. -*-Autoconf-*-
+## matplotlib.m4 - Check for Matplotlib version on a system. -*-Autoconf-*-
 ## Copyright (C) 2013 Arnaud Gardelein.
-## Author: Arnaud Gardelein <arnaud@oscopy.org
+## Author: Arnaud Gardelein <arnaud@oscopy.org>
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 # doesn't meet the requirement.  MINIMUM-VERSION should consist of
 # numbers and dots only.
 
-AC_DEFUN([AM_PATH_MATPLOTLIB],
+AC_DEFUN([AM_CHECK_MATPLOTLIB],
  [
   AC_CACHE_CHECK([for Matplotlib version], [am_cv_matplotlib_version],
     [am_cv_matplotlib_version=`$IPYTHON -c "import matplotlib,sys; sys.stdout.write(matplotlib.__version__)"`])

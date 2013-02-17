@@ -1,6 +1,6 @@
 ## ipython.m4 - Check for IPython version on a system. -*-Autoconf-*-
 ## Copyright (C) 2013 Arnaud Gardelein.
-## Author: Arnaud Gardelein <arnaud@oscopy.org
+## Author: Arnaud Gardelein <arnaud@oscopy.org>
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
