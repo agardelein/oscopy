@@ -109,7 +109,7 @@ AC_DEFUN([AM_PATH_IPYTHON],
 # Run ACTION-IF-TRUE if the IPYTHON interpreter PROG has version >= VERSION.
 # Run ACTION-IF-FALSE otherwise.
 AC_DEFUN([AM_IPYTHON_CHECK_VERSION],
- [prog="import sys, IPython;minver = list(map(int, '$2'.split('.'))) + [[0, 0, 0]];ver = list(map(int, (IPython.release.version if hasattr(IPython, 'release') else IPython.Release.version).split('.'))) + [[0, 0, 0]];minverhex = sum([[minver[i]<<((4-i)*8) for i in range(0, 4)]]);verhex = sum([[ver[i]<<((4-i)*8) for i in range(0, 4)]]);sys.stdout.write('1' if verhex < minverhex else '0');"
+ [prog="import sys, IPython;minver = list(map(int, '$2'.split('.'))) + [[0, 0, 0]];ver = list(map(int, (IPython.release.version if hasattr(IPython, 'release') else IPython.Release.version).split('.')[[0:3]])) + [[0, 0, 0]];minverhex = sum([[minver[i]<<((4-i)*8) for i in range(0, 4)]]);verhex = sum([[ver[i]<<((4-i)*8) for i in range(0, 4)]]);sys.stdout.write('1' if verhex < minverhex else '0');"
   AS_IF([AM_RUN_LOG_IPYTHON([$1 -c "$prog"])], [$3], [$4])])
 
 # AM_RUN_LOG_IPYTHON(COMMAND)
