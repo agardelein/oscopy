@@ -128,6 +128,10 @@ AC_DEFUN([AM_RUN_LOG_IPYTHON],
    else
       ac_status=`$*`
       echo "$as_me:$LINENO: \$? = $ac_status" >&AS_MESSAGE_LOG_FD
-      (exit $ac_status);
+      if test $ac_status = "1"; then
+      	 (exit 1);
+      else
+         (exit 0);
+      fi
    fi
  }])
