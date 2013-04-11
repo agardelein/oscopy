@@ -63,7 +63,7 @@ AM_PATH_PYTHON([2.5])
 AM_PATH_IPYTHON([0.13])
 AM_CHECK_MATPLOTLIB([1.1])
 AM_CHECK_NUMPY([1.6])
-
+AM_CHECK_DBUS_PYTHON([1.1])
 #####################################################################
 # Check for libraries that use pkg-config
 #####################################################################
