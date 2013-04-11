@@ -73,9 +73,6 @@ PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES(PYGTK, [pygtk-2.0 >= 2.10.0], ,
   AC_MSG_ERROR([PyGTK 2.10.0 or later is required.]))
 
-AC_MSG_CHECKING([for DBus-python])
-PKG_CHECK_EXISTS(dbus-python, [echo yes], [AC_MSG_ERROR([dbus-python is required.])])
-
 ###################################
 ### Internationalization
 ###################################
