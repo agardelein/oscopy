@@ -263,7 +263,7 @@ class App(dbus.service.Object):
         vbox.pack_start(sw)
 
         w = self._mainwindow = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        w.set_title(_('Oscopy GUI'))
+        w.set_title(_('IOscopy'))
         w.add(vbox)
         w.add_accel_group(accel_group)
         w.connect('destroy', lambda w, e: w.hide() or True)
