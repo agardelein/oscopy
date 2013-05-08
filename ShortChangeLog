@@ -1,6 +1,26 @@
+v0.71.0
+  * Update User Manual
+  * Update changelogs
+
+v0.71.0-rc2
+  * Bugfix: installation on Debian Sid, Fedora 18 and Ubuntu 12.10
+  * Check for dependencies during installation
+  * Rewrite script execution to prevent clutter
+  * Rewrite demo script to show 'update' feature
+  * Remove matplotlib toolbar
+
+v0.71.0-rc1
+  * Support for new input data format: spice2, spice3, touchstone, ...
+  * New zooming functions: mouse-wheel support, x10 mode, span
+  * Figure windows reworked: new operation bar, scrollbars for panning
+  * Command line options restored: batch mode, interactive, quiet
+  * Duplicate Signals are renamed on file reading
+  * Update of User Manual
+  * Now installation is needed to run oscopy
+
 v0.70.0
       * Update API documentation
-      * Update spanish translation 
+      * Update spanish translation
       * Add long ChangeLog
       * Bugfix: translation
 

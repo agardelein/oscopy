@@ -6,7 +6,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: oscopy 0.70.0-rc1\n"
+"Project-Id-Version: oscopy 0.71.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-05-05 12:42-0300\n"
 "PO-Revision-Date: 2012-05-04 21:20+0200\n"
