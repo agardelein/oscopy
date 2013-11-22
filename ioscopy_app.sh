@@ -1,9 +1,9 @@
 #!/bin/sh
 #-*-Shell-*-
 
-IPYTHON=ipython
+IPYTHON=ipython3
 IOSCOPY=ioscopy
-PYTHON=python
+PYTHON=python3
 IOCFG=--IOscopyConfig
 REPS="'-b': '$IOCFG.b=True $IOCFG.f=',\
 '-i': '$IOCFG.i=True',\
@@ -15,7 +15,7 @@ getprofd () {
     tmpf=tmpfile
     profd=`$IPYTHON --quick --profile=$IOSCOPY --no-banner --quiet --no-confirm-exit --classic --HistoryManager.hist_file=$tmpf<< EOF| grep /
 ip=get_ipython()
-print "\n" + ip.profile_dir.location + "\n"
+print("\n" + ip.profile_dir.location + "\n")
 EOF`;
     rm $tmpf
 }
@@ -28,12 +28,28 @@ if [ $? -ne 0 ]; then
     if [ ! -d $profd  ]; then
 	mkdir -p $profd
     fi
+    if [ a$profd = a ]; then
+	echo Profile directory not found.
+	exit
+    fi
     cp @datarootdir@/oscopy/ipython_config.py $profd
+    if [ $? -ne 0 ]; then
+	echo Unable to copy profile, see message above
+	exit
+    fi
 else
     getprofd
+    if [ a$profd = a ]; then
+	echo Profile directory not found.
+	exit
+    fi
     if [ ! -f "$profd/ipython_config.py" ]; then
 	echo IPython $IOSCOPY profile file not found, copying it.
 	cp @datarootdir@/oscopy/ipython_config.py $profd
+	if [ $? -ne 0 ]; then
+	    echo Unable to copy profile, see message above
+	    exit
+	fi
     elif [ "$profd/ipython_config.py" -ot "@datarootdir@/oscopy/ipython_config.py" ]; then
 	echo
 	upd=0
@@ -43,6 +59,10 @@ else
 	    echo Updating IPython $IOSCOPY profile.
 	    echo
 	    cp @datarootdir@/oscopy/ipython_config.py $profd
+	    if [ $? -ne 0 ]; then
+		echo Unable to copy profile, see message above
+		exit
+	    fi
 	else
 	    echo "skipping profile update."
 	    echo
