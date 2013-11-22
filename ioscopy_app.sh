@@ -75,7 +75,7 @@ fi
 args=`$PYTHON <<EOF
 reps={$REPS}
 argout=[reps.get(s, s) for s in "$*".split()]
-print " ".join(argout).replace(".f= ", ".f=")
+print (" ".join(argout).replace(".f= ", ".f="))
 EOF`
 #echo ///// $args +++++++++++++++++++++++
 $IPYTHON --profile=$IOSCOPY $args
