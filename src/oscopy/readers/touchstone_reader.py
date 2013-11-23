@@ -1,6 +1,7 @@
 from __future__ import with_statement
 
 import re
+import io
 from oscopy import Signal
 from reader import Reader, ReadError
 import struct, os
@@ -46,7 +47,7 @@ For more details, see http://www.eda.org/ibis/touchstone_ver2.0/touchstone_ver2_
         """
         self._check(fn)
         try:
-            f = open(fn)
+            f = io.open(fn, 'r')
         except IOError, e:
             return False
         while f:
@@ -87,7 +88,7 @@ For more details, see http://www.eda.org/ibis/touchstone_ver2.0/touchstone_ver2_
         """
         options = self._process_option('#')
         version = 1
-        with open(self._fn) as f:
+        with io.open(self._fn, 'r') as f:
             data_start = False
             while not data_start:
                 line = f.readline().strip()

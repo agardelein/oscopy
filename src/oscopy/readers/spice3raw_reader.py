@@ -1,6 +1,7 @@
 from __future__ import with_statement
 
 import re
+import io
 from oscopy import Signal
 from reader import Reader, ReadError
 import struct
@@ -43,7 +44,7 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
         self._check(fn)
         blocks = self._blocks
         nvar = 0
-        with open(fn) as f:
+        with io.open(fn, 'r') as f:
             lines = iter(f)
             if lines.next().startswith('Title') and lines.next().startswith('Date'):
                 return True
@@ -78,7 +79,7 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
         types = []
         names = []
         pos = 0 # Position of the data start
-        with open(self._fn) as f:
+        with io.open(self._fn, 'r') as f:
             for line in f:
                 pos = pos + len(line)
                 # Parse the file
@@ -155,20 +156,20 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
         nvars = int(self._info['No. Variables']) * (2 if is_complex else 1)
         n = int(self._info['No. Points']) # Data counter
 
-        with open(self._fn) as f:
+        with io.open(self._fn, 'rb') as f:
             # print pos, '(0x%04x)'% pos
             f.seek(pos)
             while f and n:
-                tmp = f.read(8 * nvars)
+                tmp = f.read(8 * nvars).decode()
                 if len(tmp) < 8 * nvars: break
                 values = struct.unpack('<%dd' % nvars, tmp)
                 n = n - 1
                 if is_complex:
                     for i, v in enumerate(values[::2]):
-                        append[i](complex(v, values[2*i+1]))
+                        append[i](complex(v.devode(), values[2*i+1].decode()))
                 else:
                     for i, v in enumerate(values):
-                        append[i](v)
+                        append[i](v.decode())
         return append
 
     def _read_ascii(self, pos, append):
@@ -192,7 +193,7 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
         nvars = int(self._info['No. Variables']) * (2 if is_complex else 1)
         n = int(self._info['No. Points']) # Data counter
 
-        with open(self._fn) as f:
+        with io.open(self._fn, 'r') as f:
             f.seek(pos)
             while f and n:
                 values = f.next()

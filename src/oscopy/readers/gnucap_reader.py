@@ -1,6 +1,7 @@
 from __future__ import with_statement
 
 import re
+import io
 from oscopy import Signal
 from reader import Reader
 
@@ -50,7 +51,7 @@ parenthesis stripped, e.g. v(gs) -> vgs or i(Rd) -> iRd.
         names = []
         signals = []
 
-        with open(self._fn) as f:
+        with io.open(self._fn, 'r') as f:
             lines = iter(f)
 
             # read signal names
@@ -116,7 +117,7 @@ parenthesis stripped, e.g. v(gs) -> vgs or i(Rd) -> iRd.
         """
         self._check(fn)
         try:
-            f = open(fn)
+            f = io.open(fn, 'r')
         except IOError, e:
             return False
         s = f.readline()

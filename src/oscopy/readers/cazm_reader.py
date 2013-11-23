@@ -1,6 +1,7 @@
 from __future__ import with_statement
 
 import re
+import io
 from oscopy import Signal
 from reader import Reader, ReadError
 
@@ -29,7 +30,7 @@ Afterwards follow the data in text format ordered by columns.
         """
         self._check(fn)
         try:
-            f = open(fn)
+            f = io.open(fn, 'r')
         except IOError, e:
             return False
         s = f.readline()
@@ -63,7 +64,7 @@ Afterwards follow the data in text format ordered by columns.
         names = []
         signals = []
 
-        with open(self._fn) as f:
+        with io.open(self._fn, 'r') as f:
             lines = iter(f)
 
             # read signal names

@@ -3,6 +3,7 @@ from __future__ import with_statement
 from oscopy import Signal
 from reader import Reader, ReadError
 import struct
+import io
 
 class Spice2rawReader(Reader):
     """ Read Berkeley Spice2G6 'raw' output files
@@ -29,7 +30,7 @@ class Spice2rawReader(Reader):
         """
         self._check(fn)
         try:
-            f = open(fn)
+            f = io.open(fn, 'r')
         except IOError, e:
             return False
         s = f.read(8)
@@ -58,20 +59,20 @@ class Spice2rawReader(Reader):
         """
         header_fields = ['signature', 'title', 'date', 'time',
                          'mode', 'nvars', 'const4']
-        with open(self._fn) as f:
+        with io.open(self._fn, 'rb') as f:
             # Header
-            signature = f.read(8)
-            title = f.read(80).strip('\x00')
+            signature = f.read(8).decode()
+            title = f.read(80).strip(b'\x00').decode()
             res = f.read(22)
             (date, t, mode, nvars, const4) = struct.unpack('<2d3h' ,res)
-            self._info.update(dict(zip(header_fields, (signature, title, date, t, mode, nvars, const4))))
+            self._info.update(dict(zip(header_fields, (signature, title, date.decode(), t.decode(), mode.decode(), nvars.decode(), const4.decode()))))
 
             names = []
             for i in xrange(nvars):
-                names.append(f.read(8).strip('#').strip('\x00'))
-            types = struct.unpack('<%dh' % nvars, f.read(2 * nvars))
-            locs = struct.unpack('<%dh' % nvars, f.read(2 * nvars))
-            self._info['plottitle'] = f.read(24).strip('\x00')
+                names.append(f.read(8).strip('#').strip(b'\x00').decode())
+            types = struct.unpack('<%dh' % nvars, f.read(2 * nvars).decode())
+            locs = struct.unpack('<%dh' % nvars, f.read(2 * nvars).decode())
+            self._info['plottitle'] = f.read(24).strip(b'\x00')
 
             # Now we can create the signals
             signals = []
@@ -84,11 +85,11 @@ class Spice2rawReader(Reader):
             # avoiding one dictionary lookup per line
             append = [x.append for x in data]
             while f:
-                tmp = f.read(8 * nvars)
+                tmp = f.read(8 * nvars).decode()
                 if len(tmp) < 8 * nvars: break
                 values = struct.unpack('<%dd' % nvars, tmp)
                 for i, v in enumerate(values):
-                    append[i](v)
+                    append[i](v.decode())
             
         ref = signals[0]
         ref.data = data[0]

@@ -1,6 +1,7 @@
 from __future__ import with_statement
 
 import re
+import io
 from oscopy import Signal
 from reader import Reader, ReadError
 
@@ -39,7 +40,7 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
         """
         self._check(fn)
         try:
-            f = open(fn)
+            f = io.open(fn, 'r')
         except IOError, e:
             return False
         s = f.readline()
@@ -77,7 +78,7 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
         Dict of Signals
         The list of Signals read from the file
         """
-        with open(self._fn) as f:
+        with io.open(self._fn, 'r') as f:
             lines = iter(f)
             signals = {}
 
