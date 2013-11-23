@@ -34,9 +34,9 @@
 AC_DEFUN([AM_CHECK_DBUS_PYTHON],
  [
   AC_CACHE_CHECK([for DBus-python version], [am_cv_dbus_python_version],
-    [am_cv_dbus_python_version=`$IPYTHON -c "import dbus,sys; sys.stdout.write('.'.join((str(x) for x in dbus.version)))"`])
+    [am_cv_dbus_python_version=`$IPYTHON3 --colors=NoColor -c "import dbus,sys; sys.stdout.write('.'.join((str(x) for x in dbus.version)))"`])
   AC_SUBST([DBUS_PYTHON_VERSION], [$am_cv_dbus_python_version])
-  AM_DBUS_PYTHON_CHECK_VERSION([$IPYTHON], [$1], [$2], [m4_default([$3], [AC_MSG_ERROR([DBus-python version > $1 needed])])])
+  AM_DBUS_PYTHON_CHECK_VERSION([$IPYTHON3], [$1], [$2], [m4_default([$3], [AC_MSG_ERROR([DBus-python version > $1 needed])])])
 ])
 
 # AM_DBUS_PYTHON_CHECK_VERSION(PROG, VERSION, [ACTION-IF-TRUE], [ACTION-IF-FALSE])
@@ -45,6 +45,6 @@ AC_DEFUN([AM_CHECK_DBUS_PYTHON],
 # Run ACTION-IF-FALSE otherwise.
 
 AC_DEFUN([AM_DBUS_PYTHON_CHECK_VERSION],
- [prog="import sys, dbus;minver = list(map(int, '$2'.split('.'))) + [[0, 0, 0]];ver = dbus.version + [[0, 0, 0]];minverhex = sum([[minver[i]<<((4-i)*8) for i in range(0, 4)]]);verhex = sum([[ver[i]<<((4-i)*8) for i in range(0, 4)]]);sys.stdout.write('1' if verhex < minverhex else '0');"
-  AS_IF([AM_RUN_LOG_IPYTHON([$1 -c "$prog"])], [$3], [$4])])
+ [prog="import sys, dbus;minver = list(map(int, '$2'.split('.'))) + [[0, 0, 0]];ver = list(dbus.version) + [[0, 0, 0]];minverhex = sum([[minver[i]<<((4-i)*8) for i in range(0, 4)]]);verhex = sum([[ver[i]<<((4-i)*8) for i in range(0, 4)]]);sys.stdout.write('1' if verhex < minverhex else '0');"
+  AS_IF([AM_RUN_LOG_IPYTHON3([$1 --colors=NoColor -c "$prog"])], [$3], [$4])])
 

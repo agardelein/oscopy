@@ -58,9 +58,9 @@ AC_SUBST(can_build_documentation)
 #####################################################################
 
 AC_PATH_PROGS([M4], [gm4 m4], [m4])
-AM_PATH_PYTHON([2.5])
+AM_PATH_PYTHON([3.3])
 
-AM_PATH_IPYTHON([0.13])
+AM_PATH_IPYTHON3([1.1])
 AM_CHECK_MATPLOTLIB([1.1])
 AM_CHECK_NUMPY([1.6])
 AM_CHECK_DBUS_PYTHON([1.1])

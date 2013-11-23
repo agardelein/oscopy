@@ -34,9 +34,9 @@
 AC_DEFUN([AM_CHECK_MATPLOTLIB],
  [
   AC_CACHE_CHECK([for Matplotlib version], [am_cv_matplotlib_version],
-    [am_cv_matplotlib_version=`$IPYTHON -c "import matplotlib,sys; sys.stdout.write(matplotlib.__version__)"`])
+    [am_cv_matplotlib_version=`$IPYTHON3 --colors=NoColor -c "import matplotlib,sys; sys.stdout.write(matplotlib.__version__)"`])
   AC_SUBST([MATPLOTLIB_VERSION], [$am_cv_matplotlib_version])
-  AM_MATPLOTLIB_CHECK_VERSION([$IPYTHON], [$1], [$2], [m4_default([$3], [AC_MSG_ERROR([Matplotlib version > $1 needed])])])
+  AM_MATPLOTLIB_CHECK_VERSION([$IPYTHON3], [$1], [$2], [m4_default([$3], [AC_MSG_ERROR([Matplotlib version > $1 needed])])])
 ])
 
 # AM_MATPLOTLIB_CHECK_VERSION(PROG, VERSION, [ACTION-IF-TRUE], [ACTION-IF-FALSE])
@@ -46,5 +46,5 @@ AC_DEFUN([AM_CHECK_MATPLOTLIB],
 
 AC_DEFUN([AM_MATPLOTLIB_CHECK_VERSION],
  [prog="import sys, matplotlib;minver = list(map(int, '$2'.split('.'))) + [[0, 0, 0]];ver = list(map(int, matplotlib.__version__[[0:3]].split('.'))) + [[0, 0, 0]];minverhex = sum([[minver[i]<<((4-i)*8) for i in range(0, 4)]]);verhex = sum([[ver[i]<<((4-i)*8) for i in range(0, 4)]]);sys.stdout.write('1' if verhex < minverhex else '0');"
-  AS_IF([AM_RUN_LOG_IPYTHON([$1 -c "$prog"])], [$3], [$4])])
+  AS_IF([AM_RUN_LOG_IPYTHON3([$1 --colors=NoColor -c "$prog"])], [$3], [$4])])
 
