@@ -5,9 +5,9 @@
 #from __future__ import with_statement
 GETTEXT_DOMAIN = 'oscopy'
 import gettext
-gettext.install(GETTEXT_DOMAIN, '@datarootdir@/locale', str=1)
-t = gettext.translation(GETTEXT_DOMAIN, '@datarootdir@/locale', fallback=True)
-_ = t.ugettext
+gettext.install(GETTEXT_DOMAIN, '@datarootdir@/locale')
+#t = gettext.translation(GETTEXT_DOMAIN, '@datarootdir@/locale', fallback=True)
+#_ = t.ugettext
 
 import IPython
 from IPython.config.configurable import Configurable

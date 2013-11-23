@@ -3,7 +3,7 @@
 
 import os.path
 import time
-import gobject
+from gi.repository import GObject
 from oscopy import Signal
 
 class ReadError(Exception):
@@ -46,7 +46,7 @@ methods:
         """
         return self._value
 
-class Reader(gobject.GObject):
+class Reader(GObject.GObject):
     """ Reader -- Provide common function for Signal files reading
 Derives from GObject.GObject
 The purpose of this class is to provide some basic functions to read the Signals
@@ -63,8 +63,8 @@ Signals
     end-transaction     Operation completed, Signals updated
     """
     __gsignals__ = {
-        'begin-transaction': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
-        'end-transaction': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ())
+        'begin-transaction': (GObject.SignalFlags.RUN_LAST, None, ()),
+        'end-transaction': (GObject.SignalFlags.RUN_LAST, None, ())
         }
 
     def __init__(self):
@@ -79,7 +79,7 @@ Signals
         Reader
         The object instanciated
         """
-        gobject.GObject.__init__(self)
+        GObject.GObject.__init__(self)
         self._fn = ""          # file name
         self._signals = {}     # Internal Signal list
         self._update_num = -1  # Update number

@@ -3,10 +3,10 @@ from .readers.reader import ReadError
 from .writers.detect_writer import DetectWriter
 from .writers.writer import WriteError
 from .figure import Figure
-import gobject
+from gi.repository import GObject
 import collections
 
-class Context(gobject.GObject):
+class Context(GObject.GObject):
     """ Class Context -- Interface between signals, files and figures
 
 This object is the interface between the signals, the files and the figures.
@@ -35,8 +35,8 @@ Abbreviations
    fn  : filename
    """
     __gsignals__ = {
-        'begin-transaction': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
-        'end-transaction': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ())
+        'begin-transaction': (GObject.SignalFlags.RUN_LAST, None, ()),
+        'end-transaction': (GObject.SignalFlags.RUN_LAST, None, ())
         }
 
     def __init__(self):
@@ -50,7 +50,7 @@ Abbreviations
         -------
         Object instanciated
         """
-        gobject.GObject.__init__(self)
+        GObject.GObject.__init__(self)
         self._readers = {}
         self._figures = []
         self._signals = {}

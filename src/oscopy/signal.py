@@ -1,9 +1,9 @@
 import operator
 import numpy
-import gobject
+from gi.repository import GObject
 
 # Signal class
-class Signal(gobject.GObject):
+class Signal(GObject.GObject):
     """ Signal class definition
 
 A Signal contains a list of data points, with an identifier, a reference (abscisse) and a string representing the unit of the data.
@@ -51,36 +51,36 @@ Class Signal -- Contains the signal points and other information
        to notify Listeners that they can recompute their own data
        """
     __gsignals__ = {
-        'changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
-        'recompute': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
-        'begin-transaction': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
-        'end-transaction': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ())
+        'changed': (GObject.SignalFlags.RUN_LAST, None, ()),
+        'recompute': (GObject.SignalFlags.RUN_LAST, None, ()),
+        'begin-transaction': (GObject.SignalFlags.RUN_LAST, None, ()),
+        'end-transaction': (GObject.SignalFlags.RUN_LAST, None, ())
         }
 
     __gproperties__ = {
-        'ref' : (gobject.TYPE_PYOBJECT,
+        'ref' : (GObject.TYPE_PYOBJECT,
                  'Reference signal',
                  'Abcisse of the signal',
-                 gobject.PARAM_READWRITE),
-        'data': (gobject.TYPE_PYOBJECT,
+                 GObject.PARAM_READWRITE),
+        'data': (GObject.TYPE_PYOBJECT,
                  'Signal data',
                  'Values of the signals',
-                 gobject.PARAM_READWRITE),
-        'freeze': (gobject.TYPE_BOOLEAN,
+                 GObject.PARAM_READWRITE),
+        'freeze': (GObject.TYPE_BOOLEAN,
                    'Freeze status',
                    'When True signal updates are disabled',
                    False,
-                   gobject.PARAM_READWRITE),
-        'name': (gobject.TYPE_STRING,
+                   GObject.PARAM_READWRITE),
+        'name': (GObject.TYPE_STRING,
                  'Signal nickname',
                  'Name displayed to the user',
                  '',
-                 gobject.PARAM_READABLE),
-        'unit': (gobject.TYPE_STRING,
+                 GObject.PARAM_READABLE),
+        'unit': (GObject.TYPE_STRING,
                  'Signal unit',
                  'Unit in which the data is expressed',
                  '',
-                 gobject.PARAM_READABLE)
+                 GObject.PARAM_READABLE)
         }
 
     __op_name = {
@@ -120,7 +120,7 @@ Class Signal -- Contains the signal points and other information
         <Signal[0x...] v1 / v1ref [V] data=[1, 3, 4, 8]>
 
         """
-        gobject.GObject.__init__(self)
+        GObject.GObject.__init__(self)
         if isinstance(value, Signal):
             self._data = value._data
             self._name = value._name

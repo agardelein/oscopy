@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 
-import gobject
-import gtk
+from gi.repository import GObject
+from gi.repository import Gtk
 import signal
 import os
 import sys
@@ -26,12 +26,12 @@ IOSCOPY_COL_TEXT = 0
 IOSCOPY_COL_X10 = 1
 IOSCOPY_COL_VIS = 2 # Text in graphs combobox visible
 
-# Note: for crosshair, see gtk.gdk.GC / function = gtk.gdk.XOR
+# Note: for crosshair, see Gdk.GC / function = Gdk.XOR
 
 def report_error(parent, msg):
-    dlg = gtk.MessageDialog(parent,
-                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                            gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, msg)
+    dlg = Gtk.MessageDialog(parent,
+                            Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                            Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, msg)
     dlg.set_title(parent.get_title())
     dlg.run()
     dlg.destroy()
@@ -72,9 +72,9 @@ class App(dbus.service.Object):
         self._cbx_stores = {}
 
         self._TARGET_TYPE_SIGNAL = 10354
-        self._from_signal_list = [("oscopy-signals", gtk.TARGET_SAME_APP,\
+        self._from_signal_list = [("oscopy-signals", Gtk.TargetFlags.SAME_APP,\
                                        self._TARGET_TYPE_SIGNAL)]
-        self._to_figure = [("oscopy-signals", gtk.TARGET_SAME_APP,\
+        self._to_figure = [("oscopy-signals", Gtk.TargetFlags.SAME_APP,\
                                 self._TARGET_TYPE_SIGNAL)]
         self._to_main_win = [("text/plain", 0,
                                 self._TARGET_TYPE_SIGNAL),
@@ -95,8 +95,8 @@ class App(dbus.service.Object):
         else:
             self._ctxt = ctxt        
             
-        self._store = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_PYOBJECT,
-                                    gobject.TYPE_BOOLEAN)
+        self._store = Gtk.TreeStore(GObject.TYPE_STRING, GObject.TYPE_PYOBJECT,
+                                    GObject.TYPE_BOOLEAN)
         self._create_widgets()
         #self._app_exec('read demo/irf540.dat')
         #self._app_exec('read demo/ac.dat')
@@ -114,12 +114,12 @@ class App(dbus.service.Object):
     # Actions
     #
     def _action_add_file(self, action):
-        dlg = gtk.FileChooserDialog(_('Add file(s)'), parent=self._mainwindow,
-                                    buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                             gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        dlg = Gtk.FileChooserDialog(_('Add file(s)'), parent=self._mainwindow,
+                                    buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                             Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         dlg.set_select_multiple(True)
         resp = dlg.run()
-        if resp == gtk.RESPONSE_ACCEPT:
+        if resp == Gtk.ResponseType.ACCEPT:
             for filename in dlg.get_filenames():
                 self._app_exec('oread ' + filename)
         dlg.destroy()
@@ -128,34 +128,34 @@ class App(dbus.service.Object):
         self._ctxt.update()
 
     def _action_new_math(self, action):
-        dlg = gtk.Dialog(_('New math signal'), parent=self._mainwindow,
-                         buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                  gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        dlg = Gtk.Dialog(_('New math signal'), parent=self._mainwindow,
+                         buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                  Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
 
         # Label and entry
-        hbox = gtk.HBox()
-        label = gtk.Label(_('Expression:'))
-        hbox.pack_start(label)
-        entry = gtk.Entry()
-        hbox.pack_start(entry)
-        dlg.vbox.pack_start(hbox)
+        hbox = Gtk.HBox()
+        label = Gtk.Label(label=_('Expression:'))
+        hbox.pack_start(label, True, True, 0)
+        entry = Gtk.Entry()
+        hbox.pack_start(entry, True, True, 0)
+        dlg.vbox.pack_start(hbox, True, True, 0)
 
         dlg.show_all()
         resp = dlg.run()
-        if resp == gtk.RESPONSE_ACCEPT:
+        if resp == Gtk.ResponseType.ACCEPT:
             expr = entry.get_text()
             self._app_exec('%s' % expr)
             self._app_exec('oimport %s' % expr.split('=')[0].strip())
         dlg.destroy()
 
     def _action_execute_script(self, action):
-        dlg = gtk.FileChooserDialog(_('Execute script'), parent=self._mainwindow,
-                                    buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                             gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        dlg = Gtk.FileChooserDialog(_('Execute script'), parent=self._mainwindow,
+                                    buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                             Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         resp = dlg.run()
         filename = dlg.get_filename()
         dlg.destroy()
-        if resp == gtk.RESPONSE_ACCEPT:
+        if resp == Gtk.ResponseType.ACCEPT:
             self._app_exec('oexec ' + filename)
 
     def _action_netlist_and_simulate(self, action):
@@ -178,11 +178,11 @@ class App(dbus.service.Object):
     def _action_quit(self, action):
         self._write_config()
         readline.write_history_file(self.hist_file)
-        gtk.main_quit()
+        Gtk.main_quit()
         sys.exit()
 
     def _action_figure(self, action, w, fignum):
-        if not (w.flags() & gtk.VISIBLE):
+        if not (w.flags() & Gtk.VISIBLE):
             w.show()
         else:
             w.window.show()
@@ -196,34 +196,34 @@ class App(dbus.service.Object):
         # (name, stock-id, label, accelerator, tooltip, callback)
         actions = [
             ('File', None, _('_File')),
-            ('Add file(s)...', gtk.STOCK_ADD, _('_Add file(s)...'), None, None,
+            ('Add file(s)...', Gtk.STOCK_ADD, _('_Add file(s)...'), None, None,
              self._action_add_file),
-            ('Update files', gtk.STOCK_REFRESH, _('_Update'), None, None,
+            ('Update files', Gtk.STOCK_REFRESH, _('_Update'), None, None,
              self._action_update),
-            ('Execute script...', gtk.STOCK_MEDIA_PLAY, _('_Execute script...'),
+            ('Execute script...', Gtk.STOCK_MEDIA_PLAY, _('_Execute script...'),
              None, None, self._action_execute_script),
-            ("New Math Signal...", gtk.STOCK_NEW, _('_New Math Signal'), None,
+            ("New Math Signal...", Gtk.STOCK_NEW, _('_New Math Signal'), None,
              None, self._action_new_math),
-            ("Run netlister and simulate...", gtk.STOCK_MEDIA_FORWARD,\
+            ("Run netlister and simulate...", Gtk.STOCK_MEDIA_FORWARD,\
                  _("_Run netlister and simulate..."), None, None,\
                  self._action_netlist_and_simulate),
             ('Windows', None, _('_Windows')),
-            ('Quit', gtk.STOCK_QUIT, _('_Quit'), None, None,
+            ('Quit', Gtk.STOCK_QUIT, _('_Quit'), None, None,
              self._action_quit),
             ]
 
-        actiongroup = self._actiongroup = gtk.ActionGroup('App')
+        actiongroup = self._actiongroup = Gtk.ActionGroup('App')
         actiongroup.add_actions(actions)
 
-        uimanager = self._uimanager = gtk.UIManager()
+        uimanager = self._uimanager = Gtk.UIManager()
         uimanager.add_ui_from_string(self.__ui)
         uimanager.insert_action_group(actiongroup, 0)
         return uimanager.get_accel_group(), uimanager.get_widget('/MenuBar')
 
     def _create_treeview(self):
-        celltext = gtk.CellRendererText()
-        col = gtk.TreeViewColumn(_('Signal'), celltext, text=0)
-        tv = gtk.TreeView()
+        celltext = Gtk.CellRendererText()
+        col = Gtk.TreeViewColumn(_('Signal'), celltext, text=0)
+        tv = Gtk.TreeView()
         col.set_cell_data_func(celltext, self._reader_name_in_bold)
         col.set_expand(True)
         tv.append_column(col)
@@ -231,16 +231,16 @@ class App(dbus.service.Object):
         tv.connect('row-activated', self._row_activated)
         tv.connect('drag_data_get', self._drag_data_get_cb)
         tv.connect('button-press-event', self._treeview_button_press)
-        tv.drag_source_set(gtk.gdk.BUTTON1_MASK,\
+        tv.drag_source_set(Gdk.ModifierType.BUTTON1_MASK,\
                                self._from_signal_list,\
-                               gtk.gdk.ACTION_COPY)
-        self._togglecell = gtk.CellRendererToggle()
+                               Gdk.DragAction.COPY)
+        self._togglecell = Gtk.CellRendererToggle()
         self._togglecell.set_property('activatable', True)
         self._togglecell.connect('toggled', self._cell_toggled, None)
-        colfreeze = gtk.TreeViewColumn(_('Freeze'), self._togglecell)
+        colfreeze = Gtk.TreeViewColumn(_('Freeze'), self._togglecell)
         colfreeze.add_attribute(self._togglecell, 'active', 2)
         tv.append_column(colfreeze)
-        tv.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        tv.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
         return tv
 
     def _reader_name_in_bold(self, column, cell, model, iter, data=None):
@@ -254,15 +254,15 @@ class App(dbus.service.Object):
         accel_group, self._menubar = self._create_menubar()
         self._treeview = self._create_treeview()
 
-        sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        sw = Gtk.ScrolledWindow()
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         sw.add(self._treeview)
 
-        vbox = gtk.VBox()
+        vbox = Gtk.VBox()
         vbox.pack_start(self._menubar, False)
-        vbox.pack_start(sw)
+        vbox.pack_start(sw, True, True, 0)
 
-        w = self._mainwindow = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        w = self._mainwindow = Gtk.Window(Gtk.WindowType.TOPLEVEL)
         w.set_title(_('IOscopy'))
         w.add(vbox)
         w.add_accel_group(accel_group)
@@ -270,10 +270,10 @@ class App(dbus.service.Object):
         w.connect('delete-event', lambda w, e: w.hide() or True)
         w.set_default_size(400, 300)
         w.show_all()
-        w.drag_dest_set(gtk.DEST_DEFAULT_MOTION |\
-                        gtk.DEST_DEFAULT_HIGHLIGHT |\
-                        gtk.DEST_DEFAULT_DROP,
-                        self._to_main_win, gtk.gdk.ACTION_COPY)
+        w.drag_dest_set(Gtk.DestDefaults.MOTION |\
+                        Gtk.DestDefaults.HIGHLIGHT |\
+                        Gtk.DestDefaults.DROP,
+                        self._to_main_win, Gdk.DragAction.COPY)
         w.connect('drag_data_received', self._drag_data_received_main_cb)
 
     def _create_figure_popup_menu(self, figure, graph):
@@ -571,7 +571,7 @@ class App(dbus.service.Object):
     # DBus routines
     @dbus.service.method('org.freedesktop.OscopyIFace')
     def dbus_update(self):
-        gobject.idle_add(self._activate_net_and_sim)
+        GObject.idle_add(self._activate_net_and_sim)
 
     @dbus.service.method('org.freedesktop.OscopyIFace')
     def dbus_running(self):
@@ -582,7 +582,7 @@ class App(dbus.service.Object):
         self._ctxt.update()
 
     def update_from_usr2(self):
-        gobject.idle_add(self._activate_net_and_sim)
+        GObject.idle_add(self._activate_net_and_sim)
 
     def _activate_net_and_sim(self):
         if self._actiongroup is not None:

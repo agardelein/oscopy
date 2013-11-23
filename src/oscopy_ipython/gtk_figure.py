@@ -1,7 +1,7 @@
 
 import oscopy
-import gtk
-import gobject
+from gi.repository import Gtk
+from gi.repository import GObject
 from . import gui
 from math import log10, sqrt
 from matplotlib.backend_bases import LocationEvent
@@ -70,17 +70,17 @@ class IOscopy_GTK_Figure(oscopy.Figure):
     def __init__(self, sigs={}, fig=None, title=''):
         oscopy.Figure.__init__(self, None, fig)
         self._TARGET_TYPE_SIGNAL = 10354
-        self._to_figure = [("oscopy-signals", gtk.TARGET_SAME_APP,\
+        self._to_figure = [("oscopy-signals", Gtk.TargetFlags.SAME_APP,\
                                 self._TARGET_TYPE_SIGNAL)]
         self._hadjpreval = None
         self._vadjpreval = None
 
-        w = gtk.Window()
+        w = Gtk.Window()
         w.set_title(title)
 
-        hbox1 = gtk.HBox() # The window
-        vbox1 = gtk.VBox() # The Graphs
-        hbox1.pack_start(vbox1)
+        hbox1 = Gtk.HBox() # The window
+        vbox1 = Gtk.VBox() # The Graphs
+        hbox1.pack_start(vbox1, True, True, 0)
         w.add(hbox1)
         canvas = FigureCanvas(self)
         canvas.mpl_connect('button_press_event', self._button_press)
@@ -93,39 +93,39 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         canvas.mpl_connect('motion_notify_event', self._show_coords)
         self._draw_hid = canvas.mpl_connect('draw_event', self._update_scrollbars)
         w.connect('delete-event', lambda w, e: w.hide() or True)
-        w.drag_dest_set(gtk.DEST_DEFAULT_MOTION |\
-                                 gtk.DEST_DEFAULT_HIGHLIGHT |\
-                                 gtk.DEST_DEFAULT_DROP,
-                             self._to_figure, gtk.gdk.ACTION_COPY)
+        w.drag_dest_set(Gtk.DestDefaults.MOTION |\
+                                 Gtk.DestDefaults.HIGHLIGHT |\
+                                 Gtk.DestDefaults.DROP,
+                             self._to_figure, Gdk.DragAction.COPY)
 
-        hbar = gtk.HScrollbar()
+        hbar = Gtk.HScrollbar()
         hbar.set_sensitive(False)
         self.hbar = hbar
         vbox1.pack_start(hbar, False, False)
-        vbar = gtk.VScrollbar()
+        vbar = Gtk.VScrollbar()
         vbar.set_sensitive(False)
         self.vbar = vbar
         hbox1.pack_start(vbar, False, False)
 
-        vbox1.pack_start(canvas)
+        vbox1.pack_start(canvas, True, True, 0)
 
-        vbox2 = gtk.VBox() # The right-side menu
-        store = gtk.ListStore(gobject.TYPE_STRING, # String displayed
-                              gobject.TYPE_BOOLEAN, # x10 mode status
-                              gobject.TYPE_BOOLEAN, # Combobox item sensitive
-                              gobject.TYPE_BOOLEAN, # Span mode status
-                              gobject.TYPE_PYOBJECT, # Horizontal Adjustment
-                              gobject.TYPE_PYOBJECT, # Vertical Adjustment
+        vbox2 = Gtk.VBox() # The right-side menu
+        store = Gtk.ListStore(GObject.TYPE_STRING, # String displayed
+                              GObject.TYPE_BOOLEAN, # x10 mode status
+                              GObject.TYPE_BOOLEAN, # Combobox item sensitive
+                              GObject.TYPE_BOOLEAN, # Span mode status
+                              GObject.TYPE_PYOBJECT, # Horizontal Adjustment
+                              GObject.TYPE_PYOBJECT, # Vertical Adjustment
                               )
-        iter = store.append([_('All Graphs'), False, True, False, gtk.Adjustment(), gtk.Adjustment()])
+        iter = store.append([_('All Graphs'), False, True, False, Gtk.Adjustment(), Gtk.Adjustment()])
         for i in range(4):
-            iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False, False, gtk.Adjustment(), gtk.Adjustment()])
+            iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False, False, Gtk.Adjustment(), Gtk.Adjustment()])
         self._cbx_store = store
         hbar.set_adjustment(store[0][IOSCOPY_COL_HADJ])
         vbar.set_adjustment(store[0][IOSCOPY_COL_VADJ])
 
-        graphs_cbx = gtk.ComboBox(store)
-        cell = gtk.CellRendererText()
+        graphs_cbx = Gtk.ComboBox(store)
+        cell = Gtk.CellRendererText()
         graphs_cbx.pack_start(cell, True)
         graphs_cbx.add_attribute(cell, 'text', IOSCOPY_COL_TEXT)
         graphs_cbx.add_attribute(cell, 'sensitive', IOSCOPY_COL_VIS)
@@ -133,15 +133,15 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         vbox2.pack_start(graphs_cbx, False, False)
 
         # master pan radiobuttons
-        label = gtk.Label('master pan')
+        label = Gtk.Label(label='master pan')
         vbox2.pack_start(label, False, False)
 
-        rbtns = [gtk.RadioButton(None, '%d' % (i + 1)) for i in range(4)]
-        rbtnbox = gtk.HBox()
+        rbtns = [Gtk.RadioButton(None, '%d' % (i + 1)) for i in range(4)]
+        rbtnbox = Gtk.HBox()
         for rb in rbtns[1:4]: rb.set_group(rbtns[0])
         for rb in rbtns:
             rb.set_sensitive(False)
-            rbtnbox.pack_start(rb)
+            rbtnbox.pack_start(rb, True, True, 0)
         # Cache the methods
         self._mpsel_get_act = [b.get_active for b in rbtns]
         self._mpsel_set_act = [b.set_active for b in rbtns]
@@ -150,24 +150,24 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             b.connect('toggled', self._update_scrollbars)
         vbox2.pack_start(rbtnbox, False, False)
 
-        vbox2.pack_start(gtk.HSeparator(), False, False)
+        vbox2.pack_start(Gtk.HSeparator(, True, True, 0), False, False)
 
-        x10_toggle_btn = gtk.ToggleButton('x10 mode')
+        x10_toggle_btn = Gtk.ToggleButton('x10 mode')
         x10_toggle_btn.set_mode(True)
         x10_toggle_btn.connect('toggled', self.x10_toggle_btn_toggled,
                                graphs_cbx, store)
 
-        span_toggle_btn = gtk.ToggleButton(_('Span'))
+        span_toggle_btn = Gtk.ToggleButton(_('Span'))
         span_toggle_btn.set_mode(True)
         span_toggle_btn.connect('toggled', self.span_toggle_btn_toggled,
                                graphs_cbx, store)
 
-        save_fig_btn = gtk.Button(_('Export'))
+        save_fig_btn = Gtk.Button(_('Export'))
         save_fig_btn.connect('clicked', self.save_fig_btn_clicked)
 
-        coords_lbl1 = gtk.Label('')
+        coords_lbl1 = Gtk.Label(label='')
         coords_lbl1.set_alignment(0.1, 0.5)
-        coords_lbl2 = gtk.Label('')
+        coords_lbl2 = Gtk.Label(label='')
         coords_lbl2.set_alignment(0.1, 0.5)
 
         self._cbx = graphs_cbx
@@ -344,7 +344,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 error_msg_gtk(str(e), parent=self)
 
     def get_filechooser(self):
-        # From matplotlib/backends/backend_gtk.py
+        # From matplotlib/backends/backend_Gtk.py
         return FileChooserDialog(
             title=_('Save the figure'),
             parent=self.window,
@@ -677,7 +677,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             return
         if widget == self.vbar and layout not in ['vert', 'quad']:
             return
-        if self._draw_hid is None and not event.state & gtk.gdk.BUTTON1_MASK:
+        if self._draw_hid is None and not event.get_state() & Gdk.ModifierType.BUTTON1_MASK:
             self._draw_hid = self.canvas.mpl_connect('draw_event', self._update_scrollbars)
 
     def hadj_pressed(self, widget, event):
@@ -695,19 +695,19 @@ class IOscopy_GTK_Figure(oscopy.Figure):
     layout = property(oscopy.Figure.get_layout, set_layout)
 
 def error_msg_gtk(msg, parent=None):
-    # From matplotlib/backends/backend_gtk.py
-    if parent is not None: # find the toplevel gtk.Window
+    # From matplotlib/backends/backend_Gtk.py
+    if parent is not None: # find the toplevel Gtk.Window
         parent = parent.get_toplevel()
-        if parent.flags() & gtk.TOPLEVEL == 0:
+        if parent.flags() & Gtk.TOPLEVEL == 0:
             parent = None
 
     if not is_string_like(msg):
         msg = ','.join(map(str,msg))
 
-    dialog = gtk.MessageDialog(
+    dialog = Gtk.MessageDialog(
         parent         = parent,
-        type           = gtk.MESSAGE_ERROR,
-        buttons        = gtk.BUTTONS_OK,
+        type           = Gtk.MessageType.ERROR,
+        buttons        = Gtk.ButtonsType.OK,
         message_format = msg)
     dialog.run()
     dialog.destroy()

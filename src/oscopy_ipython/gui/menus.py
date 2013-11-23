@@ -1,4 +1,4 @@
-import gtk
+from gi.repository import Gtk
 from . import dialogs
 from oscopy.graphs import factors_to_names, abbrevs_to_factors
 from oscopy import MAX_GRAPHS_PER_FIGURE
@@ -11,26 +11,26 @@ class FigureMenu(object):
     def create_menu(self, figure, graph):
         self._layout_to_str = {'horiz': _('Horizontal'), 'vert':_('Vertical'),\
                                    'quad':_('Quad')}
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
         self._create_figure_menu(menu, figure, graph)
-        sep = gtk.SeparatorMenuItem()
+        sep = Gtk.SeparatorMenuItem()
         menu.append(sep)
         self._create_graph_menu(menu, figure, graph)
 
         return menu
     
     def _create_figure_menu(self, menu, fig, graph):
-        item_add = gtk.MenuItem(_('Add graph'))
+        item_add = Gtk.MenuItem(_('Add graph'))
         item_add.connect('activate', self._add_graph_menu_item_activated,
                          (fig))
         item_add.set_sensitive(len(fig.graphs) < MAX_GRAPHS_PER_FIGURE)
         menu.append(item_add)
-        item_delete = gtk.MenuItem(_('Delete graph'))
+        item_delete = Gtk.MenuItem(_('Delete graph'))
         item_delete.connect('activate', self._delete_graph_menu_item_activated,
                             (fig, graph))
         item_delete.set_sensitive(graph is not None)
         menu.append(item_delete)
-        item_layout = gtk.MenuItem(_('Layout'))
+        item_layout = Gtk.MenuItem(_('Layout'))
         item_layout.set_submenu(self._create_layout_menu(fig))
         menu.append(item_layout)
         return menu
@@ -49,9 +49,9 @@ class FigureMenu(object):
                 figure.canvas.draw()
 
     def _create_layout_menu(self, fig):
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
         for layout in list(self._layout_to_str.keys()):
-            item = gtk.CheckMenuItem(self._layout_to_str[layout])
+            item = Gtk.CheckMenuItem(self._layout_to_str[layout])
             item.set_active(fig.layout == layout)
             item.connect('activate', self._layout_menu_item_activated,
                          (fig, layout))
@@ -76,22 +76,22 @@ class GraphMenu(object):
     def create_graph_menu(self, menu, figure, graph):
         self._scale_to_str = {'lin': _('Linear'), 'logx': _('LogX'), 'logy': _('LogY'),\
                                   'loglog': _('Loglog')}
-#        menu = gtk.Menu()
-        item_range = gtk.MenuItem(_('Range...'))
+#        menu = Gtk.Menu()
+        item_range = Gtk.MenuItem(_('Range...'))
         item_range.connect('activate', self._range_menu_item_activated,
                            (figure, graph))
         item_range.set_sensitive(graph is not None)
         menu.append(item_range)
-        item_units = gtk.MenuItem(_('Units...'))
+        item_units = Gtk.MenuItem(_('Units...'))
         item_units.connect('activate', self._units_menu_item_activated,
                            (figure, graph))
         item_units.set_sensitive(graph is not None)
         menu.append(item_units)
-        item_scale = gtk.MenuItem(_('Scale'))
+        item_scale = Gtk.MenuItem(_('Scale'))
         item_scale.set_submenu(self._create_scale_menu((figure, graph)))
         item_scale.set_sensitive(graph is not None)
         menu.append(item_scale)
-        item_remove = gtk.MenuItem(_('Remove signal'))
+        item_remove = Gtk.MenuItem(_('Remove signal'))
         item_remove.set_submenu(self._create_remove_signal_menu((figure, graph)))
         item_remove.set_sensitive(graph is not None)
         menu.append(item_remove)
@@ -151,9 +151,9 @@ class GraphMenu(object):
         figure, graph = data
         if graph is None:
             return
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
         for scale in list(self._scale_to_str.keys()):
-            item = gtk.CheckMenuItem(self._scale_to_str[scale])
+            item = Gtk.CheckMenuItem(self._scale_to_str[scale])
             item.set_active(graph.scale == scale)
             item.connect('activate', self._scale_menu_item_activated,
                          (figure, graph, scale))
@@ -162,13 +162,13 @@ class GraphMenu(object):
 
     def _create_remove_signal_menu(self, data):
         figure, graph = data
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
         if graph is None:
-            item_nograph = gtk.MenuItem(_('No graph selected'))
+            item_nograph = Gtk.MenuItem(_('No graph selected'))
             menu.append(item_nograph)
             return menu
         for name, signal in graph.signals.items():
-            item = gtk.MenuItem(name)
+            item = Gtk.MenuItem(name)
             item.connect('activate', self._remove_signal_menu_item_activated,
                          (figure, graph, {name: signal}))
             menu.append(item)
@@ -181,33 +181,33 @@ class TreeviewMenu:
 
     def make_menu(self, figures, signals):
         self._signals = signals
-        menu = gtk.Menu()
-        item = gtk.MenuItem(_('Insert Signal...'))
+        menu = Gtk.Menu()
+        item = Gtk.MenuItem(_('Insert Signal...'))
         item.set_submenu(self._make_figure_menu(figures))
         menu.append(item)
         return menu
 
     def _make_figure_menu(self, figures):
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
         for f in figures:
-            item = gtk.MenuItem(f.window.get_title())
+            item = Gtk.MenuItem(f.window.get_title())
             item.set_submenu(self._make_graph_menu(f))
             menu.append(item)
-        item = gtk.MenuItem(_('In new figure'))
+        item = Gtk.MenuItem(_('In new figure'))
         item.connect('activate', self._make_figure_menu_item_activated)
         menu.append(item)
         return menu
 
     def _make_graph_menu(self, figure):
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
         for i, g in enumerate(figure.graphs):
             name = _('Graph %d') % (i + 1)
-            item = gtk.MenuItem(name)
+            item = Gtk.MenuItem(name)
             item.connect('activate',
                          self._insert_signals_to_graph_menu_item_activated,
                          g, figure)
             menu.append(item)
-        item = gtk.MenuItem(_('In new graph'))
+        item = Gtk.MenuItem(_('In new graph'))
         item.connect('activate', self._add_graph_menu_item_activated, figure)
         item.set_sensitive(len(figure.graphs) < MAX_GRAPHS_PER_FIGURE)
         menu.append(item)
