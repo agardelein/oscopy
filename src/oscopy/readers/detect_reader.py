@@ -1,15 +1,15 @@
 """ Automagical detection of file type
 """
 import os.path
-from reader import ReadError
-from gnucap_reader import GnucapReader
-from signal_reader import SignalReader
-from cazm_reader import CazmReader
-from nsout_reader import NsoutReader
-from spice2raw_reader import Spice2rawReader
-from spice3raw_reader import Spice3rawReader
-from hspice_reader import HspiceReader
-from touchstone_reader import TouchstoneReader
+from .reader import ReadError
+from .gnucap_reader import GnucapReader
+from .signal_reader import SignalReader
+from .cazm_reader import CazmReader
+from .nsout_reader import NsoutReader
+from .spice2raw_reader import Spice2rawReader
+from .spice3raw_reader import Spice3rawReader
+from .hspice_reader import HspiceReader
+from .touchstone_reader import TouchstoneReader
 
 READERS = [SignalReader, GnucapReader, CazmReader, NsoutReader,
            Spice2rawReader, Spice3rawReader, HspiceReader,

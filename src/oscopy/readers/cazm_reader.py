@@ -1,9 +1,9 @@
-from __future__ import with_statement
+
 
 import re
 import io
 from oscopy import Signal
-from reader import Reader, ReadError
+from .reader import Reader, ReadError
 
 class CazmReader(Reader):
     """ Read CaZM output files
@@ -31,7 +31,7 @@ Afterwards follow the data in text format ordered by columns.
         self._check(fn)
         try:
             f = io.open(fn, 'r')
-        except IOError, e:
+        except IOError as e:
             return False
         s = f.readline()
         f.close()
@@ -70,10 +70,10 @@ Afterwards follow the data in text format ordered by columns.
             # read signal names
             if not lines.next().startswith(self._CAZM_ID_STRING):
                 raise ReadError('File is not CAZM format')
-            lines.next() # Blank line
-            self._info['Analysis type'] = lines.next()
+            next(lines) # Blank line
+            self._info['Analysis type'] = next(lines)
             
-            first_line = lines.next()
+            first_line = next(lines)
             for x in first_line.split():
                 name = x
                 names.append(name)
@@ -84,7 +84,7 @@ Afterwards follow the data in text format ordered by columns.
                 signals.append(Signal(name, unit))
 
             # read values
-            data = [[] for x in xrange(len(names))]
+            data = [[] for x in range(len(names))]
             # optimization: cache the append methods,
             # avoiding one dictionary lookup per line
             append = [x.append for x in data]
@@ -98,6 +98,6 @@ Afterwards follow the data in text format ordered by columns.
             s.ref = ref
             s.data = data[i + 1]
 
-        self._signals = dict(zip(names[1:], signals[1:]))
+        self._signals = dict(list(zip(names[1:], signals[1:])))
         return self._signals
         

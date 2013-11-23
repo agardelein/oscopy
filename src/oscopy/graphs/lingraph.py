@@ -1,4 +1,4 @@
-from graph import Graph
+from .graph import Graph
 
 class LinGraph(Graph):
     """ Class LinGraph -- Draw graph with linear scale on X and Y axis

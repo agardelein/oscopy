@@ -5,7 +5,7 @@
 #from __future__ import with_statement
 GETTEXT_DOMAIN = 'oscopy'
 import gettext
-gettext.install(GETTEXT_DOMAIN, '@datarootdir@/locale', unicode=1)
+gettext.install(GETTEXT_DOMAIN, '@datarootdir@/locale', str=1)
 t = gettext.translation(GETTEXT_DOMAIN, '@datarootdir@/locale', fallback=True)
 _ = t.ugettext
 
@@ -105,14 +105,14 @@ def do_figlist(self, args):
     SEPARATOR = " "
     for fn, f in enumerate(_ctxt.figures):
         if f is not None:
-            print _("%s Figure %d: %s") %\
+            print(_("%s Figure %d: %s") %\
                 ([" ", "*"][f == _current_figure],\
-                     fn + 1, f.layout)
+                     fn + 1, f.layout))
             for gn, g in enumerate(f.graphs):
-                print _("    %s Graph %d : (%s) %s") %\
+                print(_("    %s Graph %d : (%s) %s") %\
                     ([" ","*"][g == _current_graph],\
                          gn + 1, g.type,\
-                         SEPARATOR.join(g.signals.keys()))
+                         SEPARATOR.join(list(g.signals.keys()))))
 
 def do_read(self, arg):
     """oread DATAFILE
@@ -120,17 +120,17 @@ def do_read(self, arg):
     global _globals
 
     fn = os.path.abspath(os.path.expanduser(arg))
-    if fn in _ctxt.readers.keys():
-        print _("%s already read, use update to reread it") % fn
+    if fn in list(_ctxt.readers.keys()):
+        print(_("%s already read, use update to reread it") % fn)
         return
     try:
         sigs = _ctxt.read(fn)
         _gui.add_file(fn)
         _globals.update(sigs)
-    except ReadError, e:
-        print _('Failed to read %s:') % fn, e
+    except ReadError as e:
+        print(_('Failed to read %s:') % fn, e)
     except NotImplementedError:
-        print _("File format not supported")
+        print(_("File format not supported"))
 
 def do_write(self, args):
     """owrite format [(OPTIONS)] FILE SIG [, SIG [, SIG]...]
@@ -152,10 +152,10 @@ def do_write(self, args):
                 opts[tmp[0]] = tmp[1]
     try:
         _ctxt.write(fn, fmt, sns, opts)
-    except WriteError, e:
-        print _("Write error:"), e
+    except WriteError as e:
+        print(_("Write error:"), e)
     except NotImplementedError:
-        print _("File format not supported")
+        print(_("File format not supported"))
 
 def do_update(self, args):
     """oupdate
@@ -163,10 +163,10 @@ def do_update(self, args):
     if not args:
         _ctxt.update()
     else:
-        if _ctxt.readers.has_key(args):
+        if args in _ctxt.readers:
             _ctxt.update(_ctxt.readers[args])
         else:
-            print _("%s not found in readers") % args
+            print(_("%s not found in readers") % args)
     _gui.update_readers()
     do_refresh(self, '')
 
@@ -179,7 +179,7 @@ def do_add(self, args):
 
     if _current_figure is not None:
         if len(_current_figure.graphs) == MAX_GRAPHS_PER_FIGURE:
-            print _("Maximum graph number reached")
+            print(_("Maximum graph number reached"))
             return
         _current_figure.add(_ctxt.names_to_signals(\
                 get_signames(args)))
@@ -300,15 +300,15 @@ def do_siglist(self, args):
     List loaded signals"""
     SEPARATOR = "\t"
     HEADER=[_("Name"), _("Unit"), _("Ref"), _("Reader"),_("Last updated (sec)")]
-    print SEPARATOR.join(HEADER)
+    print(SEPARATOR.join(HEADER))
     t = time.time()
-    for reader_name, reader in _ctxt.readers.iteritems():
-        for signal_name, signal in reader.signals.iteritems():
-            print SEPARATOR.join((signal_name, \
+    for reader_name, reader in _ctxt.readers.items():
+        for signal_name, signal in reader.signals.items():
+            print(SEPARATOR.join((signal_name, \
                                       str(signal.unit),\
                                       signal.ref.name,\
                                       reader_name,\
-                                      str(int(t - reader.info['last_update']))))
+                                      str(int(t - reader.info['last_update'])))))
 
 def do_exec(self, fname):
     """oexec FILENAME
@@ -319,7 +319,7 @@ def do_exec(self, fname):
         with open(fname) as thefile:
             pass
     except:
-        print _('Could not open file <%s> for execution.') % fname
+        print(_('Could not open file <%s> for execution.') % fname)
         return
 
     # Find things also in current directory.  This is needed to mimic the
@@ -339,7 +339,7 @@ def do_exec(self, fname):
                         ip.ex(line)
         except:
             ip.showtraceback()
-            print _('Unknown failure executing file: <%s>') % fname
+            print(_('Unknown failure executing file: <%s>') % fname)
 
 def do_factors(self, args):
     """ofactors X, Y
@@ -391,7 +391,7 @@ def do_refresh(self, args):
         fignum = int(args) - 1
         if fignum >= 0 and fignum < len(_ctxt.figures):
             if _ctxt.figures[fignum].canvas is not None:
-                print _('refreshing')
+                print(_('refreshing'))
                 _ctxt.figures[fignum].canvas.draw()
 
 def do_gui(self, args):
@@ -412,11 +412,11 @@ def do_import(self, args):
         try:
             sig = _globals.get(name)
             sigs = _ctxt.import_signal(sig, name)
-            for s in sigs.itervalues():
+            for s in sigs.values():
                 _globals[s.name] = s
             _gui.add_file("%s=%s" % (name, sig.name))
-        except ReadError, e:
-            print _("Error: Signal not recognized (%s)") % e
+        except ReadError as e:
+            print(_("Error: Signal not recognized (%s)") % e)
             return
 #    _globals.update(sigs)
 
@@ -567,7 +567,7 @@ def init(ip):
                      'oupdate': do_update,
                      'owrite': do_write}
     
-    for name, func in oscopy_magics.iteritems():
+    for name, func in oscopy_magics.items():
             ip.define_magic(name, func)
 
 def set_ufuncs():
@@ -599,8 +599,8 @@ def update_current_figure_graph(figure=None, graph=None):
 try:
     session_bus = dbus.SessionBus()
     bus_name = dbus.service.BusName('org.freedesktop.Oscopy', bus=session_bus)
-except dbus.DBusException, e:
-    print 'DBus not available:', e
+except dbus.DBusException as e:
+    print('DBus not available:', e)
 
 ip = get_ipython()
 c = ip.config
@@ -612,13 +612,13 @@ set_ufuncs()
 # Process command line arguments
 if ioscopycfg.h:
     # Help message
-    print
+    print()
     msg=[]
-    for name, trait in ioscopycfg.traits().iteritems():
+    for name, trait in ioscopycfg.traits().items():
         if trait.get_metadata('help'):
             msg.append('   -%s\t%s' % (name, trait.get_metadata('help')))
     msg.sort()
-    print '\n'.join(msg)
+    print('\n'.join(msg))
     exit()
 if ioscopycfg.b:
     # Batch mode and interactive mode

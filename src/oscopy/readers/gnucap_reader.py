@@ -1,9 +1,9 @@
-from __future__ import with_statement
+
 
 import re
 import io
 from oscopy import Signal
-from reader import Reader
+from .reader import Reader
 
 class GnucapReader(Reader):
     """ Read gnucap output files
@@ -55,7 +55,7 @@ parenthesis stripped, e.g. v(gs) -> vgs or i(Rd) -> iRd.
             lines = iter(f)
 
             # read signal names
-            first_line = lines.next()
+            first_line = next(lines)
             for x in first_line.lstrip('#').split():
                 unit = self._unit_from_probe(x.split('(', 1)[0])
                 units.append(unit)
@@ -64,7 +64,7 @@ parenthesis stripped, e.g. v(gs) -> vgs or i(Rd) -> iRd.
                 signals.append(Signal(name, unit))
 
             # read values
-            data = [[] for x in xrange(len(names))]
+            data = [[] for x in range(len(names))]
             # optimization: cache the append methods,
             # avoiding one dictionary lookup per line
             append = [x.append for x in data]
@@ -78,7 +78,7 @@ parenthesis stripped, e.g. v(gs) -> vgs or i(Rd) -> iRd.
             s.ref = ref
             s.data = data[i + 1]
 
-        self._signals = dict(zip(names[1:], signals[1:]))
+        self._signals = dict(list(zip(names[1:], signals[1:])))
         return self._signals
 
     def _unit_from_probe(self, probe_name):
@@ -118,7 +118,7 @@ parenthesis stripped, e.g. v(gs) -> vgs or i(Rd) -> iRd.
         self._check(fn)
         try:
             f = io.open(fn, 'r')
-        except IOError, e:
+        except IOError as e:
             return False
         s = f.readline()
         f.close()

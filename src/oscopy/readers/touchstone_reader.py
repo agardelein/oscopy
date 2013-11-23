@@ -1,9 +1,9 @@
-from __future__ import with_statement
+
 
 import re
 import io
 from oscopy import Signal
-from reader import Reader, ReadError
+from .reader import Reader, ReadError
 import struct, os
 
 class TouchstoneReader(Reader):
@@ -48,7 +48,7 @@ For more details, see http://www.eda.org/ibis/touchstone_ver2.0/touchstone_ver2_
         self._check(fn)
         try:
             f = io.open(fn, 'r')
-        except IOError, e:
+        except IOError as e:
             return False
         while f:
             line = f.readline().strip()
@@ -136,11 +136,11 @@ For more details, see http://www.eda.org/ibis/touchstone_ver2.0/touchstone_ver2_
         opts = line.lstrip('#').upper().split()
         r_found = False
         for opt in opts:
-            if opt in self.FREQ_UNIT_VALUES.keys():
+            if opt in list(self.FREQ_UNIT_VALUES.keys()):
                 options['freq_mult'] = self.FREQ_UNIT_VALUES[opt]
             elif opt in self.PARAM_VALUES:
                 options['param'] = opt
-            elif opt in self.FORMAT_VALUES.keys():
+            elif opt in list(self.FORMAT_VALUES.keys()):
                 options['format'] = opt
             elif opt == 'R':
                 r_found = True
@@ -191,7 +191,7 @@ For more details, see http://www.eda.org/ibis/touchstone_ver2.0/touchstone_ver2_
 
         # Read data
         nparams = len(signals)
-        data = [[] for x in xrange(len(signals))]
+        data = [[] for x in range(len(signals))]
         append = [x.append for x in data]
         cpt = 0
         offset = 0
@@ -223,7 +223,7 @@ For more details, see http://www.eda.org/ibis/touchstone_ver2.0/touchstone_ver2_
         for i, s in enumerate(signals[1:]):
             s.ref = ref
             s.data = data[i + 1]
-        self._signals = dict(zip(names[1:], signals[1:]))
+        self._signals = dict(list(zip(names[1:], signals[1:])))
         
         self._info['noise_param'] = self._process_noise_param(noise_param, 1)
         return self._signals
@@ -285,7 +285,7 @@ For more details, see http://www.eda.org/ibis/touchstone_ver2.0/touchstone_ver2_
                     # used for reading
                     (ref, signals, names) = self._instanciate_signals(nports,
                                                                       options)
-                    data = [[] for x in xrange(len(signals))]
+                    data = [[] for x in range(len(signals))]
                     append = [x.append for x in data]
                     mxfmt = self._info.get('matrix format', 'full').lower()
                     row = 0
@@ -334,8 +334,8 @@ For more details, see http://www.eda.org/ibis/touchstone_ver2.0/touchstone_ver2_
                     self.info['reference'].append(float(x.strip()))
         if mxfmt in ['lower', 'upper']:
             # Expand matrices in case of 'upper' or 'lower'
-            for i in xrange(nports):
-                for j in xrange(nports):
+            for i in range(nports):
+                for j in range(nports):
                     if mxfmt == 'lower' and i < j:
                         data[i * nports * 2 + j * 2 + 1] = data[j * nports * 2 + i * 2 + 1]
                         data[i * nports * 2 + j * 2 + 2] = data[j * nports * 2 + i * 2 + 2]
@@ -349,7 +349,7 @@ For more details, see http://www.eda.org/ibis/touchstone_ver2.0/touchstone_ver2_
         for i, s in enumerate(signals[1:]):
             s.ref = ref
             s.data = data[i + 1]
-        self._signals = dict(zip(names[1:], signals[1:]))
+        self._signals = dict(list(zip(names[1:], signals[1:])))
 
         self._info['noise_param'] = self._process_noise_param(noise_param, 2)
         return self._signals
@@ -383,8 +383,8 @@ For more details, see http://www.eda.org/ibis/touchstone_ver2.0/touchstone_ver2_
         ref = Signal('Frequency', 'Hz')
         signals = [ref]
         names = [ref.name]
-        for p1 in xrange(nports):
-            for p2 in xrange(nports):
+        for p1 in range(nports):
+            for p2 in range(nports):
                 name = options['param'] + '%1d' % (p1 + 1) + '%1d' % (p2 + 1)
                 (unit_a, unit_b) = self.FORMAT_VALUES[options['format']]
                 signal_a = Signal(name + '_a', unit_a)
@@ -413,11 +413,11 @@ For more details, see http://www.eda.org/ibis/touchstone_ver2.0/touchstone_ver2_
         -------
         Nothing
         """
-        for i in xrange(nports):
-            for j in xrange(nports):
-                print names[i * nports * 2 + j * 2 + 1], names[i * nports * 2 + j * 2 + 2], 
-                print data[i * nports * 2 + j * 2 + 1], data[i * nports * 2 + j * 2 + 2],
-            print
+        for i in range(nports):
+            for j in range(nports):
+                print(names[i * nports * 2 + j * 2 + 1], names[i * nports * 2 + j * 2 + 2], end=' ') 
+                print(data[i * nports * 2 + j * 2 + 1], data[i * nports * 2 + j * 2 + 2], end=' ')
+            print()
                 
 
     def _process_noise_param(self, np, version):
@@ -451,10 +451,10 @@ For more details, see http://www.eda.org/ibis/touchstone_ver2.0/touchstone_ver2_
 
         sigs = [freq, minnf, reflcoefa, reflcoefb, effnr]
 
-        noise_param = [[] for x in xrange(5)]
+        noise_param = [[] for x in range(5)]
         append = [x.append for x in noise_param]
 
-        for p in xrange(len(np)):
+        for p in range(len(np)):
             for i, a in enumerate(append):
                 a(np[p][i])
 

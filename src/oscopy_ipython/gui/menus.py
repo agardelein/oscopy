@@ -1,5 +1,5 @@
 import gtk
-import dialogs
+from . import dialogs
 from oscopy.graphs import factors_to_names, abbrevs_to_factors
 from oscopy import MAX_GRAPHS_PER_FIGURE
 
@@ -50,7 +50,7 @@ class FigureMenu(object):
 
     def _create_layout_menu(self, fig):
         menu = gtk.Menu()
-        for layout in self._layout_to_str.keys():
+        for layout in list(self._layout_to_str.keys()):
             item = gtk.CheckMenuItem(self._layout_to_str[layout])
             item.set_active(fig.layout == layout)
             item.connect('activate', self._layout_menu_item_activated,
@@ -152,7 +152,7 @@ class GraphMenu(object):
         if graph is None:
             return
         menu = gtk.Menu()
-        for scale in self._scale_to_str.keys():
+        for scale in list(self._scale_to_str.keys()):
             item = gtk.CheckMenuItem(self._scale_to_str[scale])
             item.set_active(graph.scale == scale)
             item.connect('activate', self._scale_menu_item_activated,
@@ -167,7 +167,7 @@ class GraphMenu(object):
             item_nograph = gtk.MenuItem(_('No graph selected'))
             menu.append(item_nograph)
             return menu
-        for name, signal in graph.signals.iteritems():
+        for name, signal in graph.signals.items():
             item = gtk.MenuItem(name)
             item.connect('activate', self._remove_signal_menu_item_activated,
                          (figure, graph, {name: signal}))

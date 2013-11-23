@@ -1,1 +1,1 @@
-import menus
+from . import menus

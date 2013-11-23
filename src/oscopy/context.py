@@ -1,9 +1,10 @@
-from readers.detect_reader import DetectReader
-from readers.reader import ReadError
-from writers.detect_writer import DetectWriter
-from writers.writer import WriteError
-from figure import Figure
+from .readers.detect_reader import DetectReader
+from .readers.reader import ReadError
+from .writers.detect_writer import DetectWriter
+from .writers.writer import WriteError
+from .figure import Figure
 import gobject
+import collections
 
 class Context(gobject.GObject):
     """ Class Context -- Interface between signals, files and figures
@@ -132,7 +133,7 @@ Abbreviations
         When the file type is not managed by any Reader
         """
         # File already loaded ?
-        if fn in self._readers.keys():
+        if fn in list(self._readers.keys()):
             raise _("File already loaded, use update to read it again")
 
         r = DetectReader(fn)
@@ -143,14 +144,14 @@ Abbreviations
         self.connect('end-transaction', r.on_end_transaction)
 
         # Insert signals into the dict
-        for sn in sigs.keys():
-            if sn not in self._signals.keys():
+        for sn in list(sigs.keys()):
+            if sn not in list(self._signals.keys()):
                 self._signals[sn] = sigs[sn]
                 self._signal_name_to_reader[sn] = r
             else:
                 i = 0
                 newname = sn + '_%04d' % i
-                while newname in self._signals.keys():
+                while newname in list(self._signals.keys()):
                     i = i + 1
                     newname = sn + '_%04d' % i
                 newsig = r.rename_signal(sn, newname)
@@ -222,7 +223,7 @@ Abbreviations
             # Normal call create the new list etc etc
             self._update_num += 1
             if r is None:
-                for reader in self._readers.itervalues():
+                for reader in self._readers.values():
                     #                print "Updating signals from", reader
                     n.update(self.update(reader, self._update_num))
             else:
@@ -230,7 +231,7 @@ Abbreviations
             self.emit('end-transaction')
         else:
             # First look at its dependencies
-            if hasattr(r, "get_depends") and callable(r.get_depends):
+            if hasattr(r, "get_depends") and isinstance(r.get_depends, collections.Callable):
                 for sn in r.get_depends():
 #                    print " Updating signals from", self._signal_name_to_reader[sn]
                     n.update(self.update(self._signal_name_to_reader[sn], self._update_num))
@@ -242,7 +243,7 @@ Abbreviations
 
         # Find deleted signals
         d = []
-        for sn, s in self._signals.iteritems():
+        for sn, s in self._signals.items():
             #n.update(s.update(self._update_num, False))
             if s.data is None:
                 d.append(sn)
@@ -271,7 +272,7 @@ Abbreviations
         Nothing
         """
         sigs = self.names_to_signals(sns)
-        for s in sigs.itervalues():
+        for s in sigs.values():
             s.freeze = True
 
     def unfreeze(self, sns):
@@ -287,7 +288,7 @@ Abbreviations
         Nothing
         """
         sigs = self.names_to_signals(sns)
-        for s in sigs.itervalues():
+        for s in sigs.values():
             s.freeze = False
 
     @property
@@ -332,7 +333,7 @@ Abbreviations
         """
         r = DetectReader(sig)
         ss = r.read((sig, name))
-        for sn, s in ss.iteritems():
+        for sn, s in ss.items():
             self._signals[sn] = s
             self._signal_name_to_reader[sn] = r
             
@@ -361,7 +362,7 @@ Abbreviations
 
         # Prepare the signal list
         for sn in sns:
-            if sn in self._signals.keys():
+            if sn in list(self._signals.keys()):
                 sigs[sn] = self._signals[sn]
             else:
 #                print sn + ": Not here"

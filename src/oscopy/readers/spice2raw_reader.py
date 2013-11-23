@@ -1,7 +1,7 @@
-from __future__ import with_statement
+
 
 from oscopy import Signal
-from reader import Reader, ReadError
+from .reader import Reader, ReadError
 import struct
 import io
 
@@ -31,7 +31,7 @@ class Spice2rawReader(Reader):
         self._check(fn)
         try:
             f = io.open(fn, 'r')
-        except IOError, e:
+        except IOError as e:
             return False
         s = f.read(8)
         f.close()
@@ -65,10 +65,10 @@ class Spice2rawReader(Reader):
             title = f.read(80).strip(b'\x00').decode()
             res = f.read(22)
             (date, t, mode, nvars, const4) = struct.unpack('<2d3h' ,res)
-            self._info.update(dict(zip(header_fields, (signature, title, date.decode(), t.decode(), mode.decode(), nvars.decode(), const4.decode()))))
+            self._info.update(dict(list(zip(header_fields, (signature, title, date.decode(), t.decode(), mode.decode(), nvars.decode(), const4.decode())))))
 
             names = []
-            for i in xrange(nvars):
+            for i in range(nvars):
                 names.append(f.read(8).strip('#').strip(b'\x00').decode())
             types = struct.unpack('<%dh' % nvars, f.read(2 * nvars).decode())
             locs = struct.unpack('<%dh' % nvars, f.read(2 * nvars).decode())
@@ -76,11 +76,11 @@ class Spice2rawReader(Reader):
 
             # Now we can create the signals
             signals = []
-            for i in xrange(nvars):
+            for i in range(nvars):
                 signals.append(Signal(names[i],
                                       self._types_to_unit.get(types[i], 'a.u.')))          
             # Data
-            data = [[] for x in xrange(len(names))]
+            data = [[] for x in range(len(names))]
             # optimization: cache the append methods,
             # avoiding one dictionary lookup per line
             append = [x.append for x in data]
@@ -97,8 +97,8 @@ class Spice2rawReader(Reader):
             s.ref = ref
             s.data = data[i + 1]
 
-        self._signals = dict(zip(names[1:], signals[1:]))
-        print self._signals
+        self._signals = dict(list(zip(names[1:], signals[1:])))
+        print(self._signals)
         return self._signals
 
             

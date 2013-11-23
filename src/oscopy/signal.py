@@ -360,7 +360,7 @@ Class Signal -- Contains the signal points and other information
         elif property.name == 'unit':
             return self._unit
         else:
-            raise AttributeError, _('unknown property %s') % property.name
+            raise AttributeError(_('unknown property %s') % property.name)
 
     def do_set_property(self, property, value):
         """ GObject method
@@ -392,7 +392,7 @@ Class Signal -- Contains the signal points and other information
         elif property.name == 'unit':
             self._unit = value
         else:
-            raise AttributeError, _('unknown property %s') % property.name
+            raise AttributeError(_('unknown property %s') % property.name)
 
     ref = property(get_ref, set_ref)
     data = property(get_data, set_data)

@@ -1,6 +1,6 @@
 import time
 
-from reader import Reader, ReadError
+from .reader import Reader, ReadError
 from oscopy import Signal
 
 class SignalReader(Reader):
@@ -51,7 +51,7 @@ class SignalReader(Reader):
         self._info['file'] = self._fn
         self._info['last_update'] = time.time()
         sigs = self._read_signals()
-        for s in sigs.itervalues():
+        for s in sigs.values():
             self._sig.connect('changed', s.on_changed, self._sig)
             s.connect('recompute', s.on_recompute, (None, s, self._sig))
             self.connect('begin-transaction', s.on_begin_transaction)

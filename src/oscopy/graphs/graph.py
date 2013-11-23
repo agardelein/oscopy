@@ -1,7 +1,7 @@
 from matplotlib.pyplot import Axes as mplAxes
 from matplotlib.widgets import SpanSelector, RectangleSelector
 from matplotlib import rc
-from cursor import Cursor
+from .cursor import Cursor
 
 factors_to_names = {-18: ("a", 'atto'), -15:("f", 'femto'),
                  -12:("p", 'pico'), -9:("n", 'nano'),
@@ -111,7 +111,7 @@ Abbreviations
         A string representation of the Graph
         """
         a = "(" + self.type + ") "
-        for sn in self._sigs.keys():
+        for sn in list(self._sigs.keys()):
             a = a + sn + " "
         return a
 
@@ -133,7 +133,7 @@ Abbreviations
         List of Signals that where not inserted
         """
         rejected = {}
-        for sn, s in sigs.iteritems():
+        for sn, s in sigs.items():
             if not self._sigs:
                 # First signal, set_ the abscisse name and add signal
                 self._xaxis = s.ref.name
@@ -153,7 +153,7 @@ Abbreviations
                 self.legend()
             else:
                 if s.ref.name == self._xaxis and s.unit == self._yunit and\
-                        not self._sigs.has_key(s.name):
+                        s.name not in self._sigs:
                     # Add signal
                     self._sigs[sn] = s
                     fx, l = self._find_scale_factor("X")
@@ -181,8 +181,8 @@ Abbreviations
         integer
         The number of Signals remaining in the Graph
         """
-        for sn in sigs.iterkeys():
-            if sn in self._sigs.keys():
+        for sn in sigs.keys():
+            if sn in list(self._sigs.keys()):
                 del self._sigs[sn]
                 self._signals2lines[sn].remove()
                 self.plot()
@@ -202,7 +202,7 @@ Abbreviations
         -------
         Nothing
         """
-        for sn, s in self._sigs.iteritems():
+        for sn, s in self._sigs.items():
             fx, l = self._find_scale_factor("X")
             fy, l = self._find_scale_factor("Y")
             x = s.ref.data.real * pow(10, fx)
@@ -240,7 +240,7 @@ Abbreviations
         mxs = []
         mns = []
 
-        for s in self._sigs.itervalues():
+        for s in self._sigs.values():
             if a == "X":
                 mxs.append(max(s.ref.data.real))
                 mns.append(min(s.ref.data.real))
@@ -263,7 +263,7 @@ Abbreviations
             f = f + fct
 
         # Find the label corresponding to the factor
-        if factors_to_names.has_key(-f) and \
+        if -f in factors_to_names and \
                 ((self._xunit != "" and a == "X") or \
                      (self._yunit != "" and a != "X")):
             l = factors_to_names[-f][0]
@@ -507,7 +507,7 @@ Abbreviations
         fy, ly = self._find_scale_factor("Y")
         l = {"horiz": ly, "vert": lx}
         txt = {"horiz": "", "vert": ""}
-        for t, ct in self._cursors.iteritems():
+        for t, ct in self._cursors.items():
             for c in ct:
                 if c is not None:
                     c.draw(self, ct.index(c))
@@ -558,7 +558,7 @@ Abbreviations
         u = {"horiz": self._yunit, "vert": self._xunit}
         txt = {"horiz": "", "vert": ""}
         # Prepare string for each cursor type (i.e. "horiz" and "vert")
-        for t, cl in self._cursors.iteritems():
+        for t, cl in self._cursors.items():
             for c in cl:
                 if c is not None and c.visible:
                     # Add cursors value to text

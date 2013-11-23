@@ -1,7 +1,7 @@
-from __future__ import with_statement
+
 
 import itertools
-from writer import Writer
+from .writer import Writer
 
 class GnucapWriter(Writer):
     """ Class GnucapWriter -- Handle gnucap format export
@@ -59,8 +59,8 @@ class GnucapWriter(Writer):
         if not sigs:
             return False
 
-        ref = sigs.values()[0].ref
-        return all(s.ref is ref for s in sigs.itervalues())
+        ref = list(sigs.values())[0].ref
+        return all(s.ref is ref for s in sigs.values())
 
     def write_signals(self, sigs):
         """ Write signals to file
@@ -92,17 +92,17 @@ class GnucapWriter(Writer):
             mode = "a"
 
         # construct a list of signals, with the reference signal first
-        s = sigs.values()
+        s = list(sigs.values())
         s.insert(0, s[0].ref)
 
         with open(self._fn, mode) as f:
             # write the header
-            names = map(self.format_sig_name, map(lambda x: x.name, s))
+            names = list(map(self.format_sig_name, [x.name for x in s]))
             f.write('#%s\n' % SEPARATOR.join(names))
 
             # write the data
             data = (iter(x.data) for x in s)
-            for x in itertools.izip(*tuple(data)):
+            for x in zip(*tuple(data)):
                 f.write('%s\n' % SEPARATOR.join(map(str, x)))
 
     def format_sig_name(self, name):

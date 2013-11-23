@@ -1,9 +1,9 @@
-from __future__ import with_statement
+
 
 import re
 import io
 from oscopy import Signal
-from reader import Reader, ReadError
+from .reader import Reader, ReadError
 
 class NsoutReader(Reader):
     """ Read NanoSim output files
@@ -41,7 +41,7 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
         self._check(fn)
         try:
             f = io.open(fn, 'r')
-        except IOError, e:
+        except IOError as e:
             return False
         s = f.readline()
         found = False
@@ -83,7 +83,7 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
             signals = {}
 
             # Header
-            h = lines.next()
+            h = next(lines)
             while h.startswith(';') or h.startswith('.'):
                 x = h.strip('.').split()
                 if x[0] in self._instructions:
@@ -92,11 +92,11 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
                     # Use the .index value to identify the signals
                     s = Signal(x[1], self._type_to_unit[x[3]])
                     signals[x[2]] = s
-                h = lines.next()
+                h = next(lines)
 
             # Data, cache the append methods
-            data = dict(zip(signals.keys(), [[] for x in xrange(len(signals))]))
-            append = dict(zip(data.keys(), [x.append for x in data.values()]))
+            data = dict(list(zip(list(signals.keys()), [[] for x in range(len(signals))])))
+            append = dict(list(zip(list(data.keys()), [x.append for x in list(data.values())])))
             refdata = []
             if len(h.split()) == 1: refdata.append(float(h))
             for values in lines:
@@ -109,9 +109,9 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
         # Putting it altogether, make a dict of signals with names as keys
         ref = Signal('Time', 's')
         ref.data = refdata
-        for k, v in data.iteritems():
+        for k, v in data.items():
             signals[k].data = v
             signals[k].ref = ref
-        self._signals = dict(zip([x.name for x in signals.itervalues()],
-                                 signals.values()))
+        self._signals = dict(list(zip([x.name for x in signals.values()],
+                                 list(signals.values()))))
         return self._signals

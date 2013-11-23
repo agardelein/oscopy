@@ -2,7 +2,7 @@
 import oscopy
 import gtk
 import gobject
-import gui
+from . import gui
 from math import log10, sqrt
 from matplotlib.backend_bases import LocationEvent
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
@@ -118,7 +118,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                               gobject.TYPE_PYOBJECT, # Vertical Adjustment
                               )
         iter = store.append([_('All Graphs'), False, True, False, gtk.Adjustment(), gtk.Adjustment()])
-        for i in xrange(4):
+        for i in range(4):
             iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False, False, gtk.Adjustment(), gtk.Adjustment()])
         self._cbx_store = store
         hbar.set_adjustment(store[0][IOSCOPY_COL_HADJ])
@@ -136,7 +136,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         label = gtk.Label('master pan')
         vbox2.pack_start(label, False, False)
 
-        rbtns = [gtk.RadioButton(None, '%d' % (i + 1)) for i in xrange(4)]
+        rbtns = [gtk.RadioButton(None, '%d' % (i + 1)) for i in range(4)]
         rbtnbox = gtk.HBox()
         for rb in rbtns[1:4]: rb.set_group(rbtns[0])
         for rb in rbtns:
@@ -340,7 +340,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         if fname:
             try:
                 self.canvas.print_figure(fname, format=format)
-            except Exception, e:
+            except Exception as e:
                 error_msg_gtk(str(e), parent=self)
 
     def get_filechooser(self):

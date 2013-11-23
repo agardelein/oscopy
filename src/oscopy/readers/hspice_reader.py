@@ -1,8 +1,8 @@
-from __future__ import with_statement
+
 
 import re
 from oscopy import Signal
-from reader import Reader, ReadError
+from .reader import Reader, ReadError
 import struct, os
 
 # ivar: independent variable (Time, Frequency)
@@ -99,13 +99,13 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
         (names, signals) = self._process_header(values)
         (h, values) = self._read_block(f)
 
-        data = [[] for x in xrange(len(signals))]
+        data = [[] for x in range(len(signals))]
         numsigs = self._nauto + self._nprobe
         datasize = h[3]
         nvals = datasize / 4 # sizeof(float)
         vals = struct.unpack('>%df' % nvals, values)
 
-        for i in xrange(numsigs):
+        for i in range(numsigs):
             start = i
             stop = nvals - numsigs + i
             step = numsigs
@@ -117,8 +117,8 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
             s.ref = ref
             s.data = data[i + 1]
 
-        self._signals = dict(zip(names[self._nauto - 1:],\
-                                 signals[self._nauto - 1:]))
+        self._signals = dict(list(zip(names[self._nauto - 1:],\
+                                 signals[self._nauto - 1:])))
         return self._signals
 
     def _read_ascii(self, f):
@@ -140,10 +140,10 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
         header = ''
         lines = iter(f)
         while header.find('$&%#') < 0:
-            header = header + lines.next()
+            header = header + next(lines)
         (names, signals) = self._process_header(header)
 
-        data = [[] for x in xrange(len(names))]
+        data = [[] for x in range(len(names))]
         # optimization: cache the append methods,
         # avoiding one dictionary lookup per line
         append = [x.append for x in data]
@@ -162,8 +162,8 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
             s.ref = ref
             s.data = data[i + 1]
 
-        self._signals = dict(zip(names[self._nauto:],\
-                                 signals[self._nauto:]))
+        self._signals = dict(list(zip(names[self._nauto:],\
+                                 signals[self._nauto:])))
         return self._signals
 
     def _read_block(self, f):
@@ -229,19 +229,19 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
         # Units
         ivunit = self._IVTYPE_UNIT.get(tmp[1], 'a.u')
         dvunits = [ivunit]
-        for i in xrange(int(nauto) + int(nprobe) - 1):
+        for i in range(int(nauto) + int(nprobe) - 1):
             dvunits.append(self._DVTYPE_UNIT.get(tmp[i + 2], 'a.u.'))
 
         # Names
         offset = int(nauto) + int(nprobe) + 1
         ivname = tmp[offset]
         dvnames = [ivname]
-        for i in xrange(int(nauto) + int(nprobe) - 1):
+        for i in range(int(nauto) + int(nprobe) - 1):
             dvnames.append(self._sanitize_name(tmp[i + offset + 1]))
 
         # Create Signals
         signals = []
-        for i in xrange(len(dvunits)):
+        for i in range(len(dvunits)):
             signals.append(Signal(dvnames[i], dvunits[i]))
 
         # Return values

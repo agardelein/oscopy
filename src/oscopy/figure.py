@@ -52,7 +52,7 @@ Figure -- Handle a list of graphs
 """
 
 from matplotlib.pyplot import Figure as MplFig, Axes
-from graphs import Graph, LinGraph
+from .graphs import Graph, LinGraph
 
 MAX_GRAPHS_PER_FIGURE = 4
 
@@ -83,7 +83,7 @@ class Figure(MplFig):
         self._kid = None
         # FIXME: Slow way... Surely there exist something faster
         self._OBJ_TO_MODES_NAMES = {}
-        for k, v in self._MODES_NAMES_TO_OBJ.iteritems():
+        for k, v in self._MODES_NAMES_TO_OBJ.items():
             self._OBJ_TO_MODES_NAMES[v] = k
 
         if not sigs:
@@ -91,7 +91,7 @@ class Figure(MplFig):
         elif isinstance(sigs, dict):
             self.add(sigs)
         else:
-            print sigs
+            print(sigs)
             assert 0, _("Bad type")
 
     def add(self, sigs={}):
@@ -335,15 +335,15 @@ class Figure(MplFig):
         if self._layout == "horiz":
             dx = 1
             dy = 1.0 / len(self.axes)
-            num_to_xy = [[0, y] for y in xrange(len(self.axes))]
+            num_to_xy = [[0, y] for y in range(len(self.axes))]
         elif self._layout == "vert":
             dx = 1.0 / len(self.axes)
             dy = 1
-            num_to_xy = [[x, 0] for x in xrange(len(self.axes))]
+            num_to_xy = [[x, 0] for x in range(len(self.axes))]
         elif self._layout == "quad":
             dx = 0.5
             dy = 0.5
-            num_to_xy = [[x, y] for y in xrange(2) for x in xrange(2)]
+            num_to_xy = [[x, y] for y in range(2) for x in range(2)]
         else:
             assert 0, _("Bad layout")
 

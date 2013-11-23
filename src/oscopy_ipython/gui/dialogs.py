@@ -15,7 +15,7 @@ class Enter_Units_Dialog(object):
         self._entry_yunits = None
         self._scale_factors = gtk.ListStore(gobject.TYPE_STRING,
                                             gobject.TYPE_STRING)
-        sorted_list = factors_to_names.keys()
+        sorted_list = list(factors_to_names.keys())
         sorted_list.sort()
         for factor in sorted_list:
             self._scale_factors.append((factors_to_names[factor][0],
@@ -23,7 +23,7 @@ class Enter_Units_Dialog(object):
 
     def display(self, units, xy, scale_factors):
 
-        sorted_list = factors_to_names.keys()
+        sorted_list = list(factors_to_names.keys())
         sorted_list.sort()
         
         self._dlg = gtk.Dialog(_('Enter graph units'),
@@ -112,7 +112,7 @@ class Enter_Range_Dialog(object):
                 align_lbl = gtk.Alignment(0, 0.5)
                 align_lbl.add(label)
                 step = abs(float(r[col][0] - r[col][1]))/100.0
-                print step
+                print(step)
                 adj = gtk.Adjustment(r[col][row], -1e99, 1e99,
                                      step, step * 10.0, 0)
                 entry = gtk.SpinButton(adj, 1,

@@ -1,9 +1,9 @@
-from __future__ import with_statement
+
 
 import re
 import io
 from oscopy import Signal
-from reader import Reader, ReadError
+from .reader import Reader, ReadError
 import struct
 
 # ivar: independent variable (Time, Frequency)
@@ -96,8 +96,8 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
                         nvar = int(words[2])
                     elif word == 'Variables':
                         # Initialize Signals
-                        for i in xrange(nvar):
-                            x = f.next()
+                        for i in range(nvar):
+                            x = next(f)
                             pos = pos + len(x)
                             x = x.split()
                             name = x[1].replace('(', '').replace(')', '')\
@@ -109,14 +109,14 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
                             names.append(name)
                     n = blocks.index(word)
                     self.info[word] = value
-                elif word in data_read_fun.keys():
+                elif word in list(data_read_fun.keys()):
                     # Header processing finished
                     break
                 else:
                     raise ReadError(_('Spice3raw_reader: unexpected keyword in header: \'%s\'') % word)
 
         # Can now read the data
-        data = [[] for x in xrange(len(signals))]
+        data = [[] for x in range(len(signals))]
         append = [x.append for x in data]
 
         data_read_fun[word](pos, append)
@@ -127,7 +127,7 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
             s.ref = ref
             s.data = data[i + 1]
 
-        self._signals = dict(zip(names[1:], signals[1:]))
+        self._signals = dict(list(zip(names[1:], signals[1:])))
         return self._signals
     
     def _read_binary(self, pos, append):
@@ -196,13 +196,13 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
         with io.open(self._fn, 'r') as f:
             f.seek(pos)
             while f and n:
-                values = f.next()
+                values = next(f)
                 x = values.split()
                 if len(x) > 1:
                     # Get the ivar
                     append[0](float(x[1]))
                     n = n - 1
-                    for i in xrange(1, nvars):
+                    for i in range(1, nvars):
                         # And the dvars
                         values = f.next().split()
                         if is_complex:

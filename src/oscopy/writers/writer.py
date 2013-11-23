@@ -94,7 +94,7 @@ write_signals.
         if isinstance(opts, dict):
             self._opts = opts
         # Overwrite option
-        if self._opts.has_key("ow"):
+        if "ow" in self._opts:
             if self._opts["ow"] in ['True', 'true', '1']:
                 self._ow = True
             else:
@@ -122,7 +122,7 @@ write_signals.
         In case no file is specified, file exist and overwrite is not allowed
         or file access issue
         """
-        if not (isinstance(fn, str) or isinstance(fn, unicode)):
+        if not (isinstance(fn, str) or isinstance(fn, str)):
             raise WriteError("No string specified")
         if not fn:
             raise WriteError("No file specified")
@@ -181,7 +181,7 @@ write_signals.
         bool
         True if this Writer manage this format
         """
-        if (isinstance(format, str) or isinstance(format, unicode))\
+        if (isinstance(format, str) or isinstance(format, str))\
                 and format == self._get_format_name():
             return True
         else:

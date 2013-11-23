@@ -109,7 +109,7 @@ Signals
         self._fn = fn
         self._info['file'] = self._fn
         self._info['last_update'] = time.time()
-        for s in self._read_signals().itervalues():
+        for s in self._read_signals().values():
             self.connect('begin-transaction', s.on_begin_transaction)
             self.connect('end-transaction', s.on_end_transaction)
         return self._signals
@@ -171,7 +171,7 @@ Signals
         # and for updated signals check whether ref, ref unit or unit
         # has changed
         n = {}
-        for sn, s in sigs.iteritems():
+        for sn, s in sigs.items():
             if sn in self._renamed:
                 # Renamed signal
                 s = self.rename_signal(sn, self._renamed[sn])
@@ -204,7 +204,7 @@ Signals
 
         # Find deleted signals, i.e. present in old dict but not in new one
         d = []
-        for sn, s in oldsigs.iteritems():
+        for sn, s in oldsigs.items():
             if sn not in sigs:
                 if not keep:
                     s.data = None

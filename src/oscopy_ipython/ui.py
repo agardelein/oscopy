@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from __future__ import with_statement
+
 
 import gobject
 import gtk
@@ -7,8 +7,8 @@ import signal
 import os
 import sys
 import readline
-import commands
-import ConfigParser
+import subprocess
+import configparser
 import dbus, dbus.service, dbus.glib
 from math import log10, sqrt
 from xdg import BaseDirectory
@@ -19,8 +19,8 @@ import oscopy
 
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
-import gui
-from gtk_figure import IOscopy_GTK_Figure
+from . import gui
+from .gtk_figure import IOscopy_GTK_Figure
 
 IOSCOPY_COL_TEXT = 0
 IOSCOPY_COL_X10 = 1
@@ -467,7 +467,7 @@ class App(dbus.service.Object):
         if filename.strip() in self._ctxt.readers:
             it = self._store.append(None, (filename.strip(), None, False))
             for name, sig in self._ctxt.readers[filename.strip()]\
-                    .signals.iteritems():
+                    .signals.items():
                 self._store.append(it, (name, sig, sig.freeze))
 
     def update_readers(self):
@@ -480,14 +480,14 @@ class App(dbus.service.Object):
             citer = self._store.iter_children(iter)
             while citer:
                 s = self._store.get_value(citer, 1)
-                if s.name not in self._ctxt.readers[rname].signals.keys():
+                if s.name not in list(self._ctxt.readers[rname].signals.keys()):
                     self._store.remove(citer)
                     if not self._store.iter_is_valid(citer):
                         citer = None
                 else:
                     citer = self._store.iter_next(citer)
             # Add new signals
-            for sn, s in self._ctxt.readers[rname].signals.iteritems():
+            for sn, s in self._ctxt.readers[rname].signals.items():
                 citer = self._store.iter_children(iter)
                 while citer:
                     if self._store.get_value(citer, 1).name == sn:
@@ -504,7 +504,7 @@ class App(dbus.service.Object):
                                     target_type, time):
         name = selection.data
         if type(name) == str and name.startswith('file://'):
-            print name[7:].strip()
+            print(name[7:].strip())
             self._app_exec('%%oread %s' % name[7:].strip())
                 
     def _drag_data_get_cb(self, widget, drag_context, selection, target_type,\
@@ -516,7 +516,7 @@ class App(dbus.service.Object):
             iter = self._store.get_iter(pathlist[0])
             # Use the path list stored while button 1 has been pressed
             # See self._treeview_button_press()
-            data = ' '.join(map(lambda x:self._store[x][1].name, self._rows_for_drag))
+            data = ' '.join([self._store[x][1].name for x in self._rows_for_drag])
             selection.set(selection.target, 8, data)
             return True
     #
@@ -528,7 +528,7 @@ class App(dbus.service.Object):
         self.config_file = os.path.join(path, 'gui')
         self.hist_file = os.path.join(path, 'history')
         section = App.SECTION
-        self.config = ConfigParser.RawConfigParser()
+        self.config = configparser.RawConfigParser()
         self.config.add_section(section)
         # defaults
         self.config.set(section, App.OPT_NETLISTER_COMMANDS, '')
@@ -536,7 +536,7 @@ class App(dbus.service.Object):
         self.config.set(section, App.OPT_RUN_DIRECTORY, '.')
 
     def _sanitize_list(self, lst):
-        return filter(lambda x: len(x) > 0, map(lambda x: x.strip(), lst))
+        return [x for x in [x.strip() for x in lst] if len(x) > 0]
 
     def _actions_from_config(self, config):
         section = App.SECTION
@@ -593,7 +593,7 @@ class App(dbus.service.Object):
         old_dir = os.getcwd()
         os.chdir(run_dir)
         try:
-            status, output = commands.getstatusoutput(cmd)
+            status, output = subprocess.getstatusoutput(cmd)
             if status:
                 msg = _("Executing command '%s' failed.") % cmd
                 report_error(self._mainwindow, msg)
