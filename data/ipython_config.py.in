@@ -55,7 +55,7 @@ c = get_config()
 # c.TerminalIPythonApp.exec_lines = []
 
 # Enable GUI event loop integration ('qt', 'wx', 'gtk', 'glut', 'pyglet').
-c.TerminalIPythonApp.gui = 'gtk'
+c.TerminalIPythonApp.gui = 'gtk3'
 
 # Pre-load matplotlib and numpy for interactive use, selecting a particular
 # matplotlib backend and loop integration.

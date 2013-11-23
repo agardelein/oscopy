@@ -1,1 +1,1 @@
-backend : GTKAgg
+backend : GTK3Agg
