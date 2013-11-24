@@ -87,7 +87,7 @@ Class Signal -- Contains the signal points and other information
         operator.add: '+',
         operator.sub: '-',
         operator.mul: '*',
-        operator.div: '/',
+        operator.truediv: '/',
     }
 
     def __init__(self, value="", unit=""):
@@ -511,13 +511,13 @@ Class Signal -- Contains the signal points and other information
     __mul__ = __make_method(operator.mul)
     __imul__ = __make_method_inplace(operator.imul)
 
-    __div__ = __make_method(operator.div)
-    __idiv__ = __make_method_inplace(operator.idiv)
+    __truediv__ = __make_method(operator.truediv)
+    __itruediv__ = __make_method_inplace(operator.itruediv)
 
     __radd__ = __add__
     __rsub__ = __sub__
     __rmul__ = __mul__
-    __rdiv__ = __div__
+    __rdiv__ = __truediv__
 
     def __neg__(self):
         """ Compute the opposite s = -self

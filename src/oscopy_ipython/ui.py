@@ -3,6 +3,7 @@
 
 from gi.repository import GObject
 from gi.repository import Gtk
+from gi.repository import Gdk
 import signal
 import os
 import sys
@@ -17,8 +18,8 @@ import IPython
 
 import oscopy
 
-from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
-from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
+from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
+#from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 from . import gui
 from .gtk_figure import IOscopy_GTK_Figure
 
@@ -72,21 +73,21 @@ class App(dbus.service.Object):
         self._cbx_stores = {}
 
         self._TARGET_TYPE_SIGNAL = 10354
-        self._from_signal_list = [("oscopy-signals", Gtk.TargetFlags.SAME_APP,\
+        self._from_signal_list = [Gtk.TargetEntry.new("oscopy-signals", Gtk.TargetFlags.SAME_APP,\
                                        self._TARGET_TYPE_SIGNAL)]
-        self._to_figure = [("oscopy-signals", Gtk.TargetFlags.SAME_APP,\
+        self._to_figure = [Gtk.TargetEntry.new("oscopy-signals", Gtk.TargetFlags.SAME_APP,\
                                 self._TARGET_TYPE_SIGNAL)]
-        self._to_main_win = [("text/plain", 0,
+        self._to_main_win = [Gtk.TargetEntry.new("text/plain", 0,
                                 self._TARGET_TYPE_SIGNAL),
-                             ('STRING', 0,
+                             Gtk.TargetEntry.new('STRING', 0,
                               self._TARGET_TYPE_SIGNAL),
-                             ('application/octet-stream', 0,
+                             Gtk.TargetEntry.new('application/octet-stream', 0,
                               self._TARGET_TYPE_SIGNAL),
                              # For '*.raw' formats
-                             ('application/x-panasonic-raw', 0,
+                             Gtk.TargetEntry.new('application/x-panasonic-raw', 0,
                               self._TARGET_TYPE_SIGNAL),
                              # For '*.ts' formats
-                             ('video/mp2t', 0,
+                             Gtk.TargetEntry.new('video/mp2t', 0,
                               self._TARGET_TYPE_SIGNAL),
                              ]
 
@@ -259,7 +260,7 @@ class App(dbus.service.Object):
         sw.add(self._treeview)
 
         vbox = Gtk.VBox()
-        vbox.pack_start(self._menubar, False)
+        vbox.pack_start(self._menubar, False, False, 0)
         vbox.pack_start(sw, True, True, 0)
 
         w = self._mainwindow = Gtk.Window(Gtk.WindowType.TOPLEVEL)

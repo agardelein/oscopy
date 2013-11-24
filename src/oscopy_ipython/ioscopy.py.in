@@ -39,11 +39,11 @@ bus_name = None
 _ctxt = Context()
 
 class IOscopyConfig(Configurable):
-    h = Bool(False, config=True, help=_('Show this help message'))
-    q = Bool(False, config=True, help=_('Disable banner printing'))
-    b = Bool(False, config=True, help=_('Execute an oscopy command file'))
-    i = Bool(False, config=True, help=_('Resume to command line executing after batch file'))
-    f = Unicode('', config=True, help='')
+    h = Bool(False, config=True) #, help=_('Show this help message'))
+    q = Bool(False, config=True) #, help=_('Disable banner printing'))
+    b = Bool(False, config=True) #, help=_('Execute an oscopy command file'))
+    i = Bool(False, config=True) #, help=_('Resume to command line executing after batch file'))
+    f = Unicode('', config=True) #, help='')
     
 
 def do_create(self, args):

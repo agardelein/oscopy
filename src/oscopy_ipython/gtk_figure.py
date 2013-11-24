@@ -5,8 +5,8 @@ from gi.repository import GObject
 from . import gui
 from math import log10, sqrt
 from matplotlib.backend_bases import LocationEvent
-from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
-from matplotlib.backends.backend_gtk import FileChooserDialog
+from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
+from matplotlib.backends.backend_gtk3 import FileChooserDialog
 from matplotlib.widgets import SpanSelector, RectangleSelector
 from matplotlib.transforms import Bbox
 
@@ -150,7 +150,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             b.connect('toggled', self._update_scrollbars)
         vbox2.pack_start(rbtnbox, False, False)
 
-        vbox2.pack_start(Gtk.HSeparator(, True, True, 0), False, False)
+        #vbox2.pack_start(Gtk.HSeparator(, True, True, 0), False, False)
 
         x10_toggle_btn = Gtk.ToggleButton('x10 mode')
         x10_toggle_btn.set_mode(True)
