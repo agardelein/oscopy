@@ -6,8 +6,8 @@
 GETTEXT_DOMAIN = 'oscopy'
 import gettext
 gettext.install(GETTEXT_DOMAIN, '@datarootdir@/locale')
-#t = gettext.translation(GETTEXT_DOMAIN, '@datarootdir@/locale', fallback=True)
-#_ = t.ugettext
+t = gettext.translation(GETTEXT_DOMAIN, '@datarootdir@/locale', fallback=True)
+_ = t.gettext
 
 import IPython
 from IPython.config.configurable import Configurable
@@ -15,12 +15,9 @@ from IPython.utils.traitlets import Bool, Unicode
 from IPython.utils.syspathcontext import prepended_to_syspath
 import time
 import os
-from gi.repository import Gtk
 import re
 import dbus
 import numpy
-from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
-#from matplotlib.backends.backend_gtk3agg import NavigationToolbar2GTKAgg as NavigationToolbar
 
 from oscopy import Signal
 from oscopy import Context
@@ -39,11 +36,11 @@ bus_name = None
 _ctxt = Context()
 
 class IOscopyConfig(Configurable):
-    h = Bool(False, config=True) #, help=_('Show this help message'))
-    q = Bool(False, config=True) #, help=_('Disable banner printing'))
-    b = Bool(False, config=True) #, help=_('Execute an oscopy command file'))
-    i = Bool(False, config=True) #, help=_('Resume to command line executing after batch file'))
-    f = Unicode('', config=True) #, help='')
+    h = Bool(False, config=True, help=_('Show this help message'))
+    q = Bool(False, config=True, help=_('Disable banner printing'))
+    b = Bool(False, config=True, help=_('Execute an oscopy command file'))
+    i = Bool(False, config=True, help=_('Resume to command line executing after batch file'))
+    f = Unicode('', config=True, help='')
     
 
 def do_create(self, args):
