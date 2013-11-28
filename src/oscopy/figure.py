@@ -51,7 +51,7 @@ Figure -- Handle a list of graphs
       Handle keystrokes during plot
 """
 
-from matplotlib.pyplot import Figure as MplFig, Axes
+from matplotlib.figure import Figure as MplFig, Axes
 from .graphs import Graph, LinGraph
 
 MAX_GRAPHS_PER_FIGURE = 4

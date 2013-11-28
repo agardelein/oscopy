@@ -1,4 +1,4 @@
-from matplotlib.pyplot import Axes as mplAxes
+from matplotlib.axes import Axes as mplAxes
 from matplotlib.widgets import SpanSelector, RectangleSelector
 from matplotlib import rc
 from .cursor import Cursor
