@@ -18,7 +18,7 @@ import IPython
 
 import oscopy
 
-from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
+from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
 #from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 from . import gui
 from .gtk_figure import IOscopy_GTK_Figure

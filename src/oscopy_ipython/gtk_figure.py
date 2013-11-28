@@ -1,11 +1,11 @@
 
 import oscopy
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 from gi.repository import GObject
 from . import gui
 from math import log10, sqrt
 from matplotlib.backend_bases import LocationEvent
-from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
+from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
 from matplotlib.backends.backend_gtk3 import FileChooserDialog
 from matplotlib.widgets import SpanSelector, RectangleSelector
 from matplotlib.transforms import Bbox
@@ -70,7 +70,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
     def __init__(self, sigs={}, fig=None, title=''):
         oscopy.Figure.__init__(self, None, fig)
         self._TARGET_TYPE_SIGNAL = 10354
-        self._to_figure = [("oscopy-signals", Gtk.TargetFlags.SAME_APP,\
+        self._to_figure = [Gtk.TargetEntry.new("oscopy-signals", Gtk.TargetFlags.SAME_APP,\
                                 self._TARGET_TYPE_SIGNAL)]
         self._hadjpreval = None
         self._vadjpreval = None
@@ -83,6 +83,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         hbox1.pack_start(vbox1, True, True, 0)
         w.add(hbox1)
         canvas = FigureCanvas(self)
+        canvas.supports_blit = False
         canvas.mpl_connect('button_press_event', self._button_press)
         canvas.mpl_connect('scroll_event', self._mouse_scroll)
         canvas.mpl_connect('axes_enter_event', self._axes_enter)
@@ -101,11 +102,11 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         hbar = Gtk.HScrollbar()
         hbar.set_sensitive(False)
         self.hbar = hbar
-        vbox1.pack_start(hbar, False, False)
+        vbox1.pack_start(hbar, False, False, 0)
         vbar = Gtk.VScrollbar()
         vbar.set_sensitive(False)
         self.vbar = vbar
-        hbox1.pack_start(vbar, False, False)
+        hbox1.pack_start(vbar, False, False, 0)
 
         vbox1.pack_start(canvas, True, True, 0)
 
@@ -124,21 +125,21 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         hbar.set_adjustment(store[0][IOSCOPY_COL_HADJ])
         vbar.set_adjustment(store[0][IOSCOPY_COL_VADJ])
 
-        graphs_cbx = Gtk.ComboBox(store)
+        graphs_cbx = Gtk.ComboBox.new_with_model(store)
         cell = Gtk.CellRendererText()
         graphs_cbx.pack_start(cell, True)
         graphs_cbx.add_attribute(cell, 'text', IOSCOPY_COL_TEXT)
         graphs_cbx.add_attribute(cell, 'sensitive', IOSCOPY_COL_VIS)
         graphs_cbx.set_active(0)
-        vbox2.pack_start(graphs_cbx, False, False)
+        vbox2.pack_start(graphs_cbx, False, False, 0)
 
         # master pan radiobuttons
         label = Gtk.Label(label='master pan')
-        vbox2.pack_start(label, False, False)
+        vbox2.pack_start(label, False, False, 0)
 
         rbtns = [Gtk.RadioButton(None, '%d' % (i + 1)) for i in range(4)]
         rbtnbox = Gtk.HBox()
-        for rb in rbtns[1:4]: rb.set_group(rbtns[0])
+        for rb in rbtns[1:4]: rb.join_group(rbtns[0])
         for rb in rbtns:
             rb.set_sensitive(False)
             rbtnbox.pack_start(rb, True, True, 0)
@@ -148,9 +149,9 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         self._mpsel_set_sens = [b.set_sensitive for b in rbtns]
         for b in rbtns:
             b.connect('toggled', self._update_scrollbars)
-        vbox2.pack_start(rbtnbox, False, False)
+        vbox2.pack_start(rbtnbox, False, False, 0)
 
-        #vbox2.pack_start(Gtk.HSeparator(, True, True, 0), False, False)
+        vbox2.pack_start(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL), False, False, 0)
 
         x10_toggle_btn = Gtk.ToggleButton('x10 mode')
         x10_toggle_btn.set_mode(True)
@@ -189,13 +190,13 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         vbar.connect('leave-notify-event', self.enable_adj_update_on_draw)
         vbar.connect('button-press-event', self.vadj_pressed)
         vbar.connect('button-release-event', self.vadj_released)
-        vbox2.pack_start(x10_toggle_btn, False, False)
-        vbox2.pack_start(span_toggle_btn, False, False)
-        vbox2.pack_start(save_fig_btn, False, False)
-        vbox2.pack_end(coords_lbl1, False, False)
-        vbox2.pack_end(coords_lbl2, False, False)
+        vbox2.pack_start(x10_toggle_btn, False, False, 0)
+        vbox2.pack_start(span_toggle_btn, False, False, 0)
+        vbox2.pack_start(save_fig_btn, False, False, 0)
+        vbox2.pack_end(coords_lbl1, False, False, 0)
+        vbox2.pack_end(coords_lbl2, False, False, 0)
 
-        hbox1.pack_start(vbox2, False, False)
+        hbox1.pack_start(vbox2, False, False, 0)
 
         w.resize(640, 480)
         w.show_all()
