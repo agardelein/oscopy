@@ -312,9 +312,9 @@ Abbreviations
         Nothing
         """
         if isinstance(unit, tuple):
-            if len(unit) == 1 or (len(unit) == 2 and not unit[1]):
+            if len(unit) == 1:
                 self._yunit = unit[0]
-            elif len(unit) == 2 and unit[1]:
+            elif len(unit) == 2:
                 self._xunit = unit[0]
                 self._yunit = unit[1]
             else:
