@@ -603,7 +603,11 @@ class App(dbus.service.Object):
             os.chdir(old_dir)
 
     def _app_exec(self, line):
-        (first, last) = line.split(' ', 1)
+        if ' ' in line:
+            (first, last) = line.split(' ', 1)
+        else:
+            first = line
+            last = ''
         if first.startswith('%') or self.shell.find_magic(first.split()[0]) is not None:
             name = first.lstrip('%')
             self.shell.run_line_magic(name, last.strip())

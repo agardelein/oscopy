@@ -455,7 +455,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         if event.button == 3:
             menu = self._create_figure_popup_menu(event.canvas.figure, event.inaxes)
             menu.show_all()
-            menu.popup(None, None, None, event.button, event.guiEvent.time)
+            menu.popup(None, None, None, None, event.button, event.guiEvent.time)
 
     def _mouse_scroll(self, event):
         if event.button == 'up':
@@ -504,10 +504,10 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         if a is not None:
             x = '%.3f %s%s' % (event.xdata,
                              oscopy.factors_to_names[a.scale_factors[0]][0],
-                             a.unit[0])
+                             a.unit[0] if a.unit[0] is not None else 'a.u.')
             y = '%.3f %s%s' % (event.ydata,
                              oscopy.factors_to_names[a.scale_factors[1]][0],
-                             a.unit[1])
+                             a.unit[1] if a.unit[1] is not None else 'a.u.')
             self._coords_lbl1.set_text(x)
             self._coords_lbl2.set_text(y)
         else:
