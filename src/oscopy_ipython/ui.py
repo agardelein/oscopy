@@ -474,7 +474,7 @@ class App(dbus.service.Object):
     def update_readers(self):
         # Parse self._store to find deleted or new signals.
         # Shall be called subsequently to an update of reasers.
-        iter = self._store.get_iter_root()
+        iter = self._store.get_iter_first()
         while iter:
             rname = self._store.get_value(iter, 0)
             # Check for deleted signals
