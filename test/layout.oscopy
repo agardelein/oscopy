@@ -1,26 +1,26 @@
-print "*** Reading files and setting plots"
+print("*** Reading files and setting plots")
 oread demo/irf540.dat
 ocreate
 oadd iRD
 oadd vgs
 oadd vgs,vds
 oadd vds
-print "*** Layout horiz"
+print("*** Layout horiz")
 olayout horiz
-print "*** Reading files and setting plots"
+print("*** Reading files and setting plots")
 ocreate
 oadd iRD
 oadd vgs
 oadd vgs,vds
 oadd vds
-print "*** Layout vert"
+print("*** Layout vert")
 olayout vert
-print "*** Reading files and setting plots"
+print("*** Reading files and setting plots")
 ocreate
 oadd iRD
 oadd vgs
 oadd vgs,vds
 oadd vds
-print "*** Layout quad"
+print("*** Layout quad")
 olayout quad
-print "*** Done"
+print("*** Done")

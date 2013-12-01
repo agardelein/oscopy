@@ -1,5 +1,5 @@
 # Test all function, hard way; Use datafiles from demo/
-print "Read files..."
+print("Read files...")
 # Read files
 oread
 # Directory
@@ -13,7 +13,7 @@ oread demo/ac.dat
 oread demo/irf540.dat
 osiglist
 # Create and delete figures
-print "*** Create an empty figure and destroy it"
+print("*** Create an empty figure and destroy it")
 ocreate
 ofiglist
 # no args should produce an error
@@ -23,7 +23,7 @@ odestroy 1
 ofiglist
 # Destroying a non-existing figure does nothing
 odestroy 1
-print "*** Create a figure and add signals"
+print("*** Create a figure and add signals")
 ocreate
 oadd vgs, vds
 ofiglist
@@ -37,11 +37,11 @@ ocreate iRD
 ocreate
 oadd vgs
 ofiglist
-print "** Delete figure 2"
+print("** Delete figure 2")
 odestroy 2
 ofiglist
-print "** Delete figure 2 again"
+print("** Delete figure 2 again")
 odestroy 2
 ofiglist
-print "** Delete remaining figure"
+print("** Delete remaining figure")
 odestroy 1

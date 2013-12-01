@@ -1,5 +1,5 @@
 # First read data from IRF540 simulation
-print "*** Reading files and setting plots"
+print("*** Reading files and setting plots")
 oread demo/irf540.dat
 oadd vgs
 ocreate
@@ -7,43 +7,43 @@ oadd iRD
 oadd vgs
 oadd vgs,vds
 oadd vds
-print "*** Fig 2 layout to quad"
+print("*** Fig 2 layout to quad")
 olayout quad
 # Plot filter response
 oread demo/ac.dat
 ocreate
 oadd vout
 oscale loglog
-print "*** select 1-1"
+print("*** select 1-1")
 oselect 1-1
 ofiglist
-print "*** select 1-2"
+print("*** select 1-2")
 oselect 1-2
 ofiglist
-print "*** select 2-1"
+print("*** select 2-1")
 oselect 2-1
 ofiglist
-print "*** select 2-a"
+print("*** select 2-a")
 #oselect 2-a
 ofiglist
-print "*** select a-1"
+print("*** select a-1")
 #oselect a-1
 ofiglist
-print "*** select aaa-sdfsfd"
+print("*** select aaa-sdfsfd")
 #oselect aaa-sdfsfd
 ofiglist
-print "*** select 1-"
+print("*** select 1-")
 #oselect 1-
 ofiglist
-print "*** select a-"
+print("*** select a-")
 #oselect a-
 ofiglist
-print "*** select -"
+print("*** select -")
 #oselect -
 ofiglist
-print "*** select 1"
+print("*** select 1")
 #oselect 1
 ofiglist
-print "*** select"
+print("*** select")
 #oselect
 ofiglist

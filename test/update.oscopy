@@ -1,5 +1,5 @@
 # First read data from IRF540 simulation
-print "*** Reading files and setting plots"
+print("*** Reading files and setting plots")
 # Plot filter response
 oread demo/ac.dat
 ocreate
@@ -16,7 +16,7 @@ oadd vgs
 oadd iRD
 osiglist
 pwr = Signal(iRD * vds, 'W')
-print 'id(pwr): 0x%x' % id(pwr)
+print('id(pwr): 0x%x' % id(pwr))
 oimport pwr
 oadd pwr
 pwr2 = pwr
@@ -24,19 +24,19 @@ oimport pwr2
 ofreeze pwr2
 oinsert pwr2
 # Plot things
-print "*** Now plotting everything"
+print("*** Now plotting everything")
 #plot
 # Updating
-print "*** Now change C value in schematic and rerun gnetlist + gnucap"
+print("*** Now change C value in schematic and rerun gnetlist + gnucap")
 #pause
-print "*** Updating"
+print("*** Updating")
 oupdate
 osiglist
 #pause
-print "*** Updating only demo/ac.dat"
+print("*** Updating only demo/ac.dat")
 oupdate demo/ac.dat
 osiglist
-print "*** Now look at figure 3"
+print("*** Now look at figure 3")
 #plot
 # Saving results
 #write gnucap (ow:1) demo/res.dat v1,vsqu

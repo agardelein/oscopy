@@ -4,13 +4,13 @@ ocreate iRD
 ocreate vgs
 odestroy 2
 ofiglist
-print "*** Destroy figure 2 once again"
+print("*** Destroy figure 2 once again")
 odestroy 2
-print "*** destroy asfsasdf"
+print("*** destroy asfsasdf")
 #odestroy asfsasdf
-print "*** destroy -1"
+print("*** destroy -1")
 #odestroy -1
-print "*** destroy 6"
+print("*** destroy 6")
 #odestroy 6
-print "*** destroy"
+print("*** destroy")
 #odestroy

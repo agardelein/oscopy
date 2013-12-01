@@ -1,19 +1,19 @@
-print "*** Load file"
+print("*** Load file")
 oread demo/irf540.dat
 oadd vgs
 oadd vds
 oadd iRD
 oadd vgs,vds
 ofiglist
-print "*** Will delete 2"
+print("*** Will delete 2")
 odelete 2
 ofiglist
-print "*** Will delete 3"
+print("*** Will delete 3")
 odelete 3
 ofiglist
-print "*** Will delete 1"
+print("*** Will delete 1")
 odelete 1
 ofiglist
-print "*** Will delete 1"
+print("*** Will delete 1")
 odelete 1
 ofiglist

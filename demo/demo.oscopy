@@ -25,11 +25,11 @@ vsqufft=fft(vsqu)
 oimport vsqufft
 oadd vsqufft
 orange 0 15 -.002 .010
-ounit V
+ounit Hz, V
 v1=vsqu*3+10
 oimport v1
 oadd v1
-ounit V
+ounit s, V
 # Insert and remove a signal
 oselect 4-1
 oinsert v1
@@ -42,10 +42,10 @@ vs2.ref = vsqu.ref
 oimport vs
 oimport vs2
 ocreate vs
-ounit V
-print '***'
-print "*** List of figures"
-print '***'
+ounit s, V
+print('***')
+print("*** List of figures")
+print('***')
 ofiglist
 # Create a copy of vout and freeze it
 vo=vout
@@ -55,50 +55,50 @@ oselect 3-1
 oinsert vo
 osiglist
 # Updating
-print '***'
-print '*** Now we will show the updating capabilties of ioscopy.'
-print '*** We will use Figure 3 that has currently two identical signals'
-print '*** \'vout\' and \'vo\' where \'vo\' is a frozen copy of vout.'
-print '*** vout is the response of a simple RC lowpass filter.'
-print '***'
-print '*** We will change a value in the schematics and then run simulation'
-print '*** tools. Make sure you have gschem, gnetlist and gnucap installed'
-print '*** Commands to run can be edited with \'e\' when prompted.'
-print '***'
-print '*** Before updating simulation results we will run gschem.'
-print '*** In the schematics, change value of capacitor \'C\' eg from 10n to 1n.'
-print '*** Close gschem when finished to continue'
+print('***')
+print('*** Now we will show the updating capabilties of ioscopy.')
+print('*** We will use Figure 3 that has currently two identical signals')
+print('*** \'vout\' and \'vo\' where \'vo\' is a frozen copy of vout.')
+print('*** vout is the response of a simple RC lowpass filter.')
+print('***')
+print('*** We will change a value in the schematics and then run simulation')
+print('*** tools. Make sure you have gschem, gnetlist and gnucap installed')
+print('*** Commands to run can be edited with \'e\' when prompted.')
+print('***')
+print('*** Before updating simulation results we will run gschem.')
+print('*** In the schematics, change value of capacitor \'C\' eg from 10n to 1n.')
+print('*** Close gschem when finished to continue')
 cmd = 'gschem demo/demo.sch'
-c = raw_input('Command: %s [Y/n/e] ' % cmd)
+c = input('Command: %s [Y/n/e] ' % cmd)
 if not c: c = 'y'
-if c in ['e','E']: cmd = raw_input('Enter command to execute: ')
+if c in ['e','E']: cmd = input('Enter command to execute: ')
 if c in ['e', 'E', 'y', 'Y']: os.system(cmd)
 #pause...
-print '***'
-print '*** Now we will run gnetlist'
-print '*** press enter or \'y\' to continue, \'n\' to skip, \'e\' to change'
-print '***'
+print('***')
+print('*** Now we will run gnetlist')
+print('*** press enter or \'y\' to continue, \'n\' to skip, \'e\' to change')
+print('***')
 cmd = 'cd demo && gnetlist -g spice-sdb -s -o demo.net demo.sch'
-c = raw_input('Command: %s [Y/n/e] ' % cmd)
+c = input('Command: %s [Y/n/e] ' % cmd)
 if not c: c = 'y'
-if c in ['e','E']: cmd = raw_input('Enter command to execute: ')
+if c in ['e','E']: cmd = input('Enter command to execute: ')
 if c in ['e', 'E', 'y', 'Y']: os.system(cmd)
-print '***'
-print '*** Now we will run gnucap'
-print '*** press enter or \'y\' to continue, \'n\' to skip, \'e\' to change'
-print '***'
+print('***')
+print('*** Now we will run gnucap')
+print('*** press enter or \'y\' to continue, \'n\' to skip, \'e\' to change')
+print('***')
 cmd = 'cd demo && gnucap -b demo.net'
-c = raw_input('Command: %s [Y/n/e] ' % cmd)
+c = input('Command: %s [Y/n/e] ' % cmd)
 if not c: c = 'y'
-if c in ['e','E']: cmd = raw_input('Enter command to execute: ')
+if c in ['e','E']: cmd = input('Enter command to execute: ')
 if c in ['e', 'E', 'y', 'Y']: os.system(cmd)
-print '***'
-print "*** Unless there are errors simulation is complete we can update ioscopy"
-print '***'
+print('***')
+print("*** Unless there are errors simulation is complete we can update ioscopy")
+print('***')
 oupdate
-print '***'
-print "*** Now you should look at figure 3"
-print '***'
+print('***')
+print("*** Now you should look at figure 3")
+print('***')
 
 # Saving results
 owrite gnucap (ow:1) demo/res.dat v1,vsqu
