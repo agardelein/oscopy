@@ -1,0 +1,15 @@
+#!/bin/sh
+cat demo/demo.sch | awk '/value=10n/{print "value=.10n";next;}
+/value=.10n/{print "value=10n";next}
+/value=pulse 0 10 10n 10n 10n 1u 10u/{print "value=pulse 0 10 10n 10n 10n 0.5u 10u";next;}
+/value=pulse 0 10 10n 10n 10n 0.5u 10u/{print "value=pulse 0 10 10n 10n 10n 1u 10u";next}
+/value=pulse -1 1 1n 1n 1n 200n 400n/{print "value=pulse -1 1 1n 1n 1n 100n 200n";next}
+/value=pulse -1 1 1n 1n 1n 100n 200n/{print "value=pulse -1 1 1n 1n 1n 200n 400n";next}{print}' > tmp.sch
+mv tmp.sch demo/demo.sch
+#cd demo
+#gnetlist -s -o demo.cir -g spice-sdb demo.sch
+#gnucap -b demo.cir
+#cd ..
+cat demo/demo.sch|grep 'value=.*n$'
+cat demo/demo.sch|grep 'value=pulse 0 10'
+cat demo/demo.sch|grep 'value=pulse -1 1'

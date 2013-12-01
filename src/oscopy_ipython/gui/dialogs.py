@@ -157,7 +157,7 @@ class Run_Netlister_and_Simulate_Dialog(object):
 
     def _make_check_entry(self, name, do_run, commands, default_command):
         # returns a tuple (check_button, combo_box_entry)
-        combo = Gtk.combo_box_entry_new_text()
+        combo = Gtk.ComboBoxText.new_with_entry()
         if not commands:
             commands = [default_command]
         for cmd in commands:
@@ -172,7 +172,7 @@ class Run_Netlister_and_Simulate_Dialog(object):
 
     def display(self, actions):
         self._dlg = Gtk.Dialog(_("Run netlister and simulate"),
-                               flags=Gtk.DialogFlags.NO_SEPARATOR,
+#                               flags=Gtk.DialogFlags.NO_SEPARATOR,
                                buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
                                         Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         self._dlg.set_default_response(Gtk.ResponseType.ACCEPT)
@@ -184,7 +184,7 @@ class Run_Netlister_and_Simulate_Dialog(object):
                                             DEFAULT_NETLISTER_COMMAND)
         self._ckbutton_netl, self._entry_netl = btn, combo
         box.pack_start(btn, False, False, 12)
-        box.pack_start(combo, True, True)
+        box.pack_start(combo, True, True, 0)
         self._dlg.vbox.pack_start(box, False, False, 6)
 
         # simulator part
@@ -194,15 +194,17 @@ class Run_Netlister_and_Simulate_Dialog(object):
                                             DEFAULT_SIMULATOR_COMMAND)
         self._ckbutton_sim, self._entry_sim = btn, combo
         box.pack_start(btn, False, False, 12)
-        box.pack_start(combo, True, True)
+        box.pack_start(combo, True, True, 0)
         self._dlg.vbox.pack_start(box, False, False, 6)
 
         group = Gtk.SizeGroup(Gtk.SizeGroupMode.HORIZONTAL)
         group.add_widget(self._ckbutton_netl)
         group.add_widget(self._ckbutton_sim)
 
-        frame = Gtk.Frame('')
-        frame.get_label_widget().set_markup(_('<b>Options</b>'))
+        frame = Gtk.Frame()
+        label = Gtk.Label()
+        label.set_markup(_('<b>Options</b>'))
+        frame.set_label_widget(label)
         frame.set_shadow_type(Gtk.ShadowType.NONE)
         vbox = Gtk.VBox()
         box = Gtk.HBox(False, 12)
@@ -217,9 +219,9 @@ class Run_Netlister_and_Simulate_Dialog(object):
                                                 Gtk.STOCK_OK,
                                                 Gtk.ResponseType.ACCEPT))
         dialog.set_filename(actions['run_from'])
-        self._filechoose = Gtk.FileChooserButton(dialog)
+        self._filechoose = Gtk.FileChooserButton.new_with_dialog(dialog)
         box.pack_start(self._filechoose, True, True, 0)
-        vbox.pack_start(box, False)
+        vbox.pack_start(box, False, False, 0)
         box = Gtk.HBox()
         self._ckbutton_upd = Gtk.CheckButton(_('Update readers once terminated'))
         self._ckbutton_upd.set_active(actions['update'])

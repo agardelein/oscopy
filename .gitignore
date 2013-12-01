@@ -37,5 +37,4 @@ src/oscopy_ipython/ioscopy.py
 gschemrc
 git*.py
 examples/
-changecapa
 stamp-h1
