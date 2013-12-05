@@ -182,8 +182,9 @@ class App(dbus.service.Object):
         Gtk.main_quit()
         sys.exit()
 
-    def _action_figure(self, action, w, fignum):
-        if not (w.flags() & Gtk.VISIBLE):
+    def _action_figure(self, action, data):
+        w, fignum = data
+        if not w.is_visible():
             w.show()
         else:
             w.window.show()
