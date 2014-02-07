@@ -603,7 +603,7 @@ ip = get_ipython()
 c = ip.config
 ioscopycfg = IOscopyConfig(config=c)
 init(ip)
-_gui = OscopyGUI(bus_name, ctxt=_ctxt, ip=ip)
+_gui = OscopyGUI(bus_name, ctxt=_ctxt, ip=ip, datarootdir='@datarootdir@')
 set_ufuncs()
 
 # Process command line arguments

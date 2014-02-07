@@ -2,7 +2,7 @@
 
 
 from gi.repository import GObject
-from gi.repository import Gtk
+from gi.repository import Gtk, Gio
 from gi.repository import Gdk
 import signal
 import os
@@ -27,6 +27,8 @@ IOSCOPY_COL_TEXT = 0
 IOSCOPY_COL_X10 = 1
 IOSCOPY_COL_VIS = 2 # Text in graphs combobox visible
 
+IOSCOPY_UI = 'oscopy/ioscopy.ui'
+
 # Note: for crosshair, see Gdk.GC / function = Gdk.XOR
 
 def report_error(parent, msg):
@@ -36,6 +38,69 @@ def report_error(parent, msg):
     dlg.set_title(parent.get_title())
     dlg.run()
     dlg.destroy()
+
+class IOscopyApp(Gtk.Application):
+    def __init__(self, ctxt = None, ip = None, uidir=None, store=None):
+        Gtk.Application.__init__(self)
+        self.uidir = uidir
+        self.store = store
+        self.builder = None
+
+    def do_activate(self):
+        w = IOscopyAppWin(self)
+        w.show_all()
+
+    def do_startup(self):
+        Gtk.Application.do_startup(self)
+        # Add and connect actions
+        a = Gio.SimpleAction.new('quit', None)
+        a.connect('activate', self.quit_activated)
+        self.add_action(a)
+
+        a = Gio.SimpleAction.new('add_file', None)
+        a.connect('activate', self.add_file_activated)
+        self.add_action(a)
+
+        a = Gio.SimpleAction.new('update_files', None)
+        a.connect('activate', self.update_files_activated)
+        self.add_action(a)
+
+        a = Gio.SimpleAction.new('exec_script', None)
+        a.connect('activate', self.exec_script_activated)
+        self.add_action(a)
+
+        a = Gio.SimpleAction.new('run_netnsim', None)
+        a.connect('activate', self.run_netnsim_activated)
+        self.add_action(a)
+
+        self.builder = Gtk.Builder()
+        self.builder.add_from_file('/'.join((self.uidir, IOSCOPY_UI)))
+        self.set_app_menu(self.builder.get_object('appmenu'))
+
+    def quit_activated(self, action, param):
+#        self._write_config()
+#        readline.write_history_file(self.hist_file)
+        Gtk.main_quit()
+        sys.exit()
+
+    def add_file_activated(self, action, param):
+        print('Add file activated')
+
+    def update_files_activated(self, action, param):
+        print('Update file activated')
+
+    def exec_script_activated(self, action, param):
+        print('Execute script activated')
+
+    def new_math_signal_activated(self, action, param):
+        print('New Math signal activated')
+
+    def run_netnsim_activated(self, action, param):
+        print('Run Netlister and Simulator activated')
+
+class IOscopyAppWin(Gtk.ApplicationWindow):
+    def __init__(self, app):
+        Gtk.ApplicationWindow.__init__(self, title='IOscopy', application=app)
 
 class App(dbus.service.Object):
     __ui = '''<ui>
@@ -52,7 +117,7 @@ class App(dbus.service.Object):
       </menu>
     </menubar>
     </ui>'''
-    def __init__(self, bus_name, object_path='/org/freedesktop/Oscopy', ctxt=None, ip=None):
+    def __init__(self, bus_name, object_path='/org/freedesktop/Oscopy', ctxt=None, ip=None, datarootdir=None):
         if bus_name is not None:
             dbus.service.Object.__init__(self, bus_name, object_path)
         self._scale_to_str = {'lin': _('Linear'), 'logx': _('LogX'), 'logy': _('LogY'),\
@@ -102,8 +167,16 @@ class App(dbus.service.Object):
         #self._app_exec('read demo/ac.dat')
         #self._add_file('demo/res.dat')
 
+        ioscopy_app = IOscopyApp(ctxt, ip, datarootdir, self._store)
+        ioscopy_app.register(None)
+        ioscopy_app.do_activate()
+
         # From IPython/demo.py
         self.shell = ip
+
+        if datarootdir is not None:
+            print(datarootdir, '---------------------------')
+            print(os.path.exists('/'.join((datarootdir, 'oscopy/ioscopy.ui'))))
 
     SECTION = 'oscopy_ui'
     OPT_NETLISTER_COMMANDS = 'netlister_commands'

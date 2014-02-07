@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <menu id='appmenu'>
+    <submenu>
+      <attribute name='label' translatable='yes'>File</attribute>
+      <section>
+	<item>
+	  <attribute name='label' translatable='yes'>Add files(s)</attribute>
+	  <attribute name='action'>app.add_file</attribute>
+	</item>
+	<item>
+	  <attribute name='label' translatable='yes'>Update files</attribute>
+	  <attribute name='action'>app.update_files</attribute>
+	</item>
+	<item>
+	  <attribute name='label' translatable='yes'>Execute script</attribute>
+	  <attribute name='action'>app.exec_script</attribute>
+	</item>
+	<item>
+	  <attribute name='label' translatable='yes'>New Math signal</attribute>
+	  <attribute name='action'>app.new_math</attribute>
+	</item>
+	<item>
+	  <attribute name='label' translatable='yes'>Run netlister and simulate</attribute>
+	  <attribute name='action'>app.run_netnsim</attribute>
+	</item>
+	<item>
+	  <attribute name='label' translatable='yes'>Quit</attribute>
+	  <attribute name='action'>app.quit</attribute>
+	</item>
+      </section>
+    </submenu>
+  </menu>
+</interface>
