@@ -52,7 +52,6 @@ class App(dbus.service.Object):
       </menu>
     </menubar>
     </ui>'''
-
     def __init__(self, bus_name, object_path='/org/freedesktop/Oscopy', ctxt=None, ip=None):
         if bus_name is not None:
             dbus.service.Object.__init__(self, bus_name, object_path)
@@ -303,14 +302,16 @@ class App(dbus.service.Object):
                 sel.unselect_all()
                 sel.select_path(path)
             signals = {}
-            def add_sig_func(tm, p, iter):
+            def add_sig_func(tm, p, iter, data):
                 name = tm.get_value(iter, 0)
                 signals[name] = self._ctxt.signals[name]
-            sel.selected_foreach(add_sig_func)
+            sel.selected_foreach(add_sig_func, None)
             tvmenu = gui.menus.TreeviewMenu(self.create)
             menu = tvmenu.make_menu(self._ctxt.figures, signals)
-            menu.show_all()
-            menu.popup(None, None, None, event.button, event.time)
+#            menu = self._uimanager.get_widget('/PopupMenu')
+#            menu.show_all()
+            print(menu)
+            menu.popup(None, None, None, None, event.button, event.time)
             return True
         if event.button == 1:
             # It is not _that_ trivial to keep the selection when user start
@@ -322,6 +323,9 @@ class App(dbus.service.Object):
             rows = sel.get_selected_rows()[1]
             self._rows_for_drag = rows
             return False
+
+    def _on_menu_other(self, widget):
+        pass
 
     def _row_activated(self, widget, path, col):
         if len(path) == 1:

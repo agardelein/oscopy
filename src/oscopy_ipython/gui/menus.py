@@ -1,4 +1,4 @@
-from gi.repository import Gtk
+from gi.repository import Gtk, Gio
 from . import dialogs
 from oscopy.graphs import factors_to_names, abbrevs_to_factors
 from oscopy import MAX_GRAPHS_PER_FIGURE
@@ -178,39 +178,65 @@ class TreeviewMenu:
     def __init__(self, create_func):
         self._signals = None
         self._create = create_func
+        self._uiid = None
+        self._uimanager = None
 
     def make_menu(self, figures, signals):
         self._signals = signals
-        menu = Gtk.Menu()
-        item = Gtk.MenuItem(_('Insert Signal...'))
-        item.set_submenu(self._make_figure_menu(figures))
-        menu.append(item)
+        menu = Gio.Menu.new()
+#        item = Gio.MenuItem.new(_('Insert Signal...'), None)
+#        item.set_submenu()
+        menu.append_submenu('Insert Signal...', self._make_figure_menu(figures))
+        # action_group = Gtk.ActionGroup('tv_actions')
+        # self._uimanager = uimanager
+
+        # uis = "<popup name='PopupMenu'><menu action='InsertSignal'>"
+        # ag = [('InsertSignal', None, _('Insert Signal...'))]
+        # for i, f in enumerate(figures):
+        #     print(f)
+        #     uis+="<menu action='Figure%d'>\n" % i
+        #     ag += [("Figure%d" % i, None, _("Figure %d") % (i + 1))]
+        #     for j, g in enumerate(f.graphs):
+        #         print(g)
+        #         uis+="<menuitem action='Graph%d_%d'/>\n" % (i, j)
+        #         a = Gtk.Action(("Graph%d_%d" % (i, j), None, _("Graph %d") % (j + 1), None, self._insert_signals_to_graph_menu_item_activated
+        #         ag += [("Graph%d_%d" % (i, j), None, _("Graph %d") % (j + 1),
+        #                None,
+        #                self._insert_signals_to_graph_menu_item_activated)]
+        #     uis+="</menu>"
+        # uis+='</menu></popup>'
+        # print(uis)
+        # print(ag)
+        # action_group.add_actions(ag)
+        # uimanager.insert_action_group(action_group)
+        # uimanager.add_ui_from_string(uis)
+
+        # menu = uimanager.get_widget('/PopupMenu')
+
         return menu
 
     def _make_figure_menu(self, figures):
-        menu = Gtk.Menu()
+        menu = Gio.Menu.new()
         for f in figures:
-            item = Gtk.MenuItem(f.window.get_title())
-            item.set_submenu(self._make_graph_menu(f))
-            menu.append(item)
-        item = Gtk.MenuItem(_('In new figure'))
-        item.connect('activate', self._make_figure_menu_item_activated)
-        menu.append(item)
+            menu.append_submenu(f.window.get_title(), self._make_graph_menu(f))
+        item = Gio.MenuItem.new(_('In new figure'), None)
+#        item.connect('activate', self._make_figure_menu_item_activated)
+        menu.append_item(item)
         return menu
 
     def _make_graph_menu(self, figure):
-        menu = Gtk.Menu()
+        menu = Gio.Menu.new()
         for i, g in enumerate(figure.graphs):
             name = _('Graph %d') % (i + 1)
-            item = Gtk.MenuItem(name)
-            item.connect('activate',
-                         self._insert_signals_to_graph_menu_item_activated,
-                         g, figure)
-            menu.append(item)
-        item = Gtk.MenuItem(_('In new graph'))
-        item.connect('activate', self._add_graph_menu_item_activated, figure)
-        item.set_sensitive(len(figure.graphs) < MAX_GRAPHS_PER_FIGURE)
-        menu.append(item)
+            item = Gio.MenuItem.new(name, None)
+#            item.connect('activate',
+#                         self._insert_signals_to_graph_menu_item_activated,
+#                         g, figure)
+            menu.append_item(item)
+        item = Gio.MenuItem.new(_('In new graph'), None)
+#        item.connect('activate', self._add_graph_menu_item_activated, figure)
+#        item.set_sensitive(len(figure.graphs) < MAX_GRAPHS_PER_FIGURE)
+        menu.append_item(item)
         return menu
 
     def _add_graph_menu_item_activated(self, menuitem, figure):
