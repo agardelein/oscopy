@@ -31,4 +31,38 @@
       </section>
     </submenu>
   </menu>
+  <!-- The Treeview -->
+  <object class='GtkVBox' id='vbtv'>
+    <child>
+      <object class='GtkTreeView' id='tv'>
+	<!-- <property name='model'>self.store</property> -->
+	<child>
+	  <!-- Signal Column -->
+	  <object class='GtkTreeViewColumn' id='tvc'>
+	    <property name='title' translatable='yes'>Signal</property>
+	    <child>
+	      <object class='GtkCellRendererText' id='tvcrt'/>
+	      <attributes>
+		<attribute name="text">0</attribute>
+	      </attributes>
+	    </child>
+	  </object>
+	</child>
+	<child>
+	  <!-- Freeze Column -->
+	  <object class='GtkTreeViewColumn' id='tvc2'>
+	    <property name='title' translatable='yes'>Freeze</property>
+	    <child>
+	      <object class='GtkCellRendererToggle' id='tvcrtg'>
+		<property name='activatable'>True</property>
+	      </object>
+	      <attributes>
+		<attribute name='active'>2</attribute>
+	      </attributes>
+	    </child>
+	  </object>
+	</child>	  
+      </object>
+    </child>
+  </object>
 </interface>

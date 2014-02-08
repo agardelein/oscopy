@@ -42,12 +42,16 @@ def report_error(parent, msg):
 class IOscopyApp(Gtk.Application):
     def __init__(self, ctxt = None, ip = None, uidir=None, store=None):
         Gtk.Application.__init__(self)
+        # TODO: Validate uidir
         self.uidir = uidir
         self.store = store
         self.builder = None
 
     def do_activate(self):
         w = IOscopyAppWin(self)
+        w.add(self.builder.get_object('vbtv'))
+        tv = self.builder.get_object('tv')
+        tv.set_model(self.store)
         w.show_all()
 
     def do_startup(self):
@@ -167,16 +171,16 @@ class App(dbus.service.Object):
         #self._app_exec('read demo/ac.dat')
         #self._add_file('demo/res.dat')
 
-        ioscopy_app = IOscopyApp(ctxt, ip, datarootdir, self._store)
-        ioscopy_app.register(None)
-        ioscopy_app.do_activate()
+        self.ioscopy_app = IOscopyApp(ctxt, ip, datarootdir, self._store)
+        self.ioscopy_app.register(None)
+        self.ioscopy_app.do_activate()
 
         # From IPython/demo.py
         self.shell = ip
 
         if datarootdir is not None:
-            print(datarootdir, '---------------------------')
-            print(os.path.exists('/'.join((datarootdir, 'oscopy/ioscopy.ui'))))
+            # TODO : Validate datarootdir
+            pass
 
     SECTION = 'oscopy_ui'
     OPT_NETLISTER_COMMANDS = 'netlister_commands'
