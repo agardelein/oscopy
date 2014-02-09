@@ -32,36 +32,51 @@
     </submenu>
   </menu>
   <!-- The Treeview -->
-  <object class='GtkVBox' id='vbtv'>
+  <object class='GtkScrolledWindow' id='scwin'>
     <child>
-      <object class='GtkTreeView' id='tv'>
-	<!-- <property name='model'>self.store</property> -->
+      <object class='GtkVBox' id='vbtv'>
 	<child>
-	  <!-- Signal Column -->
-	  <object class='GtkTreeViewColumn' id='tvc'>
-	    <property name='title' translatable='yes'>Signal</property>
-	    <child>
-	      <object class='GtkCellRendererText' id='tvcrt'/>
-	      <attributes>
-		<attribute name="text">0</attribute>
-	      </attributes>
+	  <object class='GtkTreeView' id='tv'>
+	    <property name='model'>store</property>
+	    <signal name='row-activated' handler='row_activated'/>
+	    <signal name='drag_data_get' handler='drag_data_get'/>
+	    <signal name='button-press-event' handler='tv_button_pressed'/>
+	    <child internal-child='selection'>
+	      <object class ='GtkTreeSelection' id='selection'>
+		<!-- Gtk.SelectionMode.MULTIPLE = 3-->
+		<property name='mode'>3</property>
+	      </object>
 	    </child>
+	    <child>
+	      <!-- Signal Column -->
+	      <object class='GtkTreeViewColumn' id='tvc'>
+		<property name='title' translatable='yes'>Signal</property>
+		<child>
+		  <object class='GtkCellRendererText' id='tvcrt'/>
+		  <attributes>
+		    <attribute name="text">0</attribute>
+		  </attributes>
+		</child>
+	      </object>
+	    </child>
+	    <child>
+	      <!-- Freeze Column -->
+	      <object class='GtkTreeViewColumn' id='tvc2'>
+		<property name='title' translatable='yes'>Freeze</property>
+		<child>
+		  <object class='GtkCellRendererToggle' id='tvcrtg'>
+		    <property name='activatable'>True</property>
+		    <!-- Maybe changed to action ? -->
+		    <signal name='toggled' handler='cell_toggled'/>
+		  </object>
+		  <attributes>
+		    <attribute name='active'>2</attribute>
+		  </attributes>
+		</child>
+	      </object>
+	    </child>	  
 	  </object>
 	</child>
-	<child>
-	  <!-- Freeze Column -->
-	  <object class='GtkTreeViewColumn' id='tvc2'>
-	    <property name='title' translatable='yes'>Freeze</property>
-	    <child>
-	      <object class='GtkCellRendererToggle' id='tvcrtg'>
-		<property name='activatable'>True</property>
-	      </object>
-	      <attributes>
-		<attribute name='active'>2</attribute>
-	      </attributes>
-	    </child>
-	  </object>
-	</child>	  
       </object>
     </child>
   </object>

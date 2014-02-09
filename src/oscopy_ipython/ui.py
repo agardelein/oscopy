@@ -46,12 +46,10 @@ class IOscopyApp(Gtk.Application):
         self.uidir = uidir
         self.store = store
         self.builder = None
+        self.shell = ip
 
     def do_activate(self):
-        w = IOscopyAppWin(self)
-        w.add(self.builder.get_object('vbtv'))
-        tv = self.builder.get_object('tv')
-        tv.set_model(self.store)
+        w = IOscopyAppWin(self, self.uidir)
         w.show_all()
 
     def do_startup(self):
@@ -78,6 +76,7 @@ class IOscopyApp(Gtk.Application):
         self.add_action(a)
 
         self.builder = Gtk.Builder()
+        self.builder.expose_object('store', self.store)
         self.builder.add_from_file('/'.join((self.uidir, IOSCOPY_UI)))
         self.set_app_menu(self.builder.get_object('appmenu'))
 
@@ -102,9 +101,61 @@ class IOscopyApp(Gtk.Application):
     def run_netnsim_activated(self, action, param):
         print('Run Netlister and Simulator activated')
 
+    def exec_str(self, line):
+        if ' ' in line:
+            (first, last) = line.split(' ', 1)
+        else:
+            first = line
+            last = ''
+        if first.startswith('%') or self.shell.find_magic(first.split()[0]) is not None:
+            name = first.lstrip('%')
+            self.shell.run_line_magic(name, last.strip())
+        else:
+            self.shell.ex(line)
+
 class IOscopyAppWin(Gtk.ApplicationWindow):
-    def __init__(self, app):
+    def __init__(self, app, uidir=None):
         Gtk.ApplicationWindow.__init__(self, title='IOscopy', application=app)
+        self.app = app
+        self.uidir = uidir
+        self.builder = Gtk.Builder()
+        self.builder.expose_object('store', self.app.store)
+        self.builder.add_from_file('/'.join((self.uidir, IOSCOPY_UI)))
+        self.add(self.builder.get_object('scwin'))
+        self.set_default_size(400, 300)
+        handlers = {'row_activated': self.row_activated,
+                    'drag_data_get': self.drag_data_get,
+                    'tv_button_pressed': self.treeview_button_press,
+                    'cell_toggled': self.cell_toggled,
+                    }
+        self.builder.connect_signals(handlers)
+        # Bold font for file names
+        col = app.builder.get_object('tvc')
+        col.set_cell_data_func(app.builder.get_object('tvcrt'), self.reader_name_in_bold)        
+
+    def reader_name_in_bold(self, column, cell, model, iter, data=None):
+        if len(model.get_path(iter)) == 1:
+            cell.set_property('markup', "<b>" + model.get_value(iter, 0) +\
+                                  "</b>")
+        else:
+            cell.set_property('text', model.get_value(iter, 0))
+
+    def row_activated(self, widget, path, col):
+        if len(path) == 1:
+            return
+
+        row = self.app.store[path]
+        self.app.exec_str('ocreate %s' % row[0])
+
+    def treeview_button_press(self, widget, event):
+        print('treeview button press')
+
+    def cell_toggled(self, cellrenderer, path, data):
+        print('cell toggled')
+
+    def drag_data_get(self, widget, drag_context, selection, target_type,\
+                              time):
+        print('drag data get')
 
 class App(dbus.service.Object):
     __ui = '''<ui>
@@ -331,7 +382,7 @@ class App(dbus.service.Object):
     def _create_widgets(self):
         accel_group, self._menubar = self._create_menubar()
         self._treeview = self._create_treeview()
-
+ 
         sw = Gtk.ScrolledWindow()
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         sw.add(self._treeview)
@@ -701,3 +752,4 @@ def usr1_handler(signum, frame):
 
 def usr2_handler(signum, frame):
     app.update_from_usr2()
+
