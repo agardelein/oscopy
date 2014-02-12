@@ -28,6 +28,12 @@ IOSCOPY_COL_X10 = 1
 IOSCOPY_COL_VIS = 2 # Text in graphs combobox visible
 
 IOSCOPY_UI = 'oscopy/ioscopy.ui'
+IOSCOPY_NEW_MATH_SIGNAL_UI = 'oscopy/new_math_signal_dlg.glade'
+IOSCOPY_RUN_NETNSIM_UI = 'oscopy/run_netnsim_dlg.glade'
+IOSCOPY_SIGNAL_LIST_UI = 'oscopy/signal-list.ui'
+
+DEFAULT_NETLISTER_COMMAND = 'gnetlist -g spice-sdb -O sort_mode -o %s.net %s.sch'
+DEFAULT_SIMULATOR_COMMAND = 'gnucap -b %s.net'
 
 # Note: for crosshair, see Gdk.GC / function = Gdk.XOR
 
@@ -47,6 +53,14 @@ class IOscopyApp(Gtk.Application):
         self.store = store
         self.builder = None
         self.shell = ip
+        self.ctxt = ctxt
+        self.config = None
+        self.actions = {}
+
+    SECTION = 'oscopy_ui'
+    OPT_NETLISTER_COMMANDS = 'netlister_commands'
+    OPT_SIMULATOR_COMMANDS = 'simulator_commands'
+    OPT_RUN_DIRECTORY = 'run_directory'
 
     def do_activate(self):
         w = IOscopyAppWin(self, self.uidir)
@@ -72,6 +86,10 @@ class IOscopyApp(Gtk.Application):
         a.connect('activate', self.exec_script_activated)
         self.add_action(a)
 
+        a = Gio.SimpleAction.new('new_math', None)
+        a.connect('activate', self.new_math_signal_activated)
+        self.add_action(a)
+
         a = Gio.SimpleAction.new('run_netnsim', None)
         a.connect('activate', self.run_netnsim_activated)
         self.add_action(a)
@@ -80,6 +98,8 @@ class IOscopyApp(Gtk.Application):
         self.builder.expose_object('store', self.store)
         self.builder.add_from_file('/'.join((self.uidir, IOSCOPY_UI)))
         self.set_app_menu(self.builder.get_object('appmenu'))
+        self.init_config()
+        self.read_config()
 
     def quit_activated(self, action, param):
 #        self._write_config()
@@ -88,19 +108,70 @@ class IOscopyApp(Gtk.Application):
         sys.exit()
 
     def add_file_activated(self, action, param):
-        print('Add file activated')
+        dlg = Gtk.FileChooserDialog(_('Add file(s)'), parent=self.w,
+                                    buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                             Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
+        dlg.set_select_multiple(True)
+        resp = dlg.run()
+        if resp == Gtk.ResponseType.ACCEPT:
+            for filename in dlg.get_filenames():
+                self.exec_str('oread ' + filename)
+        dlg.destroy()
 
     def update_files_activated(self, action, param):
-        print('Update file activated')
+        self.ctxt.update()
 
     def exec_script_activated(self, action, param):
-        print('Execute script activated')
+        dlg = Gtk.FileChooserDialog(_('Execute script'), parent=self.w,
+                                    buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                             Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
+        resp = dlg.run()
+        filename = dlg.get_filename()
+        dlg.destroy()
+        if resp == Gtk.ResponseType.ACCEPT:
+            self.exec_str('oexec ' + filename)
 
     def new_math_signal_activated(self, action, param):
-        print('New Math signal activated')
+        builder = Gtk.Builder()
+        builder.add_from_file('/'.join((self.uidir, IOSCOPY_NEW_MATH_SIGNAL_UI)))
+
+        dlg = builder.get_object('new_math_signal_dlg')
+        dlg.show_all()
+
+        resp = dlg.run()
+        if resp:
+            entry = builder.get_object('math_entry')
+            expr = entry.get_text()
+            self.exec_str('%s' % expr)
+            self.exec_str('oimport %s' % expr.split('=')[0].strip())
+        dlg.destroy()
 
     def run_netnsim_activated(self, action, param):
-        print('Run Netlister and Simulator activated')
+        builder = Gtk.Builder()
+        helper = gui.dialogs.run_netnsim_dlg_helper()
+        dlg = helper.build_dialog(builder,
+                         '/'.join((self.uidir, IOSCOPY_RUN_NETNSIM_UI)),
+                         self.actions,
+                         DEFAULT_NETLISTER_COMMAND,
+                         DEFAULT_SIMULATOR_COMMAND
+                         )
+        dlg.show_all()
+        resp = dlg.run()
+
+        if resp:
+            self.actions = helper.collect_data()
+            run_dir = self.actions['run_from']
+            if self.actions['run_netlister'][0]:
+                if not self.exec_ext_command(self.actions['run_netlister'][1][0], run_dir):
+                    dlg.destroy()
+                    return
+            if self.actions['run_simulator'][0]:
+                if not self.exec_ext_command(self.actions['run_simulator'][1][0], run_dir):
+                    dlg.destroy()
+                    return
+            if self.actions['update']:
+                self.ctxt.update()
+        dlg.destroy()
 
     def exec_str(self, line):
         if ' ' in line:
@@ -113,6 +184,67 @@ class IOscopyApp(Gtk.Application):
             self.shell.run_line_magic(name, last.strip())
         else:
             self.shell.ex(line)
+
+    def exec_ext_command(self, cmd, run_dir):
+        old_dir = os.getcwd()
+        os.chdir(run_dir)
+        try:
+            status, output = subprocess.getstatusoutput(cmd)
+            if status:
+                msg = _("Executing command '%s' failed.") % cmd
+                report_error(self.w, msg)
+            return status == 0
+        finally:
+            os.chdir(old_dir)
+
+    #
+    # Configuration-file related functions
+    #
+    def init_config(self):
+        # initialize configuration stuff
+        path = BaseDirectory.save_config_path('oscopy')
+        self.config_file = os.path.join(path, 'gui')
+        self.hist_file = os.path.join(path, 'history')
+        section = IOscopyApp.SECTION
+        self.config = configparser.RawConfigParser()
+        self.config.add_section(section)
+        # defaults
+        self.config.set(section, IOscopyApp.OPT_NETLISTER_COMMANDS, '')
+        self.config.set(section, IOscopyApp.OPT_SIMULATOR_COMMANDS, '')
+        self.config.set(section, IOscopyApp.OPT_RUN_DIRECTORY, '.')
+
+    def sanitize_list(self, lst):
+        return [x for x in [x.strip() for x in lst] if len(x) > 0]
+
+    def actions_from_config(self, config):
+        section =IOscopyApp.SECTION
+        netlister_commands = config.get(section, IOscopyApp.OPT_NETLISTER_COMMANDS)
+        netlister_commands = self.sanitize_list(netlister_commands.split(';'))
+        simulator_commands = config.get(section, IOscopyApp.OPT_SIMULATOR_COMMANDS)
+        simulator_commands = self.sanitize_list(simulator_commands.split(';'))
+        actions = {
+            'run_netlister': (True, netlister_commands),
+            'run_simulator': (True, simulator_commands),
+            'update': True,
+            'run_from': config.get(section, IOscopyApp.OPT_RUN_DIRECTORY)}
+        return actions
+
+    def actions_to_config(self, actions, config):
+        section = IOscopyApp.SECTION
+        netlister_commands = ';'.join(actions['run_netlister'][1])
+        simulator_commands = ';'.join(actions['run_simulator'][1])
+        config.set(section, IOscopyApp.OPT_NETLISTER_COMMANDS, netlister_commands)
+        config.set(section, IOscopyApp.OPT_SIMULATOR_COMMANDS, simulator_commands)
+        config.set(section, IOscopyApp.OPT_RUN_DIRECTORY, actions['run_from'])
+
+    def read_config(self):
+        self.config.read(self.config_file)
+        self.actions = self.actions_from_config(self.config)
+
+    def write_config(self):
+        self.actions_to_config(self.actions, self.config)
+        with open(self.config_file, 'w') as f:
+            self.config.write(f)
 
 class IOscopyAppWin(Gtk.ApplicationWindow):
     def __init__(self, app, uidir=None):
@@ -140,7 +272,7 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
 
         self.builder = Gtk.Builder()
         self.builder.expose_object('store', self.app.store)
-        self.builder.add_from_file('/'.join((self.app.uidir, IOSCOPY_UI)))
+        self.builder.add_from_file('/'.join((self.app.uidir, IOSCOPY_SIGNAL_LIST_UI)))
         self.add(self.builder.get_object('scwin'))
         self.set_default_size(400, 300)
         handlers = {'row_activated': self.row_activated,
@@ -264,7 +396,6 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
                            target_type, time):
         name = data.get_text()
         if type(name) == str and name.startswith('file://'):
-            print(name[7:].strip())
             self.app.exec_str('%%oread %s' % name[7:].strip())
 
 class App(dbus.service.Object):

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <menu id='appmenu'>
-    <submenu>
-      <attribute name='label' translatable='yes'>File</attribute>
+<!--    <submenu>-->
+<!--      <attribute name='label' translatable='yes'>File</attribute>-->
       <section>
 	<item>
 	  <attribute name='label' translatable='yes'>Add files(s)</attribute>
@@ -13,71 +13,26 @@
 	  <attribute name='action'>app.update_files</attribute>
 	</item>
 	<item>
+	  <attribute name='label' translatable='yes'>New Math signal</attribute>
+	  <attribute name='action'>app.new_math</attribute>
+	</item>
+      </section>
+      <section>
+	<item>
 	  <attribute name='label' translatable='yes'>Execute script</attribute>
 	  <attribute name='action'>app.exec_script</attribute>
 	</item>
 	<item>
-	  <attribute name='label' translatable='yes'>New Math signal</attribute>
-	  <attribute name='action'>app.new_math</attribute>
-	</item>
-	<item>
-	  <attribute name='label' translatable='yes'>Run netlister and simulate</attribute>
+	  <attribute name='label' translatable='yes'>Run netlister and simulator</attribute>
 	  <attribute name='action'>app.run_netnsim</attribute>
 	</item>
+      </section>
+      <section>
 	<item>
 	  <attribute name='label' translatable='yes'>Quit</attribute>
 	  <attribute name='action'>app.quit</attribute>
 	</item>
       </section>
-    </submenu>
+<!--    </submenu>-->
   </menu>
-  <!-- The Treeview -->
-  <object class='GtkScrolledWindow' id='scwin'>
-    <child>
-      <object class='GtkVBox' id='vbtv'>
-	<child>
-	  <object class='GtkTreeView' id='tv'>
-	    <property name='model'>store</property>
-	    <signal name='row-activated' handler='row_activated'/>
-	    <signal name='drag_data_get' handler='drag_data_get'/>
-	    <signal name='button-press-event' handler='tv_button_pressed'/>
-	    <child internal-child='selection'>
-	      <object class ='GtkTreeSelection' id='selection'>
-		<!-- Gtk.SelectionMode.MULTIPLE = 3-->
-		<property name='mode'>3</property>
-	      </object>
-	    </child>
-	    <child>
-	      <!-- Signal Column -->
-	      <object class='GtkTreeViewColumn' id='tvc'>
-		<property name='title' translatable='yes'>Signal</property>
-		<child>
-		  <object class='GtkCellRendererText' id='tvcrt'/>
-		  <attributes>
-		    <attribute name="text">0</attribute>
-		  </attributes>
-		</child>
-	      </object>
-	    </child>
-	    <child>
-	      <!-- Freeze Column -->
-	      <object class='GtkTreeViewColumn' id='tvc2'>
-		<property name='title' translatable='yes'>Freeze</property>
-		<child>
-		  <object class='GtkCellRendererToggle' id='tvcrtg'>
-		    <property name='activatable'>True</property>
-		    <!-- Maybe changed to action ? -->
-		    <signal name='toggled' handler='cell_toggled'/>
-		  </object>
-		  <attributes>
-		    <attribute name='active'>2</attribute>
-		  </attributes>
-		</child>
-	      </object>
-	    </child>	  
-	  </object>
-	</child>
-      </object>
-    </child>
-  </object>
 </interface>

@@ -150,6 +150,73 @@ class Enter_Range_Dialog(object):
 DEFAULT_NETLISTER_COMMAND = 'gnetlist -g spice-sdb -O sort_mode -o %s.net %s.sch'
 DEFAULT_SIMULATOR_COMMAND = 'gnucap -b %s.net'
 
+class run_netnsim_dlg_helper(GObject.GObject):
+    def __init__(self):
+        pass
+
+    def build_dialog(self, builder, uifile, actions, default_net_cmd, default_sim_cmd):
+        builder.add_from_file(uifile)
+        # Not able to manage this from Glade...
+        (do_run, commands) = actions['run_netlister']
+        combo_net = Gtk.ComboBoxText.new_with_entry()
+        if not commands:
+            commands = [default_net_cmd]
+        for cmd in commands:
+            combo_net.append_text(cmd)
+        combo_net.set_active(0)
+        combo_net.set_sensitive(do_run)
+        builder.get_object('net_box').pack_start(combo_net, True, True, 0)
+        builder.get_object('checkbutton-netlister').set_active(do_run)
+        builder.get_object('checkbutton-netlister').connect('toggled', self.check_button_toggled, combo_net)
+        builder.expose_object('combo-net', combo_net)
+
+        # Not able to manage this from Glade...
+        (do_run, commands) = actions['run_simulator']
+        combo_sim = Gtk.ComboBoxText.new_with_entry()
+        if not commands:
+            commands = [default_sim_cmd]
+        for cmd in commands:
+            combo_sim.append_text(cmd)
+        combo_sim.set_active(0)
+        combo_sim.set_sensitive(do_run)
+        builder.get_object('sim_box').pack_start(combo_sim, True, True, 0)
+        builder.get_object('checkbutton-simulator').set_active(do_run)
+        builder.get_object('checkbutton-simulator').connect('toggled', self.check_button_toggled, combo_sim)
+        builder.expose_object('combo-sim', combo_sim)
+
+        # Values from config
+        builder.get_object('run_dir_button').select_filename(actions['run_from'])
+        builder.get_object('checkbutton-update-readers').set_active(actions['update'])
+        self.builder = builder
+        return builder.get_object('run_netnsim_dlg')
+
+    def check_button_toggled(self, button, combo):
+        combo.set_sensitive(button.get_active())
+
+    def collect_data(self):
+        # make sure that the command to run is always the first
+        # element of the list (more recent commands are at the
+        # beginning of the list) and eliminate duplicates
+        combo_net = self.builder.get_object('combo-net')
+        netlister_cmds = [row[0] for row in combo_net.get_model()]
+        if combo_net.get_active_text() in netlister_cmds:
+            netlister_cmds.remove(combo_net.get_active_text())
+        netlister_cmds.insert(0, combo_net.get_active_text())
+
+        combo_sim = self.builder.get_object('combo-sim')
+        simulator_cmds = [row[0] for row in combo_sim.get_model()]
+        if combo_sim.get_active_text() in simulator_cmds:
+            simulator_cmds.remove(combo_sim.get_active_text())
+        simulator_cmds.insert(0, combo_sim.get_active_text())
+
+        actions = {}
+        actions['run_netlister'] = (self.builder.get_object('checkbutton-netlister').get_active(), netlister_cmds)
+        actions['run_simulator'] = (self.builder.get_object('checkbutton-simulator').get_active(), simulator_cmds)
+        actions['update'] = self.builder.get_object('checkbutton-update-readers').get_active()
+        actions['run_from'] = self.builder.get_object('run_dir_button').get_filename()
+        return actions
+
+
 class Run_Netlister_and_Simulate_Dialog(object):
     def __init__(self):
         self._dlg = None
