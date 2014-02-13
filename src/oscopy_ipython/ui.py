@@ -240,6 +240,40 @@ class IOscopyApp(Gtk.Application):
                 self.remove_window(w)
                 w.destroy()
 
+    def add_file(self, filename):
+        if filename.strip() in self.ctxt.readers:
+            it = self.store.append(None, (filename.strip(), None, False))
+            for name, sig in self.ctxt.readers[filename.strip()]\
+                    .signals.items():
+                self.store.append(it, (name, sig, sig.freeze))
+
+    def update_readers(self):
+        # Parse self._store to find deleted or new signals.
+        # Shall be called subsequently to an update of reasers.
+        iter = self.store.get_iter_first()
+        while iter:
+            rname = self.store.get_value(iter, 0)
+            # Check for deleted signals
+            citer = self.store.iter_children(iter)
+            while citer:
+                s = self.store.get_value(citer, 1)
+                if s.name not in list(self.ctxt.readers[rname].signals.keys()):
+                    self.store.remove(citer)
+                    if not self.store.iter_is_valid(citer):
+                        citer = None
+                else:
+                    citer = self.store.iter_next(citer)
+            # Add new signals
+            for sn, s in self.ctxt.readers[rname].signals.items():
+                citer = self.store.iter_children(iter)
+                while citer:
+                    if self.store.get_value(citer, 1).name == sn:
+                        break
+                    citer = self.store.iter_next(citer)
+                if not citer:
+                    self.store.append(iter, (sn, s, s.freeze))
+            iter = self.store.iter_next(iter)
+
     def axes_enter(self, event):
         self.figure_enter(event)
         self.current_graph = event.inaxes
@@ -265,8 +299,6 @@ class IOscopyApp(Gtk.Application):
     def figure_leave(self, event):
 #        self._current_figure = None
         pass
-
-
 
     #
     # Configuration-file related functions

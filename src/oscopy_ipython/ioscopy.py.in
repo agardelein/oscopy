@@ -122,7 +122,7 @@ def do_read(self, arg):
         return
     try:
         sigs = _ctxt.read(fn)
-        _gui.add_file(fn)
+        ioscopy_app.add_file(fn)
         _globals.update(sigs)
     except ReadError as e:
         print(_('Failed to read %s:') % fn, e)
@@ -164,7 +164,7 @@ def do_update(self, args):
             _ctxt.update(_ctxt.readers[args])
         else:
             print(_("%s not found in readers") % args)
-    _gui.update_readers()
+    ioscopy_app.update_readers()
     do_refresh(self, '')
 
 def do_add(self, args):
