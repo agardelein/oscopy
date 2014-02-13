@@ -24,7 +24,7 @@ from oscopy import Context
 from oscopy import ReadError
 from oscopy import WriteError
 from oscopy import MAX_GRAPHS_PER_FIGURE, factors_to_names, abbrevs_to_factors
-from oscopy_ipython import OscopyGUI, IOscopyApp
+from oscopy_ipython import IOscopyApp
 
 _globals = globals()
 _globals['Signal'] = Signal
@@ -184,7 +184,6 @@ def do_add(self, args):
     else:
         do_create(self, args)
     do_refresh(self, '')
-#    _gui.add(_current_figure, args)
 
 def do_delete(self, args):
     """odelete GRAPH#
@@ -199,7 +198,6 @@ def do_delete(self, args):
         else:
             _current_graph = None
     do_refresh(self, '')
-#    _gui.delete(_current_figure, args)
 
 def do_mode(self, args):
     """omode MODE
@@ -284,13 +282,13 @@ def do_freeze(self, args):
     """ofreeze SIG [, SIG [, SIG]...]
     Do not consider signal for subsequent updates"""
     _ctxt.freeze(get_signames(args))
-    _gui.freeze(args)
+    ioscopy_app.freeze(args)
 
 def do_unfreeze(self, args):
     """ofreeze SIG [, SIG [, SIG]...]
     Consider signal for subsequent updates"""
     _ctxt.unfreeze(get_signames(args))
-    _gui.freeze(args)
+    ioscopy_app.freeze(args)
 
 def do_siglist(self, args):
     """osiglist
@@ -395,9 +393,6 @@ def do_gui(self, args):
     """ogui
     Invoke the oscopy gui
     """
-    global _gui
-    global _ctxt
-    _gui.show_all()
     ioscopy_app.w.show_all()
 
 def do_import(self, args):
@@ -412,7 +407,7 @@ def do_import(self, args):
             sigs = _ctxt.import_signal(sig, name)
             for s in sigs.values():
                 _globals[s.name] = s
-            _gui.add_file("%s=%s" % (name, sig.name))
+            ioscopy_app.add_file("%s=%s" % (name, sig.name))
         except ReadError as e:
             print(_("Error: Signal not recognized (%s)") % e)
             return
@@ -607,8 +602,6 @@ init(ip)
 ioscopy_app = IOscopyApp(_ctxt, ip, '@datarootdir@')
 ioscopy_app.register(None)
 ioscopy_app.do_activate()
-
-_gui = OscopyGUI(bus_name, ctxt=_ctxt, ip=ip, datarootdir='@datarootdir@', store=ioscopy_app.store)
 
 set_ufuncs()
 

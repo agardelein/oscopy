@@ -1,3 +1,2 @@
-from .ui import App as OscopyGUI
-from .ui import IOscopyApp
+from .ioscopyapp import IOscopyApp
 from . import gui
