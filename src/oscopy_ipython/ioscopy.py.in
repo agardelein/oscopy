@@ -24,7 +24,7 @@ from oscopy import Context
 from oscopy import ReadError
 from oscopy import WriteError
 from oscopy import MAX_GRAPHS_PER_FIGURE, factors_to_names, abbrevs_to_factors
-from oscopy_ipython import OscopyGUI
+from oscopy_ipython import OscopyGUI, IOscopyApp
 
 _globals = globals()
 _globals['Signal'] = Signal
@@ -398,6 +398,7 @@ def do_gui(self, args):
     global _gui
     global _ctxt
     _gui.show_all()
+    ioscopy_app.w.show_all()
 
 def do_import(self, args):
     """oimport
@@ -603,7 +604,12 @@ ip = get_ipython()
 c = ip.config
 ioscopycfg = IOscopyConfig(config=c)
 init(ip)
-_gui = OscopyGUI(bus_name, ctxt=_ctxt, ip=ip, datarootdir='@datarootdir@')
+ioscopy_app = IOscopyApp(_ctxt, ip, '@datarootdir@')
+ioscopy_app.register(None)
+ioscopy_app.do_activate()
+
+_gui = OscopyGUI(bus_name, ctxt=_ctxt, ip=ip, datarootdir='@datarootdir@', store=ioscopy_app.store)
+
 set_ufuncs()
 
 # Process command line arguments

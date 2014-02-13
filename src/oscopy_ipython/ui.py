@@ -45,16 +45,18 @@ def report_error(parent, msg):
     dlg.destroy()
 
 class IOscopyApp(Gtk.Application):
-    def __init__(self, ctxt = None, ip = None, uidir=None, store=None):
+    def __init__(self, ctxt = None, ip = None, uidir=None):
         Gtk.Application.__init__(self)
         # TODO: Validate uidir
         self.uidir = uidir
-        self.store = store
         self.builder = None
         self.shell = ip
         self.ctxt = ctxt
         self.config = None
         self.actions = {}
+        self.store = Gtk.TreeStore(GObject.TYPE_STRING, GObject.TYPE_PYOBJECT,
+                                    GObject.TYPE_BOOLEAN)
+
 
     SECTION = 'oscopy_ui'
     OPT_NETLISTER_COMMANDS = 'netlister_commands'
@@ -260,7 +262,7 @@ class App(dbus.service.Object):
       </menu>
     </menubar>
     </ui>'''
-    def __init__(self, bus_name, object_path='/org/freedesktop/Oscopy', ctxt=None, ip=None, datarootdir=None):
+    def __init__(self, bus_name, object_path='/org/freedesktop/Oscopy', ctxt=None, ip=None, datarootdir=None, store=None):
         if bus_name is not None:
             dbus.service.Object.__init__(self, bus_name, object_path)
         self._scale_to_str = {'lin': _('Linear'), 'logx': _('LogX'), 'logy': _('LogY'),\
@@ -303,16 +305,12 @@ class App(dbus.service.Object):
         else:
             self._ctxt = ctxt        
             
-        self._store = Gtk.TreeStore(GObject.TYPE_STRING, GObject.TYPE_PYOBJECT,
-                                    GObject.TYPE_BOOLEAN)
-        self._create_widgets()
         #self._app_exec('read demo/irf540.dat')
         #self._app_exec('read demo/ac.dat')
         #self._add_file('demo/res.dat')
 
-        self.ioscopy_app = IOscopyApp(ctxt, ip, datarootdir, self._store)
-        self.ioscopy_app.register(None)
-        self.ioscopy_app.do_activate()
+        self._store = store
+        self._create_widgets()
 
         # From IPython/demo.py
         self.shell = ip
@@ -499,7 +497,6 @@ class App(dbus.service.Object):
 
     def show_all(self):
         self._mainwindow.show()
-        self.ioscopy_app.w.show()
 
     #
     # Event-triggered functions
