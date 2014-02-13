@@ -54,9 +54,12 @@ class IOscopyApp(Gtk.Application):
         self.ctxt = ctxt
         self.config = None
         self.actions = {}
+        self.windows_to_figures = {}
+        self.fignum_to_windows = {}
+        self.current_graph = None
+        self.current_figure = None
         self.store = Gtk.TreeStore(GObject.TYPE_STRING, GObject.TYPE_PYOBJECT,
                                     GObject.TYPE_BOOLEAN)
-
 
     SECTION = 'oscopy_ui'
     OPT_NETLISTER_COMMANDS = 'netlister_commands'
@@ -197,6 +200,73 @@ class IOscopyApp(Gtk.Application):
             return status == 0
         finally:
             os.chdir(old_dir)
+
+    #
+    # Callbacks for ioscopy script
+    #
+    def create(self, sigs):
+        """ Instanciate the window widget with the figure inside, set the
+        relevant events and add it to the 'Windows' menu.
+        Finally, select the first graph of this figure.
+
+        The figure has been instanciated by the application
+        and is assumed to be the last one in Context's figure list
+        """
+
+        fignum = len(self.ctxt.figures) + 1
+        fig = IOscopy_GTK_Figure(sigs, None,
+                                 _('Figure %d') % fignum)
+        self.ctxt.create(fig)
+
+        fig.window.connect('drag_data_received', fig.drag_data_received_cb,
+                           self.ctxt.signals)
+        fig.canvas.mpl_connect('axes_enter_event', self.axes_enter)
+        fig.canvas.mpl_connect('axes_leave_event', self.axes_leave)
+        fig.canvas.mpl_connect('figure_enter_event', self.figure_enter)
+        fig.canvas.mpl_connect('figure_leave_event', self.figure_leave)
+
+        self.add_window(fig.window)
+        self.exec_str('%%oselect %d-1' % fignum)
+        return fig
+
+    def destroy(self, num):
+        if not num.isdigit() or int(num) > len(self.ctxt.figures):
+            return
+        else:
+            fignum = int(num)
+
+        for w in self.get_windows():
+            if _('Figure %d') % fignum == w.get_title():
+                self.remove_window(w)
+                w.destroy()
+
+    def axes_enter(self, event):
+        self.figure_enter(event)
+        self.current_graph = event.inaxes
+
+        axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
+        fig_num = self.ctxt.figures.index(self.current_figure) + 1
+        self.exec_str('%%oselect %d-%d' % (fig_num, axes_num))
+
+    def axes_leave(self, event):
+        # Unused for better user interaction
+#        self._current_graph = None
+        pass
+
+    def figure_enter(self, event):
+        self.current_figure = event.canvas.figure
+        if hasattr(event, 'inaxes') and event.inaxes is not None:
+            axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
+        else:
+            axes_num = 1
+        fig_num = self.ctxt.figures.index(self.current_figure) + 1
+        self.exec_str('%%oselect %d-%d' % (fig_num, axes_num))
+
+    def figure_leave(self, event):
+#        self._current_figure = None
+        pass
+
+
 
     #
     # Configuration-file related functions

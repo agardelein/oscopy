@@ -49,7 +49,7 @@ def do_create(self, args):
     sigs = _ctxt.names_to_signals(get_signames(args))
     # Delegate the call to Context.create() to the GUI
     # Finally it does %oselect for the _current_figure and _current_graph
-    fig = _gui.create(sigs)
+    fig = ioscopy_app.create(sigs)
 
 def do_destroy(self, args):
     """odestroy FIG#
@@ -61,7 +61,7 @@ def do_destroy(self, args):
     else:
         fignum = eval(args)
     _ctxt.destroy(fignum)
-    _gui.destroy(args)
+    ioscopy_app.destroy(args)
     # Go back to the first graph of the first figure or None
     _current_figure = None
     _current_graph = None
