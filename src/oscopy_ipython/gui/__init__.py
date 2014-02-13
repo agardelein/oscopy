@@ -1,1 +1,1 @@
-from . import menus
+from . import menus, appwin
