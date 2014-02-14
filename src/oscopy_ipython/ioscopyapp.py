@@ -1,8 +1,7 @@
 from gi.repository import GObject
 from gi.repository import Gtk, Gio
 from gi.repository import Gdk
-import signal
-import os
+import os, signal
 import sys
 import readline
 import subprocess
@@ -101,6 +100,8 @@ class IOscopyApp(Gtk.Application):
         self.set_app_menu(self.builder.get_object('appmenu'))
         self.init_config()
         self.read_config()
+        signal.signal(signal.SIGUSR1, self.sigusr1_handler)
+        signal.signal(signal.SIGUSR2, self.sigusr2_handler)
 
     def quit_activated(self, action, param):
 #        self._write_config()
@@ -380,3 +381,9 @@ class IOscopyApp(Gtk.Application):
         self.actions_to_config(self.actions, self.config)
         with open(self.config_file, 'w') as f:
             self.config.write(f)
+
+    def sigusr1_handler(self, signum, frame):
+        self.activate_action('update_files', None)
+
+    def sigusr2_handler(self, signum, frame):
+        self.activate_action('run_netnsim', None)
