@@ -600,6 +600,7 @@ c = ip.config
 ioscopycfg = IOscopyConfig(config=c)
 init(ip)
 ioscopy_app = IOscopyApp(_ctxt, ip, '@datarootdir@')
+ioscopy_app.set_application_id('org.gtk.oscopy')
 ioscopy_app.register(None)
 ioscopy_app.do_activate()
 
