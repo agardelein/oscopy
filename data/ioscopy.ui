@@ -28,6 +28,19 @@
 	</item>
       </section>
       <section>
+	<submenu id='figmenu'>
+	  <attribute name='label' translatable='yes'>Windows</attribute>
+	  <section>
+	    <item>
+	      <attribute name='label' translatable='yes'>Show Signal Window</attribute>
+	      <attribute name='action'>app.show_sigwin</attribute>
+	    </item>
+	  </section>
+	  <section id='figwin_section'>
+	  </section>
+	</submenu>
+      </section>
+      <section>
 	<item>
 	  <attribute name='label' translatable='yes'>Quit</attribute>
 	  <attribute name='action'>app.quit</attribute>

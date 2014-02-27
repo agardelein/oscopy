@@ -94,6 +94,10 @@ class IOscopyApp(Gtk.Application):
         a.connect('activate', self.run_netnsim_activated)
         self.add_action(a)
 
+        a = Gio.SimpleAction.new('show_sigwin', None)
+        a.connect('activate', self.show_sigwin)
+        self.add_action(a)
+
         self.builder = Gtk.Builder()
         self.builder.expose_object('store', self.store)
         self.builder.add_from_file('/'.join((self.uidir, IOSCOPY_UI)))
@@ -175,6 +179,9 @@ class IOscopyApp(Gtk.Application):
                 self.ctxt.update()
         dlg.destroy()
 
+    def show_sigwin(self, action, param):
+        self.w.show_all()
+
     def exec_str(self, line):
         if ' ' in line:
             (first, last) = line.split(' ', 1)
@@ -210,7 +217,7 @@ class IOscopyApp(Gtk.Application):
         The figure has been instanciated by the application
         and is assumed to be the last one in Context's figure list
         """
-
+            
         fignum = len(self.ctxt.figures) + 1
         fig = IOscopy_GTK_Figure(sigs, None,
                                  _('Figure %d') % fignum)
@@ -225,6 +232,7 @@ class IOscopyApp(Gtk.Application):
 
         self.add_window(fig.window)
         self.exec_str('%%oselect %d-1' % fignum)
+
         return fig
 
     def destroy(self, num):
