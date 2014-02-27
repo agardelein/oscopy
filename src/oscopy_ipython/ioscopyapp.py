@@ -1,5 +1,5 @@
 from gi.repository import GObject
-from gi.repository import Gtk, Gio
+from gi.repository import Gtk, Gio, GLib
 from gi.repository import Gdk
 import os, signal
 import sys
@@ -95,7 +95,11 @@ class IOscopyApp(Gtk.Application):
         self.add_action(a)
 
         a = Gio.SimpleAction.new('show_sigwin', None)
-        a.connect('activate', self.show_sigwin)
+        a.connect('activate', self.show_sigwin_activated)
+        self.add_action(a)
+
+        a = Gio.SimpleAction.new('show_figure', GLib.VariantType.new('s'))
+        a.connect('activate', self.show_figure_activated)
         self.add_action(a)
 
         self.builder = Gtk.Builder()
@@ -179,8 +183,15 @@ class IOscopyApp(Gtk.Application):
                 self.ctxt.update()
         dlg.destroy()
 
-    def show_sigwin(self, action, param):
+    def show_sigwin_activated(self, action, param):
         self.w.show_all()
+
+    def show_figure_activated(self, action, param):
+        for w in self.get_windows():
+            if w.get_title() == param.get_string():
+                w.present()
+                self.exec_str('%%oselect %s-1' % param.get_string().split()[1])
+                return
 
     def exec_str(self, line):
         if ' ' in line:
@@ -219,8 +230,8 @@ class IOscopyApp(Gtk.Application):
         """
             
         fignum = len(self.ctxt.figures) + 1
-        fig = IOscopy_GTK_Figure(sigs, None,
-                                 _('Figure %d') % fignum)
+        figname = _('Figure %d') % fignum
+        fig = IOscopy_GTK_Figure(sigs, None, figname)
         self.ctxt.create(fig)
 
         fig.window.connect('drag_data_received', fig.drag_data_received_cb,
@@ -230,9 +241,13 @@ class IOscopyApp(Gtk.Application):
         fig.canvas.mpl_connect('figure_enter_event', self.figure_enter)
         fig.canvas.mpl_connect('figure_leave_event', self.figure_leave)
 
-        self.add_window(fig.window)
         self.exec_str('%%oselect %d-1' % fignum)
 
+        # Add window to the application menu
+        self.add_window(fig.window)
+        sect = self.builder.get_object('figwin_section')
+        print(sect)
+        sect.append_item(Gio.MenuItem.new(figname, 'app.show_figure::%s' % figname))
         return fig
 
     def destroy(self, num):
@@ -243,6 +258,13 @@ class IOscopyApp(Gtk.Application):
 
         for w in self.get_windows():
             if _('Figure %d') % fignum == w.get_title():
+                # Remove the window from the appmenu
+                sect = self.builder.get_object('figwin_section')
+                for i in range(sect.get_n_items()):
+                    if sect.get_item_attribute_value(i, 'label', GLib.VariantType.new('s')).get_string() == w.get_title():
+                        sect.remove(i)
+                        break
+                # and finally destroy it
                 self.remove_window(w)
                 w.destroy()
 
