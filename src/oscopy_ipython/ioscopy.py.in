@@ -16,7 +16,7 @@ from IPython.utils.syspathcontext import prepended_to_syspath
 import time
 import os
 import re
-import dbus
+import dbus, dbus.service
 import numpy
 
 from oscopy import Signal

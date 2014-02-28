@@ -6,7 +6,6 @@ import sys
 import readline
 import subprocess
 import configparser
-import dbus, dbus.service, dbus.glib
 from math import log10, sqrt
 from xdg import BaseDirectory
 #from matplotlib.widgets import SpanSelector
@@ -246,7 +245,6 @@ class IOscopyApp(Gtk.Application):
         # Add window to the application menu
         self.add_window(fig.window)
         sect = self.builder.get_object('figwin_section')
-        print(sect)
         sect.append_item(Gio.MenuItem.new(figname, 'app.show_figure::%s' % figname))
         return fig
 
