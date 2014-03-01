@@ -2,7 +2,6 @@
 import oscopy
 from gi.repository import Gtk, Gdk
 from gi.repository import GObject
-from . import gui
 from math import log10, sqrt
 from matplotlib.backend_bases import LocationEvent
 from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
@@ -516,8 +515,9 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             
 
     def _create_figure_popup_menu(self, figure, graph):
-        figmenu = gui.menus.FigureMenu()
-        return figmenu.create_menu(figure, graph)
+#        figmenu = gui.menus.FigureMenu()
+#        return figmenu.create_menu(figure, graph)
+        pass
 
     def _update_scrollbars(self, unused):
         # Unused is not used but can be either a MPL event or a togglebutton

@@ -3,7 +3,6 @@ SUBDIRS=gui
 ioscopydir = $(pkgpythondir)/../oscopy_ipython
 
 ioscopy_PYTHON = ioscopyapp.py \
-	gtk_figure.py \
 	__init__.py
 
 bin_SCRIPTS = ioscopy.py

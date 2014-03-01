@@ -1,4 +1,6 @@
-from gi.repository import Gtk, Gio, Gdk
+from gi.repository import Gtk, Gio, Gdk, GLib
+from .gtk_figure import IOscopy_GTK_Figure
+import oscopy
 
 IOSCOPY_SIGNAL_LIST_UI = 'oscopy/signal-list.ui'
 
@@ -7,6 +9,7 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
     def __init__(self, app, uidir=None):
         Gtk.ApplicationWindow.__init__(self, title='IOscopy', application=app)
         self.app = app
+        self.popup = None
 
         self.TARGET_TYPE_SIGNAL = 10354
         self.from_signal_list = [Gtk.TargetEntry.new("oscopy-signals",
@@ -74,7 +77,6 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
     def treeview_button_press(self, widget, event):
         if event.button == 3:
             print('treeview button press')
-            return
             # FIXME : Display menu on button 3 click
             tv = widget
             ret = tv.get_path_at_pos(int(event.x), int(event.y))
@@ -91,14 +93,59 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
             signals = {}
             def add_sig_func(tm, p, iter, data):
                 name = tm.get_value(iter, 0)
-                signals[name] = self._ctxt.signals[name]
+                signals[name] = self.app.ctxt.signals[name]
             sel.selected_foreach(add_sig_func, None)
-            tvmenu = gui.menus.TreeviewMenu(self.create)
-            menu = tvmenu.make_menu(self._ctxt.figures, signals)
-#            menu = self._uimanager.get_widget('/PopupMenu')
-#            menu.show_all()
-            print(menu)
-            menu.popup(None, None, None, None, event.button, event.time)
+
+            m = Gio.Menu.new()
+            m.append(_('Insert into'), 'None')
+            param = GLib.Variant.new_tuple(GLib.Variant.new_string(','.join(signals.keys())),
+                                                       GLib.Variant.new_string(''),
+                                                       GLib.Variant.new_uint64(0))
+            param.ref_sink()
+            item = Gio.MenuItem.new(_('In new Figure'), None)
+            item.set_action_and_target_value('insert_signal', param)
+            m.append_item(item)
+            lsm = {}
+            for w in self.app.get_windows():
+                sm = Gio.Menu.new()
+                if w.get_title().startswith(_('Figure')):
+                    f = self.app.windows_to_figures[w]
+                    if len(f.graphs) < oscopy.figure.MAX_GRAPHS_PER_FIGURE:
+                        param = GLib.Variant.new_tuple(GLib.Variant.new_string(','.join(signals.keys())),
+                                                       GLib.Variant.new_string(w.get_title()),
+                                                       GLib.Variant.new_uint64(0))
+                        param.ref_sink()
+                        item = Gio.MenuItem.new(_('In new Graph'), None)
+                        item.set_action_and_target_value('insert_signal', param)
+                        sm.append_item(item)
+                    for n, g in enumerate(f.graphs):
+                        param = GLib.Variant.new_tuple(GLib.Variant.new_string(','.join(signals.keys())),
+                                                       GLib.Variant.new_string(w.get_title()),
+                                                       GLib.Variant.new_uint64(n + 1))
+                        # Prevents message assertion `value->ref_count > 0' failed
+                        param.ref_sink()
+
+                        #print(n + 1, g, param)
+                        item = Gio.MenuItem.new(_('Graph %d') % (n + 1), None)
+                        item.set_action_and_target_value('insert_signal',
+                                                         param)
+                        sm.append_item(item)
+                    # WARNING : This assumes that the figure number
+                    # is at end of window title containing the figure
+                    lsm[int(w.get_title().split()[-1])] = (w.get_title(), sm)
+
+            for k in sorted(lsm.keys()):
+                # To insert items in order
+                m.append_submenu(lsm[k][0], lsm[k][1])
+            # To prevent menu deletion after end of callback, member of self.
+            self.popup = Gtk.Menu.new()
+            # To prevent separators between items, use bind_model
+            # and insert_action_group
+            self.popup.insert_action_group('app', self.app)
+            self.popup.bind_model(m, 'app', False)
+            self.popup.show()
+#            print([(x.get_label(), type(x)) for x in self.popup.get_children()])
+            self.popup.popup(None, None, None, None, event.button, event.time)
             return True
 
         if event.button == 1:

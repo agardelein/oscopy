@@ -16,7 +16,7 @@ import oscopy
 from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
 #from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 from . import gui
-from .gtk_figure import IOscopy_GTK_Figure
+from .gui.gtk_figure import IOscopy_GTK_Figure
 
 IOSCOPY_COL_TEXT = 0
 IOSCOPY_COL_X10 = 1
@@ -99,6 +99,10 @@ class IOscopyApp(Gtk.Application):
 
         a = Gio.SimpleAction.new('show_figure', GLib.VariantType.new('s'))
         a.connect('activate', self.show_figure_activated)
+        self.add_action(a)
+
+        a = Gio.SimpleAction.new('insert_signal', GLib.VariantType.new('(sst)'))
+        a.connect('activate', self.insert_signal_activated)
         self.add_action(a)
 
         self.builder = Gtk.Builder()
@@ -192,6 +196,22 @@ class IOscopyApp(Gtk.Application):
                 self.exec_str('%%oselect %s-1' % param.get_string().split()[1])
                 return
 
+    def insert_signal_activated(self, action, param):
+        (sigs, figname, gnum) = param.unpack()
+        print(sigs, figname, gnum)
+        # WARNING : This assumes that the figure number
+        # is at end of window title containing the figure
+        if figname:
+            fignum = int(figname.split()[-1])
+            if gnum:
+                self.exec_str('%%oselect %d-%d' % (fignum, gnum))
+                self.exec_str('%%oinsert %s' % sigs)
+            else:
+                self.exec_str('%%oselect %d-1' % (fignum))
+                self.exec_str('%%oadd %s' % sigs)
+        else:
+            self.exec_str('%%ocreate %s' % sigs)
+
     def exec_str(self, line):
         if ' ' in line:
             (first, last) = line.split(' ', 1)
@@ -246,6 +266,7 @@ class IOscopyApp(Gtk.Application):
         self.add_window(fig.window)
         sect = self.builder.get_object('figwin_section')
         sect.append_item(Gio.MenuItem.new(figname, 'app.show_figure::%s' % figname))
+        self.windows_to_figures[fig.window] = fig
         return fig
 
     def destroy(self, num):
@@ -263,6 +284,7 @@ class IOscopyApp(Gtk.Application):
                         sect.remove(i)
                         break
                 # and finally destroy it
+                del self.windows_to_figures[w]
                 self.remove_window(w)
                 w.destroy()
 
