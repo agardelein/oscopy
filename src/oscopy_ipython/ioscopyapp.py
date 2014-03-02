@@ -198,7 +198,6 @@ class IOscopyApp(Gtk.Application):
 
     def insert_signal_activated(self, action, param):
         (sigs, figname, gnum) = param.unpack()
-        print(sigs, figname, gnum)
         # WARNING : This assumes that the figure number
         # is at end of window title containing the figure
         if figname:

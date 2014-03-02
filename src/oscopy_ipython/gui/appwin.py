@@ -76,8 +76,7 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
 
     def treeview_button_press(self, widget, event):
         if event.button == 3:
-            print('treeview button press')
-            # FIXME : Display menu on button 3 click
+            # Retrieve selected signals
             tv = widget
             ret = tv.get_path_at_pos(int(event.x), int(event.y))
             if ret is None: return True
@@ -96,14 +95,14 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
                 signals[name] = self.app.ctxt.signals[name]
             sel.selected_foreach(add_sig_func, None)
 
+            # Build popup menu
             m = Gio.Menu.new()
-            m.append(_('Insert into'), 'None')
             param = GLib.Variant.new_tuple(GLib.Variant.new_string(','.join(signals.keys())),
                                                        GLib.Variant.new_string(''),
                                                        GLib.Variant.new_uint64(0))
             param.ref_sink()
-            item = Gio.MenuItem.new(_('In new Figure'), None)
-            item.set_action_and_target_value('insert_signal', param)
+            item = Gio.MenuItem.new(_('New Figure'), None)
+            item.set_action_and_target_value('app.insert_signal', param)
             m.append_item(item)
             lsm = {}
             for w in self.app.get_windows():
@@ -115,8 +114,8 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
                                                        GLib.Variant.new_string(w.get_title()),
                                                        GLib.Variant.new_uint64(0))
                         param.ref_sink()
-                        item = Gio.MenuItem.new(_('In new Graph'), None)
-                        item.set_action_and_target_value('insert_signal', param)
+                        item = Gio.MenuItem.new(_('New Graph'), None)
+                        item.set_action_and_target_value('app.insert_signal', param)
                         sm.append_item(item)
                     for n, g in enumerate(f.graphs):
                         param = GLib.Variant.new_tuple(GLib.Variant.new_string(','.join(signals.keys())),
@@ -125,24 +124,32 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
                         # Prevents message assertion `value->ref_count > 0' failed
                         param.ref_sink()
 
-                        #print(n + 1, g, param)
                         item = Gio.MenuItem.new(_('Graph %d') % (n + 1), None)
-                        item.set_action_and_target_value('insert_signal',
+                        item.set_action_and_target_value('app.insert_signal',
                                                          param)
                         sm.append_item(item)
-                    # WARNING : This assumes that the figure number
                     # is at end of window title containing the figure
-                    lsm[int(w.get_title().split()[-1])] = (w.get_title(), sm)
+                    # Gtk.Menu.new_from_model automatically place separators
+                    # between toplevel items. To prevent this behavior place sm
+                    # in another Gio.Menu.
+                    sm2 = Gio.Menu.new()
+                    sm2.append_section(None, sm)
+                    # WARNING : This assumes that the figure number
+                    lsm[int(w.get_title().split()[-1])] = (w.get_title(), sm2)
 
             for k in sorted(lsm.keys()):
                 # To insert items in order
                 m.append_submenu(lsm[k][0], lsm[k][1])
+            # Gtk.Menu.new_from_model automatically place separators between
+            # toplevel items. To prevent this behavior place m in another
+            # Gio.Menu.
+            m2 = Gio.Menu.new()
+            m2.append_section(_('Insert into'), m)
             # To prevent menu deletion after end of callback, member of self.
-            self.popup = Gtk.Menu.new()
+            self.popup = Gtk.Menu.new_from_model(m2)
             # To prevent separators between items, use bind_model
             # and insert_action_group
             self.popup.insert_action_group('app', self.app)
-            self.popup.bind_model(m, 'app', False)
             self.popup.show()
 #            print([(x.get_label(), type(x)) for x in self.popup.get_children()])
             self.popup.popup(None, None, None, None, event.button, event.time)
