@@ -249,7 +249,7 @@ class IOscopyApp(Gtk.Application):
             
         fignum = len(self.ctxt.figures) + 1
         figname = _('Figure %d') % fignum
-        fig = IOscopy_GTK_Figure(sigs, None, figname)
+        fig = IOscopy_GTK_Figure(sigs, None, figname, self.uidir)
         self.ctxt.create(fig)
 
         fig.window.connect('drag_data_received', fig.drag_data_received_cb,

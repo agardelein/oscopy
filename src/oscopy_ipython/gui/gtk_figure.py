@@ -16,6 +16,8 @@ IOSCOPY_COL_SPAN = 3 # Span mode status
 IOSCOPY_COL_HADJ = 4 # Horizontal scrollbar adjustment
 IOSCOPY_COL_VADJ = 5 # Vertical scrollbar adjustment
 
+IOSCOPY_GTK_FIGURE_UI = 'oscopy/gtk_figure.glade'
+
 DEFAULT_ZOOM_FACTOR = 0.8
 DEFAULT_PAN_FACTOR = 10
 
@@ -66,13 +68,71 @@ class MyRectangleSelector(RectangleSelector):
                 event.button != self.eventpress.button)
 
 class IOscopy_GTK_Figure(oscopy.Figure):
-    def __init__(self, sigs={}, fig=None, title=''):
+    def __init__(self, sigs={}, fig=None, title='', uidir=''):
         oscopy.Figure.__init__(self, None, fig)
-        self._TARGET_TYPE_SIGNAL = 10354
-        self._to_figure = [Gtk.TargetEntry.new("oscopy-signals", Gtk.TargetFlags.SAME_APP,\
-                                self._TARGET_TYPE_SIGNAL)]
-        self._hadjpreval = None
-        self._vadjpreval = None
+        self.TARGET_TYPE_SIGNAL = 10354
+        self.to_figure = [Gtk.TargetEntry.new("oscopy-signals", Gtk.TargetFlags.SAME_APP,\
+                                self.TARGET_TYPE_SIGNAL)]
+        self.hadjpreval = None
+        self.vadjpreval = None
+
+        # The canvas for the Figure
+        canvas = FigureCanvas(self)
+        canvas.supports_blit = False
+        canvas.mpl_connect('button_press_event', self._button_press)
+        canvas.mpl_connect('scroll_event', self._mouse_scroll)
+        canvas.mpl_connect('axes_enter_event', self._axes_enter)
+        canvas.mpl_connect('axes_leave_event', self._axes_leave)
+        canvas.mpl_connect('figure_enter_event', self._figure_enter)
+        canvas.mpl_connect('figure_leave_event', self._figure_leave)
+        canvas.mpl_connect('key_press_event', self._key_press)
+        canvas.mpl_connect('motion_notify_event', self._show_coords)
+        self.canvas = canvas
+        self.draw_hid = canvas.mpl_connect('draw_event', self._update_scrollbars)
+
+        # The store for the combo box
+        store = Gtk.ListStore(GObject.TYPE_STRING, # String displayed
+                              GObject.TYPE_BOOLEAN, # x10 mode status
+                              GObject.TYPE_BOOLEAN, # Combobox item sensitive
+                              GObject.TYPE_BOOLEAN, # Span mode status
+                              GObject.TYPE_PYOBJECT, # Horizontal Adjustment
+                              GObject.TYPE_PYOBJECT, # Vertical Adjustment
+                              )
+        iter = store.append([_('All Graphs'), False, True, False, Gtk.Adjustment(), Gtk.Adjustment()])
+        for i in range(4):
+            iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False, False, Gtk.Adjustment(), Gtk.Adjustment()])
+        self.cbx_store = store
+
+        builder = Gtk.Builder()
+        builder.expose_object('store', self.cbx_store)
+        builder.add_from_file('/'.join((uidir, IOSCOPY_GTK_FIGURE_UI)))
+        self.builder = builder
+
+        # Add remaining widgets
+        builder.get_object('box').pack_start(canvas, True, True, 0)
+        # vbar = Gtk.VScrollbar()
+        # vbar.set_sensitive(False)
+        # self.vbar = vbar
+        # builder.get_object('box1').pack_start(vbar, False, False, 0)
+
+        # Expose widgets needed elsewhere
+        self.window = builder.get_object('w')
+        self.hbar = builder.get_object('hbar')
+        self.vbar = builder.get_object('vbar')
+        self.mpsel_get_act = [builder.get_object('rb%d' % (b + 1)).get_active for b in range(4)]
+        self.mpsel_set_act = [builder.get_object('rb%d' % (b + 1)).set_active for b in range(4)]
+        self.mpsel_set_sens = [builder.get_object('rb%d' % (b + 1)).set_sensitive for b in range(4)]
+        self.window.show_all()
+
+        # Add signals
+        if sigs:
+            self.add(sigs)
+#        # Update canvas for SpanSelector of Graphs
+        for gr in self.graphs:
+            if hasattr(gr, 'span'):
+                gr.span.new_axes(gr)
+
+    def delete_me(self, sigs={}, fig=None, title=''):
 
         w = Gtk.Window()
         w.set_title(title)
@@ -120,7 +180,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         iter = store.append([_('All Graphs'), False, True, False, Gtk.Adjustment(), Gtk.Adjustment()])
         for i in range(4):
             iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False, False, Gtk.Adjustment(), Gtk.Adjustment()])
-        self._cbx_store = store
+        self.cbx_store = store
         hbar.set_adjustment(store[0][IOSCOPY_COL_HADJ])
         vbar.set_adjustment(store[0][IOSCOPY_COL_VADJ])
 
@@ -143,9 +203,9 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             rb.set_sensitive(False)
             rbtnbox.pack_start(rb, True, True, 0)
         # Cache the methods
-        self._mpsel_get_act = [b.get_active for b in rbtns]
-        self._mpsel_set_act = [b.set_active for b in rbtns]
-        self._mpsel_set_sens = [b.set_sensitive for b in rbtns]
+        self.mpsel_get_act = [b.get_active for b in rbtns]
+        self.mpsel_set_act = [b.set_active for b in rbtns]
+        self.mpsel_set_sens = [b.set_sensitive for b in rbtns]
         for b in rbtns:
             b.connect('toggled', self._update_scrollbars)
         vbox2.pack_start(rbtnbox, False, False, 0)
@@ -209,13 +269,13 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
     def set_layout(self, layout='quad'):
         oscopy.Figure.set_layout(self, layout)
-        iter = self._cbx_store.get_iter_first()
+        iter = self.cbx_store.get_iter_first()
         for g in self.graphs:
-            iter = self._cbx_store.iter_next(iter)
+            iter = self.cbx_store.iter_next(iter)
             if self._layout == 'horiz':
                 g.span = SpanSelector(g, g.onselect, 'horizontal',
                                        useblit=True)
-                g.span.visible = self._cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
+                g.span.visible = self.cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
                 self.hbar.set_sensitive(True)
                 self.hbar.show()
                 self.vbar.set_sensitive(False)
@@ -223,7 +283,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             elif self._layout == 'vert':
                 g.span = SpanSelector(g, g.onselect, 'vertical',
                                        useblit=True)
-                g.span.visible = self._cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
+                g.span.visible = self.cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
                 self.hbar.set_sensitive(False)
                 self.hbar.hide()
                 self.vbar.set_sensitive(True)
@@ -231,7 +291,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             elif self._layout == 'quad':
                 g.span = MyRectangleSelector(g, g.onselect, rectprops=dict(facecolor='red', edgecolor = 'black', alpha=0.5, fill=True),
                                             useblit=True)
-                g.span.active = self._cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
+                g.span.active = self.cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
                 self.hbar.set_sensitive(True)
                 self.hbar.show()
                 self.vbar.set_sensitive(True)
@@ -420,34 +480,34 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
     def add(self, args):
         oscopy.Figure.add(self, args)
-        store = self._cbx_store
+        store = self.cbx_store
         iter = store.get_iter_first()
         iter = store.iter_next(iter)  # First item always sensitive
         while iter is not None:
             grnum = int(store.get_string_from_iter(iter))
             if grnum > len(self.graphs):
                 store.set_value(iter, IOSCOPY_COL_VIS, False)
-                self._mpsel_set_sens[grnum - 1](False) # master pan
+                self.mpsel_set_sens[grnum - 1](False) # master pan
             else:
                 store.set_value(iter, IOSCOPY_COL_VIS, True)
-                self._mpsel_set_sens[grnum - 1](True) # master pan
+                self.mpsel_set_sens[grnum - 1](True) # master pan
             iter = store.iter_next(iter)       
 
     def delete(self, args):
         oscopy.Figure.delete(self, args)
-        store = self._cbx_store
+        store = self.cbx_store
         iter = store.get_iter_first()
         iter = store.iter_next(iter)  # First item always sensitive
         while iter is not None:
             grnum = int(store.get_string_from_iter(iter))
             if grnum > len(self.graphs):
                 store.set_value(iter, IOSCOPY_COL_VIS, False)
-                self._mpsel_set_sens[grnum - 1](False) # master pan
-                if grnum > 1 and self._mpsel_get_act[grnum - 1]():
-                    self._mpsel_set_act[grnum - 2](True)
+                self.mpsel_set_sens[grnum - 1](False) # master pan
+                if grnum > 1 and self.mpsel_get_act[grnum - 1]():
+                    self.mpsel_set_act[grnum - 2](True)
             else:
                 store.set_value(iter, IOSCOPY_COL_VIS, True)
-                self._mpsel_set_sens[grnum - 1](True) # master pan
+                self.mpsel_set_sens[grnum - 1](True) # master pan
             iter = store.iter_next(iter)       
 
     def _button_press(self, event):
@@ -531,23 +591,23 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             xvs.append(xv)
             yvs.append(yv)
         # Then for all graphs...
-        for i, get_act in enumerate(self._mpsel_get_act):
+        for i, get_act in enumerate(self.mpsel_get_act):
             if get_act():
                 break
         if xvs:
-            hadj = self._cbx_store[0][IOSCOPY_COL_HADJ]
+            hadj = self.cbx_store[0][IOSCOPY_COL_HADJ]
             hadj.configure(xvs[i], lower, upper,
                            xpgs_min / 10.0, xpgs_min, xpgs_min)
         if yvs:
-            vadj = self._cbx_store[0][IOSCOPY_COL_VADJ]
+            vadj = self.cbx_store[0][IOSCOPY_COL_VADJ]
             vadj.configure(-yvs[i], -upper, lower,
                             ypgs_min / 10.0, ypgs_min, ypgs_min)
 
     def _update_graph_adj(self, grnum, g):
         (lower, upper) = (0, 1)
 
-        hadj = self._cbx_store[grnum + 1][IOSCOPY_COL_HADJ]
-        vadj = self._cbx_store[grnum + 1][IOSCOPY_COL_VADJ]
+        hadj = self.cbx_store[grnum + 1][IOSCOPY_COL_HADJ]
+        vadj = self.cbx_store[grnum + 1][IOSCOPY_COL_VADJ]
 
         # Get data Bbox and view Bbox in pixels
         (x0data, y0data, wdata, hdata) = g.dataLim.transformed(g.transData).bounds
@@ -575,7 +635,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             return False
         iter = cbx.get_active_iter()
         layout = self.layout
-        for mp, get_act in enumerate(self._mpsel_get_act):
+        for mp, get_act in enumerate(self.mpsel_get_act):
             if get_act():
                 break # Here is the master pan graph
         master_pan_gr = self.graphs[mp]
@@ -585,7 +645,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 # move only graphs having the same unit as selected master
                 adj = widget.get_adjustment()
                 val = adj.get_value()
-                delta = (val - self._hadjpreval) if self._hadjpreval is not None else 0
+                delta = (val - self.hadjpreval) if self.hadjpreval is not None else 0
                 iter = store.iter_next(iter)
                 while iter is not None:
                     grnum = int(store.get_string_from_iter(iter))
@@ -593,16 +653,16 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                         break
                     g = self.graphs[grnum - 1]
                     # Pan
-                    if self._hadjpreval is None or g.get_unit()[0] != master_pan_gr.get_unit()[0]:
+                    if self.hadjpreval is None or g.get_unit()[0] != master_pan_gr.get_unit()[0]:
                         iter = store.iter_next(iter)
                         continue
-                    hadj = self._cbx_store[grnum][IOSCOPY_COL_HADJ]
+                    hadj = self.cbx_store[grnum][IOSCOPY_COL_HADJ]
                     curval = hadj.get_value()
                     if ((val < curval and delta < 0) or (val > curval and delta > 0)) and val < 1 - hadj.get_page_size():
                         self._translate_to(g, val, None)
                         hadj.set_value(val) # Because the callback is disabled
                     iter = store.iter_next(iter)
-                self._hadjpreval = widget.get_adjustment().get_value()
+                self.hadjpreval = widget.get_adjustment().get_value()
             else:
                 g = self.graphs[grnum - 1]
                 # Pan
@@ -615,7 +675,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             return False
         iter = cbx.get_active_iter()
         layout = self.layout
-        for mp, get_act in enumerate(self._mpsel_get_act):
+        for mp, get_act in enumerate(self.mpsel_get_act):
             if get_act():
                 break # Here is the master pan graph
         master_pan_gr = self.graphs[mp]
@@ -625,7 +685,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 # Move only graphs having the same unit as selected master
                 adj = widget.get_adjustment()
                 val = adj.get_value()
-                delta = (val - self._vadjpreval) if self._vadjpreval is not None else 0
+                delta = (val - self.vadjpreval) if self.vadjpreval is not None else 0
                 iter = store.iter_next(iter)
                 while iter is not None:
                     grnum = int(store.get_string_from_iter(iter))
@@ -633,16 +693,16 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                         break
                     g = self.graphs[grnum - 1]
                     # Pan
-                    if self._vadjpreval is None or g.get_unit()[1] != master_pan_gr.get_unit()[1]:
+                    if self.vadjpreval is None or g.get_unit()[1] != master_pan_gr.get_unit()[1]:
                         iter = store.iter_next(iter)
                         continue
-                    vadj = self._cbx_store[grnum][IOSCOPY_COL_VADJ]
+                    vadj = self.cbx_store[grnum][IOSCOPY_COL_VADJ]
                     curval = vadj.get_value()
                     if ((val < curval and delta < 0) or (val > curval and delta > 0)) and val < -vadj.get_page_size():
                         self._translate_to(g, None, val)
                         vadj.set_value(val) # Because the callback is disabled
                     iter = store.iter_next(iter)
-                self._vadjpreval = widget.get_adjustment().get_value()
+                self.vadjpreval = widget.get_adjustment().get_value()
             else:
                 g = self.graphs[grnum - 1]
                 # Pan
@@ -682,16 +742,16 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             self._draw_hid = self.canvas.mpl_connect('draw_event', self._update_scrollbars)
 
     def hadj_pressed(self, widget, event):
-        self._hadjpreval = widget.get_value()
+        self.hadjpreval = widget.get_value()
 
     def hadj_released(self, widget, event):
-        self._hadjpreval = None
+        self.hadjpreval = None
 
     def vadj_pressed(self, widget, event):
-        self._vadjpreval = widget.get_value()
+        self.vadjpreval = widget.get_value()
 
     def vadj_released(self, widget, event):
-        self._vadjpreval = None
+        self.vadjpreval = None
 
     layout = property(oscopy.Figure.get_layout, set_layout)
 
