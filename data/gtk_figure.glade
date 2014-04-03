@@ -18,7 +18,6 @@
               <object class="GtkScrollbar" id="hbar">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="inverted">True</property>
                 <signal name="change-value" handler="hscroll_change_value" swapped="no"/>
                 <signal name="button-press-event" handler="hadj_pressed" swapped="no"/>
                 <signal name="enter-notify-event" handler="disable_adj_update_on_draw" swapped="no"/>

@@ -667,7 +667,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                       ystep_increment, ypage_increment, ypage_size)
         return (xvalue, xpage_size, yvalue, ypage_size)
 
-    def hscroll_change_value(self, widget, scroll, value, cbx, store):
+    def hscroll_change_value(self, widget, scroll, value):
+        (cbx, store) = (self.graphs_cbx, self.store)
         if self.layout == 'vert':
             return False
         iter = cbx.get_active_iter()
@@ -707,7 +708,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             self.canvas.draw_idle()
         return False
 
-    def vscroll_change_value(self, widget, scroll, value, cbx, store):
+    def vscroll_change_value(self, widget, scroll, value):
+        (cbx, store) = (self.graphs_cbx, self.store)
         if self.layout == 'horiz':
             return False
         iter = cbx.get_active_iter()
