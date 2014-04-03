@@ -79,14 +79,14 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         # The canvas for the Figure
         canvas = FigureCanvas(self)
         canvas.supports_blit = False
-        canvas.mpl_connect('button_press_event', self._button_press)
-        canvas.mpl_connect('scroll_event', self._mouse_scroll)
+        canvas.mpl_connect('button_press_event', self.button_press)
+        canvas.mpl_connect('scroll_event', self.mouse_scroll)
         canvas.mpl_connect('axes_enter_event', self.axes_enter)
         canvas.mpl_connect('axes_leave_event', self.axes_leave)
         canvas.mpl_connect('figure_enter_event', self.figure_enter)
         canvas.mpl_connect('figure_leave_event', self.figure_leave)
         canvas.mpl_connect('key_press_event', self.key_press)
-        canvas.mpl_connect('motion_notify_event', self._show_coords)
+        canvas.mpl_connect('motion_notify_event', self.show_coords)
         self.canvas = canvas
         self.draw_hid = canvas.mpl_connect('draw_event', self._update_scrollbars)
 
@@ -512,13 +512,16 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 self.mpsel_set_sens[grnum - 1](True) # master pan
             iter = store.iter_next(iter)       
 
-    def _button_press(self, event):
+    def button_press(self, event):
         if event.button == 3:
+            print("Button 3...")
+            return
             menu = self._create_figure_popup_menu(event.canvas.figure, event.inaxes)
             menu.show_all()
             menu.popup(None, None, None, None, event.button, event.guiEvent.time)
 
-    def _mouse_scroll(self, event):
+    def mouse_scroll(self, event):
+        print(event.button)
         if event.button == 'up':
             if event.inaxes is None:
                 return False
@@ -560,7 +563,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 #        self._current_figure = None
         pass
 
-    def _show_coords(self, event):
+    def show_coords(self, event):
         a = event.inaxes
         if a is not None:
             x = '%.3f %s%s' % (event.xdata,
