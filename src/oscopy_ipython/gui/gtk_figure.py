@@ -81,11 +81,11 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         canvas.supports_blit = False
         canvas.mpl_connect('button_press_event', self._button_press)
         canvas.mpl_connect('scroll_event', self._mouse_scroll)
-        canvas.mpl_connect('axes_enter_event', self._axes_enter)
-        canvas.mpl_connect('axes_leave_event', self._axes_leave)
-        canvas.mpl_connect('figure_enter_event', self._figure_enter)
-        canvas.mpl_connect('figure_leave_event', self._figure_leave)
-        canvas.mpl_connect('key_press_event', self._key_press)
+        canvas.mpl_connect('axes_enter_event', self.axes_enter)
+        canvas.mpl_connect('axes_leave_event', self.axes_leave)
+        canvas.mpl_connect('figure_enter_event', self.figure_enter)
+        canvas.mpl_connect('figure_leave_event', self.figure_leave)
+        canvas.mpl_connect('key_press_event', self.key_press)
         canvas.mpl_connect('motion_notify_event', self._show_coords)
         self.canvas = canvas
         self.draw_hid = canvas.mpl_connect('draw_event', self._update_scrollbars)
@@ -413,7 +413,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             filetypes=self.canvas.get_supported_filetypes(),
             default_filetype=self.canvas.get_default_filetype())
 
-    def _key_press(self, event):
+    def key_press(self, event):
         if event.inaxes is not None:
             g = event.inaxes
             if event.key == 'z':
@@ -531,7 +531,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             self.canvas.draw_idle()
         return True
 
-    def _axes_enter(self, event):
+    def axes_enter(self, event):
 #        self._figure_enter(event)
 #        self._current_graph = event.inaxes
 
@@ -540,12 +540,12 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 #        self._app_exec('%%oselect %d-%d' % (fig_num, axes_num))
         pass
 
-    def _axes_leave(self, event):
+    def axes_leave(self, event):
         # Unused for better user interaction
 #        self._current_graph = None
         pass
 
-    def _figure_enter(self, event):
+    def figure_enter(self, event):
 #        self._current_figure = event.canvas.figure
 #        if hasattr(event, 'inaxes') and event.inaxes is not None:
 #            axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
@@ -556,7 +556,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         self.canvas.grab_focus()
         pass
 
-    def _figure_leave(self, event):
+    def figure_leave(self, event):
 #        self._current_figure = None
         pass
 
