@@ -228,9 +228,8 @@
               <object class="GtkLabel" id="coord_lbl2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="halign">start</property>
                 <property name="xalign">0.10000000149011612</property>
-                <property name="label" translatable="yes">Y</property>
+                <property name="label" translatable="yes">2</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -243,9 +242,8 @@
               <object class="GtkLabel" id="coord_lbl1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="halign">start</property>
                 <property name="xalign">0.10000000149011612</property>
-                <property name="label" translatable="yes">X</property>
+                <property name="label" translatable="yes">1</property>
               </object>
               <packing>
                 <property name="expand">False</property>

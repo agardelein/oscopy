@@ -119,6 +119,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         self.window = builder.get_object('w')
         self.hbar = builder.get_object('hbar')
         self.vbar = builder.get_object('vbar')
+        self.coords_lbl1 = builder.get_object('coord_lbl1')
+        self.coords_lbl2 = builder.get_object('coord_lbl2')
         self.mpsel_get_act = [builder.get_object('rb%d' % (b + 1)).get_active for b in range(4)]
         self.mpsel_set_act = [builder.get_object('rb%d' % (b + 1)).set_active for b in range(4)]
         self.mpsel_set_sens = [builder.get_object('rb%d' % (b + 1)).set_sensitive for b in range(4)]
@@ -151,7 +153,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         canvas.mpl_connect('figure_leave_event', self._figure_leave)
         canvas.mpl_connect('key_press_event', self._key_press)
         canvas.mpl_connect('motion_notify_event', self._show_coords)
-        self._draw_hid = canvas.mpl_connect('draw_event', self._update_scrollbars)
+        self.draw_hid = canvas.mpl_connect('draw_event', self._update_scrollbars)
         w.connect('delete-event', lambda w, e: w.hide() or True)
         w.drag_dest_set(Gtk.DestDefaults.MOTION |\
                                  Gtk.DestDefaults.HIGHLIGHT |\
@@ -232,8 +234,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
         self._cbx = graphs_cbx
         self._btn = x10_toggle_btn
-        self._coords_lbl1 = coords_lbl1
-        self._coords_lbl2 = coords_lbl2
+        self.coords_lbl1 = coords_lbl1
+        self.coords_lbl2 = coords_lbl2
 
         graphs_cbx.connect('changed', self.graphs_cbx_changed, x10_toggle_btn,
                            span_toggle_btn, store)
@@ -567,11 +569,11 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             y = '%.3f %s%s' % (event.ydata,
                              oscopy.factors_to_names[a.scale_factors[1]][0],
                              a.unit[1] if a.unit[1] is not None else 'a.u.')
-            self._coords_lbl1.set_text(x)
-            self._coords_lbl2.set_text(y)
+            self.coords_lbl1.set_text(x)
+            self.coords_lbl2.set_text(y)
         else:
-            self._coords_lbl1.set_text('')
-            self._coords_lbl2.set_text('')
+            self.coords_lbl1.set_text('')
+            self.coords_lbl2.set_text('')
             
 
     def _create_figure_popup_menu(self, figure, graph):
@@ -728,9 +730,9 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             return
         if widget == self.vbar and layout not in ['vert', 'quad']:
             return
-        if self._draw_hid is not None:
-            self.canvas.mpl_disconnect(self._draw_hid)
-            self._draw_hid = None
+        if self.draw_hid is not None:
+            self.canvas.mpl_disconnect(self.draw_hid)
+            self.draw_hid = None
 
     def enable_adj_update_on_draw(self, widget, event):
         layout = self.layout
@@ -738,8 +740,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             return
         if widget == self.vbar and layout not in ['vert', 'quad']:
             return
-        if self._draw_hid is None and not event.get_state() & Gdk.ModifierType.BUTTON1_MASK:
-            self._draw_hid = self.canvas.mpl_connect('draw_event', self._update_scrollbars)
+        if self.draw_hid is None and not event.get_state() & Gdk.ModifierType.BUTTON1_MASK:
+            self.draw_hid = self.canvas.mpl_connect('draw_event', self._update_scrollbars)
 
     def hadj_pressed(self, widget, event):
         self.hadjpreval = widget.get_value()
