@@ -188,7 +188,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <signal name="toggled" handler="x10_toggle_btn_toggled_cb" swapped="no"/>
+                <signal name="toggled" handler="x10_toggle_btn_toggled" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>

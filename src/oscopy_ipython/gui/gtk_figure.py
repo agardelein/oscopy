@@ -88,7 +88,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         canvas.mpl_connect('key_press_event', self.key_press)
         canvas.mpl_connect('motion_notify_event', self.show_coords)
         self.canvas = canvas
-        self.draw_hid = canvas.mpl_connect('draw_event', self._update_scrollbars)
+        self.draw_hid = canvas.mpl_connect('draw_event', self.update_scrollbars)
 
         # The store for the combo box
         store = Gtk.ListStore(GObject.TYPE_STRING, # String displayed
@@ -103,6 +103,15 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False, False, Gtk.Adjustment(), Gtk.Adjustment()])
         self.cbx_store = store
 
+        # The Graph Combobox
+        graphs_cbx = Gtk.ComboBox.new_with_model(store)
+        cell = Gtk.CellRendererText()
+        graphs_cbx.pack_start(cell, True)
+        graphs_cbx.add_attribute(cell, 'text', IOSCOPY_COL_TEXT)
+        graphs_cbx.add_attribute(cell, 'sensitive', IOSCOPY_COL_VIS)
+        graphs_cbx.set_active(0)
+
+        # The GtkBuilder
         builder = Gtk.Builder()
         builder.expose_object('store', self.cbx_store)
         builder.add_from_file('/'.join((uidir, IOSCOPY_GTK_FIGURE_UI)))
@@ -110,10 +119,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
         # Add remaining widgets
         builder.get_object('box').pack_start(canvas, True, True, 0)
-        # vbar = Gtk.VScrollbar()
-        # vbar.set_sensitive(False)
-        # self.vbar = vbar
-        # builder.get_object('box1').pack_start(vbar, False, False, 0)
+        builder.get_object('buttonbar').pack_start(graphs_cbx, False, False, 0)
+        builder.get_object('buttonbar').reorder_child(graphs_cbx, 0)
 
         # Expose widgets needed elsewhere
         self.window = builder.get_object('w')
@@ -121,10 +128,32 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         self.vbar = builder.get_object('vbar')
         self.coords_lbl1 = builder.get_object('coord_lbl1')
         self.coords_lbl2 = builder.get_object('coord_lbl2')
+        self.graphs_cbx = graphs_cbx
+        self.store = store
         self.mpsel_get_act = [builder.get_object('rb%d' % (b + 1)).get_active for b in range(4)]
         self.mpsel_set_act = [builder.get_object('rb%d' % (b + 1)).set_active for b in range(4)]
         self.mpsel_set_sens = [builder.get_object('rb%d' % (b + 1)).set_sensitive for b in range(4)]
         self.window.show_all()
+
+        # Connect additional GTK signals
+        cbmap = {'span_toggle_btn_toggled': self.span_toggle_btn_toggled,
+                 'x10_toggle_btn_toggled': self.x10_toggle_btn_toggled,
+                 'hadj_pressed': self.hadj_pressed,
+                 'hadj_released': self.hadj_released,
+                 'hscroll_change_value': self.hscroll_change_value,
+                 'vadj_pressed': self.vadj_pressed,
+                 'vadj_released': self.vadj_released,
+                 'vscroll_change_value': self.vscroll_change_value,
+                 'disable_adj_update_on_draw': self.disable_adj_update_on_draw,
+                 'enable_adj_update_on_draw': self.enable_adj_update_on_draw,
+                 'update_scrollbars': self.update_scrollbars,
+                 'save_fig_btn_clicked': self.save_fig_btn_clicked,
+                 }
+        builder.connect_signals(cbmap)
+        graphs_cbx.connect('changed', self.graphs_cbx_changed,
+                           (builder.get_object('x10_toggle_btn'),
+                            builder.get_object('span_toggle_btn'),
+                            store))
 
         # Add signals
         if sigs:
@@ -299,7 +328,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 self.vbar.set_sensitive(True)
                 self.vbar.show()
 
-    def graphs_cbx_changed(self, graphs_cbx, x10_toggle_btn, span_toggle_btn, store):
+    def graphs_cbx_changed(self, graphs_cbx, data):
+        (x10_toggle_btn, span_toggle_btn, store) = data
         iter = graphs_cbx.get_active_iter()
         if store.get_string_from_iter(iter) == '0':
             # Do all the graphs have same state?
@@ -330,7 +360,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             self.hbar.set_adjustment(store.get_value(iter, IOSCOPY_COL_HADJ))
             self.vbar.set_adjustment(store.get_value(iter, IOSCOPY_COL_VADJ))
             
-    def x10_toggle_btn_toggled(self, x10_toggle_btn, graphs_cbx, store):
+    def x10_toggle_btn_toggled(self, x10_toggle_btn):
+        (graphs_cbx, store) = (self.graphs_cbx, self.store)
         center = None
         iter = graphs_cbx.get_active_iter()
         a = x10_toggle_btn.get_active()
@@ -370,7 +401,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             if layout == 'vert' or layout == 'quad':
                 g.set_ylim(*result.intervaly)
 
-    def span_toggle_btn_toggled(self, span_toggle_btn, graphs_cbx, store):
+    def span_toggle_btn_toggled(self, span_toggle_btn):
+        (graphs_cbx, store) = (self.graphs_cbx, self.store)
         iter = graphs_cbx.get_active_iter()
         a = span_toggle_btn.get_active()
         span_toggle_btn.set_inconsistent(False)
@@ -584,7 +616,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 #        return figmenu.create_menu(figure, graph)
         pass
 
-    def _update_scrollbars(self, unused):
+    def update_scrollbars(self, unused):
         # Unused is not used but can be either a MPL event or a togglebutton
         (lower, upper) = (0, 1)
         (xpgs_min, ypgs_min) = (1, 1)
@@ -744,7 +776,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         if widget == self.vbar and layout not in ['vert', 'quad']:
             return
         if self.draw_hid is None and not event.get_state() & Gdk.ModifierType.BUTTON1_MASK:
-            self.draw_hid = self.canvas.mpl_connect('draw_event', self._update_scrollbars)
+            self.draw_hid = self.canvas.mpl_connect('draw_event', self.update_scrollbars)
 
     def hadj_pressed(self, widget, event):
         self.hadjpreval = widget.get_value()
