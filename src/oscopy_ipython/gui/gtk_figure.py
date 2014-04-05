@@ -370,6 +370,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         layout = self.layout
         if iter is not None:
             store.set_value(iter, IOSCOPY_COL_X10, a)
+            self.hbar.set_adjustment(store.get_value(iter, IOSCOPY_COL_HADJ))
+            self.vbar.set_adjustment(store.get_value(iter, IOSCOPY_COL_VADJ))
             grnum = int(store.get_string_from_iter(iter))
             if store.get_string_from_iter(iter) == '0':
                 # Set the value for all graphs
