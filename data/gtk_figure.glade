@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkListStore" id="store">
+    <columns>
+      <!-- column-name String displayed -->
+      <column type="gchararray"/>
+      <!-- column-name x10 mode status -->
+      <column type="gboolean"/>
+      <!-- column-name Combobox item status -->
+      <column type="gboolean"/>
+      <!-- column-name Span mode status -->
+      <column type="gboolean"/>
+      <!-- column-name Horizontal Adjustment -->
+      <column type="GObject"/>
+      <!-- column-name Vertical Adjustment -->
+      <column type="GObject"/>
+    </columns>
+  </object>
   <object class="GtkWindow" id="w">
     <property name="can_focus">False</property>
     <property name="default_width">640</property>
@@ -63,6 +79,27 @@
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
             <child>
+              <object class="GtkComboBox" id="graphs_cbx">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="model">store</property>
+                <property name="id_column">0</property>
+                <property name="active_id">0</property>
+                <child>
+                  <object class="GtkCellRendererText" id="cellrenderertext1"/>
+                  <attributes>
+                    <attribute name="sensitive">2</attribute>
+                    <attribute name="text">0</attribute>
+                  </attributes>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkLabel" id="label1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -71,7 +108,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">0</property>
+                <property name="position">1</property>
               </packing>
             </child>
             <child>
@@ -166,7 +203,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">1</property>
+                <property name="position">2</property>
               </packing>
             </child>
             <child>
@@ -178,7 +215,7 @@
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="padding">2</property>
-                <property name="position">2</property>
+                <property name="position">3</property>
               </packing>
             </child>
             <child>
@@ -192,7 +229,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">3</property>
+                <property name="position">4</property>
               </packing>
             </child>
             <child>
@@ -206,7 +243,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">4</property>
+                <property name="position">5</property>
               </packing>
             </child>
             <child>
@@ -220,7 +257,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">5</property>
+                <property name="position">6</property>
               </packing>
             </child>
             <child>

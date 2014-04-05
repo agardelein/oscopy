@@ -90,37 +90,24 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         self.canvas = canvas
         self.draw_hid = canvas.mpl_connect('draw_event', self.update_scrollbars)
 
-        # The store for the combo box
-        store = Gtk.ListStore(GObject.TYPE_STRING, # String displayed
-                              GObject.TYPE_BOOLEAN, # x10 mode status
-                              GObject.TYPE_BOOLEAN, # Combobox item sensitive
-                              GObject.TYPE_BOOLEAN, # Span mode status
-                              GObject.TYPE_PYOBJECT, # Horizontal Adjustment
-                              GObject.TYPE_PYOBJECT, # Vertical Adjustment
-                              )
+        # The GtkBuilder
+        builder = Gtk.Builder()
+        builder.add_from_file('/'.join((uidir, IOSCOPY_GTK_FIGURE_UI)))
+        self.builder = builder
+
+        # Init the store for the combo box
+        store = builder.get_object('store')
         iter = store.append([_('All Graphs'), False, True, False, Gtk.Adjustment(), Gtk.Adjustment()])
         for i in range(4):
             iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False, False, Gtk.Adjustment(), Gtk.Adjustment()])
         self.cbx_store = store
 
         # The Graph Combobox
-        graphs_cbx = Gtk.ComboBox.new_with_model(store)
-        cell = Gtk.CellRendererText()
-        graphs_cbx.pack_start(cell, True)
-        graphs_cbx.add_attribute(cell, 'text', IOSCOPY_COL_TEXT)
-        graphs_cbx.add_attribute(cell, 'sensitive', IOSCOPY_COL_VIS)
+        graphs_cbx = builder.get_object('graphs_cbx')
         graphs_cbx.set_active(0)
-
-        # The GtkBuilder
-        builder = Gtk.Builder()
-        builder.expose_object('store', self.cbx_store)
-        builder.add_from_file('/'.join((uidir, IOSCOPY_GTK_FIGURE_UI)))
-        self.builder = builder
 
         # Add remaining widgets
         builder.get_object('box').pack_start(canvas, True, True, 0)
-        builder.get_object('buttonbar').pack_start(graphs_cbx, False, False, 0)
-        builder.get_object('buttonbar').reorder_child(graphs_cbx, 0)
 
         # Expose widgets needed elsewhere
         self.window = builder.get_object('w')
