@@ -8,7 +8,7 @@
 	  <object class='GtkTreeView' id='tv'>
 	    <property name='model'>store</property>
 	    <signal name='row-activated' handler='row_activated'/>
-	    <signal name='drag_data_get' handler='drag_data_get'/>
+	    <signal name='drag-data-get' handler='drag_data_get'/>
 	    <signal name='button-press-event' handler='tv_button_pressed'/>
 	    <child internal-child='selection'>
 	      <object class ='GtkTreeSelection' id='selection'>

@@ -14,6 +14,7 @@ import IPython
 import oscopy
 
 from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
+from matplotlib.backend_bases import LocationEvent
 #from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 from . import gui
 from .gui.gtk_figure import IOscopy_GTK_Figure
@@ -235,6 +236,25 @@ class IOscopyApp(Gtk.Application):
         finally:
             os.chdir(old_dir)
 
+    def figure_drag_data_received(self, window, drag_context, x, y, selection,
+                                  target_type, time):
+        if target_type == IOscopy_GTK_Figure.TARGET_TYPE_SIGNAL:
+            # Retrieve signal list
+            signals = {}
+            for name in selection.get_text().split():
+                signals[name] = self.ctxt.signals[name]
+
+            figure = self.windows_to_figures[window]
+            # Retrieve figure and graph numbers
+            # HERE : FIXME get canvas height !!!
+            canvas = figure.canvas
+            my_y = canvas.get_allocation().height - y
+            event = LocationEvent('axes_enter_event', canvas, x, my_y)
+            if event.inaxes is not None:
+                param = GLib.Variant.new_tuple(GLib.Variant.new_string(selection.get_text()),
+                                                GLib.Variant.new_string(window.get_title()),
+                                                GLib.Variant.new_uint64(figure.graphs.index(event.inaxes) + 1))
+                self.activate_action('insert_signal', param)
     #
     # Callbacks for ioscopy script
     #
@@ -252,8 +272,7 @@ class IOscopyApp(Gtk.Application):
         fig = IOscopy_GTK_Figure(sigs, None, figname, self.uidir)
         self.ctxt.create(fig)
 
-        fig.window.connect('drag_data_received', fig.drag_data_received_cb,
-                           self.ctxt.signals)
+        fig.window.connect_after('drag-data-received', self.figure_drag_data_received)
         fig.canvas.mpl_connect('axes_enter_event', self.axes_enter)
         fig.canvas.mpl_connect('axes_leave_event', self.axes_leave)
         fig.canvas.mpl_connect('figure_enter_event', self.figure_enter)

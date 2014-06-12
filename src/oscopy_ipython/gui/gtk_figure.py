@@ -68,11 +68,12 @@ class MyRectangleSelector(RectangleSelector):
                 event.button != self.eventpress.button)
 
 class IOscopy_GTK_Figure(oscopy.Figure):
+    TARGET_TYPE_SIGNAL = 10354
     def __init__(self, sigs={}, fig=None, title='', uidir=''):
         oscopy.Figure.__init__(self, None, fig)
-        self.TARGET_TYPE_SIGNAL = 10354
-        self.to_figure = [Gtk.TargetEntry.new("oscopy-signals", Gtk.TargetFlags.SAME_APP,\
-                                self.TARGET_TYPE_SIGNAL)]
+        self.to_figure = [Gtk.TargetEntry.new("text/plain",
+                                              Gtk.TargetFlags.SAME_APP,
+                                              self.TARGET_TYPE_SIGNAL)]
         self.hadjpreval = None
         self.vadjpreval = None
 
@@ -95,6 +96,11 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         builder.add_from_file('/'.join((uidir, IOSCOPY_GTK_FIGURE_UI)))
         self.builder = builder
 
+        # The window
+        w = builder.get_object('w')
+        w.set_title(title)
+        w.drag_dest_set(Gtk.DestDefaults.ALL, self.to_figure, Gdk.DragAction.COPY)
+
         # Init the store for the combo box
         store = builder.get_object('store')
         iter = store.append([_('All Graphs'), False, True, False, Gtk.Adjustment(), Gtk.Adjustment()])
@@ -110,7 +116,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         builder.get_object('box').pack_start(canvas, True, True, 0)
 
         # Expose widgets needed elsewhere
-        self.window = builder.get_object('w')
+        self.window = w
         self.hbar = builder.get_object('hbar')
         self.vbar = builder.get_object('vbar')
         self.coords_lbl1 = builder.get_object('coord_lbl1')
@@ -135,6 +141,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                  'enable_adj_update_on_draw': self.enable_adj_update_on_draw,
                  'update_scrollbars': self.update_scrollbars,
                  'save_fig_btn_clicked': self.save_fig_btn_clicked,
+                 'delete_event_cb': lambda w, e: w.hide() or True,
                  }
         builder.connect_signals(cbmap)
         graphs_cbx.connect('changed', self.graphs_cbx_changed,
@@ -151,7 +158,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 gr.span.new_axes(gr)
 
     def delete_me(self, sigs={}, fig=None, title=''):
-
+        # To be deleted on completion of transition to python3/gtk3
         w = Gtk.Window()
         w.set_title(title)
 
@@ -480,26 +487,6 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         (dymin, dymax) = (g.dataLim.ymin, g.dataLim.ymax)
         (ymin, ymax) = g.get_ybound()
         g.set_ybound(max(dymin, ymin), min(dymax, ymax))
-
-    def drag_data_received_cb(self, widget, drag_context, x, y, selection,\
-                                   target_type, time, ctxtsignals):
-        # Event handling issue: this drag and drop callback is
-        # processed before matplotlib callback _axes_enter. Therefore
-        # when dropping, self._current_graph is not valid: it contains
-        # the last graph.
-        # The workaround is to retrieve the Graph by creating a Matplotlib
-        # LocationEvent considering inverse 'y' coordinates
-        if target_type == self._TARGET_TYPE_SIGNAL:
-            canvas = self.canvas
-            my_y = canvas.allocation.height - y
-            event = LocationEvent('axes_enter_event', canvas, x, my_y)
-            signals = {}
-            for name in selection.data.split():
-                signals[name] = ctxtsignals[name]
-            if event.inaxes is not None:
-                # Graph not found
-                event.inaxes.insert(signals)
-                self.canvas.draw()
 
     def add(self, args):
         oscopy.Figure.add(self, args)

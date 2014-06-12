@@ -6,13 +6,13 @@ IOSCOPY_SIGNAL_LIST_UI = 'oscopy/signal-list.ui'
 
 
 class IOscopyAppWin(Gtk.ApplicationWindow):
+    TARGET_TYPE_SIGNAL = 10354
     def __init__(self, app, uidir=None):
         Gtk.ApplicationWindow.__init__(self, title='IOscopy', application=app)
         self.app = app
         self.popup = None
 
-        self.TARGET_TYPE_SIGNAL = 10354
-        self.from_signal_list = [Gtk.TargetEntry.new("oscopy-signals",
+        self.from_signal_list = [Gtk.TargetEntry.new("text/plain",
                                                       Gtk.TargetFlags.SAME_APP,
                                                       self.TARGET_TYPE_SIGNAL)]
 
@@ -46,9 +46,10 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
         col.set_cell_data_func(self.builder.get_object('tvcrt'), self.reader_name_in_bold)        
         # Drag setup
         tv = self.builder.get_object('tv')
-        tv.drag_source_set(Gdk.ModifierType.BUTTON1_MASK,\
-                               self.from_signal_list,\
-                               Gdk.DragAction.COPY)
+        tv.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK,
+                                        self.from_signal_list,
+                                        Gdk.DragAction.COPY)
+
         # Drop setup
         self.drag_dest_set(Gtk.DestDefaults.MOTION |\
                         Gtk.DestDefaults.HIGHLIGHT |\
@@ -198,10 +199,8 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
             # Use the path list stored while button 1 has been pressed
             # See self._treeview_button_press()
             siglist = ' '.join([self.app.store[x][1].name for x in self.rows_for_drag])
-            print(siglist)
             data.set_text(siglist, -1)
             return True
-        print('drag data get')
 
     def drag_data_received(self, widget, drag_context, x, y, data,
                            target_type, time):

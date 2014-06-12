@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.18.3 -->
 <interface>
-  <!-- interface-requires gtk+ 3.0 -->
+  <requires lib="gtk+" version="3.0"/>
   <object class="GtkListStore" id="store">
     <columns>
-      <!-- column-name String displayed -->
+      <!-- column-name String -->
       <column type="gchararray"/>
-      <!-- column-name x10 mode status -->
+      <!-- column-name x10 -->
       <column type="gboolean"/>
-      <!-- column-name Combobox item status -->
+      <!-- column-name Combobox -->
       <column type="gboolean"/>
-      <!-- column-name Span mode status -->
+      <!-- column-name Span -->
       <column type="gboolean"/>
-      <!-- column-name Horizontal Adjustment -->
+      <!-- column-name Horizontal -->
       <column type="GObject"/>
-      <!-- column-name Vertical Adjustment -->
+      <!-- column-name Vertical -->
       <column type="GObject"/>
     </columns>
   </object>
@@ -21,6 +22,7 @@
     <property name="can_focus">False</property>
     <property name="default_width">640</property>
     <property name="default_height">480</property>
+    <signal name="delete-event" handler="delete_event_cb" swapped="no"/>
     <child>
       <object class="GtkBox" id="box1">
         <property name="visible">True</property>
@@ -34,11 +36,11 @@
               <object class="GtkScrollbar" id="hbar">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <signal name="change-value" handler="hscroll_change_value" swapped="no"/>
                 <signal name="button-press-event" handler="hadj_pressed" swapped="no"/>
+                <signal name="button-release-event" handler="hadj_released" swapped="no"/>
+                <signal name="change-value" handler="hscroll_change_value" swapped="no"/>
                 <signal name="enter-notify-event" handler="disable_adj_update_on_draw" swapped="no"/>
                 <signal name="leave-notify-event" handler="enable_adj_update_on_draw" swapped="no"/>
-                <signal name="button-release-event" handler="hadj_released" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -61,9 +63,9 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
-            <signal name="change-value" handler="vscroll_change_value" swapped="no"/>
             <signal name="button-press-event" handler="vadj_pressed" swapped="no"/>
             <signal name="button-release-event" handler="vadj_released" swapped="no"/>
+            <signal name="change-value" handler="vscroll_change_value" swapped="no"/>
             <signal name="enter-notify-event" handler="disable_adj_update_on_draw" swapped="no"/>
             <signal name="leave-notify-event" handler="enable_adj_update_on_draw" swapped="no"/>
           </object>
