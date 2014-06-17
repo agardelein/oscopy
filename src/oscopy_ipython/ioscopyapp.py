@@ -251,7 +251,7 @@ class IOscopyApp(Gtk.Application):
             my_y = canvas.get_allocation().height - y
             event = LocationEvent('axes_enter_event', canvas, x, my_y)
             if event.inaxes is not None:
-                param = GLib.Variant.new_tuple(GLib.Variant.new_string(selection.get_text()),
+                param = GLib.Variant.new_tuple(GLib.Variant.new_string(','.join(selection.get_text().split())),
                                                 GLib.Variant.new_string(window.get_title()),
                                                 GLib.Variant.new_uint64(figure.graphs.index(event.inaxes) + 1))
                 self.activate_action('insert_signal', param)
