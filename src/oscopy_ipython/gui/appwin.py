@@ -49,6 +49,7 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
         tv.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK,
                                         self.from_signal_list,
                                         Gdk.DragAction.COPY)
+        tv.get_selection().connect('changed', self.tv_selection_changed)
 
         # Drop setup
         self.drag_dest_set(Gtk.DestDefaults.MOTION |\
@@ -99,9 +100,9 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
             # Build popup menu
             m = Gio.Menu.new()
             param = GLib.Variant.new_tuple(GLib.Variant.new_string(','.join(signals.keys())),
-                                                       GLib.Variant.new_string(''),
-                                                       GLib.Variant.new_uint64(0))
-            param.ref_sink()
+                                           GLib.Variant.new_string(''),
+                                           GLib.Variant.new_uint64(0))
+#            param.ref_sink()
             item = Gio.MenuItem.new(_('New Figure'), None)
             item.set_action_and_target_value('app.insert_signal', param)
             m.append_item(item)
@@ -111,10 +112,12 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
                 if w.get_title().startswith(_('Figure')):
                     f = self.app.windows_to_figures[w]
                     if len(f.graphs) < oscopy.figure.MAX_GRAPHS_PER_FIGURE:
+                        print(signals.keys())
                         param = GLib.Variant.new_tuple(GLib.Variant.new_string(','.join(signals.keys())),
                                                        GLib.Variant.new_string(w.get_title()),
                                                        GLib.Variant.new_uint64(0))
-                        param.ref_sink()
+#                        param.ref_sink()
+#                        print(param.get_type_string())
                         item = Gio.MenuItem.new(_('New Graph'), None)
                         item.set_action_and_target_value('app.insert_signal', param)
                         sm.append_item(item)
@@ -156,16 +159,9 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
             self.popup.popup(None, None, None, None, event.button, event.time)
             return True
 
-        if event.button == 1:
-            # It is not _that_ trivial to keep the selection when user start
-            # to drag. The default handler reset the selection when button 1
-            # is pressed. So we use this handler to store the selection
-            # until drag has been recognized.
-            tv = widget
-            sel = tv.get_selection()
-            rows = sel.get_selected_rows()[1]
-            self.rows_for_drag = rows
-            return False
+    def tv_selection_changed(self, widget):
+        # Store the selection for drag and drop
+        self.rows_for_drag = widget.get_selected_rows()[1]
 
     def cell_toggled(self, cellrenderer, path):
         if len(path) == 3:
@@ -191,6 +187,7 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
 
     def drag_data_get(self, widget, drag_context, data, target_type,\
                               time):
+        print('appwin: drag_data_get')
         if target_type == self.TARGET_TYPE_SIGNAL:
             tv = widget
             sel = tv.get_selection()
@@ -198,8 +195,10 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
             iter = self.app.store.get_iter(pathlist[0])
             # Use the path list stored while button 1 has been pressed
             # See self._treeview_button_press()
+            print('appwin: rows', [x for x in self.rows_for_drag])
             siglist = ' '.join([self.app.store[x][1].name for x in self.rows_for_drag])
             data.set_text(siglist, -1)
+            print('appwin: drag_data_get returns TRUE')
             return True
 
     def drag_data_received(self, widget, drag_context, x, y, data,
