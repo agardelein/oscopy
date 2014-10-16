@@ -238,7 +238,6 @@ class IOscopyApp(Gtk.Application):
 
     def figure_drag_data_received(self, window, drag_context, x, y, selection,
                                   target_type, time):
-        print("ioscopyapp: drag data received")
         if target_type == IOscopy_GTK_Figure.TARGET_TYPE_SIGNAL:
             # Retrieve signal list
             signals = {}
@@ -256,7 +255,9 @@ class IOscopyApp(Gtk.Application):
                                                 GLib.Variant.new_string(window.get_title()),
                                                 GLib.Variant.new_uint64(figure.graphs.index(event.inaxes) + 1))
                 self.activate_action('insert_signal', param)
-        print("ioscopyapp: drag data received finished")
+        # FIXME: Message occurs for next line, why ?
+        # /usr/lib/python3/dist-packages/gi/overrides/GLib.py:222: Warning: g_variant_unref: assertion 'value->ref_count > 0' failed
+        del param
     #
     # Callbacks for ioscopy script
     #

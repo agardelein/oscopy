@@ -187,7 +187,6 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
 
     def drag_data_get(self, widget, drag_context, data, target_type,\
                               time):
-        print('appwin: drag_data_get')
         if target_type == self.TARGET_TYPE_SIGNAL:
             tv = widget
             sel = tv.get_selection()
@@ -195,10 +194,8 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
             iter = self.app.store.get_iter(pathlist[0])
             # Use the path list stored while button 1 has been pressed
             # See self._treeview_button_press()
-            print('appwin: rows', [x for x in self.rows_for_drag])
             siglist = ' '.join([self.app.store[x][1].name for x in self.rows_for_drag])
             data.set_text(siglist, -1)
-            print('appwin: drag_data_get returns TRUE')
             return True
 
     def drag_data_received(self, widget, drag_context, x, y, data,
@@ -206,4 +203,3 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
         name = data.get_text()
         if type(name) == str and name.startswith('file://'):
             self.app.exec_str('%%oread %s' % name[7:].strip())
-
