@@ -50,6 +50,9 @@ else
 	    echo Unable to copy profile, see message above
 	    exit
 	fi
+    elif ! cmp -s "$profd/ipython_config.py" "@datarootdir@/oscopy/ipython_config.py"; then
+	    echo "skipping profile update."
+	    echo	
     elif [ "$profd/ipython_config.py" -ot "@datarootdir@/oscopy/ipython_config.py" ]; then
 	echo
 	upd=0
