@@ -172,8 +172,7 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
             tv.do_button_press_event(tv, event)
 
             if event.button == 3:
-                # Popup menu
-                pass
+                return self.make_menu(event)
         
             return True
 
@@ -266,7 +265,7 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
 
             if event.button == 3:
                 # Popup menu
-                print('Button 3 pressed')
+                return self.make_menu(event)
 
         return True
 
@@ -435,3 +434,51 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
         name = data.get_text()
         if type(name) == str and name.startswith('file://'):
             self.app.exec_str('%%oread %s' % name[7:].strip())
+
+    def make_menu(self, event):
+        menu_model = Gio.Menu.new()
+        
+        menu_model.append_submenu('Insert...', self.make_figures_submenu())
+        menu = Gtk.Menu.new_from_model(menu_model)
+        menu.attach_to_widget(self, None)
+        menu.popup(None, None, None, None, event.button, event.time)
+        return True
+
+    def make_figures_submenu(self):
+        tv = self.details.tree_view
+        sel = tv.get_selection()
+        model = tv.get_model()
+        names = []
+        # Get the names
+        for path in sel.get_selected_rows()[1]:
+            iter = model.get_iter(path)
+            names.append(model.get_value(iter, 0))     
+
+        menu = Gio.Menu.new()
+        item = Gio.MenuItem.new('In new figure', 'app.insert_signal')
+        param = GLib.Variant.new_tuple(GLib.Variant.new_string(','.join(names)),
+                                           GLib.Variant.new_string(''),
+                                           GLib.Variant.new_uint64(0))
+        item.set_action_and_target_value('app.insert_signal', param)
+        menu.append_item(item)
+        for i, figure in enumerate(self.app.ctxt.figures):
+            menu.append_submenu('Figure %d' % (i + 1), self.make_graphs_submenu_for_figure(figure, i, names))
+        return menu
+
+    def make_graphs_submenu_for_figure(self, figure, fignum, names):
+        menu = Gio.Menu.new()
+        if len(figure.graphs) < oscopy.MAX_GRAPHS_PER_FIGURE:
+            item = Gio.MenuItem.new('In new graph', 'app.insert_signal')
+            param = GLib.Variant.new_tuple(GLib.Variant.new_string(','.join(names)),
+                                           GLib.Variant.new_string('Figure %d' % (fignum + 1)),
+                                           GLib.Variant.new_uint64(0))
+            item.set_action_and_target_value('app.insert_signal', param)
+            menu.append_item(item)
+        for i, graph in enumerate(figure.graphs):
+            item = Gio.MenuItem.new('Graph %d' % (i + 1), 'app.insert_signal')
+            param = GLib.Variant.new_tuple(GLib.Variant.new_string(','.join(names)),
+                                           GLib.Variant.new_string('Figure %d' % (fignum + 1)),
+                                           GLib.Variant.new_uint64(i + 1))
+            item.set_action_and_target_value('app.insert_signal', param)
+            menu.append_item(item)
+        return menu
