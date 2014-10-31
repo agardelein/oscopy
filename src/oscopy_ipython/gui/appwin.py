@@ -204,7 +204,7 @@ class IOscopyAppWin(Gtk.ApplicationWindow):
                self.details.double_click_path[1] and not \
                self.details.double_click_path[1].compare(self.details.double_click_path[0]):
                 # Activate the cells on button 1 double-click
-                print('Activate cells !')
+                tv.row_activated(path, column)
             else:
                 tv.do_button_press_event(tv, event)
         else:
