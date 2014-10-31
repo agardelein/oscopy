@@ -10,6 +10,8 @@
 	    <signal name='row-activated' handler='row_activated'/>
 	    <signal name='drag-data-get' handler='drag_data_get'/>
 	    <signal name='button-press-event' handler='tv_button_pressed'/>
+	    <signal name='button-release-event' handler='tv_button_released'/>
+	    <signal name='motion-notify-event' handler='tv_motion_notify_event'/>
 	    <child internal-child='selection'>
 	      <object class ='GtkTreeSelection' id='selection'>
 		<!-- Gtk.SelectionMode.MULTIPLE = 3-->
