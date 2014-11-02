@@ -106,6 +106,18 @@ class IOscopyApp(Gtk.Application):
         a.connect('activate', self.insert_signal_activated)
         self.add_action(a)
 
+        a = Gio.SimpleAction.new('add_graph', None)
+        a.connect('activate', self.add_graph_activated)
+        self.add_action(a)
+
+        a = Gio.SimpleAction.new('delete_graph', GLib.VariantType.new('t'))
+        a.connect('activate', self.delete_graph_activated)
+        self.add_action(a)        
+
+        a = Gio.SimpleAction.new_stateful('set_layout', GLib.VariantType.new('s'), GLib.Variant.new_string('quad'))
+        a.connect('activate', self.set_layout_activated)
+        self.add_action(a)
+
         self.builder = Gtk.Builder()
         self.builder.expose_object('store', self.store)
         self.builder.add_from_file('/'.join((self.uidir, IOSCOPY_UI)))
@@ -211,6 +223,17 @@ class IOscopyApp(Gtk.Application):
                 self.exec_str('%%oadd %s' % sigs)
         else:
             self.exec_str('%%ocreate %s' % sigs)
+
+    def add_graph_activated(self, action, param):
+        self.exec_str('%%oadd')
+
+    def delete_graph_activated(self, action, param):
+        (gnum) = param.unpack()
+        self.exec_str('%%odelete %d' % (gnum + 1))
+
+    def set_layout_activated(self, action, param):
+        (layout) = param.unpack()
+        self.exec_str('%%olayout %s' % layout)
 
     def exec_str(self, line):
         if ' ' in line:
@@ -397,8 +420,12 @@ class IOscopyApp(Gtk.Application):
             axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
         else:
             axes_num = 1
+        if hasattr(event, 'inaxes'):
+            self.lookup_action('delete_graph').set_enabled(event.inaxes is not None)
         fig_num = self.ctxt.figures.index(self.current_figure) + 1
         self.exec_str('%%oselect %d-%d' % (fig_num, axes_num))
+        self.lookup_action('add_graph').set_enabled(len(event.canvas.figure.graphs) < oscopy.MAX_GRAPHS_PER_FIGURE)
+        self.lookup_action('set_layout').change_state(GLib.Variant.new_string(event.canvas.figure.layout))
 
     def figure_leave(self, event):
 #        self._current_figure = None

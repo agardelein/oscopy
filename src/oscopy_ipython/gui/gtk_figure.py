@@ -1,6 +1,6 @@
 
 import oscopy
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, Gio, GLib
 from gi.repository import GObject
 from math import log10, sqrt
 from matplotlib.backend_bases import LocationEvent
@@ -522,10 +522,30 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
     def button_press(self, event):
         if event.button == 3:
-            print("Button 3...")
-            return
-            menu = self._create_figure_popup_menu(event.canvas.figure, event.inaxes)
-            menu.show_all()
+            menu_model = Gio.Menu.new()
+
+            item = Gio.MenuItem.new('Add Graph', 'app.add_graph')
+            menu_model.append_item(item)
+
+            item = Gio.MenuItem.new('Delete Graph', None)
+            if hasattr(event, 'inaxes') and event.inaxes is not None:
+                item.set_action_and_target_value('app.delete_graph', GLib.Variant.new_uint64(self.graphs.index(event.inaxes)))
+            menu_model.append_item(item)
+
+            layout_menu_model = Gio.Menu.new()
+            item = Gio.MenuItem.new('Quad', None)
+            item.set_action_and_target_value('app.set_layout', GLib.Variant.new_string('quad'))
+            layout_menu_model.append_item(item)
+            item = Gio.MenuItem.new('Horizontal', None)
+            item.set_action_and_target_value('app.set_layout', GLib.Variant.new_string('horiz'))
+            layout_menu_model.append_item(item)
+            item = Gio.MenuItem.new('Vertical', None)
+            item.set_action_and_target_value('app.set_layout', GLib.Variant.new_string('vert'))
+            layout_menu_model.append_item(item)
+            menu_model.append_submenu('Layout...', layout_menu_model)
+
+            menu = Gtk.Menu.new_from_model(menu_model)
+            menu.attach_to_widget(self.window, None)
             menu.popup(None, None, None, None, event.button, event.guiEvent.time)
 
     def mouse_scroll(self, event):
