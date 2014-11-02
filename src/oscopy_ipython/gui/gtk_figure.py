@@ -637,6 +637,9 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                             ypgs_min / 10.0, ypgs_min, ypgs_min)
 
     def _update_graph_adj(self, grnum, g):
+        if not g.signals:
+            return (0, 0, 0, 0)
+
         (lower, upper) = (0, 1)
 
         hadj = self.cbx_store[grnum + 1][IOSCOPY_COL_HADJ]

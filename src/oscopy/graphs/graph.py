@@ -89,8 +89,8 @@ Abbreviations
             self._yaxis = ""
             self._xunit = ""
             self._yunit = ""
-            self._xrange = []
-            self._yrange = []
+            self._xrange = [0, 1]
+            self._yrange = [0, 1]
             # Cursors values, only two horiz and two vert but can be changed
             self._cursors = {"horiz":[None, None], "vert":[None, None]}
             self._txt = None
@@ -237,8 +237,8 @@ Abbreviations
         if a == "Y" and self._scale_factors[1] is not None:
             return self._scale_factors[1], factors_to_names[-self._scale_factors[1]][0]
         # Find the absolute maximum of the data
-        mxs = []
-        mns = []
+        mxs = [] if self._sigs else [1]
+        mns = [] if self._sigs else [0]
 
         for s in self._sigs.values():
             if a == "X":
