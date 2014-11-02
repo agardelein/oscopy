@@ -118,6 +118,10 @@ class IOscopyApp(Gtk.Application):
         a.connect('activate', self.set_layout_activated)
         self.add_action(a)
 
+        a = Gio.SimpleAction.new('select_graph', GLib.VariantType.new('(tt)'))
+        a.connect('activate', self.select_graph_activated)
+        self.add_action(a)
+
         self.builder = Gtk.Builder()
         self.builder.expose_object('store', self.store)
         self.builder.add_from_file('/'.join((self.uidir, IOSCOPY_UI)))
@@ -234,6 +238,10 @@ class IOscopyApp(Gtk.Application):
     def set_layout_activated(self, action, param):
         (layout) = param.unpack()
         self.exec_str('%%olayout %s' % layout)
+
+    def select_graph_activated(self, action, param):
+        (fig_num, axes_num) = param.unpack()
+        self.exec_str('%%oselect %d-%d' % (fig_num, axes_num))
 
     def exec_str(self, line):
         if ' ' in line:
@@ -405,7 +413,9 @@ class IOscopyApp(Gtk.Application):
 
         axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
         fig_num = self.ctxt.figures.index(self.current_figure) + 1
-        self.exec_str('%%oselect %d-%d' % (fig_num, axes_num))
+        param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(fig_num),
+                                       GLib.Variant.new_uint64(axes_num))
+        self.activate_action('select_graph', param)
 
     def axes_leave(self, event):
         # Unused for better user interaction
@@ -414,14 +424,16 @@ class IOscopyApp(Gtk.Application):
 
     def figure_enter(self, event):
         self.current_figure = event.canvas.figure
-        if hasattr(event, 'inaxes') and event.inaxes is not None:
-            axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
-        else:
-            axes_num = 1
+        axes_num = 0
         if hasattr(event, 'inaxes'):
             self.lookup_action('delete_graph').set_enabled(event.inaxes is not None)
+            if event.inaxes is not None:
+                axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
         fig_num = self.ctxt.figures.index(self.current_figure) + 1
-        self.exec_str('%%oselect %d-%d' % (fig_num, axes_num))
+        param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(fig_num),
+                                       GLib.Variant.new_uint64(axes_num))
+        self.activate_action('select_graph', param)
+
         self.lookup_action('add_graph').set_enabled(len(event.canvas.figure.graphs) < oscopy.MAX_GRAPHS_PER_FIGURE)
         self.lookup_action('set_layout').change_state(GLib.Variant.new_string(event.canvas.figure.layout))
 
