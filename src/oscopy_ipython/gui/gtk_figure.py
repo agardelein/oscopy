@@ -9,6 +9,8 @@ from matplotlib.backends.backend_gtk3 import FileChooserDialog
 from matplotlib.widgets import SpanSelector, RectangleSelector
 from matplotlib.transforms import Bbox
 
+from oscopy import factors_to_names, abbrevs_to_factors
+
 IOSCOPY_COL_TEXT = 0 # Combo box text
 IOSCOPY_COL_X10 = 1 # x10 mode status
 IOSCOPY_COL_VIS = 2 # Combobox items sensitive
@@ -17,6 +19,7 @@ IOSCOPY_COL_HADJ = 4 # Horizontal scrollbar adjustment
 IOSCOPY_COL_VADJ = 5 # Vertical scrollbar adjustment
 
 IOSCOPY_GTK_FIGURE_UI = 'oscopy/gtk_figure.glade'
+IOSCOPY_RANGE_UI = 'oscopy/range.glade'
 
 DEFAULT_ZOOM_FACTOR = 0.8
 DEFAULT_PAN_FACTOR = 10
@@ -95,6 +98,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         builder = Gtk.Builder()
         builder.add_from_file('/'.join((uidir, IOSCOPY_GTK_FIGURE_UI)))
         self.builder = builder
+        self.uidir = uidir
 
         # The window
         w = builder.get_object('w')
@@ -127,6 +131,11 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         self.mpsel_set_act = [builder.get_object('rb%d' % (b + 1)).set_active for b in range(4)]
         self.mpsel_set_sens = [builder.get_object('rb%d' % (b + 1)).set_sensitive for b in range(4)]
         self.window.show_all()
+
+        # Actions
+        a = Gio.SimpleAction.new('set_range', GLib.VariantType.new('t'))
+        a.connect('activate', self.set_range_activated)
+        self.window.add_action(a)
 
         # Connect additional GTK signals
         cbmap = {'span_toggle_btn_toggled': self.span_toggle_btn_toggled,
@@ -522,27 +531,39 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
     def button_press(self, event):
         if event.button == 3:
-            menu_model = Gio.Menu.new()
+            figure_menu_model = Gio.Menu.new()
 
-            item = Gio.MenuItem.new('Add Graph', 'app.add_graph')
-            menu_model.append_item(item)
+            item = Gio.MenuItem.new(_('Add Graph'), 'app.add_graph')
+            figure_menu_model.append_item(item)
 
-            item = Gio.MenuItem.new('Delete Graph', None)
+            item = Gio.MenuItem.new(_('Delete Graph'), None)
             if hasattr(event, 'inaxes') and event.inaxes is not None:
                 item.set_action_and_target_value('app.delete_graph', GLib.Variant.new_uint64(self.graphs.index(event.inaxes)))
-            menu_model.append_item(item)
+            figure_menu_model.append_item(item)
 
             layout_menu_model = Gio.Menu.new()
-            item = Gio.MenuItem.new('Quad', None)
+            item = Gio.MenuItem.new(_('Quad'), None)
             item.set_action_and_target_value('app.set_layout', GLib.Variant.new_string('quad'))
             layout_menu_model.append_item(item)
-            item = Gio.MenuItem.new('Horizontal', None)
+            item = Gio.MenuItem.new(_('Horizontal'), None)
             item.set_action_and_target_value('app.set_layout', GLib.Variant.new_string('horiz'))
             layout_menu_model.append_item(item)
-            item = Gio.MenuItem.new('Vertical', None)
+            item = Gio.MenuItem.new(_('Vertical'), None)
             item.set_action_and_target_value('app.set_layout', GLib.Variant.new_string('vert'))
             layout_menu_model.append_item(item)
-            menu_model.append_submenu('Layout...', layout_menu_model)
+            figure_menu_model.append_submenu(_('Layout...'), layout_menu_model)
+
+            graph_menu_model = Gio.Menu.new()
+            item = Gio.MenuItem.new(_('Range...'), None)
+            if hasattr(event, 'inaxes'):
+                self.window.lookup_action('set_range').set_enabled(event.inaxes is not None)
+                if event.inaxes is not None:
+                    item.set_action_and_target_value('win.set_range', GLib.Variant.new_uint64(self.graphs.index(event.inaxes)))
+            graph_menu_model.append_item(item)
+
+            menu_model = Gio.Menu.new()
+            menu_model.append_section(None, figure_menu_model)
+            menu_model.append_section(None, graph_menu_model)
 
             menu = Gtk.Menu.new_from_model(menu_model)
             menu.attach_to_widget(self.window, None)
@@ -792,6 +813,55 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         self.vadjpreval = None
 
     layout = property(oscopy.Figure.get_layout, set_layout)
+
+    def set_range_activated(self, action, param):
+        (grnum) = param.unpack()
+        graph = self.graphs[grnum]
+        names = ['xmin', 'xmax', 'ymin', 'ymax']
+        label_prefixes = ['x', 'y']
+        vals = [graph.get_range()[0][0], graph.get_range()[0][1], graph.get_range()[1][0], graph.get_range()[1][1]]
+        vmins = [vals[0], vals[0], vals[2], vals[2]]
+        vmaxs = [vals[1], vals[1], vals[3], vals[3]]
+        scale_factors = [graph.scale_factors[0], graph.scale_factors[0],
+                         graph.scale_factors[1], graph.scale_factors[1]]
+        axis_names = graph.axis_names
+        units = [graph.unit[0], graph.unit[0],
+                         graph.unit[1], graph.unit[1]]
+
+        builder = Gtk.Builder()
+        builder.add_from_file('/'.join((self.uidir, IOSCOPY_RANGE_UI)))
+        # Dialog
+        dlg = builder.get_object('range_dialog')
+        dlg.set_transient_for(self.window)
+
+        # Axes names
+        for a in zip(label_prefixes, axis_names):
+            (label_prefix, axis_name) = a
+            builder.get_object(label_prefix + '_label').set_text(axis_name)
+
+        # Unit, scale factor, adjustment value, step and boundaries
+        for a in zip(names, scale_factors, units, vals, vmins, vmaxs):
+            (name, factor, unit, val, vmin, vmax) = a
+            builder.get_object(name + '_unit_label').set_text(factors_to_names[factor][0] + unit)
+            step = abs(float(vmin - vmax)) / 100.0
+            builder.get_object(name + '_adjustment').configure(val,
+                                                               -1e99, 1e99,
+                                                               step, step * 10.0,
+                                                               0)
+
+
+        resp = dlg.run()
+        print('resp', resp, Gtk.ResponseType.ACCEPT)
+        if resp == Gtk.ResponseType.ACCEPT:
+            res = [
+                builder.get_object('xmin_spinbutton').get_value(),
+                builder.get_object('xmax_spinbutton').get_value(),
+                builder.get_object('ymin_spinbutton').get_value(),
+                builder.get_object('ymax_spinbutton').get_value()]
+            graph.range = [float(x) for x in res]
+            if self.canvas is not None:
+                self.canvas.draw()
+        dlg.destroy()
 
 def error_msg_gtk(msg, parent=None):
     # From matplotlib/backends/backend_Gtk.py

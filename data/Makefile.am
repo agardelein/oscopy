@@ -3,7 +3,8 @@ dist_pkgdata_DATA = ipython_config.py \
 	new_math_signal_dlg.glade \
 	run_netnsim_dlg.glade \
 	signal-list.ui \
-	gtk_figure.glade
+	gtk_figure.glade \
+	range.glade
 
 ipython_config.py: ipython_config.py.in
 	cat $< | sed -e 's|@bindir[@]|$(bindir)|g' > $@

@@ -18,7 +18,7 @@
       <column type="GObject"/>
     </columns>
   </object>
-  <object class="GtkWindow" id="w">
+  <object class="GtkApplicationWindow" id="w">
     <property name="can_focus">False</property>
     <property name="default_width">640</property>
     <property name="default_height">480</property>
