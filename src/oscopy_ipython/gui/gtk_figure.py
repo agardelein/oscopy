@@ -20,6 +20,7 @@ IOSCOPY_COL_VADJ = 5 # Vertical scrollbar adjustment
 
 IOSCOPY_GTK_FIGURE_UI = 'oscopy/gtk_figure.glade'
 IOSCOPY_RANGE_UI = 'oscopy/range.glade'
+IOSCOPY_UNITS_UI = 'oscopy/units.glade'
 
 DEFAULT_ZOOM_FACTOR = 0.8
 DEFAULT_PAN_FACTOR = 10
@@ -135,6 +136,10 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         # Actions
         a = Gio.SimpleAction.new('set_range', GLib.VariantType.new('t'))
         a.connect('activate', self.set_range_activated)
+        self.window.add_action(a)
+
+        a = Gio.SimpleAction.new('set_units', GLib.VariantType.new('t'))
+        a.connect('activate', self.set_units_activated)
         self.window.add_action(a)
 
         # Connect additional GTK signals
@@ -561,6 +566,13 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                     item.set_action_and_target_value('win.set_range', GLib.Variant.new_uint64(self.graphs.index(event.inaxes)))
             graph_menu_model.append_item(item)
 
+            item = Gio.MenuItem.new(_('Units...'), None)
+            if hasattr(event, 'inaxes'):
+                self.window.lookup_action('set_units').set_enabled(event.inaxes is not None)
+                if event.inaxes is not None:
+                    item.set_action_and_target_value('win.set_units', GLib.Variant.new_uint64(self.graphs.index(event.inaxes)))
+            graph_menu_model.append_item(item)
+
             menu_model = Gio.Menu.new()
             menu_model.append_section(None, figure_menu_model)
             menu_model.append_section(None, graph_menu_model)
@@ -851,7 +863,6 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
 
         resp = dlg.run()
-        print('resp', resp, Gtk.ResponseType.ACCEPT)
         if resp == Gtk.ResponseType.ACCEPT:
             res = [
                 builder.get_object('xmin_spinbutton').get_value(),
@@ -859,6 +870,48 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 builder.get_object('ymin_spinbutton').get_value(),
                 builder.get_object('ymax_spinbutton').get_value()]
             graph.range = [float(x) for x in res]
+            if self.canvas is not None:
+                self.canvas.draw()
+        dlg.destroy()
+
+    def set_units_activated(self, action, param):
+        (grnum) = param.unpack()
+        graph = self.graphs[grnum]
+        label_prefixes = ['x', 'y']
+        scale_factors = graph.scale_factors
+        axis_names = graph.axis_names
+        units = graph.unit
+
+        builder = Gtk.Builder()
+        builder.add_from_file('/'.join((self.uidir, IOSCOPY_UNITS_UI)))
+        # Dialog
+        dlg = builder.get_object('units_dialog')
+        dlg.set_transient_for(self.window)
+
+        factor_store = builder.get_object('store')
+        sorted_list = list(factors_to_names.keys())
+        sorted_list.sort()
+        for factor in sorted_list:
+            factor_store.append((factors_to_names[factor][0],
+                                       factors_to_names[factor][1]))        
+
+        for a in zip(label_prefixes, axis_names, scale_factors, units):
+            (label_prefix, axis_name, scale_factor, unit) = a
+            builder.get_object(label_prefix + '_label').set_text(axis_name)
+            builder.get_object(label_prefix + '_combobox').set_active(sorted_list.index(scale_factor))
+            builder.get_object(label_prefix + '_entry').set_text(unit)
+
+        resp = dlg.run()
+        if resp == Gtk.ResponseType.ACCEPT:
+            units = (builder.get_object('x_entry').get_text(),
+                     builder.get_object('y_entry').get_text())
+            x_index = builder.get_object('x_combobox').get_active_iter()
+            y_index = builder.get_object('y_combobox').get_active_iter()
+            scale_factors = (abbrevs_to_factors[factor_store.get(x_index, 0)[0]],
+                             abbrevs_to_factors[factor_store.get(y_index, 0)[0]])
+            graph.unit = units
+            graph.set_scale_factors(abbrevs_to_factors[factor_store.get(x_index, 0)[0]],
+                                    abbrevs_to_factors[factor_store.get(y_index, 0)[0]])
             if self.canvas is not None:
                 self.canvas.draw()
         dlg.destroy()
