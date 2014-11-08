@@ -142,6 +142,10 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         a.connect('activate', self.set_units_activated)
         self.window.add_action(a)
 
+        a = Gio.SimpleAction.new_stateful('set_scale', GLib.VariantType.new('(ts)'), GLib.Variant.new_string('lin'))
+        a.connect('activate', self.set_scale_activated)
+        self.window.add_action(a)
+
         # Connect additional GTK signals
         cbmap = {'span_toggle_btn_toggled': self.span_toggle_btn_toggled,
                  'x10_toggle_btn_toggled': self.x10_toggle_btn_toggled,
@@ -560,18 +564,42 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
             graph_menu_model = Gio.Menu.new()
             item = Gio.MenuItem.new(_('Range...'), None)
-            if hasattr(event, 'inaxes'):
-                self.window.lookup_action('set_range').set_enabled(event.inaxes is not None)
-                if event.inaxes is not None:
-                    item.set_action_and_target_value('win.set_range', GLib.Variant.new_uint64(self.graphs.index(event.inaxes)))
+            if hasattr(event, 'inaxes') and event.inaxes is not None:
+                item.set_action_and_target_value('win.set_range', GLib.Variant.new_uint64(self.graphs.index(event.inaxes)))
             graph_menu_model.append_item(item)
 
             item = Gio.MenuItem.new(_('Units...'), None)
-            if hasattr(event, 'inaxes'):
-                self.window.lookup_action('set_units').set_enabled(event.inaxes is not None)
-                if event.inaxes is not None:
-                    item.set_action_and_target_value('win.set_units', GLib.Variant.new_uint64(self.graphs.index(event.inaxes)))
+            if hasattr(event, 'inaxes') and event.inaxes is not None:
+                item.set_action_and_target_value('win.set_units', GLib.Variant.new_uint64(self.graphs.index(event.inaxes)))
             graph_menu_model.append_item(item)
+
+            axes_num = 999999
+            if hasattr(event, 'inaxes') and event.inaxes is not None:
+                    axes_num = self.graphs.index(event.inaxes)
+
+            scale_menu_model = Gio.Menu.new()
+            item = Gio.MenuItem.new(_('Linear'), None)
+            param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(axes_num),
+                                           GLib.Variant.new_string('lin'))
+            item.set_action_and_target_value('win.set_scale', param)
+            scale_menu_model.append_item(item)
+            item = Gio.MenuItem.new(_('Log X'), None)
+            param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(axes_num),
+                                           GLib.Variant.new_string('logx'))
+            item.set_action_and_target_value('win.set_scale', param)
+            scale_menu_model.append_item(item)
+            item = Gio.MenuItem.new(_('Log Y'), None)
+            param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(axes_num),
+                                           GLib.Variant.new_string('logy'))
+            item.set_action_and_target_value('win.set_scale', param)
+            scale_menu_model.append_item(item)
+            item = Gio.MenuItem.new(_('Loglog'), None)
+            param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(axes_num),
+                                           GLib.Variant.new_string('loglog'))
+            item.set_action_and_target_value('win.set_scale', param)
+            scale_menu_model.append_item(item)
+            graph_menu_model.append_submenu(_('Scale'), scale_menu_model)
+
 
             menu_model = Gio.Menu.new()
             menu_model.append_section(None, figure_menu_model)
@@ -583,6 +611,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
     def mouse_scroll(self, event):
         print(event.button)
+        
         if event.button == 'up':
             if event.inaxes is None:
                 return False
@@ -602,24 +631,35 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 #        axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
 #        fig_num = self._ctxt.figures.index(self._current_figure) + 1
 #        self._app_exec('%%oselect %d-%d' % (fig_num, axes_num))
-        pass
+        self.check_actions_enable(event)
 
     def axes_leave(self, event):
         # Unused for better user interaction
 #        self._current_graph = None
-        pass
+        self.check_actions_enable(event)
 
     def figure_enter(self, event):
 #        self._current_figure = event.canvas.figure
-#        if hasattr(event, 'inaxes') and event.inaxes is not None:
 #            axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
 #        else:
 #            axes_num = 1
 #        fig_num = self._ctxt.figures.index(self._current_figure) + 1
 #        self._app_exec('%%oselect %d-%d' % (fig_num, axes_num))
+#        pass
+        self.check_actions_enable(event)
         self.canvas.grab_focus()
-        pass
 
+    def check_actions_enable(self, event):
+        if hasattr(event, 'inaxes'):
+            self.window.lookup_action('set_scale').set_enabled(event.inaxes is not None)
+            self.window.lookup_action('set_units').set_enabled(event.inaxes is not None)
+            self.window.lookup_action('set_range').set_enabled(event.inaxes is not None)
+        else:
+            self.window.lookup_action('set_scale').set_enabled(False)
+            self.window.lookup_action('set_units').set_enabled(False)
+            self.window.lookup_action('set_range').set_enabled(False)
+            
+            
     def figure_leave(self, event):
 #        self._current_figure = None
         pass
@@ -915,6 +955,12 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             if self.canvas is not None:
                 self.canvas.draw()
         dlg.destroy()
+
+    def set_scale_activated(self, action, param):
+        (grnum, scale) = param.unpack()
+        graph = self.graphs[grnum]
+        graph.scale = scale
+
 
 def error_msg_gtk(msg, parent=None):
     # From matplotlib/backends/backend_Gtk.py
