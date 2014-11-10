@@ -146,6 +146,10 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         a.connect('activate', self.set_scale_activated)
         self.window.add_action(a)
 
+        a = Gio.SimpleAction.new('remove_signal', GLib.VariantType.new('(ts)'))
+        a.connect('activate', self.remove_signal_activated)
+        self.window.add_action(a)
+
         # Connect additional GTK signals
         cbmap = {'span_toggle_btn_toggled': self.span_toggle_btn_toggled,
                  'x10_toggle_btn_toggled': self.x10_toggle_btn_toggled,
@@ -576,6 +580,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             axes_num = 999999
             if hasattr(event, 'inaxes') and event.inaxes is not None:
                     axes_num = self.graphs.index(event.inaxes)
+                    
 
             scale_menu_model = Gio.Menu.new()
             item = Gio.MenuItem.new(_('Linear'), None)
@@ -600,6 +605,28 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             scale_menu_model.append_item(item)
             graph_menu_model.append_submenu(_('Scale'), scale_menu_model)
 
+            remove_signal_menu_model = Gio.Menu.new()
+            if event.inaxes is not None:
+                if not event.inaxes.signals:
+                    item = Gio.MenuItem.new(_('No signals'), None)
+                    param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(axes_num),
+                                                   GLib.Variant.new_string(''))
+                    item.set_action_and_target_value('win.remove_signal', param)
+                    remove_signal_menu_model.append_item(item)
+                for name in event.inaxes.signals.keys():
+                    item = Gio.MenuItem.new(name, None)
+                    param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(axes_num),
+                                                   GLib.Variant.new_string(name))
+                    item.set_action_and_target_value('win.remove_signal', param)
+                    remove_signal_menu_model.append_item(item)
+            else:
+                    item = Gio.MenuItem.new(_('No graph selected'), None)
+                    param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(axes_num),
+                                                   GLib.Variant.new_string(''))
+                    self.window.lookup_action('remove_signal').set_enabled(False)
+                    item.set_action_and_target_value('win.remove_signal', param)
+                    remove_signal_menu_model.append_item(item)
+            graph_menu_model.append_submenu(_('Remove Signal...'), remove_signal_menu_model)
 
             menu_model = Gio.Menu.new()
             menu_model.append_section(None, figure_menu_model)
@@ -654,10 +681,12 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             self.window.lookup_action('set_scale').set_enabled(event.inaxes is not None)
             self.window.lookup_action('set_units').set_enabled(event.inaxes is not None)
             self.window.lookup_action('set_range').set_enabled(event.inaxes is not None)
+            self.window.lookup_action('remove_signal').set_enabled((event.inaxes is not None) and event.inaxes.signals)
         else:
             self.window.lookup_action('set_scale').set_enabled(False)
             self.window.lookup_action('set_units').set_enabled(False)
             self.window.lookup_action('set_range').set_enabled(False)
+            self.window.lookup_action('remove_signal').set_enabled(False)
             
             
     def figure_leave(self, event):
@@ -960,6 +989,11 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         (grnum, scale) = param.unpack()
         graph = self.graphs[grnum]
         graph.scale = scale
+
+    def remove_signal_activated(self, action, param):
+        (grnum, name) = param.unpack()
+        graph = self.graphs[grnum]
+        graph.remove({name: ''})
 
 
 def error_msg_gtk(msg, parent=None):
