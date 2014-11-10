@@ -448,7 +448,10 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             self.canvas.draw()
 
     def save_fig_btn_clicked(self, save_fig_btn):
-        fname, format = self.get_filechooser().get_filename_from_user()
+        dlg = self.get_filechooser()
+        dlg.set_transient_for(self.window)
+        fname, format = dlg.get_filename_from_user()
+        dlg.destroy()
         if fname:
             try:
                 self.canvas.print_figure(fname, format=format)
