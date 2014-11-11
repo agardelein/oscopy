@@ -321,23 +321,26 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             iter = self.cbx_store.iter_next(iter)
             if self._layout == 'horiz':
                 g.span = SpanSelector(g, g.onselect, 'horizontal',
-                                       useblit=True)
+                                       useblit=False)
                 g.span.visible = self.cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
+                g.span.active = self.cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
                 self.hbar.set_sensitive(True)
                 self.hbar.show()
                 self.vbar.set_sensitive(False)
                 self.vbar.hide()
             elif self._layout == 'vert':
                 g.span = SpanSelector(g, g.onselect, 'vertical',
-                                       useblit=True)
+                                       useblit=False)
                 g.span.visible = self.cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
+                g.span.active = self.cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
                 self.hbar.set_sensitive(False)
                 self.hbar.hide()
                 self.vbar.set_sensitive(True)
                 self.vbar.show()
             elif self._layout == 'quad':
                 g.span = MyRectangleSelector(g, g.onselect, rectprops=dict(facecolor='red', edgecolor = 'black', alpha=0.5, fill=True),
-                                            useblit=True)
+                                             useblit=False)
+                g.span.visible = self.cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
                 g.span.active = self.cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
                 self.hbar.set_sensitive(True)
                 self.hbar.show()
@@ -435,16 +438,12 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                     grnum = int(store.get_string_from_iter(iter))
                     if grnum > len(self.graphs):
                         break
-                    if hasattr(self.graphs[grnum - 1].span, 'active'):
-                        self.graphs[grnum - 1].span.active = a
-                    elif hasattr(self.graphs[grnum - 1].span, 'visible'):
-                        self.graphs[grnum - 1].span.visible = a
+                    self.graphs[grnum - 1].span.active = a
+                    self.graphs[grnum - 1].span.visible = a
                     iter = store.iter_next(iter)
             else:
-                if hasattr(self.graphs[grnum - 1].span, 'active'):
-                    self.graphs[grnum - 1].span.active = a
-                elif hasattr(self.graphs[grnum - 1].span, 'visible'):
-                    self.graphs[grnum - 1].span.visible = a
+                self.graphs[grnum - 1].span.active = a
+                self.graphs[grnum - 1].span.visible = a
             self.canvas.draw()
 
     def save_fig_btn_clicked(self, save_fig_btn):
