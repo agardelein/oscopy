@@ -25,52 +25,6 @@ IOSCOPY_UNITS_UI = 'oscopy/units.glade'
 DEFAULT_ZOOM_FACTOR = 0.8
 DEFAULT_PAN_FACTOR = 10
 
-class MyRectangleSelector(RectangleSelector):
-    """ FIXME: To be removed once upstream has merged PR #658
-    https://github.com/matplotlib/matplotlib/pull/658
-    """ 
-
-    def ignore(self, event):
-        'return ``True`` if *event* should be ignored'
-        # If RectangleSelector is not active :
-        if not self.active:
-            return True
-
-        # If canvas was locked
-        if not self.canvas.widgetlock.available(self):
-            return True
-
-        # Only do rectangle selection if event was triggered
-        # with a desired button
-        if self.validButtons is not None:
-            if not event.button in self.validButtons:
-                return True
-
-        # If no button was pressed yet ignore the event if it was out
-        # of the axes
-        if self.eventpress == None:
-            return event.inaxes!= self.ax
-
-        # If a button was pressed, check if the release-button is the
-        # same. If event is out of axis, limit the data coordinates to axes
-        # boundaries.
-        if event.button == self.eventpress.button and event.inaxes != self.ax:
-            (xdata, ydata) = self.ax.transData.inverted().transform_point((event.x, event.y))
-            x0, x1 = self.ax.get_xbound()
-            y0, y1 = self.ax.get_ybound()
-            xdata = max(x0, xdata)
-            xdata = min(x1, xdata)
-            ydata = max(y0, ydata)
-            ydata = min(y1, ydata)
-            event.xdata = xdata
-            event.ydata = ydata
-            return False
-
-        # If a button was pressed, check if the release-button is the
-        # same.
-        return (event.inaxes!=self.ax or
-                event.button != self.eventpress.button)
-
 class IOscopy_GTK_Figure(oscopy.Figure):
     TARGET_TYPE_SIGNAL = 10354
     def __init__(self, sigs={}, fig=None, title='', uidir=''):
@@ -338,7 +292,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 self.vbar.set_sensitive(True)
                 self.vbar.show()
             elif self._layout == 'quad':
-                g.span = MyRectangleSelector(g, g.onselect, rectprops=dict(facecolor='red', edgecolor = 'black', alpha=0.5, fill=True),
+                g.span = RectangleSelector(g, g.onselect, rectprops=dict(facecolor='red', edgecolor = 'black', alpha=0.5, fill=True),
                                              useblit=False)
                 g.span.visible = self.cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
                 g.span.active = self.cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
