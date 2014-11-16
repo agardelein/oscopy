@@ -58,10 +58,10 @@ AC_SUBST(can_build_documentation)
 #####################################################################
 
 AC_PATH_PROGS([M4], [gm4 m4], [m4])
-AM_PATH_PYTHON([3.3])
+AM_PATH_PYTHON([3.4])
 
-AM_PATH_IPYTHON3([1.1])
-AM_CHECK_MATPLOTLIB([1.1])
+AM_PATH_IPYTHON3([2.3])
+AM_CHECK_MATPLOTLIB([1.4])
 AM_CHECK_NUMPY([1.6])
 AM_CHECK_DBUS_PYTHON([1.1])
 #####################################################################
@@ -70,8 +70,10 @@ AM_CHECK_DBUS_PYTHON([1.1])
 
 PKG_PROG_PKG_CONFIG
 
-PKG_CHECK_MODULES(PYGTK, [pygtk-2.0 >= 2.10.0], ,
-  AC_MSG_ERROR([PyGTK 2.10.0 or later is required.]))
+PKG_CHECK_MODULES(Cairo, [cairo >= 1.12], ,
+  AC_MSG_ERROR([Cairo 1.12 or later is required.]))
+PKG_CHECK_MODULES(PyGObject, [pygobject-3.0 >= 3.14], ,
+  AC_MSG_ERROR([PyGObject 3.14 or later is required.]))
 
 ###################################
 ### Internationalization
