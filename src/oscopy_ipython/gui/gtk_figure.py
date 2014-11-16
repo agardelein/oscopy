@@ -274,6 +274,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         for g in self.graphs:
             iter = self.cbx_store.iter_next(iter)
             if self._layout == 'horiz':
+                if hasattr(g, 'span'):
+                    g.span.disconnect_events()
                 g.span = SpanSelector(g, g.onselect, 'horizontal',
                                        useblit=False)
                 g.span.visible = self.cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
@@ -283,6 +285,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 self.vbar.set_sensitive(False)
                 self.vbar.hide()
             elif self._layout == 'vert':
+                if hasattr(g, 'span'):
+                    g.span.disconnect_events()
                 g.span = SpanSelector(g, g.onselect, 'vertical',
                                        useblit=False)
                 g.span.visible = self.cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
@@ -292,6 +296,8 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                 self.vbar.set_sensitive(True)
                 self.vbar.show()
             elif self._layout == 'quad':
+                if hasattr(g, 'span'):
+                    g.span.disconnect_events()
                 g.span = RectangleSelector(g, g.onselect, rectprops=dict(facecolor='red', edgecolor = 'black', alpha=0.5, fill=True),
                                              useblit=False)
                 g.span.visible = self.cbx_store.get_value(iter, IOSCOPY_COL_SPAN)
