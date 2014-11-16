@@ -133,141 +133,6 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             if hasattr(gr, 'span'):
                 gr.span.new_axes(gr)
 
-    def delete_me(self, sigs={}, fig=None, title=''):
-        # To be deleted on completion of transition to python3/gtk3
-        w = Gtk.Window()
-        w.set_title(title)
-
-        hbox1 = Gtk.HBox() # The window
-        vbox1 = Gtk.VBox() # The Graphs
-        hbox1.pack_start(vbox1, True, True, 0)
-        w.add(hbox1)
-        canvas = FigureCanvas(self)
-        canvas.supports_blit = False
-        canvas.mpl_connect('button_press_event', self._button_press)
-        canvas.mpl_connect('scroll_event', self._mouse_scroll)
-        canvas.mpl_connect('axes_enter_event', self._axes_enter)
-        canvas.mpl_connect('axes_leave_event', self._axes_leave)
-        canvas.mpl_connect('figure_enter_event', self._figure_enter)
-        canvas.mpl_connect('figure_leave_event', self._figure_leave)
-        canvas.mpl_connect('key_press_event', self._key_press)
-        canvas.mpl_connect('motion_notify_event', self._show_coords)
-        self.draw_hid = canvas.mpl_connect('draw_event', self._update_scrollbars)
-        w.connect('delete-event', lambda w, e: w.hide() or True)
-        w.drag_dest_set(Gtk.DestDefaults.MOTION |\
-                                 Gtk.DestDefaults.HIGHLIGHT |\
-                                 Gtk.DestDefaults.DROP,
-                             self._to_figure, Gdk.DragAction.COPY)
-
-        hbar = Gtk.HScrollbar()
-        hbar.set_sensitive(False)
-        self.hbar = hbar
-        vbox1.pack_start(hbar, False, False, 0)
-        vbar = Gtk.VScrollbar()
-        vbar.set_sensitive(False)
-        self.vbar = vbar
-        hbox1.pack_start(vbar, False, False, 0)
-
-        vbox1.pack_start(canvas, True, True, 0)
-
-        vbox2 = Gtk.VBox() # The right-side menu
-        store = Gtk.ListStore(GObject.TYPE_STRING, # String displayed
-                              GObject.TYPE_BOOLEAN, # x10 mode status
-                              GObject.TYPE_BOOLEAN, # Combobox item sensitive
-                              GObject.TYPE_BOOLEAN, # Span mode status
-                              GObject.TYPE_PYOBJECT, # Horizontal Adjustment
-                              GObject.TYPE_PYOBJECT, # Vertical Adjustment
-                              )
-        iter = store.append([_('All Graphs'), False, True, False, Gtk.Adjustment(), Gtk.Adjustment()])
-        for i in range(4):
-            iter = store.append([_('Graph %d') % (i + 1), False, True if i < len(self.graphs) else False, False, Gtk.Adjustment(), Gtk.Adjustment()])
-        self.cbx_store = store
-        hbar.set_adjustment(store[0][IOSCOPY_COL_HADJ])
-        vbar.set_adjustment(store[0][IOSCOPY_COL_VADJ])
-
-        graphs_cbx = Gtk.ComboBox.new_with_model(store)
-        cell = Gtk.CellRendererText()
-        graphs_cbx.pack_start(cell, True)
-        graphs_cbx.add_attribute(cell, 'text', IOSCOPY_COL_TEXT)
-        graphs_cbx.add_attribute(cell, 'sensitive', IOSCOPY_COL_VIS)
-        graphs_cbx.set_active(0)
-        vbox2.pack_start(graphs_cbx, False, False, 0)
-
-        # master pan radiobuttons
-        label = Gtk.Label(label='master pan')
-        vbox2.pack_start(label, False, False, 0)
-
-        rbtns = [Gtk.RadioButton(None, '%d' % (i + 1)) for i in range(4)]
-        rbtnbox = Gtk.HBox()
-        for rb in rbtns[1:4]: rb.join_group(rbtns[0])
-        for rb in rbtns:
-            rb.set_sensitive(False)
-            rbtnbox.pack_start(rb, True, True, 0)
-        # Cache the methods
-        self.mpsel_get_act = [b.get_active for b in rbtns]
-        self.mpsel_set_act = [b.set_active for b in rbtns]
-        self.mpsel_set_sens = [b.set_sensitive for b in rbtns]
-        for b in rbtns:
-            b.connect('toggled', self._update_scrollbars)
-        vbox2.pack_start(rbtnbox, False, False, 0)
-
-        vbox2.pack_start(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL), False, False, 0)
-
-        x10_toggle_btn = Gtk.ToggleButton('x10 mode')
-        x10_toggle_btn.set_mode(True)
-        x10_toggle_btn.connect('toggled', self.x10_toggle_btn_toggled,
-                               graphs_cbx, store)
-
-        span_toggle_btn = Gtk.ToggleButton(_('Span'))
-        span_toggle_btn.set_mode(True)
-        span_toggle_btn.connect('toggled', self.span_toggle_btn_toggled,
-                               graphs_cbx, store)
-
-        save_fig_btn = Gtk.Button(_('Export'))
-        save_fig_btn.connect('clicked', self.save_fig_btn_clicked)
-
-        coords_lbl1 = Gtk.Label(label='')
-        coords_lbl1.set_alignment(0.1, 0.5)
-        coords_lbl2 = Gtk.Label(label='')
-        coords_lbl2.set_alignment(0.1, 0.5)
-
-        self._cbx = graphs_cbx
-        self._btn = x10_toggle_btn
-        self.coords_lbl1 = coords_lbl1
-        self.coords_lbl2 = coords_lbl2
-
-        graphs_cbx.connect('changed', self.graphs_cbx_changed, x10_toggle_btn,
-                           span_toggle_btn, store)
-        hbar.connect('change-value', self.hscroll_change_value, graphs_cbx,
-                     store)
-        hbar.connect('enter-notify-event', self.disable_adj_update_on_draw)
-        hbar.connect('leave-notify-event', self.enable_adj_update_on_draw)
-        hbar.connect('button-press-event', self.hadj_pressed)
-        hbar.connect('button-release-event', self.hadj_released)
-        vbar.connect('change-value', self.vscroll_change_value, graphs_cbx,
-                     store)
-        vbar.connect('enter-notify-event', self.disable_adj_update_on_draw)
-        vbar.connect('leave-notify-event', self.enable_adj_update_on_draw)
-        vbar.connect('button-press-event', self.vadj_pressed)
-        vbar.connect('button-release-event', self.vadj_released)
-        vbox2.pack_start(x10_toggle_btn, False, False, 0)
-        vbox2.pack_start(span_toggle_btn, False, False, 0)
-        vbox2.pack_start(save_fig_btn, False, False, 0)
-        vbox2.pack_end(coords_lbl1, False, False, 0)
-        vbox2.pack_end(coords_lbl2, False, False, 0)
-
-        hbox1.pack_start(vbox2, False, False, 0)
-
-        w.resize(640, 480)
-        w.show_all()
-        self.window = w
-        if sigs:
-            self.add(sigs)
-#        # Update canvas for SpanSelector of Graphs
-        for gr in self.graphs:
-            if hasattr(gr, 'span'):
-                gr.span.new_axes(gr)
-
     def set_layout(self, layout='quad'):
         oscopy.Figure.set_layout(self, layout)
         iter = self.cbx_store.get_iter_first()
@@ -614,27 +479,12 @@ class IOscopy_GTK_Figure(oscopy.Figure):
         return True
 
     def axes_enter(self, event):
-#        self._figure_enter(event)
-#        self._current_graph = event.inaxes
-
-#        axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
-#        fig_num = self._ctxt.figures.index(self._current_figure) + 1
-#        self._app_exec('%%oselect %d-%d' % (fig_num, axes_num))
         self.check_actions_enable(event)
 
     def axes_leave(self, event):
-        # Unused for better user interaction
-#        self._current_graph = None
         self.check_actions_enable(event)
 
     def figure_enter(self, event):
-#        self._current_figure = event.canvas.figure
-#            axes_num = event.canvas.figure.axes.index(event.inaxes) + 1
-#        else:
-#            axes_num = 1
-#        fig_num = self._ctxt.figures.index(self._current_figure) + 1
-#        self._app_exec('%%oselect %d-%d' % (fig_num, axes_num))
-#        pass
         self.check_actions_enable(event)
         self.canvas.grab_focus()
 
@@ -652,7 +502,6 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             
             
     def figure_leave(self, event):
-#        self._current_figure = None
         pass
 
     def show_coords(self, event):
@@ -670,11 +519,6 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             self.coords_lbl1.set_text('')
             self.coords_lbl2.set_text('')
             
-
-    def _create_figure_popup_menu(self, figure, graph):
-#        figmenu = gui.menus.FigureMenu()
-#        return figmenu.create_menu(figure, graph)
-        pass
 
     def update_scrollbars(self, unused):
         # Unused is not used but can be either a MPL event or a togglebutton
