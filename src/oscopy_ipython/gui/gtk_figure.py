@@ -21,9 +21,12 @@ IOSCOPY_COL_VADJ = 5 # Vertical scrollbar adjustment
 IOSCOPY_GTK_FIGURE_UI = 'oscopy/gtk_figure.glade'
 IOSCOPY_RANGE_UI = 'oscopy/range.glade'
 IOSCOPY_UNITS_UI = 'oscopy/units.glade'
+IOSCOPY_GTK_FIGURE_MENU_UI = 'oscopy/gtk_figure_menu.ui'
 
 DEFAULT_ZOOM_FACTOR = 0.8
 DEFAULT_PAN_FACTOR = 10
+
+USE_CURRENT_AXES = 999998
 
 class IOscopy_GTK_Figure(oscopy.Figure):
     TARGET_TYPE_SIGNAL = 10354
@@ -34,6 +37,7 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                                               self.TARGET_TYPE_SIGNAL)]
         self.hadjpreval = None
         self.vadjpreval = None
+        self.current_axes = None
 
         # The canvas for the Figure
         canvas = FigureCanvas(self)
@@ -371,75 +375,12 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
     def button_press(self, event):
         if event.button == 3:
-            figure_menu_model = Gio.Menu.new()
-
-            item = Gio.MenuItem.new(_('Add Graph'), 'app.add_graph')
-            figure_menu_model.append_item(item)
-
-            item = Gio.MenuItem.new(_('Delete Graph'), None)
-            if hasattr(event, 'inaxes') and event.inaxes is not None:
-                item.set_action_and_target_value('app.delete_graph', GLib.Variant.new_uint64(self.graphs.index(event.inaxes)))
-            figure_menu_model.append_item(item)
-
-            layout_menu_model = Gio.Menu.new()
-            item = Gio.MenuItem.new(_('Quad'), None)
-            item.set_action_and_target_value('app.set_layout', GLib.Variant.new_string('quad'))
-            layout_menu_model.append_item(item)
-            item = Gio.MenuItem.new(_('Horizontal'), None)
-            item.set_action_and_target_value('app.set_layout', GLib.Variant.new_string('horiz'))
-            layout_menu_model.append_item(item)
-            item = Gio.MenuItem.new(_('Vertical'), None)
-            item.set_action_and_target_value('app.set_layout', GLib.Variant.new_string('vert'))
-            layout_menu_model.append_item(item)
-            figure_menu_model.append_submenu(_('Layout...'), layout_menu_model)
-
-            graph_menu_model = Gio.Menu.new()
-            item = Gio.MenuItem.new(_('Range...'), None)
-            if hasattr(event, 'inaxes') and event.inaxes is not None:
-                item.set_action_and_target_value('win.set_range', GLib.Variant.new_uint64(self.graphs.index(event.inaxes)))
-            graph_menu_model.append_item(item)
-
-            item = Gio.MenuItem.new(_('Units...'), None)
-            if hasattr(event, 'inaxes') and event.inaxes is not None:
-                item.set_action_and_target_value('win.set_units', GLib.Variant.new_uint64(self.graphs.index(event.inaxes)))
-            graph_menu_model.append_item(item)
-
-            axes_num = 999999
-            if hasattr(event, 'inaxes') and event.inaxes is not None:
-                    axes_num = self.graphs.index(event.inaxes)
-                    
-
-            scale_menu_model = Gio.Menu.new()
-            item = Gio.MenuItem.new(_('Linear'), None)
-            param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(axes_num),
-                                           GLib.Variant.new_string('lin'))
-            item.set_action_and_target_value('win.set_scale', param)
-            scale_menu_model.append_item(item)
-            item = Gio.MenuItem.new(_('Log X'), None)
-            param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(axes_num),
-                                           GLib.Variant.new_string('logx'))
-            item.set_action_and_target_value('win.set_scale', param)
-            scale_menu_model.append_item(item)
-            item = Gio.MenuItem.new(_('Log Y'), None)
-            param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(axes_num),
-                                           GLib.Variant.new_string('logy'))
-            item.set_action_and_target_value('win.set_scale', param)
-            scale_menu_model.append_item(item)
-            item = Gio.MenuItem.new(_('Loglog'), None)
-            param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(axes_num),
-                                           GLib.Variant.new_string('loglog'))
-            item.set_action_and_target_value('win.set_scale', param)
-            scale_menu_model.append_item(item)
-            graph_menu_model.append_submenu(_('Scale'), scale_menu_model)
-
-            remove_signal_menu_model = Gio.Menu.new()
-            if event.inaxes is not None:
-                if not event.inaxes.signals:
-                    item = Gio.MenuItem.new(_('No signals'), None)
-                    param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(axes_num),
-                                                   GLib.Variant.new_string(''))
-                    item.set_action_and_target_value('win.remove_signal', param)
-                    remove_signal_menu_model.append_item(item)
+            builder = Gtk.Builder()
+            builder.add_from_file('/'.join((self.uidir, IOSCOPY_GTK_FIGURE_MENU_UI)))
+            # Build the list of Signals that can be removed
+            remove_signal_menu_model = builder.get_object('remove_signal_menu')
+            axes_num = USE_CURRENT_AXES
+            if event.inaxes is not None and event.inaxes.signals:
                 for name in event.inaxes.signals.keys():
                     item = Gio.MenuItem.new(name, None)
                     param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(axes_num),
@@ -447,18 +388,17 @@ class IOscopy_GTK_Figure(oscopy.Figure):
                     item.set_action_and_target_value('win.remove_signal', param)
                     remove_signal_menu_model.append_item(item)
             else:
+                # No Graph selected or no Signal in Graph
+                if event.inaxes is None:
                     item = Gio.MenuItem.new(_('No graph selected'), None)
-                    param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(axes_num),
-                                                   GLib.Variant.new_string(''))
-                    self.window.lookup_action('remove_signal').set_enabled(False)
-                    item.set_action_and_target_value('win.remove_signal', param)
-                    remove_signal_menu_model.append_item(item)
-            graph_menu_model.append_submenu(_('Remove Signal...'), remove_signal_menu_model)
+                else:
+                    item = Gio.MenuItem.new(_('No signals'), None)
+                param = GLib.Variant.new_tuple(GLib.Variant.new_uint64(axes_num),
+                                               GLib.Variant.new_string(''))
+                item.set_action_and_target_value('win.remove_signal', param)
+                remove_signal_menu_model.append_item(item)
 
-            menu_model = Gio.Menu.new()
-            menu_model.append_section(None, figure_menu_model)
-            menu_model.append_section(None, graph_menu_model)
-
+            menu_model = builder.get_object('menu')
             menu = Gtk.Menu.new_from_model(menu_model)
             menu.attach_to_widget(self.window, None)
             menu.popup(None, None, None, None, event.button, event.guiEvent.time)
@@ -480,12 +420,15 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
     def axes_enter(self, event):
         self.check_actions_enable(event)
+        self.check_current_axes(event)
 
     def axes_leave(self, event):
         self.check_actions_enable(event)
+        self.check_current_axes(event)
 
     def figure_enter(self, event):
         self.check_actions_enable(event)
+        self.check_current_axes(event)
         self.canvas.grab_focus()
 
     def check_actions_enable(self, event):
@@ -499,10 +442,14 @@ class IOscopy_GTK_Figure(oscopy.Figure):
             self.window.lookup_action('set_units').set_enabled(False)
             self.window.lookup_action('set_range').set_enabled(False)
             self.window.lookup_action('remove_signal').set_enabled(False)
-            
+
+    def check_current_axes(self, event):
+        self.current_axes = None
+        if hasattr(event, 'inaxes'):
+            self.current_axes = event.inaxes
             
     def figure_leave(self, event):
-        pass
+        self.check_current_axes(event)
 
     def show_coords(self, event):
         a = event.inaxes
@@ -703,7 +650,10 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
     def set_range_activated(self, action, param):
         (grnum) = param.unpack()
-        graph = self.graphs[grnum]
+        if grnum == USE_CURRENT_AXES:
+            graph = self.current_axes
+        else:
+            graph = self.graphs[grnum]
         names = ['xmin', 'xmax', 'ymin', 'ymax']
         label_prefixes = ['x', 'y']
         vals = [graph.get_range()[0][0], graph.get_range()[0][1], graph.get_range()[1][0], graph.get_range()[1][1]]
@@ -751,7 +701,10 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
     def set_units_activated(self, action, param):
         (grnum) = param.unpack()
-        graph = self.graphs[grnum]
+        if grnum == USE_CURRENT_AXES:
+            graph = self.current_axes
+        else:
+            graph = self.graphs[grnum]
         label_prefixes = ['x', 'y']
         scale_factors = graph.scale_factors
         axis_names = graph.axis_names
@@ -793,12 +746,18 @@ class IOscopy_GTK_Figure(oscopy.Figure):
 
     def set_scale_activated(self, action, param):
         (grnum, scale) = param.unpack()
-        graph = self.graphs[grnum]
+        if grnum == USE_CURRENT_AXES:
+            graph = self.current_axes
+        else:
+            graph = self.graphs[grnum]
         graph.scale = scale
 
     def remove_signal_activated(self, action, param):
         (grnum, name) = param.unpack()
-        graph = self.graphs[grnum]
+        if grnum == USE_CURRENT_AXES:
+            graph = self.current_axes
+        else:
+            graph = self.graphs[grnum]
         graph.remove({name: ''})
 
 

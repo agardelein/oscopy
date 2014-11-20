@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <menu id="menu">
+    <section id="figure_menu">
+      <item>
+	<attribute name="label" translatable="yes">Add Graph</attribute>
+	<attribute name="action">app.add_graph</attribute>
+      </item>
+      <item>
+	<attribute name="label" translatable="yes">Delete Graph</attribute>
+	<attribute name="action">app.delete_graph</attribute>
+	<attribute name="target">1</attribute>
+      </item>
+      <submenu>
+	<attribute name="label" translatable="yes">Layout...</attribute>
+	<item>
+	  <attribute name="label" translatable="yes">Quad</attribute>
+	  <attribute name="action">app.set_layout</attribute>
+	  <attribute name="target">quad</attribute>
+	</item>
+	<item>
+	  <attribute name="label" translatable="yes">Horizontal</attribute>
+	  <attribute name="action">app.set_layout</attribute>
+	  <attribute name="target">horiz</attribute>
+	</item>
+	<item>
+	  <attribute name="label" translatable="yes">Vertical</attribute>
+	  <attribute name="action">app.set_layout</attribute>
+	  <attribute name="target">vert</attribute>
+	</item>
+      </submenu>
+    </section>
+    <section>
+      <item>
+	<attribute name="label" translatable="yes">Range...</attribute>
+	<attribute name="action">win.set_range</attribute>
+	<attribute name="target" type="t">999998</attribute>
+      </item>
+      <item>
+	<attribute name="label" translatable="yes">Units...</attribute>
+	<attribute name="action">win.set_units</attribute>
+	<attribute name="target" type="t">999998</attribute>
+      </item>
+      <submenu>
+	<attribute name="label" translatable="yes">Scale</attribute>
+	<item>
+	  <attribute name="label" translatable="yes">Linear</attribute>
+	  <attribute name="action">win.set_scale</attribute>
+	  <attribute name="target" type="(ts)">(999998,"lin")</attribute>
+	</item>
+	<item>
+	  <attribute name="label" translatable="yes">Log X</attribute>
+	  <attribute name="action">win.set_scale</attribute>
+	  <attribute name="target" type="(ts)">(999998,"logx")</attribute>
+	</item>
+	<item>
+	  <attribute name="label" translatable="yes">Log Y</attribute>
+	  <attribute name="action">win.set_scale</attribute>
+	  <attribute name="target" type="(ts)">(999998,"logy")</attribute>
+	</item>
+	<item>
+	  <attribute name="label" translatable="yes">Loglog</attribute>
+	  <attribute name="action">win.set_scale</attribute>
+	  <attribute name="target" type="(ts)">(999998,"loglog")</attribute>
+	</item>
+      </submenu>
+      <submenu id="remove_signal_menu">
+	<attribute name="label">Remove signal...</attribute>
+      </submenu>
+    </section>
+  </menu>
+</interface>

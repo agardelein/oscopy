@@ -5,7 +5,8 @@ dist_pkgdata_DATA = ipython_config.py \
 	signal-list.ui \
 	gtk_figure.glade \
 	range.glade \
-	units.glade
+	units.glade \
+	gtk_figure_menu.ui
 
 ipython_config.py: ipython_config.py.in
 	cat $< | sed -e 's|@bindir[@]|$(bindir)|g' > $@
