@@ -1,0 +1,11 @@
+import numpy as np
+
+s1 = Signal('s1', 'V')
+s1ref = Signal('s1ref', 'Degree')
+s1ref.data = np.arange(0, 3.0, 0.01)
+s1.ref = s1ref
+s1.data = 2 * np.pi * s1ref.data
+oimport s1
+ocreate s1
+omode polar
+ofiglist

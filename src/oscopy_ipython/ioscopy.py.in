@@ -210,7 +210,7 @@ def do_mode(self, args):
         return
     mode = args
     idx = _current_figure.graphs.index(_current_graph)
-    _current_figure.mode = mode
+    _current_figure.set_mode(_current_graph, mode)
     _current_graph = _current_figure.graphs[idx]
     do_refresh(self, '')
 

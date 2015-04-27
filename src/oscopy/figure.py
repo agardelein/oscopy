@@ -52,7 +52,7 @@ Figure -- Handle a list of graphs
 """
 
 from matplotlib.figure import Figure as MplFig, Axes
-from .graphs import Graph, LinGraph
+from .graphs import Graph, LinGraph, PolarGraph
 
 MAX_GRAPHS_PER_FIGURE = 4
 
@@ -79,7 +79,7 @@ class Figure(MplFig):
         MplFig.__init__(self)
 
         self._layout = "horiz"
-        self._MODES_NAMES_TO_OBJ = {"lin":LinGraph}
+        self._MODES_NAMES_TO_OBJ = {"lin":LinGraph, "polar":PolarGraph}
         self._kid = None
         # FIXME: Slow way... Surely there exist something faster
         self._OBJ_TO_MODES_NAMES = {}
@@ -192,7 +192,7 @@ class Figure(MplFig):
 #        FIXME: DISABLED AS ONLY ONE MODE CURRENTLY AVAILABLE
 #        return self._OBJ_TO_MODES_NAMES(self._current)
 
-    def set_mode(self, args):
+    def set_mode(self, gr, new_mode):
         """ Set the mode of the current graph
         Replace the graph provided by a new one of other mode, i.e. copy the
         Signals from it.
@@ -211,12 +211,15 @@ class Figure(MplFig):
         Nothing
         """
         # Currently this cannot be tested (only one mode available)
-        old_graph = args[0]
-        gmode = args[1]
-        if not self._graphs:
+        old_graph = gr
+        gmode = new_mode
+        if not self.axes:
             assert 0, _("No graph defined")
-        g = (self._MODES_NAMES_TO_OBJ(gmode))(old_graph)
-        self._graphs[self._graphs.index(old_graph)] = g
+        pos = self._graph_position(len(self.axes) - 1)
+        a = (self._MODES_NAMES_TO_OBJ[gmode])(self, pos, old_graph)
+        idx = self._axstack.as_list().index(old_graph)
+        self._axstack.remove(old_graph)
+        self._axstack.add(idx, a)
 
     def get_layout(self):
         """ Return the figure layout

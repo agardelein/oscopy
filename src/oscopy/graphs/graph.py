@@ -76,12 +76,11 @@ Abbreviations
 
         if isinstance(sigs, Graph):
             mysigs = {}
-            mysigs = sigs.sigs.copy()
-            self._xrange = sigs.xrange
-            self._yrange = sigs.yrange
+            mysigs = sigs.signals.copy()
+            (self._xrange, self._yrange) = sigs.get_range()
             self._cursors = {"horiz": [None, None], "vert": [None, None]}
             self._txt = None
-            self._scale_factors = sigs.scale_factors
+            self._scale_factors = sigs._scale_factors
             self._signals2lines = sigs._signals2lines.copy()
             self.insert(mysigs)
         else:
@@ -97,7 +96,7 @@ Abbreviations
             self._scale_factors = [None, None]
             self._signals2lines = {}
             self.insert(sigs)
-
+            
     def __str__(self):
         """ Returns a string with the type and the signal list of the graph
 
