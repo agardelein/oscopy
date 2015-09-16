@@ -46,8 +46,11 @@ For more details see http://www.rvq.fr/linux/gawfmt.php
         nvar = 0
         with io.open(fn, 'r') as f:
             lines = iter(f)
-            if lines.next().startswith('Title') and lines.next().startswith('Date'):
-                return True
+            try:
+                if lines.next().startswith('Title') and lines.next().startswith('Date'):
+                    return True
+            except AttributeError:
+                return False
         return False
 
     def _read_signals(self):
