@@ -1,6 +1,6 @@
 
 
-import re
+import re, cmath, numpy as np
 import io
 from oscopy import Signal
 from .reader import Reader, ReadError
@@ -224,7 +224,8 @@ For more details, see http://www.eda.org/ibis/touchstone_ver2.0/touchstone_ver2_
             s.ref = ref
             s.data = data[i + 1]
         self._signals = dict(list(zip(names[1:], signals[1:])))
-        
+        self._add_complex(signals, ref, options)
+
         self._info['noise_param'] = self._process_noise_param(noise_param, 1)
         return self._signals
 
@@ -350,6 +351,7 @@ For more details, see http://www.eda.org/ibis/touchstone_ver2.0/touchstone_ver2_
             s.ref = ref
             s.data = data[i + 1]
         self._signals = dict(list(zip(names[1:], signals[1:])))
+        self._add_complex(signals, ref, options)
 
         self._info['noise_param'] = self._process_noise_param(noise_param, 2)
         return self._signals
@@ -467,3 +469,29 @@ For more details, see http://www.eda.org/ibis/touchstone_ver2.0/touchstone_ver2_
                        'Refl_coef_a': reflcoefa, 'Refl_coef_b': reflcoefb,
                        'R_neff': effnr}
         return ret
+
+    def _add_complex(self, signals, ref, options):
+        units = 'a.u.'
+        for i, s in enumerate(signals[1:], start=1):
+            if s.name.endswith('_b'):
+                continue
+            print(s.name[:-2], signals[i].name, signals[i + 1].name)
+            sa = signals[i].data  # ... or s
+            sb = signals[i + 1].data
+            val = None
+            if options['format'] == 'DB':
+                a1 = np.power(10.0, sa / 20.0) * np.cos(sb * cmath.pi / 180.0)
+                a2 = np.power(10.0, sa / 20.0) * np.sin(sb * cmath.pi / 180.0)
+                val = a1 + a2 * 1.j
+            elif options['format'] == 'MA':
+                a1 = sa * np.cos(sb * cmath.pi / 180.0)
+                a2 = sa * np.sin(sb * cmath.pi / 180.0)
+                val = a1 + a2 * 1.j
+            elif options['format'] == 'RI':
+                val = sa + sb * 1.j
+            else:
+                raise TypeError('Unrecognized format %s' % options['format'])
+            signal = Signal(s.name[:-2], units)
+            signal.data = val
+            signal.ref = ref
+            self.signals[signal.name] = signal
