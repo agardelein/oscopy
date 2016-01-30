@@ -45,6 +45,6 @@ AC_DEFUN([AM_CHECK_NUMPY],
 # Run ACTION-IF-FALSE otherwise.
 
 AC_DEFUN([AM_NUMPY_CHECK_VERSION],
- [prog="import sys, numpy;minver = list(map(int, '$2'.split('.'))) + [[0, 0, 0]];ver = list(map(int, numpy.version.version[[0:3]].split('.'))) + [[0, 0, 0]];minverhex = sum([[minver[i]<<((4-i)*8) for i in range(0, 4)]]);verhex = sum([[ver[i]<<((4-i)*8) for i in range(0, 4)]]);sys.stdout.write('1' if verhex < minverhex else '0');"
+ [prog="import sys, numpy;minver = list(map(int, '$2'.split('.'))) + [[0, 0, 0]];ver = list(map(int, numpy.version.version[[0:4]].split('.'))) + [[0, 0, 0]];minverhex = sum([[minver[i]<<((4-i)*8) for i in range(0, 4)]]);verhex = sum([[ver[i]<<((4-i)*8) for i in range(0, 4)]]);sys.stdout.write('1' if verhex < minverhex else '0');"
   AS_IF([AM_RUN_LOG_IPYTHON3([$1 --colors=NoColor -c "$prog"])], [$3], [$4])])
 
