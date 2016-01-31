@@ -8,7 +8,9 @@ import gettext
 gettext.install(GETTEXT_DOMAIN, '@datarootdir@/locale')
 t = gettext.translation(GETTEXT_DOMAIN, '@datarootdir@/locale', fallback=True)
 _ = t.gettext
-
+import gi
+gi.require_version('Gtk', '3.0')
+gi.require_version('PangoCairo', '1.0')
 import IPython
 from IPython.config.configurable import Configurable
 from IPython.utils.traitlets import Bool, Unicode
@@ -404,6 +406,7 @@ def do_import(self, args):
     for name in args.split(','):
         try:
             sig = _globals.get(name)
+            print(sig, name)
             sigs = _ctxt.import_signal(sig, name)
             for s in sigs.values():
                 _globals[s.name] = s

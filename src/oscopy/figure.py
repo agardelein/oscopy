@@ -52,7 +52,7 @@ Figure -- Handle a list of graphs
 """
 
 from matplotlib.figure import Figure as MplFig, Axes
-from .graphs import Graph, LinGraph, PolarGraph
+from .graphs import Graph, LinGraph, PolarGraph, SmithChart
 
 MAX_GRAPHS_PER_FIGURE = 4
 
@@ -79,7 +79,7 @@ class Figure(MplFig):
         MplFig.__init__(self)
 
         self._layout = "horiz"
-        self._MODES_NAMES_TO_OBJ = {"lin":LinGraph, "polar":PolarGraph}
+        self._MODES_NAMES_TO_OBJ = {'lin':LinGraph, 'polar':PolarGraph, 'smith':SmithChart}
         self._kid = None
         # FIXME: Slow way... Surely there exist something faster
         self._OBJ_TO_MODES_NAMES = {}

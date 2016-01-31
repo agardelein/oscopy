@@ -1,0 +1,8 @@
+oread examples/mys2p.s2p
+z11=Signal('z11', 'Ohms')
+z11.ref = S11.ref
+z11.data = (1 + S11.data) / (1 - S11.data)
+oimport z11
+ocreate z11
+omode smith
+ofiglist
