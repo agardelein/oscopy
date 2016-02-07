@@ -1,0 +1,55 @@
+# -*- Python -*-
+import numpy, random
+import scipy.signal as ssp
+
+frequency = 1e6
+samples_per_period = 300
+symbols_number = 2
+periods_number = 400
+start_time = 0
+filter_frequency_ratio = 0.1
+noise_amplitude = 0.02
+
+period = 1.0 / frequency
+end_time = period * periods_number
+num_points = (end_time - start_time) * samples_per_period * frequency
+noise_min = - noise_amplitude / 2
+noise_max = noise_amplitude / 2
+
+t = numpy.linspace(start_time, end_time, num_points + 1)
+
+# The digital signal
+symbols = [i for i in range(symbols_number)]
+data = [random.choice(symbols)+i*0 for i in range(periods_number)]
+
+# The analog signal
+sig1 = t * 0
+for n, val in enumerate(data):val_tab = [val + i * 0 for i in range(samples_per_period)];start = n * samples_per_period;stop = (n + 1) * samples_per_period;sig1[start:stop] = val_tab
+
+# Filtering to simulate a transmission channel
+b, a = ssp.butter(2, filter_frequency_ratio)
+sig2 =  ssp.lfilter(b, a, sig1)
+
+# Adding some noise
+sig3 = sig2 + [random.normalvariate((noise_min + noise_max) / 2, noise_amplitude) + i*0 for i in range(len(sig2))]
+
+ref = Signal('Time', 's')
+ref.data = t
+s1 = Signal('s1', 'V')
+s1.ref = ref
+s1.data = sig1
+oimport s1
+#ocreate s1
+s2 = Signal('s2', 'V')
+s2.ref = ref
+s2.data = sig2
+oimport s2
+#oadd s2
+s3 = Signal('s3', 'V')
+s3.ref = ref
+s3.data = sig3
+oimport s3
+ocreate s3
+
+oadd s3
+omode eye

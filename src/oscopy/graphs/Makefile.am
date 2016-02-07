@@ -5,4 +5,5 @@ graphs_PYTHON = __init__.py\
 	lingraph.py\
 	polargraph.py\
 	smithchart.py\
+	eyegraph.py\
 	cursor.py
