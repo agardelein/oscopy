@@ -138,16 +138,14 @@ class EyeGraph(Graph):
         
         # Data range, thresholds
         middle = round((start + stop) / 2)
+        # The trailing [0] is needed to cover some case where condition is met
+        # more than one time
         condition = histo[middle:stop] == max(histo[middle:stop])
-        # The trailing [0] is needed to cover some case where condition is met
-        # more than one time
         high = np.where(condition)[0][0] + middle
-#        print(np.where(condition), adc_bins[np.where(condition)[0] + middle])
-        condition = histo[start:middle] == max(histo[start:middle])
         # The trailing [0] is needed to cover some case where condition is met
         # more than one time
+        condition = histo[start:middle] == max(histo[start:middle])
         low = np.where(condition)[0][0]
-#        print(np.where(condition), adc_bins[np.where(condition)])
 #        print(low, high)
         waverange = high - low
         middle = (high + low) / 2
@@ -160,19 +158,19 @@ class EyeGraph(Graph):
         greater_than_middle = sig > middle
         greater_than_high = sig > high_threshold
         lesser_than_low = sig < low_threshold
-        temp = greater_than_middle[0]
+        last_gtm = greater_than_middle[0]
         cross = False
         
-        for a, gtm in enumerate(greater_than_middle):
+        for time, gtm in enumerate(greater_than_middle):
             if cross == False:
-                if temp != gtm:
-                    temp = gtm
-                    edges.append(a)
+                if last_gtm != gtm:
+                    last_gtm = gtm
+                    edges.append(time)
                     cross = True
             else:
-                if cross == greater_than_high[a] or cross == lesser_than_low[a]:
+                if cross == greater_than_high[time] or \
+                   cross == lesser_than_low[time]:
                     cross = False
-
 #        edges = len(edges)
 #        print(edges, edges)
 
