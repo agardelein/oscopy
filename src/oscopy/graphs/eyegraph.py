@@ -116,21 +116,16 @@ class EyeGraph(Graph):
         return rejected
 
     def make_eye(self, sn, ClockRecovery='CC', DRsel='Auto Detect', BWsel='Auto Set'):
-        DRsel = 1e6
-        sigx = self._sigs[sn].data
-        sigy = self._sigs[sn].ref.data
         [HPos, HDelay, yoff, ymult, yzero] = [0, 0, 0, 0, 0]
-        recLen = len(sigx)
         xincr = self._sigs[sn].ref.data[1] - self._sigs[sn].ref.data[0]
-        print('xincr', xincr)
-        y = np.array(self._sigs[sn].data)
-#        self.hist(y, self.Y_SAMPLING)
+#        print('xincr', xincr)
         ret = [1]
         [histo, adc_bins] = np.histogram(self._sigs[sn].data,
                              bins=self.Y_SAMPLING - 1,
                              density=False)
         # Digitize the signal to allow to store eye values in a matrix
         sig = np.digitize(self._sigs[sn].data, adc_bins)
+        recLen = len(sig)
 #        ret = self.hist(adc_bins, histo)
 #        print("adc_bins", len(adc_bins), min(sig), max(sig))
         start = 0
@@ -174,7 +169,7 @@ class EyeGraph(Graph):
 #        edges = len(edges)
 #        print(edges, edges)
 
-        # Make array of differences
+        # Detect cycles by making edges difference
         cycles = []
         for a, edge in enumerate(edges):
             try:
@@ -192,32 +187,32 @@ class EyeGraph(Graph):
             glitch = int(len(cycles) / 10)
             if glitch < 1:
                 glitch = 1
-            var3 = cycles
-            var4 = []
-            var3.sort()
+            cycles_durations = cycles
+            bit_durations = []
+            cycles_durations.sort()
             while True:
-                for a in var3:
-                    if a <= (var3[0] * 1.2):
-                        var4.append(a)
-                if len(var4) > glitch:
-                    bitave = float(sum(var4) / len(var4))
+                for duration in cycles_durations:
+                    if duration <= (cycles_durations[0] * 1.2):
+                        bit_durations.append(duration)
+                if len(bit_durations) > glitch:
+                    bit_average = float(sum(bit_durations) / len(bit_durations))
                     break
                 else:
-                    var3 = var3[1:]
+                    cycles_durations = cycles_durations[1:]
                         
-            bitrate = 1 / (bitave * xincr)
-            bitave = int(bitave)
+            bitrate = 1 / (bit_average * xincr)
+            bit_average = int(bit_average)
         else:
             bitrate = float(DRsel)
-            bitave = int(1 / (bitrate * xincr))
+            bit_average = int(1 / (bitrate * xincr))
 
-        print('bitrate', bitrate, bitave)
+        print('bitrate', bitrate, bit_average)
                 
         if ClockRecovery == 'CC':
             fullrclock = []
             rclock = []
             for i in range(int(float(recLen) * float(xincr) * float(bitrate))):
-                fullrclock.append(edges[0] + i * bitave)
+                fullrclock.append(edges[0] + i * bit_average)
                 swing = int(1 / (float(bitrate) * float(xincr) * 4))
             for a in edges: # Find corresponding edges to rclock edges
                 for b in range(len(fullrclock)):
@@ -229,12 +224,12 @@ class EyeGraph(Graph):
 #        print(rclock)
         
         # Generate 2d histogram of the eye
-        padsize = int(0.3 * bitave)
-        window_length = int(bitave + 2 * padsize)
+        padsize = int(0.3 * bit_average)
+        window_length = int(bit_average + 2 * padsize)
         eye = np.zeros((self.Y_SAMPLING + 1, window_length))
         for i, b in enumerate(rclock):
             window_start = b - padsize
-            window_stop = b + int(bitave + padsize)
+            window_stop = b + int(bit_average + padsize)
             window = sig[window_start:window_stop]
 #            print(window_start, window_stop, window)
             for a in range(len(window) - 1):
