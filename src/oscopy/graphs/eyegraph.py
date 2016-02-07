@@ -127,12 +127,12 @@ class EyeGraph(Graph):
 #        self.hist(y, self.Y_SAMPLING)
         ret = [1]
         [histo, adc_bins] = np.histogram(self._sigs[sn].data,
-                             bins=self.Y_SAMPLING,
+                             bins=self.Y_SAMPLING - 1,
                              density=False)
         # Digitize the signal to allow to store eye values in a matrix
         sig = np.digitize(self._sigs[sn].data, adc_bins)
 #        ret = self.hist(adc_bins, histo)
-#        print(adc_bins)
+#        print("adc_bins", len(adc_bins), min(sig), max(sig))
         start = 0
         stop = self.Y_SAMPLING - 1
         
@@ -141,25 +141,25 @@ class EyeGraph(Graph):
         condition = histo[middle:stop] == max(histo[middle:stop])
         # The trailing [0] is needed to cover some case where condition is met
         # more than one time
-        high = adc_bins[(np.where(condition)[0]) + middle][0]
+        high = np.where(condition)[0][0] + middle
 #        print(np.where(condition), adc_bins[np.where(condition)[0] + middle])
         condition = histo[start:middle] == max(histo[start:middle])
         # The trailing [0] is needed to cover some case where condition is met
         # more than one time
-        low = adc_bins[(np.where(condition)[0])][0]
+        low = np.where(condition)[0][0]
 #        print(np.where(condition), adc_bins[np.where(condition)])
 #        print(low, high)
         waverange = high - low
         middle = (high + low) / 2
         low_threshold = 0.3 * waverange + low
         high_threshold = 0.7 * waverange + low
-        print(low_threshold, high_threshold)
+#        print(low_threshold, high_threshold)
 
         # Find the edges
         edges = []
-        greater_than_middle = y > adc_bins[round((start + stop) / 2)]
-        greater_than_high = y > high_threshold
-        lesser_than_low = y < low_threshold
+        greater_than_middle = sig > middle
+        greater_than_high = sig > high_threshold
+        lesser_than_low = sig < low_threshold
         temp = greater_than_middle[0]
         cross = False
         
@@ -233,11 +233,11 @@ class EyeGraph(Graph):
         # Generate 2d histogram of the eye
         padsize = int(0.3 * bitave)
         window_length = int(bitave + 2 * padsize)
-        eye = np.zeros((self.Y_SAMPLING, window_length))
+        eye = np.zeros((self.Y_SAMPLING + 1, window_length))
         for i, b in enumerate(rclock):
             window_start = b - padsize
             window_stop = b + int(bitave + padsize)
-            window = (sigx[window_start:window_stop] - min(sigx)) / (max(sigx) - min(sigx)) * (self.Y_SAMPLING - 1)
+            window = sig[window_start:window_stop]
 #            print(window_start, window_stop, window)
             for a in range(len(window) - 1):
 #                print(a)
