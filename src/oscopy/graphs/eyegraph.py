@@ -126,68 +126,75 @@ class EyeGraph(Graph):
         y = np.array(self._sigs[sn].data)
 #        self.hist(y, self.Y_SAMPLING)
         ret = [1]
-        [histo, bin_edges] = np.histogram(self._sigs[sn].data,
+        [histo, adc_bins] = np.histogram(self._sigs[sn].data,
                              bins=self.Y_SAMPLING,
                              density=False)
-#        ret = self.hist(bin_edges, histo)
-#        print(bin_edges)
+        # Digitize the signal to allow to store eye values in a matrix
+        sig = np.digitize(self._sigs[sn].data, adc_bins)
+#        ret = self.hist(adc_bins, histo)
+#        print(adc_bins)
         start = 0
         stop = self.Y_SAMPLING - 1
+        
         # Data range, thresholds
-        mid = round((start + stop) / 2)
-        condition = histo[mid:stop] == max(histo[mid:stop])
-        high = bin_edges[(np.where(condition)[0]) + mid][0]
-#        print(np.where(condition), bin_edges[np.where(condition)[0] + mid])
-        condition = histo[start:mid] == max(histo[start:mid])
-        low = bin_edges[(np.where(condition)[0])][0]
-#        print(np.where(condition), bin_edges[np.where(condition)])
+        middle = round((start + stop) / 2)
+        condition = histo[middle:stop] == max(histo[middle:stop])
+        # The trailing [0] is needed to cover some case where condition is met
+        # more than one time
+        high = adc_bins[(np.where(condition)[0]) + middle][0]
+#        print(np.where(condition), adc_bins[np.where(condition)[0] + middle])
+        condition = histo[start:middle] == max(histo[start:middle])
+        # The trailing [0] is needed to cover some case where condition is met
+        # more than one time
+        low = adc_bins[(np.where(condition)[0])][0]
+#        print(np.where(condition), adc_bins[np.where(condition)])
 #        print(low, high)
         waverange = high - low
-        mid = (high + low) / 2
+        middle = (high + low) / 2
         low_threshold = 0.3 * waverange + low
         high_threshold = 0.7 * waverange + low
         print(low_threshold, high_threshold)
 
         # Find the edges
-        edges_list = []
-        gtmid = y > bin_edges[round((start + stop) / 2)]
-        gthigh = y > high_threshold
-        gtlow = y < low_threshold
-        temp = gtmid[0]
+        edges = []
+        greater_than_middle = y > adc_bins[round((start + stop) / 2)]
+        greater_than_high = y > high_threshold
+        lesser_than_low = y < low_threshold
+        temp = greater_than_middle[0]
         cross = False
         
-        for a in range(len(gtmid)):
+        for a, gtm in enumerate(greater_than_middle):
             if cross == False:
-                if temp != gtmid[a]:
-                    temp = gtmid[a]
-                    edges_list.append(a)
+                if temp != gtm:
+                    temp = gtm
+                    edges.append(a)
                     cross = True
             else:
-                if cross == gthigh[a] or cross == gtlow[a]:
+                if cross == greater_than_high[a] or cross == lesser_than_low[a]:
                     cross = False
 
-        edges = len(edges_list)
-#        print(edges, edges_list)
+#        edges = len(edges)
+#        print(edges, edges)
 
         # Make array of differences
-        diff_list = []
-        for a in range(len(edges_list)):
+        cycles = []
+        for a, edge in enumerate(edges):
             try:
-                diff_list.append(edges_list[a + 1] - edges_list[a])
+                cycles.append(edges[a + 1] - edge)
             except:
                 pass
 
         # Verify that enough cycles are present to construct the eye
-        if len(diff_list) < 4:
+        if len(cycles) < 4:
             print('Not enough cycles to construct the eye')
             return [1]
 
         # Determine the bitrate
         if DRsel == 'Auto Detect':
-            glitch = int(len(diff_list) / 10)
+            glitch = int(len(cycles) / 10)
             if glitch < 1:
                 glitch = 1
-            var3 = diff_list
+            var3 = cycles
             var4 = []
             var3.sort()
             while True:
@@ -212,9 +219,9 @@ class EyeGraph(Graph):
             fullrclock = []
             rclock = []
             for i in range(int(float(recLen) * float(xincr) * float(bitrate))):
-                fullrclock.append(edges_list[0] + i * bitave)
+                fullrclock.append(edges[0] + i * bitave)
                 swing = int(1 / (float(bitrate) * float(xincr) * 4))
-            for a in edges_list: # Find corresponding edges to rclock edges
+            for a in edges: # Find corresponding edges to rclock edges
                 for b in range(len(fullrclock)):
                     diff = abs(fullrclock[b] - a)
                     if swing > diff:

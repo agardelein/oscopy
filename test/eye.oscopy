@@ -7,8 +7,8 @@ samples_per_period = 300
 symbols_number = 2
 periods_number = 400
 start_time = 0
-filter_frequency_ratio = 0.1
-noise_amplitude = 0.02
+filter_frequency_ratio = 0.005
+noise_amplitude = 0.04
 
 period = 1.0 / frequency
 end_time = period * periods_number
