@@ -115,7 +115,7 @@ class EyeGraph(Graph):
                 rejected[sn] = s
         return rejected
 
-    def make_eye(self, sn, ClockRecovery='CC', DRsel='Auto Detect', BWsel='Auto Set'):
+    def make_eye(self, sn, ClockRecovery='PLL', DRsel='Auto Detect', BWsel='Auto Set'):
         [HPos, HDelay, yoff, ymult, yzero] = [0, 0, 0, 0, 0]
         xincr = self._sigs[sn].ref.data[1] - self._sigs[sn].ref.data[0]
 #        print('xincr', xincr)
@@ -195,7 +195,7 @@ class EyeGraph(Graph):
                     if duration <= (cycles_durations[0] * 1.2):
                         bit_durations.append(duration)
                 if len(bit_durations) > glitch:
-                    bit_average = float(sum(bit_durations) / len(bit_durations))
+                    bit_average = sum(bit_durations) / len(bit_durations)
                     break
                 else:
                     cycles_durations = cycles_durations[1:]
@@ -220,6 +220,42 @@ class EyeGraph(Graph):
                     if swing > diff:
                         rclock.append(fullrclock[b])
                         break
+        elif ClockRecovery == 'None':
+            rclock = cycles
+        elif ClockRecovery == 'PLL':
+            fullrclock = []
+            rclock = []
+            for i in range(int(float(recLen) * float(xincr) * float(bitrate))):
+                fullrclock.append(cycles[0] + i * bit_average)
+                # find max swing from rclock to be within 2/3 of UI
+            swing = float(1 / (float(bitrate) * float(xincr) * 1.5))
+            if BWsel == 'Auto Set':
+                # BW filter is 1/4 data rate by default
+                loopBW = float(1 / (float(bitrate) * float(xincr) * 2))
+                if loopBW < 2:
+                    print('Error: Sample rate too slow to use PLL')
+                    return None
+            else:
+                loopBW = float(bit_average * float(BWsel) / bitrate)
+            for a in edges:
+                for b, frc in enumerate(fullrclock):
+                    diff = abs(frc - a)
+                    if swing >= diff: # When found, filter diff and apply to rclock
+                        if diff != 0:
+                            filtdif = int(diff * \
+                                          abs(1 / (1 + ((diff / loopBW)**2*1j))))
+                            if frc > a:
+                                sign = -1
+                            else:
+                                sign = 1
+                            for d in range(b, len(rclock), 1):
+                                fullrclock[d] = fullrclock[d] + sign * filtdif
+                            rclock.append(frc + sign * filtdif)
+                        else:
+                            rclock.append(frc)
+                        break
+
+                                
 #        print(fullrclock)
 #        print(rclock)
         
@@ -241,54 +277,3 @@ class EyeGraph(Graph):
         print(start, stop)
         
         return ret
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    def old_make_eye(self):
-        # Digitize the signal with resolution self.Y_SAMPLING
-        mini = min(self._sigs[sn].data)
-        maxi = max(self._sigs[sn].data)
-        bins = np.linspace(0, self.Y_SAMPLING - 1, self.Y_SAMPLING)
-        wave = np.digitize((self._sigs[sn].data - mini) / maxi * (self.Y_SAMPLING - 1), bins)
-        print("wave: %d" % len(wave))
-        print(bins, min(wave), max(wave))
-
-        # Assumes the signal has discrete values, on self.Y_SAMPLING resoluton
-        histo = np.arange(self.Y_SAMPLING)
-        for a in range(len(histo)):
-            histo[a] = 0
-
-        # make x, y for the waveform plot
-        x = self._sigs[sn].ref.data
-        y = array(wave)
-
-        # build a 1d histogram
-        for a in wave:
-            histo[a - 1] = histo[a - 1] + 1
-
-        # Find the range where data starts and stops in historgram
-        for a in range(self.Y_SAMPLING):
-            if histo[a] != 0:
-                start = a
-                break
-        for a in range(self.Y_SAMPLING - 1, 0, -1):
-            if histo[a] != 0:
-                stop = a
-                break
-
-        print(start, stop)
-
-        return [1]
