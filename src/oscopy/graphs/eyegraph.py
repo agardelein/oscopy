@@ -211,9 +211,9 @@ class EyeGraph(Graph):
         if ClockRecovery == 'CC':
             fullrclock = []
             rclock = []
-            for i in range(int(float(recLen) * float(xincr) * float(bitrate))):
+            for i in range(int(recLen * xincr * bitrate)):
                 fullrclock.append(edges[0] + i * bit_average)
-                swing = int(1 / (float(bitrate) * float(xincr) * 4))
+                swing = int(1 / (bitrate * xincr * 4))
             for a in edges: # Find corresponding edges to rclock edges
                 for b in range(len(fullrclock)):
                     diff = abs(fullrclock[b] - a)
@@ -225,18 +225,18 @@ class EyeGraph(Graph):
         elif ClockRecovery == 'PLL':
             fullrclock = []
             rclock = []
-            for i in range(int(float(recLen) * float(xincr) * float(bitrate))):
+            for i in range(int(recLen * xincr * bitrate)):
                 fullrclock.append(cycles[0] + i * bit_average)
                 # find max swing from rclock to be within 2/3 of UI
-            swing = float(1 / (float(bitrate) * float(xincr) * 1.5))
+            swing = 1 / (bitrate * xincr * 1.5)
             if BWsel == 'Auto Set':
                 # BW filter is 1/4 data rate by default
-                loopBW = float(1 / (float(bitrate) * float(xincr) * 2))
+                loopBW = 1 / (bitrate * xincr * 2)
                 if loopBW < 2:
                     print('Error: Sample rate too slow to use PLL')
                     return None
             else:
-                loopBW = float(bit_average * float(BWsel) / bitrate)
+                loopBW = bit_average * BWsel / bitrate
             for a in edges:
                 for b, frc in enumerate(fullrclock):
                     diff = abs(frc - a)
