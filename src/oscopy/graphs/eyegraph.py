@@ -118,7 +118,6 @@ class EyeGraph(Graph):
     def make_eye(self, sn, ClockRecovery='PLL', DRsel='Auto Detect', BWsel='Auto Set'):
         [HPos, HDelay, yoff, ymult, yzero] = [0, 0, 0, 0, 0]
         xincr = self._sigs[sn].ref.data[1] - self._sigs[sn].ref.data[0]
-#        print('xincr', xincr)
         ret = [1]
         [histo, adc_bins] = np.histogram(self._sigs[sn].data,
                              bins=self.Y_SAMPLING - 1,
@@ -126,8 +125,6 @@ class EyeGraph(Graph):
         # Digitize the signal to allow to store eye values in a matrix
         sig = np.digitize(self._sigs[sn].data, adc_bins)
         recLen = len(sig)
-#        ret = self.hist(adc_bins, histo)
-#        print("adc_bins", len(adc_bins), min(sig), max(sig))
         start = 0
         stop = self.Y_SAMPLING - 1
         
@@ -141,12 +138,10 @@ class EyeGraph(Graph):
         # more than one time
         condition = histo[start:middle] == max(histo[start:middle])
         low = np.where(condition)[0][0]
-#        print(low, high)
         waverange = high - low
         middle = (high + low) / 2
         low_threshold = 0.3 * waverange + low
         high_threshold = 0.7 * waverange + low
-#        print(low_threshold, high_threshold)
 
         # Find the edges
         edges = []
@@ -166,8 +161,6 @@ class EyeGraph(Graph):
                 if cross == greater_than_high[time] or \
                    cross == lesser_than_low[time]:
                     cross = False
-#        edges = len(edges)
-#        print(edges, edges)
 
         # Detect cycles by making edges difference
         cycles = []
@@ -179,7 +172,7 @@ class EyeGraph(Graph):
 
         # Verify that enough cycles are present to construct the eye
         if len(cycles) < 4:
-            print('Not enough cycles to construct the eye')
+            raise TypeError(_('Not enough cycles to construct the eye'))
             return [1]
 
         # Determine the bitrate
@@ -206,17 +199,15 @@ class EyeGraph(Graph):
             bitrate = float(DRsel)
             bit_average = int(1 / (bitrate * xincr))
 
-        print('bitrate', bitrate, bit_average)
-                
         if ClockRecovery == 'CC':
             fullrclock = []
             rclock = []
             for i in range(int(recLen * xincr * bitrate)):
                 fullrclock.append(edges[0] + i * bit_average)
                 swing = int(1 / (bitrate * xincr * 4))
-            for a in edges: # Find corresponding edges to rclock edges
+            for edge in edges: # Find corresponding edges to rclock edges
                 for b in range(len(fullrclock)):
-                    diff = abs(fullrclock[b] - a)
+                    diff = abs(fullrclock[b] - edge)
                     if swing > diff:
                         rclock.append(fullrclock[b])
                         break
@@ -233,18 +224,17 @@ class EyeGraph(Graph):
                 # BW filter is 1/4 data rate by default
                 loopBW = 1 / (bitrate * xincr * 2)
                 if loopBW < 2:
-                    print('Error: Sample rate too slow to use PLL')
-                    return None
+                    raise TypeError(_('Sample rate too slow to use PLL'))
             else:
                 loopBW = bit_average * BWsel / bitrate
-            for a in edges:
+            for edge in edges:
                 for b, frc in enumerate(fullrclock):
-                    diff = abs(frc - a)
+                    diff = abs(frc - edge)
                     if swing >= diff: # When found, filter diff and apply to rclock
                         if diff != 0:
                             filtdif = int(diff * \
                                           abs(1 / (1 + ((diff / loopBW)**2*1j))))
-                            if frc > a:
+                            if frc > edge:
                                 sign = -1
                             else:
                                 sign = 1
@@ -254,10 +244,6 @@ class EyeGraph(Graph):
                         else:
                             rclock.append(frc)
                         break
-
-                                
-#        print(fullrclock)
-#        print(rclock)
         
         # Generate 2d histogram of the eye
         padsize = int(0.3 * bit_average)
@@ -267,13 +253,8 @@ class EyeGraph(Graph):
             window_start = b - padsize
             window_stop = b + int(bit_average + padsize)
             window = sig[window_start:window_stop]
-#            print(window_start, window_stop, window)
             for a in range(len(window) - 1):
-#                print(a)
                 eye[window[a], a] = eye[window[a], a] + 1
-#        print(eye)
         self.contourf(eye)
-        
-        print(start, stop)
         
         return ret
