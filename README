@@ -139,6 +139,9 @@ omode MODE
    Set the type of the current graph of the current figure
    Available modes :
    lin      Linear graph
+   polar    Polar graph
+   smith    Smith Chart graph
+   eye	    Eye diagram graph
 
 orange [x|y min max]|[xmin xmax ymin ymax]
    Set the axis range of the current graph of the current figure
