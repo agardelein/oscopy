@@ -33,9 +33,12 @@ class EyeGraph(Graph):
         self: Graph
         The Graph instanciated
         """
+        self.ClockRecovery = kwargs.pop('ClockRecovery', 'PLL')
+        self.DRsel = kwargs.pop('DRsel', 'Auto Detect')
+        self.BWsel = kwargs.pop('BWsel', 'Auto Set')        
         Graph.__init__(self, fig, rect, **kwargs)
         self._sigs = {}
-
+        
         if isinstance(sigs, Graph):
             mysigs = {}
             mysigs = sigs.signals.copy()
@@ -105,7 +108,10 @@ class EyeGraph(Graph):
                 fy, l = self._find_scale_factor("Y")
                 x = s.ref.data.real * pow(10, fx)
                 y = s.data.real * pow(10, fy)
-                line, = self.make_eye(sn)
+                line, = self.make_eye(sn,
+                                      ClockRecovery=self.ClockRecovery,
+                                      DRsel=self.DRsel,
+                                      BWsel=self.BWsel)
                 self._signals2lines[sn] = line
                 self._draw_cursors()
                 self._print_cursors()

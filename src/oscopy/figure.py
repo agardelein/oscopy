@@ -192,7 +192,7 @@ class Figure(MplFig):
 #        FIXME: DISABLED AS ONLY ONE MODE CURRENTLY AVAILABLE
 #        return self._OBJ_TO_MODES_NAMES(self._current)
 
-    def set_mode(self, gr, new_mode):
+    def set_mode(self, gr, new_mode, **kwargs):
         """ Set the mode of the current graph
         Replace the graph provided by a new one of other mode, i.e. copy the
         Signals from it.
@@ -216,7 +216,7 @@ class Figure(MplFig):
         if not self.axes:
             assert 0, _("No graph defined")
         pos = self._graph_position(len(self.axes) - 1)
-        a = (self._MODES_NAMES_TO_OBJ[gmode])(self, pos, old_graph)
+        a = (self._MODES_NAMES_TO_OBJ[gmode])(self, pos, old_graph, **kwargs)
         idx = self._axstack.as_list().index(old_graph)
         self._axstack.remove(old_graph)
         self._axstack.add(idx, a)

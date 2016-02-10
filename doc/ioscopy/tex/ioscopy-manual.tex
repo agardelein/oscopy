@@ -444,7 +444,7 @@ This section describes the IOscopy commands. Unless otherwise noticed, examples 
    oscopy> olayout quad
 \end{lstlisting}
 
-\ocmd{omode}{MODE}
+\ocmd{omode}{MODE [options]}
    Set the type of the current graph of the current figure\\
    Available modes:
    \begin{description}
@@ -452,6 +452,12 @@ This section describes the IOscopy commands. Unless otherwise noticed, examples 
    \item[omode polar]      Polar graph
    \item[omode smith]      Smith Chart graph
    \item[omode eye]      Eye diagram graph
+   \end{description}
+   For \textbf{eye} mode, following options are available:
+   \begin{description}
+   \item[ClockRecovery] selects method for retrieving the bitrate from the signal. '\texttt{PLL}' for phase locked loop (default), '\texttt{CC}' for constant clock, '\texttt{None}' for no clock recovery
+   \item[DRsel] defines the data rate. '\texttt{Autodetect}' for automatic detection, \texttt{[VALUE]} for user-provided value
+   \item[BWsel] defines the PLL bandwidth. '\texttt{Auto Set}' for automatic detection, \texttt{[VALUE]} for user-provided value
    \end{description}
 
 \ocmd{orange}{[x$|$y min max]$|$[xmin xmax ymin ymax]$|$[reset]}
