@@ -23,10 +23,9 @@
 (define oscopy:bindir "@BINDIR@")
 (define oscopy:pythonpath "@PYEXECDIR@")
 
-(define oscopy:oscopy-cmd
-        (string-append "PATH=" oscopy:bindir ":$PATH "
-                       "PYTHONPATH=" oscopy:pythonpath
-                       " $COLORTERM -e 'sh ioscopy'"))
+(define oscopy:oscopy-cmd-list
+  (let ((color-term (getenv "COLORTERM")))
+    `(,(if color-term color-term "xterm") "-e" "'sh ioscopy'")))
 
 (define oscopy:dbus-oscopy-is-running-cmd "dbus-send --print-reply --session --dest=org.freedesktop.Oscopy /org/freedesktop/Oscopy org.freedesktop.OscopyIFace.dbus_running")
 (define oscopy:dbus-oscopy-update-cmd "dbus-send --print-reply --session --dest=org.freedesktop.Oscopy /org/freedesktop/Oscopy org.freedesktop.OscopyIFace.dbus_update")
@@ -47,40 +46,45 @@
 (define (oscopy:is-running)
   (eq? (status:exit-val (system oscopy:dbus-oscopy-is-running-cmd)) 0))
 
+(define (prepend-var-to-env-path path var)
+  (setenv path (string-append var ":" (getenv path))))
+
+(define (oscopy:run-oscopy)
+  (and (prepend-var-to-env-path "PATH" oscopy:bindir)
+       (setenv "PYTHONPATH"
+               (string-append "/usr/local/lib/python3.4/site-packages/"
+                              ":"
+                              oscopy:pythonpath))
+       (apply system* oscopy:oscopy-cmd-list)))
+
 (define (oscopy:launch-oscopy)
   (if (oscopy:is-running)
       (if (gschem-confirm (string-append "An instance of oscopy is already running\n"
                                          "Launch anyway ?"))
-          (system oscopy:oscopy-cmd)
-          )
-      (system oscopy:oscopy-cmd)
-      )
-  )
+          (oscopy:run-oscopy))
+      (oscopy:run-oscopy)))
 
 (define (oscopy:update-oscopy)
   (if (oscopy:is-running)
       (system oscopy:dbus-oscopy-update-cmd)
       (if (gschem-confirm (string-append "No running instance of oscopy\n"
                                          "Launch oscopy ?"))
-          (system oscopy:oscopy-cmd)
-          )
-      )
-  )
-
-(define oscopy:oscopy-keymap
-  '(
-    ("?" . oscopy:about)
-    ("l" . oscopy:launch-oscopy)
-    ("u" . oscopy:update-oscopy)
-    )
-)
+          (oscopy:run-oscopy))))
 
 (define oscopy:menu-items
-  '( ("About..."     oscopy:about    oscopy:about)
-     ("Launch oscopy" oscopy:launch-oscopy oscopy:launch-oscopy)
-     ("Update oscopy" oscopy:update-oscopy oscopy:update-oscopy)
-     )
-)
+  ;;  menu item name        menu action          menu stock icon
+  `((,(N_ "_About...")      oscopy:about         "gtk-help")
+    (,(N_ "_Launch oscopy") oscopy:launch-oscopy "gtk-execute")
+    (,(N_ "_Update oscopy") oscopy:update-oscopy "gtk-execute")))
 
-(add-menu "oscopy" oscopy:menu-items)
+;;; Define Oscopy keymap
+(global-set-key "<Shift>O A" 'oscopy:about)
+(global-set-key "<Shift>O L" 'oscopy:launch-oscopy)
+(global-set-key "<Shift>O U" 'oscopy:update-oscopy)
 
+;;; Add Oscopy menu
+(begin
+  ;; (begin...) is necessary here for guile 2.0.
+  ;; See 'info guile' "R6RS Incompatibilities" for information on bug related
+  ;; to syntax-transformers in top-level programs (N_ is a syntax transformer)
+  (add-menu (N_ "_Oscopy") oscopy:menu-items))
