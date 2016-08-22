@@ -25,10 +25,10 @@
 
 (define oscopy:oscopy-cmd-list
   (let ((color-term (getenv "COLORTERM")))
-    `(,(if color-term color-term "xterm") "-e" "'sh ioscopy'")))
+    `(,(if color-term "gnome-terminal" "xterm") "-e" "'ioscopy'")))
 
-(define oscopy:dbus-oscopy-is-running-cmd "dbus-send --print-reply --session --dest=org.freedesktop.Oscopy /org/freedesktop/Oscopy org.freedesktop.OscopyIFace.dbus_running")
-(define oscopy:dbus-oscopy-update-cmd "dbus-send --print-reply --session --dest=org.freedesktop.Oscopy /org/freedesktop/Oscopy org.freedesktop.OscopyIFace.dbus_update")
+(define oscopy:dbus-oscopy-is-running-cmd "dbus-send --print-reply --session --dest=org.gtk.oscopy /org/gtk/oscopy org.gtk.Actions.List")
+(define oscopy:dbus-oscopy-update-cmd "ioscopy-activate-action.py update_files")
 
 ;; Menu
 (define (oscopy:about)

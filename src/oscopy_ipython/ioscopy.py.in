@@ -603,13 +603,6 @@ def update_current_figure_graph(figure=None, graph=None):
     _current_figure = figure
     _current_graph = graph
 
-
-try:
-    session_bus = dbus.SessionBus()
-    bus_name = dbus.service.BusName('org.freedesktop.Oscopy', bus=session_bus)
-except dbus.DBusException as e:
-    print('DBus not available:', e)
-
 ip = get_ipython()
 c = ip.config
 ioscopycfg = IOscopyConfig(config=c)
