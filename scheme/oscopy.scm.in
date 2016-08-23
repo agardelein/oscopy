@@ -29,6 +29,7 @@
 
 (define oscopy:dbus-oscopy-is-running-cmd "dbus-send --print-reply --session --dest=org.gtk.oscopy /org/gtk/oscopy org.gtk.Actions.List")
 (define oscopy:dbus-oscopy-update-cmd "ioscopy-activate-action.py update_files")
+(define oscopy:dbus-oscopy-run_netnsim-cmd "ioscopy-activate-action.py run_netnsim")
 
 ;; Menu
 (define (oscopy:about)
@@ -71,15 +72,24 @@
                                          "Launch oscopy ?"))
           (oscopy:run-oscopy))))
 
+(define (oscopy:run_netnsim-oscopy)
+  (if (oscopy:is-running)
+      (system oscopy:dbus-oscopy-run_netnsim-cmd)
+      (if (gschem-confirm (string-append "No running instance of oscopy\n"
+                                         "Launch oscopy ?"))
+          (oscopy:run-oscopy))))
+
 (define oscopy:menu-items
   ;;  menu item name        menu action          menu stock icon
   `((,(N_ "_About...")      oscopy:about         "gtk-help")
     (,(N_ "_Launch oscopy") oscopy:launch-oscopy "gtk-execute")
+    (,(N_ "_Run netlister and simulator from oscopy") oscopy:run_netnsim-oscopy "gtk-execute")
     (,(N_ "_Update oscopy") oscopy:update-oscopy "gtk-execute")))
 
 ;;; Define Oscopy keymap
 (global-set-key "<Shift>O A" 'oscopy:about)
 (global-set-key "<Shift>O L" 'oscopy:launch-oscopy)
+(global-set-key "<Shift>O R" 'oscopy:run_netnsim-oscopy)
 (global-set-key "<Shift>O U" 'oscopy:update-oscopy)
 
 ;;; Add Oscopy menu

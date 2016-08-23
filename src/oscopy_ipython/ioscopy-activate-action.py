@@ -5,7 +5,7 @@ import sys, dbus
 OSCOPY_DBUS_NAME = 'org.gtk.oscopy'
 OSCOPY_DBUS_PATH = '/org/gtk/oscopy'
 GTK_ACTION_IFACE = 'org.gtk.Actions'
-SUPPORTED_ACTIONS = ['update_files']
+SUPPORTED_ACTIONS = ['update_files', 'run_netnsim', 'quit']
 
 if len(sys.argv) != 2:
     print('Usage : %s <action>' % sys.argv[0])

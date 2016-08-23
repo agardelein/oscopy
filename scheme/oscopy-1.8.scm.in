@@ -29,6 +29,7 @@
 
 (define oscopy:dbus-oscopy-is-running-cmd "dbus-send --print-reply --session --dest=org.gtk.oscopy /org/gtk/oscopy org.gtk.Actions.List")
 (define oscopy:dbus-oscopy-update-cmd "ioscopy-activate-action.py update_files")
+(define oscopy:dbus-oscopy-run_netnsim-cmd "ioscopy-activate-action.py run_netnsim")
 
 ;; Menu
 (define (oscopy:about)
@@ -71,10 +72,18 @@
                                          "Launch oscopy ?"))
           (oscopy:run-oscopy))))
 
+(define (oscopy:run_netnsim-oscopy)
+  (if (oscopy:is-running)
+      (system oscopy:dbus-oscopy-run_netnsim-cmd)
+      (if (gschem-confirm (string-append "No running instance of oscopy\n"
+                                         "Launch oscopy ?"))
+          (oscopy:run-oscopy))))
+
 (define oscopy:oscopy-keymap
   '(
     ("?" . oscopy:about)
     ("l" . oscopy:launch-oscopy)
+    ("r" . oscopy:run_netnsim-oscopy)
     ("u" . oscopy:update-oscopy)
     )
 )
@@ -82,6 +91,7 @@
 (define oscopy:menu-items
   '( ("About..."     oscopy:about    oscopy:about)
      ("Launch oscopy" oscopy:launch-oscopy oscopy:launch-oscopy)
+     ("Run netlister and simulator from oscopy" oscopy:run_netnsim-oscopy oscopy:run_netnsim-oscopy)
      ("Update oscopy" oscopy:update-oscopy oscopy:update-oscopy)
      )
 )
