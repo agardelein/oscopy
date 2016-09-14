@@ -20,8 +20,27 @@
 ;;
 ;;
 
+(use-modules (ice-9 binary-ports))
+(use-modules (ice-9 popen))
+(use-modules (ice-9 rdelim))
+(use-modules (ice-9 regex))
+(use-modules (ice-9 format))
+
+(define port (open-pipe "gschem --version" OPEN_READ))
+(define version_list (string-split
+	    (match:substring
+	     (string-match "[0-9]{,2}\\.[0-9]{,2}\\.[0-9]{,2}"
+			   (read-line port))
+	     ) #\.))
+(close-pipe port)
+(define gschem_version (+ (* (string->number (list-ref version_list 0)) 10000)
+		       (* (string->number (list-ref version_list 1)) 100)
+		       (* (string->number (list-ref version_list 2)) 1)))
+;; (display gschem_version)
+
 (define oscopy:bindir "@BINDIR@")
 (define oscopy:pythonpath "@PYEXECDIR@")
+(define GSCHEM_VERSION_THRESHOLD 10900)
 
 (define oscopy:oscopy-cmd-list
   (let ((color-term (getenv "COLORTERM")))
@@ -79,22 +98,50 @@
                                          "Launch oscopy ?"))
           (oscopy:run-oscopy))))
 
-(define oscopy:menu-items
-  ;;  menu item name        menu action          menu stock icon
-  `((,(N_ "_About...")      oscopy:about         "gtk-help")
-    (,(N_ "_Launch oscopy") oscopy:launch-oscopy "gtk-execute")
-    (,(N_ "_Run netlister and simulator from oscopy") oscopy:run_netnsim-oscopy "gtk-execute")
-    (,(N_ "_Update oscopy") oscopy:update-oscopy "gtk-execute")))
-
 ;;; Define Oscopy keymap
-(global-set-key "<Shift>O A" 'oscopy:about)
-(global-set-key "<Shift>O L" 'oscopy:launch-oscopy)
-(global-set-key "<Shift>O R" 'oscopy:run_netnsim-oscopy)
-(global-set-key "<Shift>O U" 'oscopy:update-oscopy)
+(if (> gschem_version GSCHEM_VERSION_THRESHOLD)
+    ((global-set-key "<Shift>O A" 'oscopy:about)
+     (global-set-key "<Shift>O L" 'oscopy:launch-oscopy)
+     (global-set-key "<Shift>O R" 'oscopy:run_netnsim-oscopy)
+     (global-set-key "<Shift>O U" 'oscopy:update-oscopy)
+     )
+    )
+(define oscopy:oscopy-keymap
+  (if (< gschem_version GSCHEM_VERSION_THRESHOLD)
+      '(
+	("?" . oscopy:about)
+	("l" . oscopy:launch-oscopy)
+	("r" . oscopy:run_netnsim-oscopy)
+	("u" . oscopy:update-oscopy)
+	)
+      )
+  )
+
+(define oscopy:menu-items #t)
+(if (> gschem_version GSCHEM_VERSION_THRESHOLD)
+    (set! oscopy:menu-items 
+	  ;;  menu item name        menu action          menu stock icon
+	  `((,(N_ "_About...")      oscopy:about         "gtk-help")
+	    (,(N_ "_Launch oscopy") oscopy:launch-oscopy "gtk-execute")
+	    (,(N_ "_Run netlister and simulator from oscopy") oscopy:run_netnsim-oscopy "gtk-execute")
+	    (,(N_ "_Update oscopy") oscopy:update-oscopy "gtk-execute")))
+    (set! oscopy:menu-items
+	  '( ("About..."     oscopy:about    oscopy:about)
+	     ("Launch oscopy" oscopy:launch-oscopy oscopy:launch-oscopy)
+	     ("Run netlister and simulator from oscopy" oscopy:run_netnsim-oscopy oscopy:run_netnsim-oscopy)
+	     ("Update oscopy" oscopy:update-oscopy oscopy:update-oscopy)
+	     ))
+)
 
 ;;; Add Oscopy menu
-(begin
-  ;; (begin...) is necessary here for guile 2.0.
-  ;; See 'info guile' "R6RS Incompatibilities" for information on bug related
-  ;; to syntax-transformers in top-level programs (N_ is a syntax transformer)
-  (add-menu (N_ "_Oscopy") oscopy:menu-items))
+(if (> gschem_version GSCHEM_VERSION_THRESHOLD)
+    (begin
+      ;; (begin...) is necessary here for guile 2.0.
+      ;; See 'info guile' "R6RS Incompatibilities" for information on bug related
+      ;; to syntax-transformers in top-level programs (N_ is a syntax transformer)
+      (add-menu (N_ "_Oscopy") oscopy:menu-items)
+      )
+    (add-menu "oscopy" oscopy:menu-items)
+    )
+
+
