@@ -78,7 +78,7 @@ print('***')
 print('*** Now we will run gnetlist')
 print('*** press enter or \'y\' to continue, \'n\' to skip, \'e\' to change')
 print('***')
-cmd = 'cd demo && gnetlist -g spice-sdb -s -o demo.net demo.sch'
+cmd = 'cd demo && gnetlist -g spice-sdb -O sort_mode -o demo.net demo.sch'
 c = input('Command: %s [Y/n/e] ' % cmd)
 if not c: c = 'y'
 if c in ['e','E']: cmd = input('Enter command to execute: ')
